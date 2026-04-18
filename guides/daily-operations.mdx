@@ -1,0 +1,302 @@
+---
+title: "Daily operations"
+description: "Routine tasks for managing VaultWares products"
+---
+
+## Overview
+
+This guide covers the routine tasks that security and IT administrators should perform on a daily, weekly, and monthly basis to keep VaultWares deployments healthy and secure.
+
+## Daily tasks
+
+### Check device status
+
+Start each day by verifying all managed hardware is online and healthy:
+
+```bash
+# Check status of all managed devices
+vw-admin status --all
+
+# Output:
+# Device                  Type          Status     Last Seen      Alerts
+# VaultDrive-Fleet        Storage       45 online  2 minutes ago  0
+# HSM01 (prod-cluster)    VaultHSM      Active     10 seconds ago 0
+# HSM02 (prod-cluster)    VaultHSM      Active     10 seconds ago 0
+# ServerRoom-Entry-01     VaultScan     Online     5 minutes ago  0
+# VaultGate-01            Network       Active     8 seconds ago  1  ⚠
+
+# Investigate the alert on VaultGate-01
+vw-admin alerts list --device VaultGate-01 --status open
+```
+
+### Review security alerts
+
+```bash
+# Review all open alerts from the last 24 hours
+vw-monitor alerts list \
+  --status open \
+  --since 24h \
+  --severity medium,high,critical \
+  --format table
+
+# Acknowledge and assign alerts
+vw-monitor alerts acknowledge \
+  --id alert_abc123 \
+  --assignee alice@example.com \
+  --comment "Investigating - appears to be a misconfigured device"
+
+# View alert details
+vw-monitor alerts get --id alert_abc123 --verbose
+```
+
+### Review audit logs
+
+```bash
+# Review privileged operations from the last 24 hours
+vw-admin audit query \
+  --start "$(date -d '24 hours ago' -Iseconds)" \
+  --operation-types privileged \
+  --format table
+
+# Review failed authentication attempts
+vw-admin audit query \
+  --start "$(date -d '24 hours ago' -Iseconds)" \
+  --event-type auth_failure \
+  --min-count 3 \
+  --group-by user,source_ip \
+  --format table
+
+# Export audit log for today
+vw-admin audit export \
+  --start "$(date -d 'today' --iso-8601=seconds)" \
+  --output /var/log/vaultwares/audit-$(date +%Y%m%d).json
+```
+
+### Check backup jobs
+
+```bash
+# Review backup job status from the last 24 hours
+vw-backup jobs list \
+  --since 24h \
+  --format table
+
+# Output:
+# Job Name              Type          Status     Duration  Size      Completed
+# Daily incremental     Incremental   Success    4m 12s    12.3 GB   2024-11-15 02:04
+# Daily incremental     Incremental   Success    3m 58s    11.8 GB   2024-11-14 02:04
+# Weekly full           Full          Success    28m 45s   312 GB    2024-11-10 01:29
+
+# Alert on any failed jobs
+vw-backup jobs list --status failed --since 24h
+```
+
+## User management
+
+### Onboard a new user
+
+```bash
+# Create a new user account
+vw-admin user create \
+  --username charlie \
+  --email charlie@example.com \
+  --first-name Charlie \
+  --last-name Brown \
+  --department Engineering \
+  --role StandardUser \
+  --require-mfa true \
+  --send-welcome-email
+
+# Assign additional roles or group memberships
+vw-admin user assign-role \
+  --user charlie@example.com \
+  --role EncryptedStorageUser
+
+# Assign a VaultDrive device to the user
+vw-storage assign \
+  --device VD-ENT-00247 \
+  --user charlie@example.com \
+  --policy corporate-standard
+```
+
+### Offboard a user
+
+<Steps>
+  <Step title="Disable the account immediately">
+    ```bash
+    vw-admin user disable --user charlie@example.com --reason "Employment terminated"
+    ```
+  </Step>
+  <Step title="Revoke all active sessions">
+    ```bash
+    vw-admin user revoke-sessions --user charlie@example.com
+    ```
+  </Step>
+  <Step title="Revoke API keys and certificates">
+    ```bash
+    vw-admin user revoke-api-keys --user charlie@example.com
+    vw-admin user revoke-certificates --user charlie@example.com
+    ```
+  </Step>
+  <Step title="Reclaim assigned hardware">
+    ```bash
+    # Remotely lock the user's assigned VaultDrive
+    vw-storage remote-lock --device VD-ENT-00247
+
+    # Unassign device for redeployment
+    vw-storage unassign --device VD-ENT-00247
+    ```
+  </Step>
+  <Step title="Archive audit records">
+    ```bash
+    # Export user activity history for records retention
+    vw-admin audit export \
+      --user charlie@example.com \
+      --all-time \
+      --output /var/log/vaultwares/offboarding/charlie-audit.json
+    ```
+  </Step>
+</Steps>
+
+### Reset user MFA
+
+```bash
+# Generate a temporary bypass code for a user who has lost their MFA device
+vw-admin mfa generate-bypass \
+  --user alice@example.com \
+  --valid-for 1h \
+  --single-use true \
+  --approver admin@example.com
+
+# Clear all enrolled MFA devices (user must re-enroll on next login)
+vw-admin mfa reset --user alice@example.com
+```
+
+## Key management tasks
+
+### Check key expiration
+
+```bash
+# List all keys expiring in the next 30 days
+vw-hsm key list \
+  --expiring-within 30d \
+  --format table
+
+# Output:
+# Key Label              Algorithm  Created      Expires      Status
+# TLS-WebServer-Key-v3   RSA-2048   2023-11-20   2024-11-20   Expiring soon
+# Code-Signing-Key-v2    ECC-P256   2022-06-01   2025-06-01   OK
+```
+
+### Rotate a key
+
+```bash
+# Generate a new key version
+vw-hsm generate-key \
+  --type rsa \
+  --size 4096 \
+  --label "TLS-WebServer-Key-v4" \
+  --extractable false
+
+# Re-sign TLS certificate with new key
+vw-hsm sign \
+  --key "TLS-WebServer-Key-v4" \
+  --input tls-csr.pem \
+  --output new-server.crt \
+  --algorithm sha384-rsa
+
+# Update service to use new certificate
+vw-admin tls install \
+  --cert new-server.crt \
+  --key-hsm "TLS-WebServer-Key-v4"
+
+# Mark old key as deprecated
+vw-hsm key deprecate --label "TLS-WebServer-Key-v3"
+```
+
+### Verify HSM cluster health
+
+```bash
+# Check HSM cluster status
+vw-hsm cluster status --verbose
+
+# Output:
+# Cluster: production-cluster (active-active)
+# Members:
+#   HSM01  192.168.1.100  Active   Leader  15,234 ops/sec  Queue: 8
+#   HSM02  192.168.1.101  Active   Member  14,891 ops/sec  Queue: 6
+#   HSM03  192.168.1.102  Active   Member  15,102 ops/sec  Queue: 7
+# Total throughput: 45,227 ops/sec
+# Keys synchronized: Yes (last sync: 10 seconds ago)
+```
+
+## Weekly tasks
+
+```bash
+# Generate weekly security summary report
+vw-monitor report generate \
+  --template weekly-security-summary \
+  --start "$(date -d '7 days ago' --iso-8601=date)" \
+  --end "$(date --iso-8601=date)" \
+  --format pdf \
+  --output /reports/weekly-$(date +%Y-W%V).pdf \
+  --email security@example.com
+
+# Verify backup integrity
+vw-backup verify-all \
+  --repo backup://nas01/vaults/prod \
+  --decrypt-key hsm:DB-Backup-Key
+
+# Review user access (access recertification)
+vw-admin access-review generate \
+  --scope all-users \
+  --output /reports/access-review-$(date +%Y%m%d).csv
+
+# Check for firmware/software updates
+vw-admin updates check --all
+```
+
+## Monthly tasks
+
+```bash
+# Generate compliance report
+vw-monitor report generate \
+  --template pci-dss-summary \
+  --month "$(date +%Y-%m)" \
+  --format pdf \
+  --output /reports/pci-monthly-$(date +%Y-%m).pdf
+
+# Rotate service account passwords
+vw-admin service-account rotate-password \
+  --account svc_vaultaccess \
+  --generate-random \
+  --update-in-directory
+
+# Review and clean up stale devices
+vw-admin device list \
+  --last-seen-before 30d \
+  --status inactive \
+  --format table
+
+# Archive old audit logs
+vw-admin audit archive \
+  --older-than 90d \
+  --output s3://corp-log-archive/vaultwares/ \
+  --encrypt-key hsm:AuditLog-Signing-Key
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Maintenance guide" icon="wrench" href="/guides/maintenance">
+    Firmware updates and scheduled maintenance
+  </Card>
+  <Card title="Troubleshooting" icon="magnifying-glass" href="/guides/troubleshooting">
+    Diagnose and resolve common issues
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Security recommendations and policies
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/endpoints">
+    Automate operational tasks via API
+  </Card>
+</CardGroup>

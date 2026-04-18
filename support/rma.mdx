@@ -1,0 +1,177 @@
+---
+title: "RMA process"
+description: "Return merchandise authorization process"
+---
+
+## Overview
+
+The Return Merchandise Authorization (RMA) process is used when you need to return a defective or damaged VaultWares hardware product for replacement or repair under warranty, or for end-of-life disposal. This guide walks through the complete RMA process.
+
+## When to file an RMA
+
+File an RMA if:
+
+- A hardware product has a confirmed defect covered under warranty (see [Warranty information](/support/warranty))
+- A device arrived damaged (DOA — Dead on Arrival)
+- You need to return a device for secure disposal/destruction and receive a certificate of destruction
+- You are exchanging a device for a different model or capacity (contact sales for exchanges)
+
+<Note>
+  Before filing an RMA, open a support ticket so our team can confirm the defect and issue an RMA number. Packages without a valid RMA number may be refused or returned at your expense.
+</Note>
+
+## Step-by-step RMA process
+
+<Steps>
+  <Step title="Open a support ticket">
+    Contact VaultWares support to diagnose the issue and confirm warranty coverage:
+
+    - **Portal**: [portal.vaultwares.com/support](https://portal.vaultwares.com/support)
+    - **Email**: [support@vaultwares.com](mailto:support@vaultwares.com)
+    - **Phone**: Available to Gold and Platinum support plan customers
+
+    Include in your ticket:
+    - Device serial number (printed on the device label)
+    - Date of purchase and proof of purchase (order number or invoice)
+    - Detailed description of the defect
+    - Diagnostic output: `vw-admin diag collect --output diag.tar.gz`
+  </Step>
+
+  <Step title="Receive RMA authorization">
+    Once the defect is confirmed and warranty coverage is verified, you will receive:
+
+    - **RMA number** (format: `RMA-YYYYMMDD-NNNN`)
+    - **RMA instructions** including the return shipping address
+    - **Prepaid return shipping label** (for warranty repairs — standard warranty service)
+    - **Expected resolution timeline**
+
+    RMA numbers are valid for 30 days from issuance. Contact support to extend if needed.
+  </Step>
+
+  <Step title="Perform crypto-erase before returning (REQUIRED)">
+    Before returning any VaultWares hardware, you **must** perform a cryptographic erasure to destroy all key material and data on the device. This protects your organization and is required to maintain your security posture.
+
+    <Warning>
+      Returning a device without performing crypto-erase may expose sensitive data. VaultWares will not be responsible for data remaining on returned devices.
+    </Warning>
+
+    ```bash
+    # Crypto-erase a VaultDrive
+    vw-storage crypto-erase \
+      --device /dev/sdb \
+      --confirm \
+      --audit-log "RMA return - RMA-20241115-0042"
+
+    # Remote crypto-erase a managed VaultDrive
+    vw-storage remote-crypto-erase \
+      --serial VD-ENT-00247 \
+      --confirm \
+      --reason "RMA-20241115-0042"
+
+    # Erase a VaultHSM (requires SO credentials)
+    vw-hsm factory-reset \
+      --so-pin <so-pin> \
+      --confirm \
+      --audit-log "RMA return - RMA-20241115-0043"
+    ```
+
+    If the device cannot be powered on or is physically damaged:
+    - VaultWares can perform physical destruction and provide a **Certificate of Destruction**
+    - Note in your RMA request that the device cannot be erased prior to return
+  </Step>
+
+  <Step title="Package the device">
+    Proper packaging prevents shipping damage and protects the tamper-evident features of VaultWares hardware.
+
+    **Packaging requirements**:
+    - Use the **original VaultWares packaging** if available. If not, use a similarly sized sturdy box with at least 5 cm of foam or bubble wrap on all sides.
+    - **Do not** wrap devices directly in loose packing peanuts — they can damage the device and interfere with tamper-detection features.
+    - For VaultHSM appliances: rack rails and accessories do not need to be returned unless specifically requested.
+    - Include a **printed copy of the RMA number** inside the box.
+    - Write the **RMA number** on the outside of the box.
+
+    <Warning>
+      Attach the prepaid shipping label to the outside of the box, not the original manufacturer's box. Do not obscure any labels on the inner box.
+    </Warning>
+  </Step>
+
+  <Step title="Ship the package">
+    Use the **prepaid shipping label** provided with your RMA authorization. Drop off the package at the designated carrier location.
+
+    For packages not using the prepaid label (e.g., non-warranty returns), ship to the address provided in your RMA authorization. VaultWares recommends using a trackable shipping service with insurance for high-value items.
+
+    After shipping, update your support ticket with the **tracking number**.
+  </Step>
+
+  <Step title="Track your RMA">
+    Monitor the status of your RMA at [portal.vaultwares.com/support/rma](https://portal.vaultwares.com/support/rma) or via the CLI:
+
+    ```bash
+    # Check RMA status
+    vw-admin rma status --rma-number RMA-20241115-0042
+
+    # Output:
+    # RMA number:   RMA-20241115-0042
+    # Status:       In transit to VaultWares
+    # Tracking:     1Z999AA10123456784
+    # Received:     Pending
+    # Resolution:   Replacement shipment
+    # ETA:          2024-11-22 (estimated)
+    ```
+  </Step>
+</Steps>
+
+## RMA resolution types
+
+| Resolution | Description | Timeline |
+|---|---|---|
+| **Advanced replacement** | Replacement device ships before return is received (requires credit card hold) | Next business day |
+| **Standard replacement** | Replacement ships after defective unit is received and inspected | 5–10 business days after receipt |
+| **Repair** | Device is repaired and returned | 10–15 business days after receipt |
+| **Refund** | Available within 30 days of purchase for DOA units | 5–10 business days after receipt |
+| **Certificate of Destruction** | Physical destruction with written certification | 5 business days after receipt |
+
+## Advanced replacement
+
+Advanced replacement ships a new device immediately while you return the defective unit.
+
+- Requires a **valid credit card** on file (charged only if the defective unit is not returned within 30 days)
+- Available for VaultDrive Pro/Enterprise, VaultHSM PCIe/Network, and VaultScan
+- Request advanced replacement when opening your support ticket
+
+## Shipping and logistics
+
+| Situation | Shipping cost |
+|---|---|
+| Warranty defect (within warranty period) | VaultWares pays return shipping |
+| DOA within 30 days of purchase | VaultWares pays return shipping |
+| Non-warranty return or exchange | Customer pays return shipping |
+| Advanced replacement outbound | VaultWares pays outbound shipping |
+
+VaultWares ships replacements via FedEx Priority, UPS Next Day Air, or equivalent carrier depending on region. Signature required on delivery for HSM products.
+
+## International RMAs
+
+For customers outside the continental US:
+
+- International return shipping labels are provided for warranty claims
+- Customs documentation is handled by VaultWares — do not declare a commercial value on the customs form beyond what VaultWares provides
+- Allow additional 5–10 business days for international RMAs
+- Contact [support@vaultwares.com](mailto:support@vaultwares.com) to confirm regional availability for advanced replacement
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Warranty information" icon="file-certificate" href="/support/warranty">
+    Warranty terms and coverage details
+  </Card>
+  <Card title="Contact support" icon="headset" href="/support/contact">
+    Open a support ticket
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
+    Try to resolve the issue before filing an RMA
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/support/faq">
+    Frequently asked questions
+  </Card>
+</CardGroup>

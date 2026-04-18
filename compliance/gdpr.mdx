@@ -1,0 +1,196 @@
+---
+title: "GDPR compliance"
+description: "General Data Protection Regulation compliance guide"
+---
+
+## Overview
+
+The General Data Protection Regulation (GDPR) requires organizations processing personal data of EU/EEA residents to implement appropriate technical and organizational measures to protect that data. VaultWares products provide the technical controls needed to meet GDPR's security requirements.
+
+<Note>
+  This guide provides technical guidance on how VaultWares products support GDPR compliance. It is not legal advice. Consult your Data Protection Officer (DPO) and legal counsel for a complete compliance assessment.
+</Note>
+
+## Relevant GDPR articles
+
+<AccordionGroup>
+  <Accordion title="Article 5 — Principles of data processing">
+    **Relevance**: Integrity and confidentiality principle (Art. 5(1)(f)) requires personal data to be processed "in a manner that ensures appropriate security of the personal data, including protection against unauthorised or unlawful processing and against accidental loss, destruction or damage."
+
+    **VaultWares controls**:
+    - VaultDrive and VaultCrypt ensure data-at-rest confidentiality
+    - VaultHSM provides key management to protect encryption keys
+    - VaultBackup ensures data availability and disaster recovery
+  </Accordion>
+  <Accordion title="Article 25 — Data protection by design and by default">
+    **Relevance**: Requires implementing data protection measures from the ground up, not as an afterthought.
+
+    **VaultWares controls**:
+    - Hardware encryption on VaultDrive is always-on; it cannot be disabled
+    - VaultAccess enforces least-privilege by default; access must be explicitly granted
+    - VaultCrypt can enforce always-encrypted volumes via GPO/MDM policy
+  </Accordion>
+  <Accordion title="Article 32 — Security of processing">
+    **Relevance**: Requires "appropriate technical and organisational measures" including encryption, pseudonymisation, ongoing confidentiality/integrity/availability assurance, and regular testing.
+
+    **VaultWares controls**:
+    - AES-256-XTS encryption for storage; TLS 1.3 for transmission
+    - VaultHSM FIPS 140-3 Level 3/4 certified key management
+    - VaultMonitor continuous security monitoring and anomaly detection
+    - VaultBackup automated recovery testing
+  </Accordion>
+  <Accordion title="Article 17 — Right to erasure ('Right to be forgotten')">
+    **Relevance**: Data subjects can request deletion of their personal data.
+
+    **VaultWares controls**:
+    VaultCrypt's cryptographic erasure capability makes data permanently inaccessible by destroying the encryption key, which is typically faster and more reliable than overwriting data (especially on SSDs).
+
+    ```bash
+    # Cryptographic erasure of a VaultCrypt volume
+    vaultcrypt crypto-erase \
+      --volume /dev/sdc \
+      --confirm \
+      --audit-log "GDPR right-to-erasure request #DSR-2024-1115"
+
+    # Remote cryptographic erasure of a VaultDrive
+    vw-storage crypto-erase \
+      --device VD-ENT-00247 \
+      --reason "GDPR erasure request" \
+      --audit-log
+    ```
+  </Accordion>
+  <Accordion title="Article 20 — Right to data portability">
+    **Relevance**: Data subjects can request their data in a portable format.
+
+    **VaultWares controls**:
+    VaultAccess and VaultMonitor provide data export APIs that allow organizations to extract user-specific data in standard formats (JSON, CSV) for subject access requests.
+
+    ```bash
+    curl https://api.vaultwares.com/v1/users/user_abc123/data-export \
+      -H "X-API-Key: vw_live_..." \
+      -d '{"format": "json", "include": ["access_logs", "profile", "preferences"]}'
+    ```
+  </Accordion>
+  <Accordion title="Article 33 — Notification of a personal data breach">
+    **Relevance**: Organizations must notify the supervisory authority within 72 hours of becoming aware of a breach.
+
+    **VaultWares controls**:
+    VaultMonitor can detect and alert on suspected data breach indicators (unauthorized bulk data access, anomalous downloads, credential compromise) within minutes. Automated alerting and forensic log export support the 72-hour notification window.
+  </Accordion>
+</AccordionGroup>
+
+## Technical implementation
+
+### Encryption configuration for GDPR
+
+```bash
+# VaultCrypt: Enable mandatory encryption for all drives in scope
+vaultcrypt policy set \
+  --name GDPR-Personal-Data \
+  --algorithm AES-256-XTS \
+  --key-source hsm \
+  --require-pre-boot-auth true \
+  --apply-to-volumes /data/personal-data \
+  --audit-log-all-access true
+
+# VaultDrive: Enforce corporate policy including audit logging
+vw-admin deploy-config \
+  --policy gdpr-compliant-storage \
+  --device-group EU-PersonalData-Drives \
+  --require-2fa true \
+  --audit-logging enabled \
+  --geofencing eu-countries
+```
+
+### Audit logging for GDPR
+
+GDPR's accountability principle (Art. 5(2)) requires organizations to demonstrate compliance. VaultMonitor's tamper-evident audit logs support this:
+
+```bash
+# Enable comprehensive GDPR audit logging
+vw-admin audit configure \
+  --scope personal-data-access \
+  --log-level detailed \
+  --include-user-identity true \
+  --include-resource-accessed true \
+  --include-source-ip true \
+  --retention-days 1825 \  # 5 years
+  --sign-with hsm:AuditLog-Signing-Key \
+  --export-to-siem true
+
+# Generate a Data Subject Access Request (DSAR) report
+vw-admin dsar-report \
+  --subject-email alice@example.com \
+  --start "2024-01-01" \
+  --end "2024-11-15" \
+  --output /reports/dsar-alice-$(date +%Y%m%d).pdf
+```
+
+### Data residency controls
+
+For GDPR compliance regarding data transfers outside the EU/EEA:
+
+```bash
+# Restrict VaultHSM Cloud key storage to EU regions
+vw-admin cloud configure \
+  --key-storage-regions eu-west-1,eu-central-1 \
+  --deny-non-eu-regions true
+
+# Configure VaultBackup to keep data in EU regions only
+vw-backup repo add \
+  --name eu-cloud-backup \
+  --type s3 \
+  --bucket corp-vaultbackup-eu \
+  --region eu-central-1 \
+  --restrict-to-region true
+```
+
+## GDPR compliance checklist
+
+<AccordionGroup>
+  <Accordion title="Technical controls">
+    - [ ] All personal data encrypted at rest (VaultDrive or VaultCrypt)
+    - [ ] All personal data encrypted in transit (TLS 1.3)
+    - [ ] Encryption keys managed by VaultHSM (not software keystores)
+    - [ ] Cryptographic erasure capability tested and documented
+    - [ ] Audit logging enabled for all personal data access
+    - [ ] Audit logs tamper-protected (HSM-signed)
+    - [ ] Audit log retention ≥ 5 years (configurable in VaultMonitor)
+  </Accordion>
+  <Accordion title="Access control">
+    - [ ] Least-privilege access enforced via VaultAccess RBAC
+    - [ ] MFA required for access to personal data systems
+    - [ ] PAM in place for privileged access to databases containing personal data
+    - [ ] Access reviews completed quarterly
+    - [ ] Automated offboarding revokes access within 24 hours
+  </Accordion>
+  <Accordion title="Data subject rights">
+    - [ ] DSAR export procedure documented and tested
+    - [ ] Cryptographic erasure procedure documented and tested
+    - [ ] Data portability export in machine-readable format available
+    - [ ] SLA for responding to DSARs defined (GDPR: 1 month)
+  </Accordion>
+  <Accordion title="Breach notification readiness">
+    - [ ] VaultMonitor alert rules cover breach indicators
+    - [ ] 72-hour notification runbook documented and rehearsed
+    - [ ] Incident response contact list current
+    - [ ] Forensic log export procedure tested
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Data residency" icon="globe" href="/compliance/data-residency">
+    EU data sovereignty and regional storage requirements
+  </Card>
+  <Card title="Encryption protocols" icon="lock" href="/security/encryption-protocols">
+    Technical details on encryption algorithms
+  </Card>
+  <Card title="HIPAA compliance" icon="hospital" href="/compliance/hipaa">
+    Healthcare data protection requirements
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Security and key management recommendations
+  </Card>
+</CardGroup>
