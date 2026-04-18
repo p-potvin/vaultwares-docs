@@ -1,0 +1,336 @@
+---
+title: "Integration guides"
+description: "Integrate VaultWares with your existing infrastructure"
+---
+
+## Overview
+
+VaultWares products are designed to integrate with the identity, security, and cloud infrastructure you already have. This guide covers the most common integration scenarios.
+
+<CardGroup cols={3}>
+  <Card title="Active Directory" icon="sitemap" href="#active-directory">
+    Sync users and groups from AD
+  </Card>
+  <Card title="LDAP" icon="server" href="#ldap">
+    Generic LDAP directory integration
+  </Card>
+  <Card title="SAML / SSO" icon="key" href="#saml--sso">
+    Federated authentication
+  </Card>
+  <Card title="SIEM" icon="chart-line" href="#siem-integration">
+    Security event forwarding
+  </Card>
+  <Card title="PKI" icon="certificate" href="#pki-integration">
+    Certificate authority integration
+  </Card>
+  <Card title="Cloud" icon="cloud" href="#cloud-integration">
+    AWS, Azure, and GCP
+  </Card>
+</CardGroup>
+
+---
+
+## Active Directory
+
+### Service account requirements
+
+Create a dedicated service account for VaultWares with the following minimum permissions:
+
+| Permission | Scope | Purpose |
+|-----------|-------|---------|
+| `Read` | All user objects in target OU | User enumeration and sync |
+| `Read` | All group objects in target OU | Group membership sync |
+| `Read` | Domain password policy | Password policy enforcement |
+
+```powershell
+# Create the VaultWares service account
+New-ADUser `
+  -Name "svc_vaultaccess" `
+  -SamAccountName "svc_vaultaccess" `
+  -UserPrincipalName "svc_vaultaccess@corp.example.com" `
+  -Path "OU=ServiceAccounts,DC=corp,DC=example,DC=com" `
+  -AccountPassword (ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force) `
+  -Enabled $true `
+  -PasswordNeverExpires $true `
+  -CannotChangePassword $true
+
+# Delegate read permissions to the service account
+$acl = Get-Acl "AD:\OU=Users,DC=corp,DC=example,DC=com"
+$sid = (Get-ADUser svc_vaultaccess).SID
+$rule = New-Object System.DirectoryServices.ActiveDirectoryAccessRule(
+    $sid, "ReadProperty,GenericRead", "Allow", "Descendents"
+)
+$acl.AddAccessRule($rule)
+Set-Acl "AD:\OU=Users,DC=corp,DC=example,DC=com" $acl
+```
+
+### Configuration
+
+```bash
+# Join VaultWares to the AD domain
+vw-admin ad join \
+  --domain corp.example.com \
+  --dc dc01.corp.example.com \
+  --username CORP\\svc_vaultaccess \
+  --password <service-account-password> \
+  --ou "OU=VaultWares,DC=corp,DC=example,DC=com"
+
+# Map AD groups to VaultAccess roles
+vw-admin ad map-group \
+  --ad-group "CN=VW-Administrators,OU=Groups,DC=corp,DC=example,DC=com" \
+  --vw-role Administrator
+
+vw-admin ad map-group \
+  --ad-group "CN=VW-SecurityOfficers,OU=Groups,DC=corp,DC=example,DC=com" \
+  --vw-role SecurityOfficer
+
+vw-admin ad map-group \
+  --ad-group "CN=VW-Users,OU=Groups,DC=corp,DC=example,DC=com" \
+  --vw-role StandardUser
+```
+
+---
+
+## LDAP
+
+### OpenLDAP configuration
+
+```bash
+# Configure OpenLDAP integration
+vw-admin ldap configure \
+  --url ldaps://ldap.example.com:636 \
+  --bind-dn "uid=svc_vaultaccess,ou=services,dc=example,dc=com" \
+  --bind-password <bind-password> \
+  --base-dn "dc=example,dc=com" \
+  --user-search-base "ou=users,dc=example,dc=com" \
+  --user-search-filter "(&(objectClass=inetOrgPerson)(uid={username}))" \
+  --user-attributes "uid:username,cn:displayName,mail:email,memberOf:groups" \
+  --group-search-base "ou=groups,dc=example,dc=com" \
+  --group-member-attribute "uniqueMember" \
+  --tls-ca-cert /etc/ssl/certs/ldap-ca.pem
+
+# Test a specific user lookup
+vw-admin ldap test-user --username alice
+```
+
+---
+
+## SAML / SSO
+
+### Okta
+
+<Steps>
+  <Step title="Create a SAML app in Okta">
+    1. Log into your Okta admin console
+    2. Navigate to **Applications** → **Create App Integration** → **SAML 2.0**
+    3. Set the **Single sign-on URL** to `https://vaultaccess.corp.example.com/saml/acs`
+    4. Set the **Audience URI (SP Entity ID)** to `https://vaultaccess.corp.example.com/saml/sp`
+    5. Configure attribute mappings:
+
+    | Okta Attribute | VaultWares Attribute |
+    |---|---|
+    | `user.login` | `username` |
+    | `user.email` | `email` |
+    | `user.firstName` | `firstName` |
+    | `user.lastName` | `lastName` |
+    | `user.groups` | `groups` |
+  </Step>
+  <Step title="Download IdP metadata">
+    Download the IdP metadata XML from Okta and save it to `/etc/vaultwares/saml/okta-metadata.xml`.
+  </Step>
+  <Step title="Configure VaultAccess SAML">
+    ```bash
+    vw-admin sso configure-saml \
+      --idp-metadata /etc/vaultwares/saml/okta-metadata.xml \
+      --entity-id https://vaultaccess.corp.example.com/saml/sp \
+      --acs-url https://vaultaccess.corp.example.com/saml/acs \
+      --sign-requests true \
+      --require-signed-assertions true \
+      --name-id-format emailAddress
+    ```
+  </Step>
+  <Step title="Map SAML groups to VaultAccess roles">
+    ```bash
+    vw-admin sso map-group \
+      --saml-group "VaultWares-Admins" \
+      --vw-role Administrator
+
+    vw-admin sso map-group \
+      --saml-group "VaultWares-Users" \
+      --vw-role StandardUser
+    ```
+  </Step>
+</Steps>
+
+### Azure Active Directory
+
+```bash
+# Configure Azure AD / Entra ID OIDC
+vw-admin sso configure-oidc \
+  --provider azure \
+  --tenant-id <azure-tenant-id> \
+  --client-id <app-registration-client-id> \
+  --client-secret <client-secret> \
+  --scopes "openid,profile,email,offline_access,https://graph.microsoft.com/GroupMember.Read.All"
+
+# Map Azure AD groups (use Object IDs)
+vw-admin sso map-group \
+  --azure-group-id "00000000-0000-0000-0000-000000000001" \
+  --vw-role Administrator
+```
+
+---
+
+## SIEM integration
+
+### Splunk
+
+```bash
+# Configure Splunk HEC forwarding
+vw-monitor siem configure splunk \
+  --url https://splunk.example.com:8088 \
+  --token <hec-token> \
+  --index vaultwares \
+  --sourcetype vaultwares:events \
+  --ssl-verify true \
+  --batch-size 500 \
+  --flush-interval 5s
+
+# Install the VaultWares Splunk app from Splunkbase
+# Search for "VaultWares" in Splunkbase, or install manually:
+# https://splunkbase.splunk.com/app/vaultwares
+```
+
+### IBM QRadar
+
+```bash
+# Configure QRadar syslog-TLS forwarding
+vw-monitor siem configure qradar \
+  --host qradar.example.com \
+  --port 6514 \
+  --protocol syslog-tls \
+  --client-cert /etc/vaultwares/tls/qradar-client.crt \
+  --client-key /etc/vaultwares/tls/qradar-client.key \
+  --server-ca-cert /etc/vaultwares/tls/qradar-ca.crt
+
+# Install VaultWares DSM from the QRadar App Exchange
+# or download from https://portal.vaultwares.com/integrations/qradar
+```
+
+### Microsoft Sentinel
+
+```bash
+# Configure Azure Log Analytics / Sentinel
+vw-monitor siem configure sentinel \
+  --workspace-id <log-analytics-workspace-id> \
+  --shared-key <workspace-primary-key> \
+  --table VaultWaresEvents_CL \
+  --time-field TimeGenerated
+```
+
+---
+
+## PKI integration
+
+### Microsoft Certificate Authority
+
+```bash
+# Configure VaultWares to use Microsoft CA for certificate enrollment
+vw-admin pki configure \
+  --type msca \
+  --ca-server ca01.corp.example.com \
+  --template VaultWaresDevice \
+  --enrollment-method certsrv \
+  --credential CORP\\svc_vaultaccess \
+  --auto-enroll true \
+  --renewal-threshold-days 30
+```
+
+### HashiCorp Vault PKI
+
+```bash
+# Configure HashiCorp Vault as PKI backend
+vw-admin pki configure \
+  --type hashicorp-vault \
+  --vault-addr https://vault.corp.example.com:8200 \
+  --vault-token <vault-token> \
+  --pki-mount pki_int \
+  --role vaultwares-devices \
+  --ttl 8760h
+```
+
+### ACME (Let's Encrypt / internal CA)
+
+```bash
+# Configure ACME for automatic TLS certificate renewal
+vw-admin tls configure-acme \
+  --directory https://acme.corp.example.com/directory \
+  --email admin@corp.example.com \
+  --domain vaultaccess.corp.example.com \
+  --challenge-type dns-01 \
+  --dns-provider route53 \
+  --auto-renew true
+```
+
+---
+
+## Cloud integration
+
+### AWS
+
+```bash
+# Configure AWS integration (for cloud backup, CloudHSM, KMS)
+vw-admin cloud configure aws \
+  --region us-east-1 \
+  --access-key $AWS_ACCESS_KEY_ID \
+  --secret-key $AWS_SECRET_ACCESS_KEY \
+  --kms-key-id arn:aws:kms:us-east-1:123456789012:key/mrk-abc123 \
+  --use-cloudhsm false
+
+# Use AWS IAM role (recommended for EC2/ECS deployments)
+vw-admin cloud configure aws \
+  --region us-east-1 \
+  --use-iam-role true
+```
+
+### Azure
+
+```bash
+# Configure Azure integration (Key Vault, Blob Storage)
+vw-admin cloud configure azure \
+  --tenant-id <tenant-id> \
+  --subscription-id <subscription-id> \
+  --client-id <service-principal-client-id> \
+  --client-secret <service-principal-secret> \
+  --key-vault-name corp-vaultwares-kv \
+  --use-managed-identity false
+```
+
+### Google Cloud Platform
+
+```bash
+# Configure GCP integration (Cloud KMS, Cloud Storage)
+vw-admin cloud configure gcp \
+  --project-id corp-security-project \
+  --service-account-key /etc/vaultwares/gcp-sa-key.json \
+  --kms-location us-east1 \
+  --kms-keyring vaultwares-keyring \
+  --kms-key-id backup-encryption-key
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
+    Complete post-installation setup
+  </Card>
+  <Card title="Access control" icon="shield-halved" href="/software/access-control">
+    Configure RBAC, ABAC, and SSO policies
+  </Card>
+  <Card title="Security monitoring" icon="chart-line" href="/software/security-monitoring">
+    Configure VaultMonitor SIEM forwarding
+  </Card>
+  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
+    Operational tasks and maintenance
+  </Card>
+</CardGroup>

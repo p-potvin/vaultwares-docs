@@ -1,0 +1,169 @@
+---
+title: "Warranty information"
+description: "Product warranty terms and coverage"
+---
+
+## Overview
+
+All VaultWares hardware products are covered by a limited warranty from the date of purchase. This page describes warranty periods, coverage, exclusions, and how to make a warranty claim.
+
+## Warranty periods
+
+<Tabs>
+  <Tab title="Encrypted storage">
+    | Product | Standard warranty | Extended warranty (optional) |
+    |---------|-------------------|------------------------------|
+    | VaultDrive Pro | 5 years | +2 years (7 years total) |
+    | VaultDrive Enterprise | 7 years | +3 years (10 years total) |
+    | VaultDrive Rugged | 5 years | +2 years (7 years total) |
+    | VaultDrive Biometric | 5 years | +2 years (7 years total) |
+  </Tab>
+  <Tab title="Hardware security modules">
+    | Product | Standard warranty | Extended warranty (optional) |
+    |---------|-------------------|------------------------------|
+    | VaultHSM PCIe | 3 years | +2 years (5 years total) |
+    | VaultHSM Network | 5 years | +2 years (7 years total) |
+    | VaultHSM Enterprise | 7 years | +3 years (10 years total) |
+    | VaultHSM Cloud | Service SLA (99.99%) | N/A (service, not hardware) |
+  </Tab>
+  <Tab title="Other hardware">
+    | Product | Standard warranty | Extended warranty (optional) |
+    |---------|-------------------|------------------------------|
+    | VaultScan biometric terminal | 3 years | +2 years (5 years total) |
+    | VaultGate network appliance | 5 years | +2 years (7 years total) |
+  </Tab>
+</Tabs>
+
+## What is covered
+
+VaultWares' limited hardware warranty covers:
+
+<AccordionGroup>
+  <Accordion title="Defects in materials and workmanship">
+    Manufacturing defects, component failures under normal use conditions, and premature failure of electrical components are covered under the standard warranty.
+
+    **Examples**:
+    - USB connector failure under normal use
+    - Firmware update failure resulting in a bricked device
+    - Premature failure of the fingerprint sensor
+    - Power supply failure in VaultHSM appliances
+    - Persistent LED malfunction
+  </Accordion>
+  <Accordion title="DOA (Dead on Arrival)">
+    If a product is non-functional immediately upon receipt, VaultWares will ship a replacement within 2 business days upon verification. Contact [support@vaultwares.com](mailto:support@vaultwares.com) within 30 days of delivery.
+  </Accordion>
+  <Accordion title="Functional defects">
+    If a device fails to perform its advertised functions (encryption, authentication, cryptographic operations) as specified in the product datasheet, it is covered under warranty.
+  </Accordion>
+</AccordionGroup>
+
+## What is NOT covered
+
+The following are explicitly excluded from warranty coverage:
+
+- **Physical damage**: Drops, impacts, crushing, liquid immersion (except VaultDrive Rugged within IP68 rating)
+- **Intentional destruction**: Triggered crypto-erase or self-destruct features are not covered — these are working as designed
+- **Unauthorized modifications**: Opening the tamper-evident enclosure voids the warranty
+- **Normal wear and tear**: Cosmetic scratches, worn USB connectors after years of normal use
+- **Lost or stolen devices**: Warranty is tied to the device, not the owner
+- **Data recovery**: VaultWares cannot recover encrypted data under any circumstances — this is by design
+- **Third-party damage**: Damage caused by third-party equipment, power surges, or environmental factors
+- **Misuse**: Use outside the specified operating conditions (temperature, humidity, voltage)
+
+<Warning>
+  VaultWares tamper-detection features will trigger automatic key destruction and may render the device non-functional if the enclosure is opened. This is a security feature, not a defect, and is not covered under warranty.
+</Warning>
+
+## Warranty service levels
+
+| Service level | Response time | Resolution time | Availability |
+|---|---|---|---|
+| **Standard** | 2 business days | 10 business days | Included with all products |
+| **Advanced Replacement** | Next business day | Ship replacement before return | Optional upgrade |
+| **On-site** | 4 hours | Same-day (network appliances) | Enterprise products only |
+
+Contact [sales@vaultwares.com](mailto:sales@vaultwares.com) to purchase Advanced Replacement or On-site warranty upgrades.
+
+## How to make a warranty claim
+
+<Steps>
+  <Step title="Verify warranty status">
+    Check your product's warranty status at [portal.vaultwares.com/warranty](https://portal.vaultwares.com/warranty) using the device serial number.
+
+    Alternatively:
+    ```bash
+    # Check warranty status via CLI
+    vw-admin warranty-status --serial VD-ENT-00247
+    # Output:
+    # Serial: VD-ENT-00247
+    # Product: VaultDrive Enterprise
+    # Purchase date: 2021-11-15
+    # Warranty expires: 2028-11-15
+    # Status: Active
+    ```
+  </Step>
+  <Step title="Contact support">
+    Email [support@vaultwares.com](mailto:support@vaultwares.com) or open a ticket at [portal.vaultwares.com/support](https://portal.vaultwares.com/support). Include:
+    - Device serial number
+    - Proof of purchase (order number or invoice)
+    - Detailed description of the failure
+    - Steps to reproduce (if applicable)
+    - Photos or videos demonstrating the defect
+  </Step>
+  <Step title="Receive RMA authorization">
+    If the warranty claim is approved, you will receive an RMA (Return Merchandise Authorization) number within 2 business days. See the [RMA process](/support/rma) for detailed return instructions.
+  </Step>
+  <Step title="Ship the defective unit">
+    Package and ship the defective unit as instructed. VaultWares covers return shipping for warranty claims.
+  </Step>
+  <Step title="Receive replacement or repaired unit">
+    Depending on the warranty service level, you will receive either a replacement unit or the repaired original. Firmware and configuration are not guaranteed to be restored — ensure you have backups.
+  </Step>
+</Steps>
+
+## Warranty registration
+
+Register your VaultWares hardware within 30 days of purchase to activate enhanced warranty terms and receive security advisories:
+
+```bash
+# Register a device via CLI
+vw-admin device register \
+  --serial VD-ENT-00247 \
+  --purchase-date 2024-11-15 \
+  --purchase-order PO-20241115-001 \
+  --reseller "Tech Distributor Inc."
+
+# Or register at:
+# https://portal.vaultwares.com/warranty/register
+```
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Does warranty transfer if I sell or transfer the device?">
+    Warranty coverage is tied to the original purchaser's organization. Transfer of warranty requires a formal transfer request submitted to [support@vaultwares.com](mailto:support@vaultwares.com) with documentation of the transfer.
+  </Accordion>
+  <Accordion title="Can I recover data from a warranty replacement?">
+    No. Because of hardware encryption, data on a failed device cannot be recovered — even by VaultWares. Ensure you have current backups of all important data. Replacement devices ship factory-fresh.
+  </Accordion>
+  <Accordion title="What happens to my encryption keys if I return a device?">
+    Before returning any device, initiate a crypto-erase to destroy all key material. If the device cannot be powered on, VaultWares will perform a physical destruction procedure and provide a certificate of destruction on request.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="RMA process" icon="arrow-rotate-left" href="/support/rma">
+    How to return a defective device
+  </Card>
+  <Card title="Contact support" icon="headset" href="/support/contact">
+    Reach our support team
+  </Card>
+  <Card title="Updates and releases" icon="circle-arrow-up" href="/support/updates">
+    Firmware and software updates
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/support/faq">
+    Frequently asked questions
+  </Card>
+</CardGroup>

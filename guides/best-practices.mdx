@@ -1,0 +1,297 @@
+---
+title: "Security best practices"
+description: "Recommended security practices for VaultWares deployments"
+---
+
+## Overview
+
+This guide presents security best practices for VaultWares deployments based on NIST SP 800-57, the CIS Controls, and lessons learned from enterprise security deployments. Following these recommendations will maximize the security value of your VaultWares investment.
+
+## Key management best practices
+
+### Principle of least privilege for keys
+
+<AccordionGroup>
+  <Accordion title="Key purpose separation">
+    Never use the same cryptographic key for multiple purposes. Maintain separate keys for:
+    - Data encryption (one key per sensitivity tier, e.g., `PII-Data-Key`, `Financial-Data-Key`)
+    - Backup encryption (`Backup-Master-Key`)
+    - TLS certificates (`TLS-WebServer-Key`, `TLS-API-Key`)
+    - Code signing (`Code-Signing-Key`)
+    - Audit log signing (`AuditLog-Signing-Key`)
+  </Accordion>
+  <Accordion title="Key hierarchy">
+    Use a key hierarchy: Master Keys (stored in HSM, never exported) → Data Encryption Keys (DEKs) → Derived session keys. This limits the blast radius of any key compromise.
+
+    ```bash
+    # Generate a master key (never extractable)
+    vw-hsm generate-key \
+      --type aes \
+      --size 256 \
+      --label "Master-Key-v1" \
+      --extractable false \
+      --usage wrap,unwrap
+
+    # Generate a DEK protected by the master key
+    vw-hsm generate-key \
+      --type aes \
+      --size 256 \
+      --label "PII-DEK-v1" \
+      --extractable true \
+      --wrap-with Master-Key-v1
+    ```
+  </Accordion>
+  <Accordion title="M-of-N key custodianship">
+    For master keys, always use M-of-N key splitting. No single person should be able to recover a master key alone. A 3-of-5 split is recommended for most organizations.
+
+    ```bash
+    vw-hsm backup create \
+      --key Master-Key-v1 \
+      --split 3-of-5 \
+      --custodians alice,bob,charlie,diana,erin \
+      --output /secure/backup/master-key-backup.enc
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Key rotation schedule
+
+| Key type | Recommended rotation | Notes |
+|----------|---------------------|-------|
+| TLS certificates (public-facing) | Annual or at compromise | Use short-lived certs (90 days) with ACME where possible |
+| TLS certificates (internal) | 2 years | Automate with internal ACME or SCEP |
+| Data encryption keys | Annual | Re-encrypt data with new DEK at rotation |
+| Backup encryption keys | Annual | Maintain old keys for backup decryption |
+| API keys | 90 days | Automate rotation where possible |
+| HSM master keys | 3–5 years | Only with full key ceremony |
+| Admin passwords | 90 days | Enforce via VaultAccess password policy |
+
+```bash
+# Check upcoming key expirations
+vw-hsm key list --expiring-within 60d
+
+# Schedule automated key rotation
+vw-admin key-rotation schedule \
+  --key-pattern "TLS-*" \
+  --interval 365d \
+  --notification-lead 30d \
+  --alert-email security@example.com
+```
+
+## Password policies
+
+### Recommended password policy
+
+```json
+{
+  "password_policy": {
+    "min_length": 16,
+    "require_uppercase": true,
+    "require_lowercase": true,
+    "require_numbers": true,
+    "require_special_chars": true,
+    "disallow_common_passwords": true,
+    "disallow_username_in_password": true,
+    "max_age_days": 90,
+    "history_count": 24,
+    "lockout_threshold": 5,
+    "lockout_duration_minutes": 30,
+    "admin_unlock_required": false
+  }
+}
+```
+
+<Tip>
+  For VaultDrive devices, consider setting a minimum password length of 12 characters with the lockout set to 10 failed attempts and crypto-erasure triggered after 15 consecutive failures.
+</Tip>
+
+### Privileged account passwords
+
+```bash
+# Enforce stricter policy for privileged accounts
+vw-admin policy create \
+  --name PrivilegedAccountPolicy \
+  --min-length 20 \
+  --require-all-character-classes true \
+  --max-age-days 60 \
+  --require-mfa hardware-key \
+  --apply-to-roles Administrator,SecurityOfficer,CryptoAdmin
+```
+
+## Network security
+
+### Segment your security infrastructure
+
+<AccordionGroup>
+  <Accordion title="HSM network isolation">
+    VaultHSM appliances should be on a dedicated VLAN accessible only from application servers that require cryptographic services. Never expose HSM management interfaces to general corporate networks.
+
+    ```bash
+    # Example firewall rule: allow only app servers to reach HSM
+    # Source: 10.10.20.0/24 (App Server VLAN)
+    # Destination: 10.10.30.10 (HSM VLAN)
+    # Port: TCP 1792 (PKCS#11 over TLS)
+    # Allow. Log all connections.
+    ```
+  </Accordion>
+  <Accordion title="Management network">
+    All VaultWares management interfaces (consoles, SSH) should be on a dedicated out-of-band management network, accessible only via VPN or jump server with MFA.
+  </Accordion>
+  <Accordion title="VaultGate segmentation">
+    Deploy VaultGate at network boundaries to enforce encrypted communication between segments. All inter-segment traffic should be authenticated and encrypted.
+  </Accordion>
+</AccordionGroup>
+
+### TLS hardening
+
+```bash
+# Configure minimum TLS 1.2 and strong cipher suites
+vw-admin tls configure \
+  --min-version TLSv1.2 \
+  --ciphers "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384" \
+  --hsts-max-age 31536000 \
+  --hsts-include-subdomains true \
+  --hsts-preload true
+
+# Disable legacy protocols on VaultGate
+vaultgate ssl-policy set \
+  --min-version TLSv1.2 \
+  --disable-weak-ciphers true \
+  --disable-compression true
+```
+
+## Backup strategy
+
+### The 3-2-1-1 rule
+
+Follow the expanded 3-2-1-1 backup strategy for critical data:
+
+| Requirement | Implementation |
+|-------------|---------------|
+| **3** copies of data | Original + local backup + off-site backup |
+| **2** different media types | On-premises NAS + cloud storage |
+| **1** copy off-site | Cloud or co-location backup with VaultBackup |
+| **1** copy immutable | VaultBackup immutable repository (ransomware protection) |
+
+```bash
+# Verify all three backup destinations are healthy
+vw-backup repo status --all
+
+# Test restore quarterly (automate where possible)
+vw-backup restore-test \
+  --repo backup://nas01/vaults/prod \
+  --sample-size 10 \
+  --target /data/restore-test \
+  --verify-checksums
+```
+
+## Incident response
+
+### Immediate response playbook
+
+<Steps>
+  <Step title="Contain the incident">
+    ```bash
+    # Lock a compromised device
+    vw-storage remote-lock --device VD-ENT-00247
+
+    # Revoke a compromised user's access
+    vw-admin user disable --user compromised-user@example.com
+    vw-admin user revoke-sessions --user compromised-user@example.com
+
+    # Isolate a compromised system via VaultGate
+    vaultgate quarantine-host --ip 10.10.20.45 --reason "Suspected compromise"
+    ```
+  </Step>
+  <Step title="Preserve evidence">
+    ```bash
+    # Export audit logs for the affected user/device (do this before any remediation)
+    vw-admin audit export \
+      --user compromised-user@example.com \
+      --start "2024-11-01T00:00:00Z" \
+      --end "2024-11-15T23:59:59Z" \
+      --output /forensics/incident-$(date +%Y%m%d)/user-audit.json \
+      --sign-with hsm:AuditLog-Signing-Key
+
+    vw-monitor export \
+      --device VD-ENT-00247 \
+      --all-events \
+      --output /forensics/incident-$(date +%Y%m%d)/device-events.json
+    ```
+  </Step>
+  <Step title="Assess scope">
+    ```bash
+    # Check what resources the compromised account accessed
+    vw-admin audit query \
+      --user compromised-user@example.com \
+      --since 30d \
+      --group-by resource,operation \
+      --format table
+    ```
+  </Step>
+  <Step title="Remediate">
+    If cryptographic keys may have been exposed, initiate emergency key rotation:
+
+    ```bash
+    # Emergency key rotation
+    vw-admin key-rotation emergency \
+      --key-labels "DB-Master-Key,TLS-WebServer-Key" \
+      --revoke-old true \
+      --notify security@example.com \
+      --incident-id INC-20241115-001
+    ```
+  </Step>
+  <Step title="Document and review">
+    Generate a post-incident report and update policies based on lessons learned. Schedule a tabletop exercise within 30 days.
+  </Step>
+</Steps>
+
+## Compliance checklist
+
+<AccordionGroup>
+  <Accordion title="Access control">
+    - [ ] MFA enforced for all user accounts
+    - [ ] Hardware keys required for privileged accounts
+    - [ ] Access reviews completed (quarterly minimum)
+    - [ ] Dormant accounts reviewed and disabled (30+ days inactive)
+    - [ ] Least-privilege RBAC applied to all roles
+  </Accordion>
+  <Accordion title="Key management">
+    - [ ] All encryption keys stored in VaultHSM (not software keystores)
+    - [ ] Key rotation schedule documented and automated
+    - [ ] M-of-N backup in place for master keys
+    - [ ] Key custodians named and trained
+    - [ ] No keys shared across environments (dev/staging/prod)
+  </Accordion>
+  <Accordion title="Audit and monitoring">
+    - [ ] Audit logging enabled on all VaultWares products
+    - [ ] Logs forwarded to SIEM within 5 minutes
+    - [ ] Alert rules reviewed and tuned quarterly
+    - [ ] Log retention meets regulatory requirements (1–7 years)
+    - [ ] Audit log integrity protected (HSM signing enabled)
+  </Accordion>
+  <Accordion title="Backup and recovery">
+    - [ ] 3-2-1-1 backup strategy implemented
+    - [ ] Backup encryption keys in HSM
+    - [ ] Recovery tested quarterly
+    - [ ] RTO/RPO targets documented and verified
+    - [ ] Offsite backups verified accessible
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Encryption protocols" icon="lock" href="/security/encryption-protocols">
+    Technical details on the cryptographic algorithms used
+  </Card>
+  <Card title="Compliance guides" icon="file-certificate" href="/compliance/gdpr">
+    GDPR, HIPAA, and PCI DSS compliance walkthroughs
+  </Card>
+  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
+    Routine operational tasks
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
+    Diagnose security events and system issues
+  </Card>
+</CardGroup>

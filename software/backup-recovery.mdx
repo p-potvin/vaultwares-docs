@@ -1,0 +1,315 @@
+---
+title: "Backup & recovery"
+description: "Automated encrypted backup and disaster recovery"
+---
+
+## Overview
+
+VaultBackup provides automated, hardware-encrypted backup and disaster recovery for organizations that cannot afford data loss. All backup data is encrypted at the source using AES-256 before transmission, and VaultBackup integrates natively with VaultHSM for enterprise key management. Built-in ransomware protection and immutable backup storage ensure your recovery data remains safe even when your primary environment is compromised.
+
+## Product editions
+
+<CardGroup cols={3}>
+  <Card title="VaultBackup Standard" icon="floppy-disk">
+    **Targets**: Up to 5 servers or 25 workstations  
+    **Retention**: Up to 90 days  
+    **Features**: Full, incremental, scheduled backups  
+    **Storage**: Local and NAS targets
+  </Card>
+  <Card title="VaultBackup Professional" icon="cloud-arrow-up">
+    **Targets**: Up to 50 servers  
+    **Retention**: Up to 1 year  
+    **Features**: + Off-site replication, deduplication  
+    **Storage**: Local, NAS, S3-compatible cloud
+  </Card>
+  <Card title="VaultBackup Enterprise" icon="shield-halved">
+    **Targets**: Unlimited  
+    **Retention**: Configurable (up to 7 years)  
+    **Features**: + Ransomware protection, immutable storage, DR orchestration  
+    **Storage**: All targets + VaultWares Cloud Vault
+  </Card>
+</CardGroup>
+
+## Key features
+
+### Encryption at every stage
+
+- **Source encryption**: Data is encrypted on the backup agent before leaving the source system
+- **In-transit encryption**: All backup streams use TLS 1.3
+- **At-rest encryption**: Backup repositories use AES-256-XTS
+- **Key management**: Integrate with VaultHSM for hardware-protected backup keys
+- **Key escrow**: Encrypted key copies held in secure escrow for disaster scenarios
+
+### Backup types
+
+<Tabs>
+  <Tab title="Full backup">
+    A complete copy of all selected data. Used as the baseline for incremental and differential chains.
+
+    ```bash
+    # Run a full backup immediately
+    vw-backup run \
+      --type full \
+      --source /data/production \
+      --destination backup://nas01/vaults/prod-full \
+      --encrypt-key hsm:DB-Backup-Key \
+      --compress lz4
+    ```
+  </Tab>
+  <Tab title="Incremental backup">
+    Backs up only data changed since the last backup of any type. Minimizes backup window and storage consumption.
+
+    ```bash
+    # Run an incremental backup
+    vw-backup run \
+      --type incremental \
+      --source /data/production \
+      --destination backup://nas01/vaults/prod-incr \
+      --base-backup latest \
+      --encrypt-key hsm:DB-Backup-Key
+    ```
+  </Tab>
+  <Tab title="Differential backup">
+    Backs up all data changed since the last **full** backup. Faster restores than incremental at the cost of more storage.
+
+    ```bash
+    # Run a differential backup
+    vw-backup run \
+      --type differential \
+      --source /data/production \
+      --destination backup://nas01/vaults/prod-diff \
+      --full-backup-ref "2024-11-01T02:00:00Z" \
+      --encrypt-key hsm:DB-Backup-Key
+    ```
+  </Tab>
+</Tabs>
+
+### Schedule configuration
+
+```json
+{
+  "schedule": {
+    "name": "ProductionBackupSchedule",
+    "timezone": "America/New_York",
+    "jobs": [
+      {
+        "name": "Daily incremental",
+        "type": "incremental",
+        "cron": "0 2 * * 1-6",
+        "retention_days": 30,
+        "source": "/data/production",
+        "destination": "backup://nas01/vaults/prod",
+        "encrypt_key": "hsm:DB-Backup-Key",
+        "compression": "lz4",
+        "verify_after": true
+      },
+      {
+        "name": "Weekly full",
+        "type": "full",
+        "cron": "0 1 * * 0",
+        "retention_days": 90,
+        "source": "/data/production",
+        "destination": "backup://nas01/vaults/prod",
+        "encrypt_key": "hsm:DB-Backup-Key",
+        "compression": "zstd",
+        "replicate_to": "backup://cloud-vault-us-east-1/vaults/prod",
+        "verify_after": true
+      },
+      {
+        "name": "Monthly archive",
+        "type": "full",
+        "cron": "0 0 1 * *",
+        "retention_days": 2555,
+        "source": "/data/production",
+        "destination": "backup://cloud-vault-us-east-1/vaults/prod-archive",
+        "encrypt_key": "hsm:DB-Backup-Key",
+        "immutable": true,
+        "verify_after": true
+      }
+    ]
+  }
+}
+```
+
+```bash
+# Apply schedule configuration
+vw-backup schedule apply --config /etc/vaultbackup/schedules/production.json
+
+# List active schedules
+vw-backup schedule list
+
+# Run a scheduled job manually
+vw-backup schedule run-now --job "Daily incremental"
+```
+
+### Off-site replication
+
+```bash
+# Configure off-site replication to AWS S3
+vw-backup replication configure \
+  --name "AWS-US-East-1" \
+  --type s3 \
+  --bucket my-vaultbackup-vault \
+  --region us-east-1 \
+  --access-key $AWS_ACCESS_KEY_ID \
+  --secret-key $AWS_SECRET_ACCESS_KEY \
+  --encrypt-in-transit true \
+  --bandwidth-limit 100Mbps
+
+# Configure replication to Azure Blob Storage
+vw-backup replication configure \
+  --name "Azure-East-US" \
+  --type azure-blob \
+  --account my-backup-storage \
+  --container vaultbackup \
+  --sas-token $AZURE_SAS_TOKEN
+
+# View replication status
+vw-backup replication status --all
+```
+
+### Ransomware protection
+
+VaultBackup Enterprise includes multi-layered ransomware protection:
+
+<AccordionGroup>
+  <Accordion title="Immutable backup storage">
+    Backup data written to immutable storage cannot be modified or deleted for the configured retention period, even by administrators with full credentials. Supported on VaultWares Cloud Vault and S3-compatible storage with Object Lock.
+
+    ```bash
+    # Enable immutability on a backup repository
+    vw-backup repo set-immutable \
+      --repo backup://cloud-vault-us-east-1/vaults/prod \
+      --retention-days 30 \
+      --compliance-mode governance
+    ```
+  </Accordion>
+  <Accordion title="Honeypot file monitoring">
+    VaultBackup plants hidden sentinel files in monitored directories. Any modification to these files triggers an immediate alert and optionally pauses new backups to prevent encrypting already-ransomed data.
+
+    ```bash
+    # Enable honeypot monitoring
+    vw-backup ransomware-protection enable \
+      --directories /data/production,/data/databases \
+      --alert-on-trigger \
+      --pause-backup-on-trigger true
+    ```
+  </Accordion>
+  <Accordion title="Entropy analysis">
+    Backup streams are analyzed for abnormally high entropy, which is characteristic of ransomware-encrypted data. Suspicious backups are flagged for review before overwriting previous clean backups.
+  </Accordion>
+</AccordionGroup>
+
+## Recovery procedures
+
+### Restore from backup
+
+<Steps>
+  <Step title="List available recovery points">
+    ```bash
+    # List all recovery points for a source
+    vw-backup restore list \
+      --source /data/production \
+      --repo backup://nas01/vaults/prod
+
+    # Output:
+    # Recovery Point           Type          Size     Encrypted  Verified
+    # 2024-11-15T02:00:01Z     Incremental   45.2 GB  Yes        Yes
+    # 2024-11-14T02:00:02Z     Incremental   44.8 GB  Yes        Yes
+    # 2024-11-10T01:00:05Z     Full          312 GB   Yes        Yes
+    ```
+  </Step>
+  <Step title="Verify backup integrity">
+    ```bash
+    # Verify a specific recovery point
+    vw-backup verify \
+      --repo backup://nas01/vaults/prod \
+      --recovery-point "2024-11-15T02:00:01Z" \
+      --decrypt-key hsm:DB-Backup-Key
+    ```
+  </Step>
+  <Step title="Perform the restore">
+    ```bash
+    # Restore to original location
+    vw-backup restore \
+      --repo backup://nas01/vaults/prod \
+      --recovery-point "2024-11-15T02:00:01Z" \
+      --destination /data/production \
+      --decrypt-key hsm:DB-Backup-Key \
+      --overwrite-mode prompt
+
+    # Restore to alternate location (for testing)
+    vw-backup restore \
+      --repo backup://nas01/vaults/prod \
+      --recovery-point "2024-11-15T02:00:01Z" \
+      --destination /data/restore-test \
+      --decrypt-key hsm:DB-Backup-Key
+    ```
+  </Step>
+  <Step title="Verify restored data">
+    ```bash
+    # Generate a checksum report of restored files
+    vw-backup verify-restore \
+      --source /data/restore-test \
+      --compare-to-backup \
+      --recovery-point "2024-11-15T02:00:01Z"
+    ```
+  </Step>
+</Steps>
+
+### Disaster recovery
+
+```bash
+# Initiate a full DR failover
+vw-backup dr failover \
+  --plan DR-Production \
+  --target-site aws-us-west-2 \
+  --rpo-target 1h \
+  --rto-target 4h \
+  --dry-run false
+
+# Monitor DR failover progress
+vw-backup dr status --plan DR-Production
+
+# Test DR plan (non-destructive)
+vw-backup dr test \
+  --plan DR-Production \
+  --isolated-network \
+  --snapshot-only
+```
+
+## Backup verification
+
+Regular verification is critical. VaultBackup supports both on-demand and scheduled verification:
+
+```bash
+# Verify all backups in a repository
+vw-backup verify-all \
+  --repo backup://nas01/vaults/prod \
+  --decrypt-key hsm:DB-Backup-Key \
+  --threads 4
+
+# Schedule automated weekly verification
+vw-backup schedule add-verification \
+  --repo backup://nas01/vaults/prod \
+  --cron "0 3 * * 0" \
+  --alert-on-failure \
+  --alert-email security@example.com
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
+    Configure backup destinations and schedules during initial setup
+  </Card>
+  <Card title="HSM integration" icon="microchip" href="/hardware/hsm">
+    Use VaultHSM to protect backup encryption keys
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Backup strategy and retention recommendations
+  </Card>
+  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
+    Monitoring and managing backup jobs day to day
+  </Card>
+</CardGroup>
