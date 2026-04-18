@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npx mintlify build",
+  "outputDirectory": ".mintlify/build",
+  "framework": null
+}
