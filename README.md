@@ -44,7 +44,7 @@ You can also publish changes via the [Mintlify GitHub app](https://dashboard.min
 
 ## Troubleshooting
 
-- **Dev environment not starting:** Run `mintlify install` to ensure dependencies are up to date.
+- **Dev environment not starting:** Re-install the CLI with `npm install -g mintlify` to ensure you have the latest version.
 - **Page shows as 404:** Make sure the page path is listed under `navigation` in `docs.json`.
 
 ## Resources
