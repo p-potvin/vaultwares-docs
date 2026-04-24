@@ -62,6 +62,13 @@
               "guides/troubleshooting",
               "guides/maintenance"
             ]
+          },
+          {
+            "group": "Brand & voice",
+            "icon": "paintbrush",
+            "pages": [
+              "branding"
+            ]
           }
         ]
       },
