@@ -19,6 +19,7 @@
             "icon": "rocket",
             "pages": [
               "getting-started/overview",
+              "getting-started/products-and-services",
               "getting-started/system-requirements",
               "getting-started/quick-installation"
             ]
