@@ -10,6 +10,11 @@
     before injection.
 
     Run as Administrator via scheduled task or manually.
+
+    Scheduled task uses the headless conhost pattern:
+      Execute:   C:\Windows\System32\conhost.exe
+      Arguments: --headless powershell.exe -NoProfile -WindowStyle Hidden
+                 -NonInteractive -ExecutionPolicy Bypass -File "<this script>"
 .NOTES
     Source: vaultwares-docs/scripts/sync-global-instructions.ps1
     See:    vaultwares-agentciation/docs/ARCHITECTURE.md
