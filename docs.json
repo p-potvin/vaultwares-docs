@@ -80,6 +80,7 @@
           {
             "group": "Security standards",
             "pages": [
+              "security/zero-knowledge-encryption-standard",
               "security/encryption-protocols",
               "security/certifications",
               "security/industry-standards"
