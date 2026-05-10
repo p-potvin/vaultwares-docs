@@ -18,7 +18,12 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
+            mkdir -p /var/www/vaultwares-docs
             cd /var/www/vaultwares-docs
+            if [ ! -d ".git" ]; then
+              git init
+              git remote add origin https://github.com/vaultwares/vaultwares-docs.git
+            fi
             git pull origin main
             npm install
             npm run build
