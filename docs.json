@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "VaultWares Documentation",
   "colors": {
-    "primary": "#1E40AF",
-    "light": "#3B82F6",
-    "dark": "#1E3A8A"
+    "primary": "#CC9B21",
+    "light": "#E5C06A",
+    "dark": "#B78C1E"
   },
   "favicon": "/favicon.svg",
   "navigation": {

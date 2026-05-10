@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Default light theme: codex-solar-light-revisited */
+  --primary: #FDF6E3;
+  --surface: #EEE8D5;
+  --surface-alt: #E1DACB;
+  --text: #4A5459;
+  --text-muted: #586E75;
+  --text-inverse: #FFFFFF;
+  --accent: #21B8CC;
+  --accent-muted: #1A92A3;
+  --border: rgba(88, 110, 117, 0.2);
+  --error: #A63D40;
+  --success: #4ECC21;
+}
+
+[data-theme="dark"] {
+  /* Default dark theme: golden-slate */
+  --primary: #002B36;
+  --surface: #073642;
+  --surface-alt: #0B4A5A;
+  --text: #839496;
+  --text-muted: #586E75;
+  --text-inverse: #000000;
+  --accent: #CC9B21;
+  --accent-muted: #B78C1E;
+  --border: rgba(88, 110, 117, 0.4);
+  --error: #DC322F;
+  --success: #859900;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--primary);
+  color: var(--text);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--accent);
+}
+
+.nav-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+select, button {
+  background-color: var(--surface-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+select:hover, button:hover {
+  border-color: var(--accent);
+}
+
+.sidebar-layout {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1rem;
+}
+
+.content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 900px;
+}

@@ -1,54 +1,73 @@
-# VaultWares Documentation
+# React + TypeScript + Vite
 
-Official documentation for [VaultWares](https://vaultwares.com) — enterprise-grade security hardware and software, including encrypted storage, hardware security modules (HSMs), biometric devices, network appliances, and encryption software.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Overview
+Currently, two official plugins are available:
 
-This repository contains the source for [VaultWares Documentation](https://docs.vaultwares.com), built with [Mintlify](https://mintlify.com). The docs cover:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-- **Hardware products** — VaultDrive, VaultHSM, VaultScan, VaultGate
-- **Software products** — VaultCrypt, VaultAccess, VaultBackup, VaultMonitor
-- **Installation & setup** — hardware installation, software deployment, initial configuration, integration guides
-- **Security & compliance** — encryption protocols, certifications, GDPR, HIPAA, PCI DSS
-- **API reference** — authentication, REST endpoints, webhooks, SDKs
-- **Support** — FAQs, contact, warranty, RMA, updates
+## React Compiler
 
-## Local development
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview changes locally:
+## Expanding the ESLint configuration
 
-```bash
-npm install -g mintlify
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-Run the following command at the root of this repository (where `docs.json` is located):
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```bash
-mintlify dev
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-
-View your local preview at `http://localhost:3000`.
-
-## Contributing
-
-- All documentation pages are MDX files with YAML frontmatter (`title` and `description` required).
-- Navigation is configured in `docs.json`.
-- Use Mintlify components for callouts, steps, tabs, cards, and code examples.
-- See `CLAUDE.md` for AI-assisted writing guidelines and documentation standards.
-
-## Deployment
-
-This documentation is deployed to [Vercel](https://vercel.com) on every push to the default branch. The `vercel.json` at the root of this repository configures the build.
-
-You can also publish changes via the [Mintlify GitHub app](https://dashboard.mintlify.com/settings/organization/github-app), which deploys to Mintlify's CDN automatically.
-
-## Troubleshooting
-
-- **Dev environment not starting:** Re-install the CLI with `npm install -g mintlify` to ensure you have the latest version.
-- **Page shows as 404:** Make sure the page path is listed under `navigation` in `docs.json`.
-
-## Resources
-
-- [Mintlify documentation](https://mintlify.com/docs)
-- [VaultWares customer portal](https://portal.vaultwares.com)
-- [VaultWares community](https://community.vaultwares.com)
