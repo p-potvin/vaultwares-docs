@@ -27,4 +27,4 @@ jobs:
             git pull origin main
             npm install
             npm run build
-            pm2 restart vaultwares-docs
+            pm2 restart vaultwares-docs || pm2 serve dist 8080 --name "vaultwares-docs" --spa
