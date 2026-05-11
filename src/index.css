@@ -2,44 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Default light theme: codex-solar-light-revisited */
-  --primary: #FDF6E3;
+  --background: #FDF6E3;
+  --primary: var(--background);
   --surface: #EEE8D5;
   --surface-alt: #E1DACB;
+  --surface-elevated: #EDE5C8;
   --text: #4A5459;
-  --text-muted: #586E75;
-  --text-inverse: #FFFFFF;
-  --accent: #21B8CC;
-  --accent-muted: #1A92A3;
-  --border: rgba(88, 110, 117, 0.2);
-  --error: #A63D40;
-  --success: #4ECC21;
-}
-
-[data-theme="dark"] {
-  /* Default dark theme: golden-slate */
-  --primary: #002B36;
-  --surface: #073642;
-  --surface-alt: #0B4A5A;
-  --text: #839496;
-  --text-muted: #586E75;
-  --text-inverse: #000000;
-  --accent: #CC9B21;
-  --accent-muted: #B78C1E;
-  --border: rgba(88, 110, 117, 0.4);
+  --text-primary: #073642;
+  --text-secondary: #586E75;
+  --text-muted: #657B83;
+  --text-inverse: #FDF6E3;
+  --accent: #268BD2;
+  --accent-muted: #1A6BA8;
+  --border: rgba(38, 139, 210, 0.2);
   --error: #DC322F;
+  --error-bg: rgba(220,50,47,0.1);
+  --warning: #CB4B16;
+  --warning-bg: rgba(203,75,22,0.1);
   --success: #859900;
+  --success-bg: rgba(133,153,0,0.1);
+  --info: #2AA198;
+  --info-bg: rgba(42,161,152,0.1);
+  --muted: #93A1A1;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--background);
   color: var(--text);
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 
 * {

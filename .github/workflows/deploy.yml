@@ -22,9 +22,10 @@ jobs:
             cd /var/www/vaultwares-docs
             if [ ! -d ".git" ]; then
               git init
-              git remote add origin https://github.com/vaultwares/vaultwares-docs.git
+              git remote add origin https://github.com/p-potvin/vaultwares-docs.git
             fi
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             npm install
             npm run build
-            pm2 restart vaultwares-docs || pm2 serve dist 8080 --name "vaultwares-docs" --spa
+            # Nginx serves from /var/www/vaultwares-docs/dist
