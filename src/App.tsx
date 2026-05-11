@@ -172,7 +172,9 @@ export default function App() {
                   className="bg-transparent text-text text-xs font-medium px-2 py-1 outline-none cursor-pointer"
                 >
                   {THEMES.map(theme => (
-                    <option key={theme.id} value={theme.id} className="bg-surface">{theme.name}</option>
+                    <option key={theme.id} value={theme.id} className="bg-surface">
+                      {t.themeNames[theme.id as keyof typeof t.themeNames] || theme.name}
+                    </option>
                   ))}
                 </select>
               </div>

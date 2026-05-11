@@ -14,6 +14,23 @@ export const translations = {
     notFoundDesc: "The requested documentation page could not be found.",
     light: "Light",
     dark: "Dark",
+    themeNames: {
+      "golden-slate": "Golden Slate",
+      "solarized-light-revisited": "Solarized Light Revisited",
+      "cyberpunk-cinder": "Cyberpunk Cinder",
+      "vintage-velvet": "Vintage Velvet",
+      "modern-monolith": "Modern Monolith",
+      "neon-void": "Neon Void",
+      "ocean-mist": "Ocean Mist",
+      "royal-tangerine": "Royal Tangerine",
+      "crimson-bloom": "Crimson Bloom",
+      "amethyst-frost": "Amethyst Frost",
+      "catppuccin-mocha": "Catppuccin Mocha",
+      "dracula": "Dracula",
+      "tokyo-night-storm": "Tokyo Night Storm",
+      "github-light": "GitHub Light Default",
+      "monokai-pro": "Monokai Pro"
+    }
   },
   QC: {
     title: "Documentation VaultWares",
@@ -30,6 +47,23 @@ export const translations = {
     notFoundDesc: "La page de documentation demandée est introuvable.",
     light: "Clair",
     dark: "Sombre",
+    themeNames: {
+      "golden-slate": "Ardoise Dorée",
+      "solarized-light-revisited": "Solarisé Clair Revisité",
+      "cyberpunk-cinder": "Cendre Cyberpunk",
+      "vintage-velvet": "Velours Vintage",
+      "modern-monolith": "Monolithe Moderne",
+      "neon-void": "Néon Vide",
+      "ocean-mist": "Brume Océanique",
+      "royal-tangerine": "Mandarine Royale",
+      "crimson-bloom": "Floraison Cramoisie",
+      "amethyst-frost": "Givre Améthyste",
+      "catppuccin-mocha": "Catppuccin Mocha",
+      "dracula": "Dracula",
+      "tokyo-night-storm": "Nuit de Tokyo",
+      "github-light": "GitHub Clair Défaut",
+      "monokai-pro": "Monokai Pro"
+    }
   }
 };
 

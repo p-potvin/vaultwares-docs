@@ -433,3 +433,22 @@ export const THEMES: VaultTheme[] = [
         muted: "#5B595C"
     }
 ];
+
+export class VaultThemeManager {
+    private themes: VaultTheme[] = THEMES;
+
+    getThemes(): VaultTheme[] {
+        return this.themes;
+    }
+
+    getTheme(name?: string, index: number = 0): VaultTheme {
+        if (name) {
+            const found = this.themes.find(t => t.name === name);
+            if (found) return found;
+        }
+        if (index >= 0 && index < this.themes.length) {
+            return this.themes[index];
+        }
+        return this.themes[0];
+    }
+}
