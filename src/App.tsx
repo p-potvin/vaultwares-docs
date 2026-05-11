@@ -2,9 +2,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import matter from 'gray-matter';
+import { motion, AnimatePresence } from 'framer-motion';
 import { THEMES } from './themes';
-import { translations } from './translations';
 import type { Lang } from './translations';
+import { translations } from './translations';
 import './index.css';
 
 // VaultWares Logo Component
@@ -14,7 +17,36 @@ const Logo = ({ className = "w-8 h-8" }: { className?: string }) => (
   </svg>
 );
 
-// Dynamically import all mdx files as raw strings
+// Custom MDX Components
+const Card = ({ title, icon, href, children }: { title: string; icon: string; href: string; children: React.ReactNode }) => (
+  <Link to={href} className="group p-6 bg-surface-alt hover:bg-surface-elevated border border-border rounded-xl transition-all duration-300 block no-underline mb-4">
+    <div className="flex items-start gap-4">
+      <div className="p-2 bg-accent/10 rounded-lg group-hover:bg-accent/20 transition-colors">
+        <span className="text-accent text-xl">{icon === 'rocket' ? '🚀' : icon === 'microchip' ? '🔬' : icon === 'shield-halved' ? '🛡️' : '📁'}</span>
+      </div>
+      <div>
+        <h3 className="text-lg font-bold text-text-primary mb-1 group-hover:text-accent transition-colors mt-0">{title}</h3>
+        <div className="text-sm text-text-secondary leading-relaxed">{children}</div>
+      </div>
+    </div>
+  </Link>
+);
+
+const CardGroup = ({ children, cols = 2 }: { children: React.ReactNode; cols?: number }) => (
+  <div className={`grid grid-cols-1 md:grid-cols-${cols} gap-4 my-8`}>
+    {children}
+  </div>
+);
+
+const Note = ({ children }: { children: React.ReactNode }) => (
+  <div className="p-4 my-6 bg-info-bg border-l-4 border-info rounded-r-lg">
+    <div className="flex gap-3">
+      <span className="text-info font-bold">ℹ️</span>
+      <div className="text-sm text-text-secondary">{children}</div>
+    </div>
+  </div>
+);
+
 const mdxModules = import.meta.glob('../docs-content/**/*.mdx', { query: '?raw', import: 'default' });
 
 function MarkdownViewer({ lang }: { lang: Lang }) {
@@ -33,7 +65,11 @@ function MarkdownViewer({ lang }: { lang: Lang }) {
       if (module) {
         try {
           const raw = await module() as string;
-          setContent(raw);
+          const { content: mdxContent, data } = matter(raw);
+          setContent(mdxContent);
+          if (data.title) {
+            document.title = `${data.title} | VaultWares`;
+          }
         } catch {
           setContent(`# ${t.notFoundTitle}\n${t.notFoundDesc}`);
         }
@@ -45,28 +81,38 @@ function MarkdownViewer({ lang }: { lang: Lang }) {
   }, [path, lang, t]);
 
   return (
-    <div className="prose prose-vault max-w-none text-text prose-headings:text-text-primary prose-a:text-accent hover:prose-a:text-accent-muted prose-code:text-accent prose-pre:bg-surface-alt prose-strong:text-text-primary prose-blockquote:border-accent prose-blockquote:text-text-secondary transition-colors duration-200">
-      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="prose prose-vault max-w-none"
+    >
+      <ReactMarkdown 
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw]}
+        components={{
+          // @ts-expect-error - Custom MDX component
+          Card,
+          CardGroup,
+          Note,
+        }}
+      >
         {content}
       </ReactMarkdown>
-    </div>
+    </motion.div>
   );
 }
 
 export default function App() {
-  // Initialize state from localStorage
   const [themeId, setThemeId] = useState(() => localStorage.getItem('vw-theme-id') || 'golden-slate');
   const [mode, setMode] = useState<'light' | 'dark'>(() => (localStorage.getItem('vw-theme-mode') as 'light' | 'dark') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
   const [lang, setLang] = useState<Lang>(() => (localStorage.getItem('vw-lang') as Lang) || 'EN');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const t = translations[lang];
+  const currentTheme = useMemo(() => THEMES.find(t => t.id === themeId) || THEMES[0], [themeId]);
 
-  const currentTheme = useMemo(() => {
-    return THEMES.find(t => t.id === themeId) || THEMES[0];
-  }, [themeId]);
-
-  // Apply theme variables to document root
   useEffect(() => {
     const root = document.documentElement;
     Object.entries(currentTheme).forEach(([key, value]) => {
@@ -74,7 +120,6 @@ export default function App() {
         root.style.setProperty(`--${key.replace('_', '-')}`, value);
       }
     });
-    // Sync localStorage
     localStorage.setItem('vw-theme-id', themeId);
     localStorage.setItem('vw-theme-mode', mode);
   }, [currentTheme, themeId, mode]);
@@ -86,16 +131,8 @@ export default function App() {
   const toggleMode = () => {
     const newMode = mode === 'dark' ? 'light' : 'dark';
     setMode(newMode);
-    // Switch to default theme for mode if current theme doesn't match
-    if (newMode === 'dark' && currentTheme.mode !== 'dark') {
-      setThemeId('golden-slate');
-    } else if (newMode === 'light' && currentTheme.mode !== 'light') {
-      setThemeId('codex-solarized-light-revisited');
-    }
-  };
-
-  const toggleLang = () => {
-    setLang(prev => prev === 'EN' ? 'QC' : 'EN');
+    if (newMode === 'dark' && currentTheme.mode !== 'dark') setThemeId('golden-slate');
+    else if (newMode === 'light' && currentTheme.mode !== 'light') setThemeId('codex-solarized-light-revisited');
   };
 
   const handleThemeChange = (id: string) => {
@@ -115,59 +152,50 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-background text-text flex flex-col font-sans transition-colors duration-200">
-        {/* Header */}
-        <header className="sticky top-0 z-50 bg-surface/80 backdrop-blur-md border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+      <div className="min-h-screen bg-background text-text flex flex-col font-sans transition-colors duration-300">
+        <header className="fixed top-0 left-0 right-0 z-[100] h-16 bg-surface/80 backdrop-blur-xl border-b border-border shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
             <Link to="/" className="flex items-center gap-3 group">
-              <Logo className="w-8 h-8 text-accent group-hover:scale-110 transition-transform" />
+              <Logo className="w-8 h-8 text-accent group-hover:rotate-12 transition-transform duration-500" />
               <div className="hidden sm:block">
-                <h1 className="font-bold text-lg leading-none text-text-primary">{t.title}</h1>
-                <p className="text-xs text-text-muted mt-0.5">{t.tagline}</p>
+                <h1 className="font-bold text-lg leading-none text-text-primary tracking-tight">{t.title}</h1>
+                <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-text-muted mt-0.5">{t.tagline}</p>
               </div>
             </Link>
 
-            <div className="flex items-center gap-2 sm:gap-4">
-              {/* Theme Picker */}
-              <div className="hidden lg:flex items-center gap-2">
-                <span className="text-xs font-medium text-text-muted">{t.theme}:</span>
+            <div className="flex items-center gap-3">
+              <div className="hidden lg:flex items-center bg-surface-alt rounded-lg border border-border p-1 gap-2">
+                <span className="text-[10px] uppercase tracking-wider font-bold text-text-muted pl-2">{t.theme}</span>
                 <select 
                   value={themeId}
                   onChange={(e) => handleThemeChange(e.target.value)}
-                  className="bg-surface-alt hover:bg-surface-elevated text-text text-sm border border-border rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-accent/50 cursor-pointer transition-all"
+                  className="bg-transparent text-text text-xs font-medium px-2 py-1 outline-none cursor-pointer"
                 >
                   {THEMES.map(theme => (
-                    <option key={theme.id} value={theme.id}>{theme.name}</option>
+                    <option key={theme.id} value={theme.id} className="bg-surface">{theme.name}</option>
                   ))}
                 </select>
               </div>
 
-              {/* Toggles */}
               <div className="flex items-center bg-surface-alt rounded-full p-1 border border-border">
                 <button 
                   onClick={toggleMode}
-                  className="p-1.5 rounded-full hover:bg-surface-elevated text-text transition-colors"
-                  title={mode === 'dark' ? t.light : t.dark}
+                  className="p-1.5 rounded-full hover:bg-surface-elevated text-text transition-all active:scale-90"
                 >
-                  {mode === 'dark' ? (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
-                  )}
+                  {mode === 'dark' ? '☀️' : '🌙'}
                 </button>
                 <div className="w-px h-4 bg-border mx-1" />
                 <button 
-                  onClick={toggleLang}
-                  className="px-2 py-0.5 text-xs font-bold hover:bg-surface-elevated rounded-full transition-colors"
+                  onClick={() => setLang(lang === 'EN' ? 'QC' : 'EN')}
+                  className="px-2 py-0.5 text-[10px] font-black hover:bg-surface-elevated rounded-full transition-all active:scale-90"
                 >
                   {lang}
                 </button>
               </div>
 
-              {/* Mobile Menu Toggle */}
               <button 
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="md:hidden p-2 text-text hover:bg-surface-alt rounded-md"
+                className="md:hidden p-2 text-text hover:bg-surface-alt rounded-lg transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
               </button>
@@ -175,46 +203,31 @@ export default function App() {
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full">
-          {/* Sidebar */}
+        <div className="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full pt-16">
           <aside className={`
-            ${isMenuOpen ? 'block' : 'hidden'} 
-            md:block w-full md:w-64 bg-surface/50 border-r border-border p-6 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto
+            ${isMenuOpen ? 'fixed inset-0 top-16 bg-background z-[90] block p-8' : 'hidden'} 
+            md:block md:relative md:inset-auto md:w-64 md:bg-transparent border-r border-border/50 p-6 h-[calc(100vh-4rem)] md:sticky md:top-16 overflow-y-auto
           `}>
-            <nav className="space-y-1">
+            <nav className="space-y-1.5">
               {navLinks.map(link => (
                 <Link 
                   key={link.to} 
                   to={link.to} 
                   onClick={() => setIsMenuOpen(false)}
-                  className="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-accent/10 hover:text-accent transition-all"
+                  className="block px-4 py-2.5 rounded-xl text-sm font-semibold text-text-secondary hover:bg-accent/10 hover:text-accent transition-all duration-200 border border-transparent hover:border-accent/20"
                 >
                   {link.label}
                 </Link>
               ))}
             </nav>
-
-            <div className="mt-10 pt-10 border-t border-border lg:hidden">
-              <span className="text-xs font-medium text-text-muted block mb-3">{t.theme}:</span>
-              <select 
-                value={themeId}
-                onChange={(e) => handleThemeChange(e.target.value)}
-                className="w-full bg-surface-alt text-text text-sm border border-border rounded-md px-2 py-2 outline-none"
-              >
-                {THEMES.map(theme => (
-                  <option key={theme.id} value={theme.id}>{theme.name}</option>
-                ))}
-              </select>
-            </div>
           </aside>
 
-          {/* Content */}
-          <main className="flex-1 min-w-0 p-6 md:p-10 lg:p-16">
-            <div className="max-w-3xl">
+          <main className="flex-1 min-w-0 p-6 md:p-12 lg:p-20">
+            <AnimatePresence mode="wait">
               <Routes>
                 <Route path="/*" element={<MarkdownViewer lang={lang} />} />
               </Routes>
-            </div>
+            </AnimatePresence>
           </main>
         </div>
       </div>
