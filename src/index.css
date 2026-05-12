@@ -357,6 +357,59 @@ body {
 }
 
 /* ============================================================
+   Responsive header collapse
+   Breakpoints:
+     ≥ 640px  — icon + title + tagline  (full)
+     360–639px — icon + title only      (tagline hidden)
+     < 360px  — icon only               (brand text hidden)
+   ============================================================ */
+.header-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  transition: width 200ms ease-out, height 200ms ease-out;
+}
+
+.header-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-title {
+  font-size: 1rem;
+  transition: font-size 200ms ease-out;
+}
+
+.header-tagline {
+  display: block;
+  transition: opacity 150ms ease-out, max-height 150ms ease-out;
+  max-height: 20px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+/* 360–639px: hide tagline, shrink title slightly */
+@media (max-width: 639px) {
+  .header-tagline {
+    display: none;
+  }
+  .header-title {
+    font-size: 0.9rem;
+  }
+}
+
+/* < 360px: hide entire brand text, show only icon */
+@media (max-width: 359px) {
+  .header-brand-text {
+    display: none;
+  }
+  .header-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ============================================================
    Semantic state banners (aligned to VaultTheme token names)
    ============================================================ */
 .banner-error {
