@@ -117,9 +117,11 @@ export default function App() {
     const root = document.documentElement;
     Object.entries(currentTheme).forEach(([key, value]) => {
       if (key !== 'name' && key !== 'id' && key !== 'mode') {
-        root.style.setProperty(`--${key.replace('_', '-')}`, value);
+        root.style.setProperty(`--${key.replaceAll('_', '-')}`, value);
       }
     });
+    // Set data-mode for potential CSS selectors
+    root.setAttribute('data-mode', currentTheme.mode);
     localStorage.setItem('vw-theme-id', themeId);
     localStorage.setItem('vw-theme-mode', mode);
   }, [currentTheme, themeId, mode]);
@@ -132,7 +134,7 @@ export default function App() {
     const newMode = mode === 'dark' ? 'light' : 'dark';
     setMode(newMode);
     if (newMode === 'dark' && currentTheme.mode !== 'dark') setThemeId('golden-slate');
-    else if (newMode === 'light' && currentTheme.mode !== 'light') setThemeId('codex-solarized-light-revisited');
+    else if (newMode === 'light' && currentTheme.mode !== 'light') setThemeId('solarized-light-revisited');
   };
 
   const handleThemeChange = (id: string) => {
