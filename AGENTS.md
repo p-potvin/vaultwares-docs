@@ -12,6 +12,11 @@ Standard terms used across all VaultWares projects (full reference:
 - **AI Assistant** — the LLM service (Claude, ChatGPT, Gemini, Codex, etc.)
 - **Agent** — a personality/role instance defined as a markdown file
 - **Global Instructions Path** — the first file an AI Assistant reads on startup
+- **Credit Routine** - The credit optimization routine available on the vaultwares-mcp server that every Assistant should go through when they are prompted.
+- **SSoT, SoT** - Single Source of Truth, Source of Truth.
+- **VW** - VaultWares.
+- **Ledger, Agent Ledger** - The repo agent-ledger which serves as a bookkeeping entry of the work done by every Assistant, that they must log before each reply they send.
+- **Agents Team, Le Méchant Changement, Le Stéphane Bellavance** - Trigger words referring to the multi-agents team routine defined in vaultwares-agentciation.
 
 ## Company Overview
 
@@ -71,6 +76,26 @@ For OMX operating contract, Agent definitions, delegation rules, Lore commit
 protocol, and skill distribution, read:
 - `vaultwares-agentciation/AGENTS.md`
 - `vaultwares-agentciation/docs/LEXICON.md`
+
+### Multi-Agent Flow Protocol
+
+Trigger phrases **"le stéphane bellavance"**, **"le réal t.v."**, and
+**"le méchant changement"** (any variant, case-insensitive) activate the full
+multi-agent team routine. When any of these appear in a user message, read:
+- `vaultwares-agentciation/docs/MULTI_AGENT_FLOW.md` — canonical 6-phase protocol
+- `vaultwares-agentciation/docs/TASKS_MD_SCHEMA.md` — machine-parseable task format
+- `vaultwares-agentciation/docs/AGENT_TELEMETRY.md` — ledger fields + thought logs
+- `vaultwares-agentciation/docs/JULES_INTEGRATION.md` — Jules API dispatch rules
+
+**Execution tiers** used in multi-agent runs:
+
+| TASK_TYPE | Runtime | On Redis? | Use for |
+|-----------|---------|-----------|---------|
+| `CLOUD` | Cloud LLM (GPT-4 default) | Yes | Complex reasoning, security-critical, time-sensitive |
+| `ASYNC` | Jules API | No | Non-blocking, file-based, tolerates latency |
+| `LOCAL` | Ollama local model | No | Mechanical, repetitive, deterministic |
+
+ASYNC and LOCAL agents never join the Redis network. They deliver PRs independently.
 
 ## Documentation Standards
 
