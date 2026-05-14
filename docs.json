@@ -64,15 +64,25 @@
               "guides/maintenance"
             ]
           },
-          {
-            "group": "Brand & voice",
-            "icon": "paintbrush",
-            "pages": [
-              "branding"
-            ]
-          }
-        ]
-      },
+        {
+          "group": "Brand & voice",
+          "icon": "paintbrush",
+          "pages": [
+            "branding"
+          ]
+        },
+        {
+          "group": "Operations (Private)",
+          "icon": "server",
+          "pages": [
+            "operations/network-map",
+            "operations/ops-log-2026-05-13",
+            "operations/tailscale",
+            "operations/secrets"
+          ]
+        }
+      ]
+    },
       {
         "tab": "Security & compliance",
         "icon": "shield-check",

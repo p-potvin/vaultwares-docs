@@ -1,0 +1,115 @@
+---
+title: "Network map (Private)"
+description: "Tailnet, VPSes, PCs, services, ports, and how we access them. Private (tailnet-only)."
+---
+
+# Network map (Private)
+
+## Quick facts / Faits rapides
+
+- **Tailnet:** `tail1764b8.ts.net`
+- **Private docs:** `docs.vaultwares.ca` (tailnet-only)
+- **Public website:** `vaultwares.ca` (public)
+- **Ops log (today):** `operations/ops-log-2026-05-13`
+
+## Diagram (Mermaid) / Diagramme (Mermaid)
+
+```mermaid
+flowchart TB
+  %% Public entrypoints (Internet)
+  subgraph Internet["Public (Internet)"]
+    Users["Public users"]
+    VaultWaresCA["vaultwares.ca\n(vaultwares-website)\nHTTPS :443"]
+    Noddit["noddit.org\n(vault-flows SPA)\nHTTPS :443"]
+    PromKing["prom-king.xyz\n(tube)\nHTTPS :443"]
+    FullXXX["fullxxx.video\n(tube)\nHTTPS :443"]
+  end
+
+  %% Tailnet-only entrypoints
+  subgraph Tailnet["Private (Tailnet-only)"]
+    Docs["docs.vaultwares.ca\n(vaultwares-docs)\nHTTPS :443"]
+    Secrets["secrets.vaultwares.ca\n(Vaultwarden bootstrap)\nHTTPS :443"]
+    PCAPI["Clopeux-Desktop\nFastAPI pipelines\nhttp://100.71.101.21:9001"]
+    VaultFlowsSPA["Clopeux-Desktop\nvault-flows SPA\nhttp://100.71.101.21:3100"]
+    RDP["Clopeux-Desktop RDP\n100.71.101.21:3389"]
+  end
+
+  %% Machines
+  subgraph Machines["Machines"]
+    V1["vaultwares-1 (GreenCloud VPS)\nDebian 12\nPublic 173.249.194.15\nTailnet 100.73.93.84"]
+    V0["ci-egress-vps (Old VPS)\nDebian 12\nPublic 212.193.6.35\nTailnet 100.73.57.6"]
+    PC["Clopeux-Desktop\nWindows\nTailnet 100.71.101.21"]
+    Brume2["Brume2\nOpenWrt\nTailnet 100.67.153.112"]
+  end
+
+  %% Public routing (nginx on VPS)
+  Users -->|HTTPS| VaultWaresCA --> V1
+  Users -->|HTTPS| Noddit --> V1
+  Users -->|HTTPS| PromKing --> V1
+  Users -->|HTTPS| FullXXX --> V1
+
+  %% Tailnet routing
+  Docs --> V1
+  Secrets --> V1
+  Noddit -->|proxy| VaultFlowsSPA --> PC
+  VaultWaresCA -->|future API calls| PCAPI --> PC
+
+  %% Ops access
+  V1 <-->|Tailscale (WireGuard)| PC
+  V0 <-->|Tailscale (WireGuard)| PC
+  Brume2 <-->|Tailscale (WireGuard)| PC
+  RDP --> PC
+```
+
+### diagrams.net (draw.io) source (optional)
+
+- Source file: `images/diagrams/vaultwares-network.drawio`
+- Recommended workflow: edit the `.drawio` in diagrams.net, export an `.svg`, and embed it here (Mermaid remains the canonical text source).
+
+## Machines / Machines
+
+> This page intentionally avoids passwords/tokens. Store secrets in Vaultwarden (bootstrap) and later VaultWares Secrets (primary).
+
+| Machine | Role | OS | Tailnet IP | Public IP | Access |
+|---|---|---|---|---|---|
+| `Clopeux-Desktop` | PC / pipelines host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`), API on `9001` |
+| `Brume2` | Home gateway (DHCP/DNS/router) | OpenWrt | `100.67.153.112` | (home) | Tailnet admin only |
+| `vaultwares-1` | **New VPS** (GreenCloud) | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only**, HTTPS public services |
+| `ci-egress-vps` | **Old VPS** | Debian 12 | `100.73.57.6` | `212.193.6.35` | SSH **tailnet-only**, legacy services |
+
+## Services / Services
+
+### Public (Internet)
+
+| Service | URL | Where | Ports | TLS |
+|---|---|---:|---:|---|
+| VaultWares website | `https://vaultwares.ca` | `vaultwares-1` | `443` | Let’s Encrypt (nginx) |
+| Noddit | `https://noddit.org` | `vaultwares-1` (proxy to PC) | `443` | Let’s Encrypt (nginx) |
+| Prom King | `https://prom-king.xyz` | `vaultwares-1` | `443` | Let’s Encrypt (nginx) |
+| FullXXX | `https://fullxxx.video` | `vaultwares-1` | `443` | Let’s Encrypt (nginx) |
+
+### Private (Tailnet-only)
+
+| Service | URL / Endpoint | Where | Ports | Auth |
+|---|---|---:|---:|---|
+| Private docs | `https://docs.vaultwares.ca` | `vaultwares-1` | `443` | Tailnet ACL + nginx allowlist |
+| Pipelines API (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | App auth (JWT/API key), Tailnet ACL |
+| Vaultwarden (bootstrap) | `https://secrets.vaultwares.ca` | `vaultwares-1` | `443` | Vaultwarden auth, Tailnet ACL |
+
+## Access model / Modèle d’accès
+
+- **Network encryption:** Tailscale (WireGuard).
+- **Public TLS:** nginx + Let’s Encrypt on VPSes.
+- **SSH:** **Tailnet-only** (port `22` allowed only on `tailscale0`).
+- **RDP:** Tailnet-only to `Clopeux-Desktop:3389` (policy-controlled).
+
+## Onboarding checklist / Liste d’intégration
+
+1. Join the tailnet (Tailscale client).
+2. Confirm your device appears in the admin console and is authorized.
+3. Read this page and the Tailscale policy doc.
+4. Get access to Vaultwarden (bootstrap secrets).
+5. Verify:
+   - You can reach `docs.vaultwares.ca` from tailnet.
+   - You can reach `vaultwares.ca` publicly.
+   - You can reach the PC API endpoint needed for your work (policy permitting).

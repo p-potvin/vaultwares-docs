@@ -145,6 +145,16 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    label: 'Operations (Private)',
+    labelFR: 'Opérations (Privé)',
+    icon: '🛠️',
+    links: [
+      { to: '/operations/network-map', labelEN: 'Network map', labelFR: 'Carte du réseau' },
+      { to: '/operations/tailscale', labelEN: 'Tailscale', labelFR: 'Tailscale' },
+      { to: '/operations/secrets', labelEN: 'Secrets', labelFR: 'Secrets' },
+    ],
+  },
+  {
     label: 'Security & compliance',
     labelFR: 'Sécurité et conformité',
     icon: '🛡️',
