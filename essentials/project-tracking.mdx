@@ -1,0 +1,25 @@
+---
+title: 'Project Tracking'
+description: 'How to manage tasks, milestones, and roadmaps in VaultWares repositories'
+icon: 'list-check'
+---
+
+VaultWares utilizes a tiered tracking system to maintain grounding and visibility across short-term execution and long-term vision.
+
+## 1. Documentation Hierarchy
+
+| File | Scope | Level |
+| ---- | ----- | ----- |
+| `TASKS.md` | Active run execution items | Atomic |
+| `TODO.md` | Short-term backlog and immediate next steps | Project |
+| `ROADMAP.md` | Long-term reference and strategic vision | Global |
+
+## 2. Maintenance
+
+Agents are responsible for maintaining these files during the Multi-Agent Flow:
+- **Phase 1**: Read `TODO.md` and `ROADMAP.md` to ground the new task list.
+- **Phase 6**: Update `TODO.md` with completed items and identify new backlog entries.
+
+## 3. Telemetry
+
+All project tracking data is supplemented by the **Agent Telemetry** system. Performance statistics are archived every **2 weeks** to keep the active tracking files efficient.
