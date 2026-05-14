@@ -1,0 +1,32 @@
+---
+title: 'Large Files & Heavy Assets'
+description: 'Guidelines for handling heavy files, AI models, and large datasets across VaultWares projects'
+icon: 'file-import'
+---
+
+To ensure system stability and predictable performance, all VaultWares projects handling large files (AI models, datasets, video blobs, etc.) must adhere to these guidelines.
+
+## 1. Resource Management
+
+### Warm Loading
+Any project that loads heavy assets into memory must implement a "Warm Loading" phase. This establishes the necessary hardware context (e.g., CUDA) and ensures that memory is correctly allocated before high-throughput processing begins.
+
+### Cache Flushing
+Explicitly clear hardware and software caches between intensive tasks. 
+- **Python**: Use `torch.cuda.empty_cache()` and `gc.collect()`.
+- **Rust/Node**: Ensure explicit drops or manual memory clearing where applicable.
+
+## 2. Safety Thresholds
+
+### Download Approval
+No agent or automated process may download a file larger than **500MB** without explicit user approval in the current conversation. 
+
+> [!IMPORTANT]
+> If a task requires a large download, the agent must pause and present the file size and source to the user.
+
+## 3. Visual Feedback
+
+Every long-running operation involving large files must provide a robust, real-time visual cue to the user. 
+
+- **CLI Implementation**: Use `tqdm` (Python), `indicatif` (Rust), or equivalent high-fidelity progress bars.
+- **GUI Implementation**: Follow the [Visual Cues](/vault-themes/visual-cues) guidelines in the Vault Themes system.

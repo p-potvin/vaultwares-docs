@@ -25,6 +25,15 @@
             ]
           },
           {
+            "group": "Operations & Best Practices",
+            "icon": "microscope",
+            "pages": [
+              "essentials/large-files",
+              "essentials/project-tracking",
+              "essentials/backup-strategy"
+            ]
+          },
+          {
             "group": "Hardware products",
             "icon": "microchip",
             "pages": [

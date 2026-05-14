@@ -1,0 +1,39 @@
+---
+title: 'Backup Strategy'
+description: 'The A.N.S.W.E.R.S. protocol for multi-location, encrypted backups'
+icon: 'shield-check'
+---
+
+VaultWares employs the **A.N.S.W.E.R.S.** (Alternating, Non Sequential, With Encryption, Restoring System) protocol to ensure maximum data durability.
+
+## 1. Targets
+
+Backups are synchronized across the following targets:
+- Local Machine
+- Greencloud VPS
+- Old VPS
+- Google Drive
+- Self-hosted Vaultwarden
+- Proton Drive
+- iCloud
+- Mega
+
+## 2. Encryption Mandate
+
+> [!CAUTION]
+> **No data may leave the local environment without being encrypted.** 
+> All multi-location backups must be encrypted in-transit to VPS or cloud targets.
+
+## 3. Rotation Logic (A.N.S.W.E.R.S.)
+
+To extend the coverage period while maintaining recent backups, use the following mathematical rotation logic ($N=20$):
+
+1. **Calculate Skip Value**: `skip_value = today_count + skip_modifier` (where `skip_modifier` defaults to 1).
+2. **Select Target for Deletion**:
+   - If `today_count` is **odd**: Remove record at index `N - skip_value`.
+   - If `today_count` is **even**: Remove record at index `0 + skip_value`.
+3. **Update State**: Increment `skip_modifier`. Reset to 1 once `skip_value >= (N/2) - 1`.
+
+## 4. Automation Rule
+
+The `sync-global-instructions.ps1` script and the backup sync routine must **never** be executed automatically. They require an active conversation and explicit user confirmation.
