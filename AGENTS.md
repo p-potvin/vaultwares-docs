@@ -104,6 +104,34 @@ Every page needs `title` and `description` in frontmatter. Use second-person
 voice, relative paths for internal links, and language tags on all code blocks.
 New pages must be added to `docs.json` navigation.
 
+## GUI Verification Standard (Web UIs)
+
+When a task involves a web UI (docs sites, dashboards, admin panels, SPAs), **do
+not** mark it as "working" based on a single `200 OK` response or a single
+screenshot.
+
+Minimum verification checklist (do as many as are feasible in the current
+environment):
+
+- **Interactive navigation**: load the app, then navigate at least **2 links
+  deep** (route changes), and return back.
+- **Network inspection**: open DevTools Network and confirm no blocking
+  client-side errors (failed dynamic imports, CSP issues, mixed-content,
+  redirected assets, etc.). A `200` can still be a functional 404 or a broken
+  payload.
+- **Console inspection**: check DevTools Console for runtime exceptions/warnings
+  tied to the change.
+- **UI state sanity**: trigger at least one **hover/focus** state and one
+  **error/empty** state relevant to the change (e.g., missing page, bad input).
+- **Cross-check modality** (recommended): use a second tool in addition to the
+  interactive browser, such as:
+  - a CLI probe (`curl`, `Invoke-WebRequest`) to verify redirects/headers, and/or
+  - an automated UI check (Playwright) or the internal **GUI auditor** tool when
+    available.
+
+Always record what was actually verified (pages visited + tools used) in the
+Agent Ledger entry.
+
 ## Global Instruction Targets & Sync
 
 VaultWares maintains exactly 7 synchronized global instruction targets for supported Hosts:

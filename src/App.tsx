@@ -3,12 +3,52 @@ import { BrowserRouter, Routes, Route, Link, NavLink, useParams, Navigate } from
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import matter from 'gray-matter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { THEMES } from './themes';
 import type { Lang } from './translations';
 import { translations } from './translations';
 import './index.css';
+
+type FrontmatterData = {
+  title?: string;
+  description?: string;
+};
+
+function parseFrontmatter(raw: string): { content: string; data: FrontmatterData } {
+  // Vite raw imports preserve CRLF, and the production inlined strings include
+  // explicit `\r` escapes. Normalize first so delimiter matching is reliable.
+  const normalized = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+  if (!normalized.startsWith('---\n')) {
+    return { content: normalized, data: {} };
+  }
+
+  const endIndex = normalized.indexOf('\n---\n', 4);
+  if (endIndex === -1) {
+    return { content: normalized, data: {} };
+  }
+
+  const fmBlock = normalized.slice(4, endIndex).trim();
+  const data: FrontmatterData = {};
+
+  for (const line of fmBlock.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+
+    const colonIndex = trimmed.indexOf(':');
+    if (colonIndex === -1) continue;
+
+    const key = trimmed.slice(0, colonIndex).trim();
+    let value = trimmed.slice(colonIndex + 1).trim();
+    value = value.replace(/^['"]/, '').replace(/['"]$/, '');
+
+    if (key === 'title') data.title = value;
+    if (key === 'description') data.description = value;
+  }
+
+  const content = normalized.slice(endIndex + '\n---\n'.length);
+  return { content, data };
+}
 
 // ── Minimal-gold icon (mode-aware per vault-themes AGENTS.md) ─────────────────
 const VaultIcon = ({ mode, className = 'w-8 h-8' }: { mode: 'light' | 'dark'; className?: string }) => (
@@ -231,12 +271,15 @@ function MarkdownViewer({ lang }: { lang: Lang }) {
       if (module) {
         try {
           const raw = await module() as string;
-          const { content: mdxContent, data } = matter(raw);
+          const { content: mdxContent, data } = parseFrontmatter(raw);
           setContent(mdxContent);
           if (data.title) {
             document.title = `${data.title} | VaultWares`;
           }
-        } catch {
+        } catch (err) {
+          // Keep the UI stable even if a page is malformed, but leave a trail for diagnosis.
+          // eslint-disable-next-line no-console
+          console.error('[docs] Failed to load page content', { filePath }, err);
           setContent(`# ${t.notFoundTitle}\n\n${t.notFoundDesc}`);
         }
       } else {
@@ -246,12 +289,14 @@ function MarkdownViewer({ lang }: { lang: Lang }) {
         if (indexModule) {
           try {
             const raw = await indexModule() as string;
-            const { content: mdxContent, data } = matter(raw);
+            const { content: mdxContent, data } = parseFrontmatter(raw);
             setContent(mdxContent);
             if (data.title) {
               document.title = `${data.title} | VaultWares`;
             }
-          } catch {
+          } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error('[docs] Failed to load index page content', { indexPath }, err);
             setContent(`# ${t.notFoundTitle}\n\n${t.notFoundDesc}`);
           }
         } else {
