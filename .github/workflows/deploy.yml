@@ -25,7 +25,7 @@ jobs:
 
       - name: Deploy (local)
         run: |
-          sudo mkdir -p /var/www/vaultwares-docs
-          sudo rm -rf /var/www/vaultwares-docs/dist
-          sudo cp -R dist /var/www/vaultwares-docs/dist
+          mkdir -p /var/www/vaultwares-docs
+          rm -rf /var/www/vaultwares-docs/dist
+          cp -R dist /var/www/vaultwares-docs/dist
           # Nginx serves from /var/www/vaultwares-docs/dist
