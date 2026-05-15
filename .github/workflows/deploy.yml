@@ -6,31 +6,26 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # Tailnet Lock blocks GitHub-hosted runners from joining the tailnet.
+    # This workflow is intended to run on the GreenCloud VPS runner only.
+    runs-on: [self-hosted, greencloud-vps]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Connect to Tailnet
-        uses: tailscale/github-action@v2
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          node-version: 22
 
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_TAILNET_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          password: ${{ secrets.VPS_PASSWORD }}
-          script: |
-            mkdir -p /var/www/vaultwares-docs
-            cd /var/www/vaultwares-docs
-            if [ ! -d ".git" ]; then
-              git init
-              git remote add origin https://github.com/p-potvin/vaultwares-docs.git
-            fi
-            git fetch origin main
-            git reset --hard origin/main
-            npm install
-            npm run build
-            # Nginx serves from /var/www/vaultwares-docs/dist
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy (local)
+        run: |
+          sudo mkdir -p /var/www/vaultwares-docs
+          sudo rm -rf /var/www/vaultwares-docs/dist
+          sudo cp -R dist /var/www/vaultwares-docs/dist
+          # Nginx serves from /var/www/vaultwares-docs/dist
