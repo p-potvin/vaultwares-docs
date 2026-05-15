@@ -132,6 +132,20 @@ environment):
 Always record what was actually verified (pages visited + tools used) in the
 Agent Ledger entry.
 
+## Shell Commands: Copy/Paste Safety
+
+When giving users shell commands, assume copy/paste may break pipes (`|`) and
+line continuations depending on terminal (Windows PowerShell, PuTTY/SSH, web
+consoles).
+
+Rules:
+- Prefer **single-line** commands for critical steps.
+- When multi-line is unavoidable, wrap in one fenced block and avoid
+  backticks/line-wrapping that can introduce hidden characters.
+- Prefer **temporary files** over pipelines for parsing (e.g., `curl -o file`
+  then `jq file`) to avoid SIGPIPE and copy/paste corruption.
+- If a pipe is required, also provide an equivalent “no-pipe” alternative.
+
 ## Global Instruction Targets & Sync
 
 VaultWares maintains exactly 7 synchronized global instruction targets for supported Hosts:
