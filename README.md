@@ -1,73 +1,101 @@
-# React + TypeScript + Vite
+# vaultwares-docs
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+VaultWares documentation site (Mintlify-style MDX content rendered by a custom
+React + Vite app).
 
-Currently, two official plugins are available:
+Primary goals:
+- Provide public product documentation and private ops onboarding docs.
+- Keep UX consistent with VaultWares brand and the `vault-themes` design system.
+- Maintain strict, repeatable verification for GUI changes (see `AGENTS.md`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Repo layout
 
-## React Compiler
+- `docs-content/` — documentation pages as `.mdx` (frontmatter required).
+- `docs.json` — navigation structure (SoT for docs ordering/sections).
+- `src/App.tsx` — router + nav rendering + MDX/markdown rendering.
+- `public/` — static assets.
+- `vault-themes/` — design tokens & brand system (submodule).
+- `vaultwares-agentciation/` — agent workflow docs (submodule).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Writing docs
 
-## Expanding the ESLint configuration
+### Page format
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+All `.mdx` pages must include YAML frontmatter:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```mdx
+---
+title: "My Page Title"
+description: "One sentence description"
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Content
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Add a new page
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1) Add a file under `docs-content/` (example: `docs-content/getting-started/foo.mdx`).
+2) Add the page to `docs.json` navigation.
+3) Keep nav labels bilingual (English + Quebec French):
+   - update the nav list in `src/App.tsx` (search `NAV_SECTIONS`).
+4) Verify the route renders (see “Verification”).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Development
+
+Install dependencies:
+
+```bash
+npm ci
 ```
+
+Run dev server:
+
+```bash
+npm run dev
+```
+
+Build:
+
+```bash
+npm run build
+```
+
+Preview built app locally:
+
+```bash
+npm run preview
+```
+
+## Deployment (current)
+
+Production deploys are designed to keep the server in control:
+
+- GitHub sends a **signed push webhook**.
+- `vw-deployd` on the VPS verifies signature + allowlist and deploys by commit SHA.
+
+Webhook endpoint:
+- `https://hooks.vaultwares.ca/github`
+
+The deploy mechanism lives outside this repo (see `automation-suite/deployd`).
+
+## Verification (must-do for GUI changes)
+
+Do not mark the site “working” from a single `200 OK`.
+
+Minimum verification checklist:
+- Navigate at least **2 links deep** (route changes) and back.
+- Inspect DevTools **Network** (dynamic imports/assets) and **Console** (runtime errors).
+- Trigger at least one hover/focus state and one error/empty state relevant to the change.
+
+The full standard lives in `AGENTS.md`.
+
+## Submodules
+
+Initialize:
+
+```bash
+git submodule update --init --recursive
+```
+
+Important: when changing `vault-themes` or `vaultwares-agentciation`, do it in
+their standalone repos (not via submodule copies).
