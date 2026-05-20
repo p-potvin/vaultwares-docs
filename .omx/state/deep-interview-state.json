@@ -1,12 +1,12 @@
 {
-  "version": 1,
   "active": true,
-  "skill": "deep-interview",
-  "keyword": "interview",
-  "phase": "planning",
-  "activated_at": "2026-05-20T12:31:18.956Z",
+  "mode": "deep-interview",
+  "current_phase": "intent-first",
+  "started_at": "2026-05-20T12:31:18.956Z",
   "updated_at": "2026-05-20T12:31:18.960Z",
-  "source": "keyword-detector",
+  "session_id": "",
+  "thread_id": "019e429e-9476-7463-a2ad-7d01ee036b38",
+  "turn_id": "019e455c-29cb-7361-99c3-8eb23f17c4e7",
   "input_lock": {
     "active": true,
     "scope": "deep-interview-auto-approval",
