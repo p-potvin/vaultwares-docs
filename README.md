@@ -5,7 +5,7 @@ React + Vite app).
 
 Primary goals:
 - Provide public product documentation and private ops onboarding docs.
-- Keep UX consistent with VaultWares brand and the `vault-themes` design system.
+- Keep UX consistent with VaultWares brand and the `vaultwares-themes` design system.
 - Maintain strict, repeatable verification for GUI changes (see `AGENTS.md`).
 
 ## Repo layout
@@ -14,8 +14,8 @@ Primary goals:
 - `docs.json` — navigation structure (SoT for docs ordering/sections).
 - `src/App.tsx` — router + nav rendering + MDX/markdown rendering.
 - `public/` — static assets.
-- `vault-themes/` — design tokens & brand system (submodule).
-- `vaultwares-agentciation/` — agent workflow docs (submodule).
+- `vaultwares-themes/` — design tokens & brand system (submodule).
+- `vaultwares-adk/` — agent workflow docs (submodule).
 
 ## Writing docs
 
@@ -97,5 +97,5 @@ Initialize:
 git submodule update --init --recursive
 ```
 
-Important: when changing `vault-themes` or `vaultwares-agentciation`, do it in
+Important: when changing `vaultwares-themes` or `vaultwares-adk`, do it in
 their standalone repos (not via submodule copies).

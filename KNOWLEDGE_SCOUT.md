@@ -14,7 +14,7 @@ Assistants MUST consult this file ONLY under these conditions:
 | Date | Project / Context | Finding / Solution | Cost Saved |
 |------|-------------------|-------------------|------------|
 | 2026-05-11 | vaultwares-docs | **Tailwind 4 Build Fix**: Tailwind 4 requires `@plugin` syntax instead of old CSS imports for custom extensions. Use `npm run build` to verify Vite integration. | High (Deep debugging) |
-| 2026-05-11 | vault-themes | **Theme Reorganization**: All language-specific managers (Python, TS, C#, TW) are consolidated in `theme-manager/exports/`. Do not modify `VaultWares.Brand.xaml` or `sync_submodule_rules.py`. | Medium (Path discovery) |
+| 2026-05-11 | vaultwares-themes | **Theme Reorganization**: All language-specific managers (Python, TS, C#, TW) are consolidated in `theme-manager/exports/`. Do not modify `VaultWares.Brand.xaml` or `sync_submodule_rules.py`. | Medium (Path discovery) |
 | 2026-05-11 | Shared | **Bilingual Priority**: All user-facing strings MUST be EN (English) and QC (Quebec French). QC strings are typically 15-20% longer; design layouts accordingly. | Low (Compliance) |
 
 ## Scout Entry Protocol

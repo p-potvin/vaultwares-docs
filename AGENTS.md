@@ -6,7 +6,7 @@ Assistant working in this workspace should read this file first.
 ## Lexicon
 
 Standard terms used across all VaultWares projects (full reference:
-`vaultwares-agentciation/docs/LEXICON.md`):
+`vaultwares-adk/docs/LEXICON.md`):
 
 - **Host** — application container (VS Code, Claude Desktop, Windsurf, etc.)
 - **AI Assistant** — the LLM service (Claude, ChatGPT, Gemini, Codex, etc.)
@@ -16,7 +16,7 @@ Standard terms used across all VaultWares projects (full reference:
 - **SSoT, SoT** - Single Source of Truth, Source of Truth.
 - **VW** - VaultWares.
 - **Ledger, Agent Ledger** - The repo agent-ledger which serves as a bookkeeping entry of the work done by every Assistant, that they must log before each reply they send.
-- **Agents Team, Le Méchant Changement, Le Stéphane Bellavance** - Trigger words referring to the multi-agents team routine defined in vaultwares-agentciation.
+- **Agents Team, Le Méchant Changement, Le Stéphane Bellavance** - Trigger words referring to the multi-agents team routine defined in vaultwares-adk.
 
 ## Company Overview
 
@@ -62,30 +62,30 @@ replying** (not at the start of a task):
 Do not log secrets. If the ledger cannot be accessed, say so in your reply.
 Full protocol: `agent-ledger/AGENTS.md`.
 
-## Design & Brand → vault-themes
+## Design & Brand → vaultwares-themes
 
 Before any UI, branding, design token, or theme work, read:
-- `vault-themes/AGENTS.md` — full design system rules, token reference, visual rules, quality gates
-- `vault-themes/brand/brand-guide.md` — brand philosophy and identity
+- `vaultwares-themes/AGENTS.md` — full design system rules, token reference, visual rules, quality gates
+- `vaultwares-themes/brand/brand-guide.md` — brand philosophy and identity
 
-Never hardcode colors, fonts, or spacing. Use named tokens from `vault-themes`.
+Never hardcode colors, fonts, or spacing. Use named tokens from `vaultwares-themes`.
 
-## AI Infrastructure → vaultwares-agentciation
+## AI Infrastructure → vaultwares-adk
 
 For OMX operating contract, Agent definitions, delegation rules, Lore commit
 protocol, and skill distribution, read:
-- `vaultwares-agentciation/AGENTS.md`
-- `vaultwares-agentciation/docs/LEXICON.md`
+- `vaultwares-adk/AGENTS.md`
+- `vaultwares-adk/docs/LEXICON.md`
 
 ### Multi-Agent Flow Protocol
 
 Trigger phrases **"le stéphane bellavance"**, **"le réal t.v."**, and
 **"le méchant changement"** (any variant, case-insensitive) activate the full
 multi-agent team routine. When any of these appear in a user message, read:
-- `vaultwares-agentciation/docs/MULTI_AGENT_FLOW.md` — canonical 6-phase protocol
-- `vaultwares-agentciation/docs/TASKS_MD_SCHEMA.md` — machine-parseable task format
-- `vaultwares-agentciation/docs/AGENT_TELEMETRY.md` — ledger fields + thought logs
-- `vaultwares-agentciation/docs/JULES_INTEGRATION.md` — Jules API dispatch rules
+- `vaultwares-adk/docs/MULTI_AGENT_FLOW.md` — canonical 6-phase protocol
+- `vaultwares-adk/docs/TASKS_MD_SCHEMA.md` — machine-parseable task format
+- `vaultwares-adk/docs/AGENT_TELEMETRY.md` — ledger fields + thought logs
+- `vaultwares-adk/docs/JULES_INTEGRATION.md` — Jules API dispatch rules
 
 **Execution tiers** used in multi-agent runs:
 
@@ -188,12 +188,12 @@ Never reduce output quality to save credits.
 | Tier | Repo | Governs |
 |------|------|---------|
 | 1 | `vaultwares-docs` | Company rules, mandatory protocols, pointers to tier-2 |
-| 2 | `vault-themes` | Design tokens, brand, visual rules, theme manager |
-| 2 | `vaultwares-agentciation` | OMX contract, Agents, Lore protocol, skills |
+| 2 | `vaultwares-themes` | Design tokens, brand, visual rules, theme manager |
+| 2 | `vaultwares-adk` | OMX contract, Agents, Lore protocol, skills |
 | 2 | `agent-ledger` | Ledger protocol, agent header, event schema |
 | 3 | Each repo | Repo-specific rules only |
 
 Narrower scope overrides broader. A repo's AGENTS.md overrides this file for
 repo-specific concerns.
 
-**CRITICAL SUBMODULE RULE:** When making a change to `vault-themes`, `vaultwares-agentciation`, or `vaultwares_agentciation`, always make sure to do it within the real standalone repository itself, and NEVER in a submodule version.
+**CRITICAL SUBMODULE RULE:** When making a change to `vaultwares-themes`, `vaultwares-adk`, or `vaultwares-adk`, always make sure to do it within the real standalone repository itself, and NEVER in a submodule version.

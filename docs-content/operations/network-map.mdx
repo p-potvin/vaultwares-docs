@@ -36,7 +36,7 @@ flowchart TB
 
   %% Machines
   subgraph Machines["Machines"]
-    V1["vaultwares-1 (GreenCloud VPS)\nDebian 12\nPublic 173.249.194.15\nTailnet 100.73.93.84"]
+    V1["greencloud-vps (GreenCloud VPS)\nDebian 12\nPublic 173.249.194.15\nTailnet 100.73.93.84"]
     V0["ci-egress-vps (Old VPS)\nDebian 12\nPublic 212.193.6.35\nTailnet 100.73.57.6"]
     PC["Clopeux-Desktop\nWindows\nTailnet 100.71.101.21"]
     Brume2["Brume2\nOpenWrt\nTailnet 100.67.153.112"]
@@ -74,7 +74,7 @@ flowchart TB
 |---|---|---|---|---|---|
 | `Clopeux-Desktop` | PC / pipelines host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`), API on `9001` |
 | `Brume2` | Home gateway (DHCP/DNS/router) | OpenWrt | `100.67.153.112` | (home) | Tailnet admin only |
-| `vaultwares-1` | **New VPS** (GreenCloud) | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only**, HTTPS public services |
+| `greencloud-vps` | **New VPS** (GreenCloud) | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only**, HTTPS public services |
 | `ci-egress-vps` | **Old VPS** | Debian 12 | `100.73.57.6` | `212.193.6.35` | SSH **tailnet-only**, legacy services |
 
 ## Services / Services
@@ -83,18 +83,18 @@ flowchart TB
 
 | Service | URL | Where | Ports | TLS |
 |---|---|---:|---:|---|
-| VaultWares website | `https://vaultwares.ca` | `vaultwares-1` | `443` | Let’s Encrypt (nginx) |
-| Noddit | `https://noddit.org` | `vaultwares-1` (proxy to PC) | `443` | Let’s Encrypt (nginx) |
-| Prom King | `https://prom-king.xyz` | `vaultwares-1` | `443` | Let’s Encrypt (nginx) |
-| FullXXX | `https://fullxxx.video` | `vaultwares-1` | `443` | Let’s Encrypt (nginx) |
+| VaultWares website | `https://vaultwares.ca` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| Noddit | `https://noddit.org` | `greencloud-vps` (proxy to PC) | `443` | Let’s Encrypt (nginx) |
+| Prom King | `https://prom-king.xyz` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| FullXXX | `https://fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 
 ### Private (Tailnet-only)
 
 | Service | URL / Endpoint | Where | Ports | Auth |
 |---|---|---:|---:|---|
-| Private docs | `https://docs.vaultwares.ca` | `vaultwares-1` | `443` | Tailnet ACL + nginx allowlist |
+| Private docs | `https://docs.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
 | Pipelines API (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | App auth (JWT/API key), Tailnet ACL |
-| Vaultwarden (bootstrap) | `https://secrets.vaultwares.ca` | `vaultwares-1` | `443` | Vaultwarden auth, Tailnet ACL |
+| Vaultwarden (bootstrap) | `https://secrets.vaultwares.ca` | `greencloud-vps` | `443` | Vaultwarden auth, Tailnet ACL |
 
 ## Access model / Modèle d’accès
 

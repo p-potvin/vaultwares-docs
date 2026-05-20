@@ -71,7 +71,7 @@ description: "Concise summary for SEO and navigation"
 
 ## Overview
 
-The VaultWares Theming Skill provides agents and developers with a unified, framework-agnostic interface for applying, inspecting, and enforcing VaultWares design tokens and theming rules across any project. It abstracts the theme source of truth (`vault-themes/theme_manager.py`, `Brand/tokens.ts`, `VaultWares.Brand.xaml`) and provides usage patterns for Qt/PySide6, React/Tailwind, and WinUI3/XAML.
+The VaultWares Theming Skill provides agents and developers with a unified, framework-agnostic interface for applying, inspecting, and enforcing VaultWares design tokens and theming rules across any project. It abstracts the theme source of truth (`vaultwares-themes/theme_manager.py`, `Brand/tokens.ts`, `VaultWares.Brand.xaml`) and provides usage patterns for Qt/PySide6, React/Tailwind, and WinUI3/XAML.
 
 ## Capabilities
 - List all available VaultWares themes (name, accent, surface, style family)
