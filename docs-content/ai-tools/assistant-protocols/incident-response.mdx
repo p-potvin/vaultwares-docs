@@ -1,0 +1,23 @@
+---
+title: "Incident Response"
+description: "Assistant protocol summary: Incident Response"
+---
+
+# Incident Response
+
+- Category ID: `INCIDENT_RESPONSE`
+- Summary source: `instructions/summaries/INCIDENT_RESPONSE.md`
+- Notes source: `instructions/notes/INCIDENT_RESPONSE.md`
+
+Applies when: outage, production breakage, security incident, urgent regression.
+Do:
+- Stabilize first (stop bleed), then diagnose, then fix.
+- Keep an incident timeline and note what was verified.
+Do not:
+- Make irreversible changes without a rollback plan.
+Done when:
+- Service is stable and incident notes exist.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/INCIDENT_RESPONSE.md`

@@ -1,0 +1,24 @@
+---
+title: "Git Branch Policy"
+description: "Assistant protocol summary: Git Branch Policy"
+---
+
+# Git Branch Policy
+
+- Category ID: `GIT_BRANCH_POLICY`
+- Summary source: `instructions/summaries/GIT_BRANCH_POLICY.md`
+- Notes source: `instructions/notes/GIT_BRANCH_POLICY.md`
+
+Applies when: any git workflow action, commits, branches, pushes.
+Do:
+- If on branch main: do not commit unless the user explicitly requested commits in the current prompt.
+- Prefer a feature branch (default prefix: vw-codex-).
+- Keep unrelated changes out of the branch.
+Do not:
+- Commit/push on main without explicit instruction.
+Done when:
+- Branch state is clean, isolated, and ready for review.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/GIT_BRANCH_POLICY.md`

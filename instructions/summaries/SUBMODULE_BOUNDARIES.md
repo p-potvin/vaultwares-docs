@@ -1,0 +1,9 @@
+# SUBMODULE_BOUNDARIES
+Applies when: the path you are editing is a git submodule or a mirrored vendor copy.
+Do:
+- If the change targets vaultwares-themes, vaultwares-adk, or agent-ledger, prefer editing the standalone repo under C:\\Users\\Administrator\\Desktop\\Github Repos\\<repo> (not a submodule checkout).
+- If you must read a submodule copy to understand behavior, treat it as read-only.
+Do not:
+- Patch Tier-2 repos inside another repo's submodule directory.
+Done when:
+- The final patch is applied in the standalone repo checkout.

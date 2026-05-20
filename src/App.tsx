@@ -240,6 +240,7 @@ const NAV_SECTIONS = [
       { to: '/ai-tools/claude-code', labelEN: 'Claude Code', labelFR: 'Claude Code' },
       { to: '/ai-tools/cursor', labelEN: 'Cursor', labelFR: 'Cursor' },
       { to: '/ai-tools/windsurf', labelEN: 'Windsurf', labelFR: 'Windsurf' },
+      { to: '/ai-tools/assistant-protocols', labelEN: 'Assistant protocols', labelFR: 'Protocoles assistants' },
     ],
   },
   {

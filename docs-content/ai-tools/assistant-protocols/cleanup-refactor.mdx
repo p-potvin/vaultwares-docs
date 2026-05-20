@@ -1,0 +1,24 @@
+---
+title: "Cleanup Refactor"
+description: "Assistant protocol summary: Cleanup Refactor"
+---
+
+# Cleanup Refactor
+
+- Category ID: `CLEANUP_REFACTOR`
+- Summary source: `instructions/summaries/CLEANUP_REFACTOR.md`
+- Notes source: `instructions/notes/CLEANUP_REFACTOR.md`
+
+Applies when: refactoring, decluttering, reorganizing, large edits without new user-facing functionality.
+Do:
+- Write a cleanup plan before editing.
+- Lock behavior with tests or concrete verification steps first.
+- Prefer deletion over addition; keep diffs small and reversible.
+Do not:
+- Mix refactor with unrelated feature work.
+Done when:
+- Behavior is unchanged (or explicitly declared) and verification evidence exists.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/CLEANUP_REFACTOR.md`

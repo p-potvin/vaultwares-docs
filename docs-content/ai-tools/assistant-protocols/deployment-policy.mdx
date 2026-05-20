@@ -1,0 +1,23 @@
+---
+title: "Deployment Policy"
+description: "Assistant protocol summary: Deployment Policy"
+---
+
+# Deployment Policy
+
+- Category ID: `DEPLOYMENT_POLICY`
+- Summary source: `instructions/summaries/DEPLOYMENT_POLICY.md`
+- Notes source: `instructions/notes/DEPLOYMENT_POLICY.md`
+
+Applies when: deploying, VPS changes, release operations, production routing.
+Do:
+- Tailnet-first admin; minimize blast radius; keep rollback path.
+- Verify deploy behavior with concrete probes and UI checks when relevant.
+Do not:
+- Deploy from assumptions; verify the actual environment state.
+Done when:
+- Deploy steps and verification evidence are recorded.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/DEPLOYMENT_POLICY.md`

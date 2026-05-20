@@ -1,0 +1,23 @@
+---
+title: "Automation Policy"
+description: "Assistant protocol summary: Automation Policy"
+---
+
+# Automation Policy
+
+- Category ID: `AUTOMATION_POLICY`
+- Summary source: `instructions/summaries/AUTOMATION_POLICY.md`
+- Notes source: `instructions/notes/AUTOMATION_POLICY.md`
+
+Applies when: cron, monitors, recurring automations, background jobs, schedulers.
+Do:
+- Prefer explicit, inspectable configs; avoid hidden state.
+- Record what runs where, and how to stop/rollback.
+Do not:
+- Create automations that run outside the tailnet policy.
+Done when:
+- Automation is documented and verifiable.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/AUTOMATION_POLICY.md`

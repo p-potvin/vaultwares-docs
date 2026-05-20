@@ -1,0 +1,7 @@
+# VaultWares — pre-instructions (repo stub)
+This file is intentionally short. It routes work to the company protocol TOC.
+Always start at: `C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\instructions\ROUTER.md`
+Routines run first (always). Then scan all protocol categories, select relevant, read only selected summaries in category order.
+Read full notes only when explicitly prompted: `read full notes`
+Mandatory ledger (last step before replying): use `C:\Users\Administrator\Desktop\Github Repos\agent-ledger\scripts\record-agent-change.ps1`
+

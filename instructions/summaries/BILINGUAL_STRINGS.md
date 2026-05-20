@@ -1,0 +1,9 @@
+# BILINGUAL_STRINGS
+Applies when: any user-facing string, UI label, nav, marketing copy, error messages.
+Do:
+- Provide English (EN) and Quebec French (QC) versions.
+- Design for QC strings being 15-20% longer than EN.
+Do not:
+- Ship new user-facing strings in EN only.
+Done when:
+- Both EN and QC are present and layout is tolerant.

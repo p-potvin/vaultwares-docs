@@ -1,0 +1,23 @@
+---
+title: "Multi Agent Flow"
+description: "Assistant protocol summary: Multi Agent Flow"
+---
+
+# Multi Agent Flow
+
+- Category ID: `MULTI_AGENT_FLOW`
+- Summary source: `instructions/summaries/MULTI_AGENT_FLOW.md`
+- Notes source: `instructions/notes/MULTI_AGENT_FLOW.md`
+
+Applies when: user uses trigger phrases or requests multi-agent execution.
+Do:
+- On trigger phrases, follow the canonical flow defined in vaultwares-adk/docs/MULTI_AGENT_FLOW.md and related schema docs.
+- Do not improvise the phases.
+Do not:
+- Start delegation without the required reads.
+Done when:
+- TASKS.md and telemetry expectations are followed for the run.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/MULTI_AGENT_FLOW.md`

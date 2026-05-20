@@ -1,0 +1,25 @@
+---
+title: "Gui Verification"
+description: "Assistant protocol summary: Gui Verification"
+---
+
+# Gui Verification
+
+- Category ID: `GUI_VERIFICATION`
+- Summary source: `instructions/summaries/GUI_VERIFICATION.md`
+- Notes source: `instructions/notes/GUI_VERIFICATION.md`
+
+Applies when: web UI, docs site UI, dashboards, admin panels, SPAs.
+Do:
+- Navigate at least 2 links deep and back.
+- Check DevTools Console and Network for blocking errors.
+- Trigger hover/focus state and an empty/error state relevant to the change.
+- Cross-check with a second modality when feasible (curl/Invoke-WebRequest or Playwright).
+Do not:
+- Mark “working” from a single screenshot or 200 OK.
+Done when:
+- You can list pages visited and what you inspected.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/GUI_VERIFICATION.md`

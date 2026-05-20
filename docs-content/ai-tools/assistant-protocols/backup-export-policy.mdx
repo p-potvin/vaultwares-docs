@@ -1,0 +1,23 @@
+---
+title: "Backup Export Policy"
+description: "Assistant protocol summary: Backup Export Policy"
+---
+
+# Backup Export Policy
+
+- Category ID: `BACKUP_EXPORT_POLICY`
+- Summary source: `instructions/summaries/BACKUP_EXPORT_POLICY.md`
+- Notes source: `instructions/notes/BACKUP_EXPORT_POLICY.md`
+
+Applies when: backups, exports, migrations, archive creation, restore planning.
+Do:
+- Define what is included (data+metadata+blobs) and how to restore.
+- Prefer a restore test over “backup succeeded” claims.
+Do not:
+- Produce partial backups without stating exclusions.
+Done when:
+- Backup is restorable and the restore path is documented.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/BACKUP_EXPORT_POLICY.md`
