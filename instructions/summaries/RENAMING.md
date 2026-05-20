@@ -1,0 +1,19 @@
+# RENAMING
+Applies when: renaming a GitHub repo, Jira project, or any tracked identifier that other systems reference.
+Do:
+- Before renaming anything on GitHub, check `vw-jira-sync/config.yaml` — every repo has a Jira project key and a mapping file.
+- Follow the full 6-step GitHub repo rename procedure (see notes or `operations/jira-sync.mdx`):
+  1. Rename on GitHub.
+  2. Update `repo_project_keys` and `repos` in `vw-jira-sync/config.yaml`.
+  3. `Copy-Item mapping\old-name.json mapping\new-name.json` then `Remove-Item mapping\old-name.json`.
+  4. `python scripts/backfill.py --repo new-name` (mapping file prevents duplicates).
+  5. `python scripts/deploy_caller_workflows.py --repo new-name --strategy main`.
+  6. Commit and push `vw-jira-sync` to main.
+- Rename the mapping file *before* re-running backfill — order matters.
+Do not:
+- Run backfill with the new name before renaming the mapping file — it will create duplicate Jira issues.
+- Delete the old mapping file without copying it first.
+- Assume GitHub's automatic redirect covers Jira labels — labels embed the repo name and must be kept consistent via backfill.
+Done when:
+- `config.yaml` uses the new name, mapping file is renamed, backfill completed with no errors, caller workflow re-deployed, vw-jira-sync pushed.
+- Full runbook: `vaultwares-docs/docs-content/operations/jira-sync.mdx`
