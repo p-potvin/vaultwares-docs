@@ -3,10 +3,18 @@ This file is the single entrypoint for VaultWares company protocols.
 Default read target: summaries. Notes are human reference and are read only when the user explicitly says: read full notes.
 Protocol categories are executed only when relevant.
 ## ROUTER routine (always, first)
-1) Do a quick safety/scope check: if the request is ambiguous or risky, ask clarifying questions. Routing never replaces clarification.
-2) Scan the full protocol category table below end-to-end, then select 1+ relevant categories.
-3) Decide which other routines are relevant for this prompt (tools/routines, etc.).
-4) Only after steps 1-3: open only the selected summary files in table order.
+1) Resume shortcut: if the prior assistant reply contains a VW_STATE block with resume.resumeMode=true, resume from that state:
+- Do not re-run routing, routines, or estimates; use the stored routerCategories/protocolsSelected/overlaysApplied/estimate as-is.
+- Set VW_STATE.interview.completed=true and continue execution.
+- Do not re-trigger the interview gate again for the same resumeId.
+2) Do a quick safety/scope check: if the request is ambiguous or risky, ask clarifying questions. Routing never replaces clarification.
+3) Scan the full protocol category table below end-to-end, then select 1+ relevant categories.
+4) Decide which other routines are relevant for this prompt (tools/routines, etc.).
+5) Run relevant routines (if any).
+6) Read the selected summary files in table order (mandatory).
+7) Compute estimate: estimated_output_tokens for the task (mandatory). Tokens are the primary estimate. Time is derived if needed.
+8) Apply overlay protocols driven by the estimate:
+- If estimated_output_tokens >= 8000: add overlay LONG_RUNNING_TASKS (even if other protocols already match).
 ## Other routines (run only when relevant)
 - Tools/routines (optional): if an MCP routine exists (credit optimization, batching, etc.), decide whether to run it. This does not change which protocols apply.
 - Ledger (always, last step before replying): record completed work in agent-ledger. If you cannot access agent-ledger, state that in the reply and include a compact ledger block for later capture.
@@ -36,6 +44,7 @@ Protocol categories are executed only when relevant.
 | AUTOMATION_POLICY | Monitors, schedules, background jobs | instructions/summaries/AUTOMATION_POLICY.md | instructions/notes/AUTOMATION_POLICY.md | cron,automation,monitor,pm2 |
 | DEPLOYMENT_POLICY | Deploy/release ops, VPS changes | instructions/summaries/DEPLOYMENT_POLICY.md | instructions/notes/DEPLOYMENT_POLICY.md | deploy,release,vercel,nginx |
 | BACKUP_EXPORT_POLICY | Backups, exports, restore testing | instructions/summaries/BACKUP_EXPORT_POLICY.md | instructions/notes/BACKUP_EXPORT_POLICY.md | backup,export,restore |
+| LONG_RUNNING_TASKS | Overlay: estimated_output_tokens >= 8000 | instructions/summaries/LONG_RUNNING_TASKS.md | instructions/notes/LONG_RUNNING_TASKS.md | long running,checkpoint,resume,vw_state |
 | HANDLING_BUGS | Bugs, defects, unexpected behavior | instructions/summaries/HANDLING_BUGS.md | instructions/notes/HANDLING_BUGS.md | bug,broken,error,regression |
 | INCIDENT_RESPONSE | Prod incident, outage, security event | instructions/summaries/INCIDENT_RESPONSE.md | instructions/notes/INCIDENT_RESPONSE.md | incident,outage,breach |
 | LEGAL_COMPLIANCE | Compliance/legal/process constraints | instructions/summaries/LEGAL_COMPLIANCE.md | instructions/notes/LEGAL_COMPLIANCE.md | compliance,policy,legal |

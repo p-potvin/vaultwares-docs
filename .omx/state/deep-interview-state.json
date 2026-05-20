@@ -3,10 +3,10 @@
   "mode": "deep-interview",
   "current_phase": "intent-first",
   "started_at": "2026-05-20T12:31:18.956Z",
-  "updated_at": "2026-05-20T12:31:18.960Z",
+  "updated_at": "2026-05-20T14:49:47.246Z",
   "session_id": "",
   "thread_id": "019e429e-9476-7463-a2ad-7d01ee036b38",
-  "turn_id": "019e455c-29cb-7361-99c3-8eb23f17c4e7",
+  "turn_id": "019e45c7-ccd8-7fa0-a30c-9b7bc3dbd446",
   "input_lock": {
     "active": true,
     "scope": "deep-interview-auto-approval",
