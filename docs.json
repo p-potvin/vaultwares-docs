@@ -87,7 +87,8 @@
             "operations/network-map",
             "operations/ops-log-2026-05-13",
             "operations/tailscale",
-            "operations/secrets"
+            "operations/secrets",
+            "operations/jira-sync"
           ]
         }
       ]

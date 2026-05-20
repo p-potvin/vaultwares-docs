@@ -1,0 +1,254 @@
+---
+title: "GitHub → Jira Sync (Private)"
+description: "Runbook for the vw-jira-sync one-way integration: project structure, repo onboarding, rename procedure, and secret management."
+---
+
+# GitHub → Jira Sync
+
+One-way sync from GitHub to Jira Cloud. Lives in `p-potvin/vw-jira-sync`. Fires via reusable
+GitHub Actions workflow (`workflow_call`) triggered by each tracked repo's caller workflow at
+`.github/workflows/jira-sync.yml`.
+
+## Architecture
+
+```
+GitHub event (push / pull_request / review / comment)
+        │
+        ▼
+Caller workflow in the repo  (.github/workflows/jira-sync.yml)
+        │  workflow_call
+        ▼
+p-potvin/vw-jira-sync  →  scripts/live_sync.py
+        │
+        ├─ pull_request          → upsert Task, transition status
+        ├─ pull_request_review   → add review summary comment
+        ├─ pull_request_review_comment → add inline comment
+        ├─ issue_comment (on PR) → add comment
+        └─ push (default branch)
+                ├─ commit belongs to a PR → comment on PR Task
+                └─ direct commit → create individual Task
+```
+
+Every GitHub repo maps to exactly one Jira project. Tasks are created directly in the
+project — no Epics, no parent hierarchy.
+
+## Project map
+
+41 active projects (37 VaultWares + 4 Prom-King). Full reference in `config.yaml`
+→ `repo_project_keys`. Key prefixes:
+
+| Prefix | Org | Examples |
+|--------|-----|---------|
+| `VW`, `AGMK`, `VLRT`, … | `p-potvin` | Most VaultWares repos |
+| `PK*` | `Prom-King` | `PKLS`, `PKPRE`, `PKQA`, `PKTS` |
+
+## Jira issue types
+
+| GitHub event | Jira issue type | Label pattern |
+|---|---|---|
+| Pull request | Task | `gh-pr-{owner}-{repo}-{number}` |
+| Direct commit (push, not in a PR) | Task | `gh-commit-{owner}-{repo}-{sha12}` |
+
+Labels make every operation idempotent: the sync scripts JQL-search by label before creating.
+
+## PR status mapping
+
+| GitHub state | Jira status |
+|---|---|
+| `open` | In Progress |
+| `draft` | To Do |
+| `merged` | Done |
+| `closed` | Done |
+
+## Secrets
+
+Three repo-level secrets are required in every tracked repo:
+
+| Secret | Value source |
+|---|---|
+| `JIRA_BASE_URL` | `https://vaultwares.atlassian.net` |
+| `JIRA_EMAIL` | Atlassian account email |
+| `JIRA_TOKEN` | Atlassian API token |
+
+Distribute to all repos at once:
+
+```powershell
+$env:JIRA_TOKEN_FILE = "C:\path\to\token.txt"
+python scripts/distribute_secrets.py
+```
+
+## Adding a new repo
+
+1. Create a Jira project (team-managed, Kanban) with an uppercase 2–10 char key.
+2. Add the mapping to `config.yaml`:
+
+```yaml
+repo_project_keys:
+  my-new-repo: MYNR   # ← new entry
+
+repos:
+  - my-new-repo       # ← new entry
+```
+
+3. If the repo belongs to a different GitHub org, also add to `repo_owners`:
+
+```yaml
+repo_owners:
+  my-new-repo: OtherOrg
+```
+
+4. Deploy the caller workflow to the new repo:
+
+```bash
+python scripts/deploy_caller_workflows.py --repo my-new-repo --strategy main
+```
+
+5. Run the initial backfill:
+
+```bash
+python scripts/backfill.py --repo my-new-repo
+```
+
+6. Add the three secrets to the new repo (or re-run `distribute_secrets.py`).
+
+## Adding a new GitHub org
+
+1. Add the org repos to `repo_owners` in `config.yaml`:
+
+```yaml
+repo_owners:
+  repo-name: NewOrg
+```
+
+2. Add each repo to `repo_project_keys` and `repos` as normal.
+3. Ensure the `gh` CLI is authenticated for the new org
+   (`gh auth status` — must show the org as accessible).
+
+## Repo rename procedure
+
+When a GitHub repo is renamed, the Jira project key and all existing issues stay unchanged.
+Only labels (which embed the repo name) and the mapping file need updating.
+
+**Step-by-step:**
+
+1. Rename the repo on GitHub (Settings → Rename).
+
+2. Update `config.yaml` in `vw-jira-sync`:
+
+```yaml
+repo_project_keys:
+  new-repo-name: SAME    # ← update key (was old-repo-name)
+  # old-repo-name: SAME  # ← remove this line
+
+repos:
+  - new-repo-name         # ← update (was old-repo-name)
+```
+
+3. Rename the mapping file so existing issues are not re-created:
+
+```powershell
+Copy-Item "mapping\old-repo-name.json" "mapping\new-repo-name.json"
+Remove-Item "mapping\old-repo-name.json"
+```
+
+4. Re-run backfill with the new name to tag any new issues with the current label
+   (existing issues keep their old labels and won't be duplicated — the mapping file
+   prevents that):
+
+```bash
+python scripts/backfill.py --repo new-repo-name
+```
+
+5. Commit and push to `vw-jira-sync` main.
+
+6. Deploy the caller workflow to the renamed repo (GitHub renames the repo but
+   the workflow file path stays the same — if it was already present, a re-deploy
+   ensures the file is current):
+
+```bash
+python scripts/deploy_caller_workflows.py --repo new-repo-name --strategy main
+```
+
+**Tested on:** `i-dub-thee` → `vaultwares-asttro` (IDUB project, 2026-05-19).
+Mapping file renamed, backfill re-run, 6 duplicate issues cleaned up from partial
+re-backfill before mapping fix.
+
+## Backfill script reference
+
+```bash
+# All repos
+python scripts/backfill.py
+
+# Single repo
+python scripts/backfill.py --repo vault-flows
+
+# Dry-run (print what would be created, no writes)
+python scripts/backfill.py --repo vault-flows --dry-run
+```
+
+Backfill is idempotent. Progress is checkpointed in `mapping/{repo}.json`
+(format: `{"prs": {"42": "PROJ-7"}, "commits": {"abc123def456": "PROJ-8"}}`).
+
+## Deploying caller workflows
+
+```bash
+# Single repo, push directly to main
+python scripts/deploy_caller_workflows.py --repo my-repo --strategy main
+
+# All repos, open PRs (default)
+python scripts/deploy_caller_workflows.py --strategy pr
+
+# All repos, push to main
+python scripts/deploy_caller_workflows.py --strategy main
+```
+
+## Creating Jira projects in bulk
+
+```bash
+# Dry run — prints what would be created
+python scripts/create_projects.py --dry-run
+
+# Create only for a specific repo
+python scripts/create_projects.py --repo my-new-repo
+
+# Create all missing projects
+python scripts/create_projects.py
+```
+
+## Troubleshooting
+
+### `startup_failure` in GitHub Actions
+
+**Cause:** The caller workflow has a `permissions:` block that conflicts with
+reusable workflow dispatch on personal accounts.
+
+**Fix:** Remove the `permissions:` block from `.github/workflows/jira-sync.yml`
+in the affected repo, or re-deploy with the current template (which has no
+`permissions:` block).
+
+### Jira 401 / "You do not have permission to create issues"
+
+**Cause:** `JIRA_TOKEN` secret is corrupted or expired.
+
+**Fix:** Re-distribute secrets:
+```powershell
+$env:JIRA_TOKEN_FILE = "C:\path\to\token.txt"
+python scripts/distribute_secrets.py
+```
+
+### Duplicate Jira issues after a rename
+
+**Cause:** Mapping file was not renamed before re-running backfill, so the script
+didn't recognize already-synced issues.
+
+**Fix:**
+1. Delete the duplicates in Jira (REST DELETE or UI).
+2. Restore the mapping file from git, rename it correctly, then re-run backfill.
+
+### Backfill error on a specific PR
+
+**Cause:** Deleted/restricted GitHub issue or network failure during comment fetch.
+
+**Behavior:** Logged as `WARN` and skipped — does not abort the run. Re-run
+backfill for the repo; checkpointing means already-created issues won't be
+duplicated.
