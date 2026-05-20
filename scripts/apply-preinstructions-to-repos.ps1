@@ -57,6 +57,22 @@ foreach ($repo in $repos) {
   Write-Output ""
   Write-Output "Repo: $repoName"
 
+  # Never overwrite the Tier-1 Source of Truth repo's own instructions.
+  # This script propagates stubs to other repos; `vaultwares-docs` is the canonical full instructions set.
+  try {
+    if ((Resolve-Path -LiteralPath $repoPath).Path -eq (Resolve-Path -LiteralPath $DocsRoot).Path) {
+      Write-Output "  skip: vaultwares-docs (SSOT)"
+      continue
+    }
+  }
+  catch {
+    # If resolution fails, fall back to name-based skip.
+    if ($repoName -eq 'vaultwares-docs') {
+      Write-Output "  skip: vaultwares-docs (SSOT)"
+      continue
+    }
+  }
+
   Backup-IfExists -RepoName $repoName -FilePath $agentsPath
   Backup-IfExists -RepoName $repoName -FilePath $claudePath
 
