@@ -1,0 +1,110 @@
+---
+title: "New project bootstrap (Private)"
+description: "Central runbook: create a repo + Jira project, wire webhooks, Tailscale access, and VaultWarden secrets."
+---
+
+# New project bootstrap (Private)
+
+This page is the default checklist for onboarding a **new VaultWares repo/project** into the tailnet + Jira sync + secrets model.
+
+## 0) Decide the identifiers
+
+- **GitHub repo name:** keep dash-case (example: `vault-warden`).
+- **Jira project key:** uppercase, 2–10 chars (example: `VWRN`).
+- **Owner/org:** default `p-potvin` unless the repo is explicitly elsewhere (then set `repo_owners` in `vw-jira-sync`).
+
+## 1) Create the GitHub repo
+
+- Create the repo on GitHub (default branch: `main`).
+- Add stub instruction files to route assistants to the Tier-1 protocol:
+
+`AGENTS.md` (repo root):
+```md
+# VaultWares — pre-instructions (repo stub)
+This file is intentionally short. It routes work to the company protocol TOC.
+Always start at: `C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\instructions\ROUTER.md`
+Execute the ROUTER routine first (always): scan all protocol categories end-to-end, select relevant categories, then open only the selected summaries in category order.
+Execute other routines only when relevant (tools/routines). Ledger is always the last step before replying.
+Read full notes only when explicitly prompted: `read full notes`
+Mandatory ledger (last step before replying): use `C:\Users\Administrator\Desktop\Github Repos\agent-ledger\scripts\record-agent-change.ps1`
+```
+
+`CLAUDE.md` (repo root):
+```md
+# VaultWares — Claude Code pre-instructions (repo stub)
+Start at: `C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\instructions\ROUTER.md`
+This file is intentionally short. Do not duplicate company protocols here.
+```
+
+## 2) Tailscale access + private DNS
+
+- Tailnet is the default control plane: private services should be tailnet-only.
+- Prefer **tailnet DNS** over per-device host-file edits.
+- Fallback (when needed): per-device hosts file can pin private hostnames to tailnet IPs.
+
+Reference:
+- `operations/network-map`
+- `operations/tailscale`
+
+## 3) Secrets (VaultWarden)
+
+- Store secrets on `greencloud-vps` in **VaultWarden** (`https://secrets.vaultwares.ca`, tailnet-only).
+- Do not commit secrets to git. Do not paste secret values into docs.
+- Provision secrets to services via `/etc/*` env files on the VPS (names only in docs).
+
+Reference:
+- `operations/secrets`
+
+## 4) Jira project + vw-jira-sync onboarding
+
+In `vw-jira-sync/config.yaml`:
+
+1. Add the Jira key:
+```yaml
+repo_project_keys:
+  my-new-repo: MYNR
+```
+
+2. Add the repo to the tracked list:
+```yaml
+repos:
+  - my-new-repo
+```
+
+3. Create/rename the mapping file:
+- `mapping/my-new-repo.json`
+
+Then run:
+- `python scripts/backfill.py --repo my-new-repo`
+
+Reference:
+- `operations/jira-sync`
+
+## 5) GitHub webhook → hooks.vaultwares.ca
+
+For each repo:
+
+- Repo → Settings → Webhooks → Add webhook
+  - Payload URL: `https://hooks.vaultwares.ca/github`
+  - Content type: `application/json`
+  - Secret: `VW_GITHUB_WEBHOOK_SECRET` (stored in VaultWarden; provisioned on the VPS)
+  - Events:
+    - `push`
+    - `pull_request`
+    - `pull_request_review`
+    - `pull_request_review_comment`
+    - `issue_comment`
+
+## 6) Bots / automation placement
+
+- Bot/agent projects belong under `vaultwares-adk` (not `automation-suite`).
+- Keep QA/bot-testing work isolated from infrastructure repos; use separate Jira projects.
+
+## Verification checklist
+
+- Private services:
+  - `curl https://docs.vaultwares.ca/` returns `200` on tailnet DNS.
+  - `curl https://secrets.vaultwares.ca/health` returns `200` on tailnet DNS.
+  - Forcing the public IP path returns `403` (tailnet-only enforcement).
+- Jira sync:
+  - A test webhook delivery results in a Jira Task being created/updated for a PR.

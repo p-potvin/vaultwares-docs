@@ -85,7 +85,9 @@
           "icon": "server",
           "pages": [
             "operations/network-map",
+            "operations/project-bootstrap",
             "operations/ops-log-2026-05-13",
+            "operations/ops-log-2026-05-21",
             "operations/tailscale",
             "operations/secrets",
             "operations/jira-sync"

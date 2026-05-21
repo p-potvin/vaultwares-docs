@@ -1,0 +1,23 @@
+---
+title: "Ops log — 2026-05-21 (Private)"
+description: "Verification + infra changes performed on 2026-05-21."
+---
+
+# Ops log — 2026-05-21
+
+## Network verification
+
+- Confirmed tailnet DNS for private services resolves to the GreenCloud VPS tailnet IP:
+  - `docs.vaultwares.ca` → `100.73.93.84`
+  - `secrets.vaultwares.ca` → `100.73.93.84`
+- Confirmed private services are **blocked** on the public IP path:
+  - Forcing `docs.vaultwares.ca` and `secrets.vaultwares.ca` to `173.249.194.15` returns `403 Forbidden`.
+
+## Secrets
+
+- `secrets.vaultwares.ca` now serves **VaultWarden** (first-party secrets service) behind nginx.
+- Legacy `vaultwarden/server` container removed from `greencloud-vps` after taking a backup (stored on the VPS under `/opt`).
+
+## Notes
+
+- Do not paste secret values into docs/logs; only reference secret names and locations.
