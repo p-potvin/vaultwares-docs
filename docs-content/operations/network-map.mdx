@@ -28,7 +28,7 @@ flowchart TB
   %% Tailnet-only entrypoints
   subgraph Tailnet["Private (Tailnet-only)"]
     Docs["docs.vaultwares.ca\n(vaultwares-docs)\nHTTPS :443"]
-    Secrets["secrets.vaultwares.ca\n(VaultWarden / vault-warden)\nHTTPS :443"]
+    Secrets["warden.vaultwares.ca\n(VaultWarden / vault-warden)\nHTTPS :443"]
     Hooks["hooks.vaultwares.ca\n(vaultwares-webhooks)\nHTTPS :443"]
     PCAPI["Clopeux-Desktop\nFastAPI pipelines\nhttp://100.71.101.21:9001"]
     VaultFlowsSPA["Clopeux-Desktop\nvault-flows (local preview)\nhttps://localhost:3100"]
@@ -96,7 +96,7 @@ flowchart TB
 |---|---|---:|---:|---|
 | Private docs | `https://docs.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
 | Pipelines API (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | App auth (JWT/API key), Tailnet ACL |
-| VaultWarden (secrets service) | `https://secrets.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |
+| VaultWarden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |
 | GitHub webhooks (receiver) | `https://hooks.vaultwares.ca` | `greencloud-vps` | `443` | Webhook signature verification |
 
 ## Access model / Modèle d’accès
@@ -111,7 +111,7 @@ flowchart TB
 1. Join the tailnet (Tailscale client).
 2. Confirm your device appears in the admin console and is authorized.
 3. Read this page and the Tailscale policy doc.
-4. Get access to VaultWarden (`https://secrets.vaultwares.ca`) (tailnet allowlist + service authz).
+4. Get access to VaultWarden (`https://warden.vaultwares.ca`) (tailnet allowlist + service authz).
 5. Verify:
    - You can reach `docs.vaultwares.ca` from tailnet.
    - You can reach `vaultwares.ca` publicly.
