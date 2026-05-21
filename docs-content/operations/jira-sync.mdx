@@ -5,28 +5,32 @@ description: "Runbook for the vw-jira-sync one-way integration: project structur
 
 # GitHub → Jira Sync
 
-One-way sync from GitHub to Jira Cloud. Lives in `p-potvin/vw-jira-sync`. Fires via reusable
-GitHub Actions workflow (`workflow_call`) triggered by each tracked repo's caller workflow at
-`.github/workflows/jira-sync.yml`.
+One-way sync from GitHub to Jira Cloud. Lives in `p-potvin/vw-jira-sync`.
+
+**Preferred trigger model:** GitHub Webhooks → `https://hooks.vaultwares.ca/github` → `vw-deployd`
+→ run `vw-jira-sync/scripts/live_sync.py` on `vaultwares-1` (inside the tailnet).
 
 ## Architecture
 
 ```
 GitHub event (push / pull_request / review / comment)
-        │
+        │  (signed webhook)
         ▼
-Caller workflow in the repo  (.github/workflows/jira-sync.yml)
-        │  workflow_call
+hooks.vaultwares.ca/github  (nginx)
+        │  proxy
         ▼
-p-potvin/vw-jira-sync  →  scripts/live_sync.py
-        │
-        ├─ pull_request          → upsert Task, transition status
-        ├─ pull_request_review   → add review summary comment
-        ├─ pull_request_review_comment → add inline comment
-        ├─ issue_comment (on PR) → add comment
+vw-deployd (webhook receiver)
+        │  writes event JSON to disk
+        │  sets: GITHUB_EVENT_NAME + GITHUB_EVENT_PATH
+        ▼
+vw-jira-sync/scripts/live_sync.py
+        ├─ pull_request                 → upsert Task, transition status
+        ├─ pull_request_review          → add review summary comment
+        ├─ pull_request_review_comment  → add inline comment
+        ├─ issue_comment (on PR)        → add comment
         └─ push (default branch)
-                ├─ commit belongs to a PR → comment on PR Task
-                └─ direct commit → create individual Task
+              ├─ commit belongs to a PR → comment on PR Task
+              └─ direct commit          → create individual Task
 ```
 
 Every GitHub repo maps to exactly one Jira project. Tasks are created directly in the
@@ -62,20 +66,28 @@ Labels make every operation idempotent: the sync scripts JQL-search by label bef
 
 ## Secrets
 
-Three repo-level secrets are required in every tracked repo:
+For the webhook-triggered VPS model, secrets live on the VPS (not in every repo):
 
-| Secret | Value source |
-|---|---|
-| `JIRA_BASE_URL` | `https://vaultwares.atlassian.net` |
-| `JIRA_EMAIL` | Atlassian account email |
-| `JIRA_TOKEN` | Atlassian API token |
+- `VW_GITHUB_WEBHOOK_SECRET` (used by `vw-deployd` to verify webhook signatures)
+- Jira token for `vw-jira-sync` (`JIRA_TOKEN` or `JIRA_TOKEN_FILE`)
+- GitHub API token for `vw-jira-sync` (`GITHUB_TOKEN` preferred, or `GH_TOKEN`)
 
-Distribute to all repos at once:
+Do not commit these. Store the values in VaultWarden (`https://warden.vaultwares.ca`, tailnet-only)
+and provision them to the VPS via `/etc/*` environment files.
 
-```powershell
-$env:JIRA_TOKEN_FILE = "C:\path\to\token.txt"
-python scripts/distribute_secrets.py
-```
+## GitHub configuration (per repository)
+
+Repo → Settings → Webhooks → Add webhook:
+
+- Payload URL: `https://hooks.vaultwares.ca/github`
+- Content type: `application/json`
+- Secret: same value as `VW_GITHUB_WEBHOOK_SECRET` on the VPS
+- Events: select
+  - `push`
+  - `pull_request`
+  - `pull_request_review`
+  - `pull_request_review_comment`
+  - `issue_comment`
 
 ## Adding a new repo
 
@@ -97,11 +109,9 @@ repo_owners:
   my-new-repo: OtherOrg
 ```
 
-4. Deploy the caller workflow to the new repo:
+4. Add the GitHub webhook (preferred model):
 
-```bash
-python scripts/deploy_caller_workflows.py --repo my-new-repo --strategy main
-```
+- Repo → Settings → Webhooks → Add webhook (see “GitHub configuration” below).
 
 5. Run the initial backfill:
 
@@ -109,7 +119,11 @@ python scripts/deploy_caller_workflows.py --repo my-new-repo --strategy main
 python scripts/backfill.py --repo my-new-repo
 ```
 
-6. Add the three secrets to the new repo (or re-run `distribute_secrets.py`).
+6. Optional (legacy): deploy the caller workflow to the new repo:
+
+```bash
+python scripts/deploy_caller_workflows.py --repo my-new-repo --strategy main
+```
 
 ## Adding a new GitHub org
 
@@ -189,7 +203,7 @@ python scripts/backfill.py --repo vault-flows --dry-run
 Backfill is idempotent. Progress is checkpointed in `mapping/{repo}.json`
 (format: `{"prs": {"42": "PROJ-7"}, "commits": {"abc123def456": "PROJ-8"}}`).
 
-## Deploying caller workflows
+## Deploying caller workflows (Legacy: GitHub Actions)
 
 ```bash
 # Single repo, push directly to main
@@ -217,24 +231,31 @@ python scripts/create_projects.py
 
 ## Troubleshooting
 
-### `startup_failure` in GitHub Actions
+### `startup_failure` in GitHub Actions (Legacy)
 
-**Cause:** The caller workflow has a `permissions:` block that conflicts with
+**Cause:** The legacy caller workflow has a `permissions:` block that conflicts with
 reusable workflow dispatch on personal accounts.
 
 **Fix:** Remove the `permissions:` block from `.github/workflows/jira-sync.yml`
 in the affected repo, or re-deploy with the current template (which has no
 `permissions:` block).
 
+### Webhook-driven sync not running (Preferred model)
+
+- Confirm `https://hooks.vaultwares.ca/health` returns 200.
+- Confirm `https://hooks.vaultwares.ca/github` is receiving deliveries (check `/var/log/vw-deployd.log`).
+- Ensure `/etc/vw-deployd/config.yml` has `jira_sync.enabled: true`.
+- Ensure `vw-jira-sync` exists on `vaultwares-1` (default path: `/opt/vw-jira-sync`).
+- Ensure `vw-jira-sync` has secrets available:
+  - `JIRA_TOKEN` or `JIRA_TOKEN_FILE`
+  - `GITHUB_TOKEN` (preferred) or `GH_TOKEN`
+
 ### Jira 401 / "You do not have permission to create issues"
 
-**Cause:** `JIRA_TOKEN` secret is corrupted or expired.
+**Cause:** Jira token is corrupted or expired (`JIRA_TOKEN` or `JIRA_TOKEN_FILE`).
 
-**Fix:** Re-distribute secrets:
-```powershell
-$env:JIRA_TOKEN_FILE = "C:\path\to\token.txt"
-python scripts/distribute_secrets.py
-```
+**Fix:** Re-provision the token on the VPS (preferred), or re-distribute secrets if
+you are still using the legacy GitHub Actions model.
 
 ### Duplicate Jira issues after a rename
 
