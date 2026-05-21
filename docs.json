@@ -90,6 +90,7 @@
             "operations/ops-log-2026-05-21",
             "operations/tailscale",
             "operations/secrets",
+            "operations/backups",
             "operations/jira-sync"
           ]
         }
