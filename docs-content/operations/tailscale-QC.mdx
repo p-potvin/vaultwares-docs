@@ -18,8 +18,66 @@ description: "How Tailnet is used for access control, SSH, and internal services
 - Owner can reach `100.71.101.21` on `3389` (RDP) and `9001` (pipelines API).
 - `tag:server` can reach `100.71.101.21:9001` (VPS reverse-proxy to PC).
 
-## Operational notes
+## Exposer des services web internes au tailnet (Split DNS)
 
-- Avoid tagging personal devices unless you intentionally want them to behave like “service accounts”.
-- Prefer dedicated tags for infrastructure: `tag:server`, `tag:vps-old`, `tag:vps-greencloud`.
-- Brume2 runs the home network; update Tailscale carefully to avoid disrupting routing.
+Certains sous-domaines (p. ex. `stats.vaultwares.ca`) sont des services **réservés au tailnet**. Le DNS public renvoie l'IP publique du VPS, qui retourne un 403 à tous les clients externes (intentionnel). Les nœuds du tailnet résolvent le même nom d'hôte vers l'**IP Tailscale** de `greencloud-vps` via une règle DNS Tailscale, contournant ainsi le vhost nginx public et atterrissant sur un bloc serveur nginx interne dédié.
+
+### Fonctionnement
+
+```
+Client public  →  stats.vaultwares.ca  →  <IP publique>  →  nginx (403, intentionnel)
+Nœud tailnet   →  stats.vaultwares.ca  →  100.x.x.x      →  nginx (vhost interne, 200)
+```
+
+### Étape 1 — Règle DNS Tailscale (Split DNS)
+
+Dans la [console d'administration Tailscale](https://login.tailscale.com/admin/dns) → **Nameservers** :
+
+- Ajouter une entrée **Split DNS** pour le domaine `vaultwares.ca` pointant vers l'IP Tailscale de `greencloud-vps` (p. ex. `100.x.x.x`).
+- Cela fait résoudre `*.vaultwares.ca` vers l'IP Tailscale **uniquement pour les nœuds du tailnet**. Le DNS public n'est pas affecté.
+
+> L'ACL doit autoriser `tag:server` sur le port **53** (TCP+UDP) si `greencloud-vps` est le serveur DNS autoritaire. Voir les règles clés ci-dessus.
+
+### Étape 2 — Vhost nginx interne sur l'interface Tailscale
+
+Ajouter un second bloc `server` qui écoute uniquement sur l'IP Tailscale :
+
+```nginx
+server {
+    listen 100.x.x.x:443 ssl;
+    server_name stats.vaultwares.ca;
+
+    ssl_certificate     /etc/nginx/certs/stats.vaultwares.ca.crt;
+    ssl_certificate_key /etc/nginx/certs/stats.vaultwares.ca.key;
+
+    root /var/www/stats.vaultwares.ca;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+Remplacer `100.x.x.x` par l'IP Tailscale réelle de `greencloud-vps`. Recharger nginx :
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### Certificat TLS pour le vhost interne
+
+Deux options :
+
+- **`tailscale cert`** — génère un certificat Let's Encrypt valide pour le nom MagicDNS.
+- **Certificat Let's Encrypt existant** — si vous avez déjà un certificat wildcard ou SAN pour `*.vaultwares.ca`, réutilisez-le.
+
+### Note sur les ACL
+
+Aucune modification d'ACL n'est nécessaire — la règle existante `owner → tag:server : [80, 443]` suffit. La règle Split DNS est le seul point de contrôle d'accès.
+
+## Notes opérationnelles
+
+- Évitez de taguer les appareils personnels sauf si vous souhaitez qu'ils se comportent comme des « comptes de service ».
+- Préférez des tags dédiés pour l'infrastructure : `tag:server`, `tag:vps-old`, `tag:vps-greencloud`.
+- Brume2 gère le réseau domestique ; mettez à jour Tailscale avec précaution pour ne pas perturber le routage.

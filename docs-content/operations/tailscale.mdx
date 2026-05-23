@@ -17,7 +17,64 @@ description: "How Tailnet is used for access control, SSH, and internal services
 - If we use split DNS with `greencloud-vps` as the nameserver, also allow `tag:server` on **DNS** (`53` TCP+UDP).
 - Owner can reach `100.71.101.21` on `3389` (RDP) and `9001` (pipelines API).
 - `tag:server` can reach `100.71.101.21:9001` (VPS reverse-proxy to PC).
+## Exposing internal web services to the tailnet (Split DNS)
 
+Some subdomains (e.g. `stats.vaultwares.ca`) are **tailnet-only** services. The public DNS record returns the VPS public IP, which serves a 403 to all non-tailnet clients. Tailnet nodes resolve the same hostname to the **Tailscale IP** of `greencloud-vps` via a Tailscale DNS override, bypassing the public nginx vhost entirely and hitting a separate internal-only nginx server block.
+
+### How it works
+
+```
+Public client  →  stats.vaultwares.ca  →  <public IP>  →  nginx (403, intentional)
+Tailnet node   →  stats.vaultwares.ca  →  100.x.x.x    →  nginx (internal vhost, 200)
+```
+
+### Step 1 — Tailscale DNS override
+
+In the [Tailscale admin console](https://login.tailscale.com/admin/dns) → **Nameservers**:
+
+- Add a **Split DNS** entry for domain `vaultwares.ca` pointing to the Tailscale IP of `greencloud-vps` (e.g. `100.x.x.x`).
+- This makes `*.vaultwares.ca` resolve to the Tailscale IP **only for tailnet nodes**. Public DNS is unaffected.
+
+> The ACL must allow `tag:server` on port **53** (TCP+UDP) if `greencloud-vps` is the authoritative nameserver. See Key rules above.
+
+### Step 2 — nginx internal vhost on the Tailscale interface
+
+Add a second `server` block that listens only on the Tailscale IP:
+
+```nginx
+server {
+    listen 100.x.x.x:443 ssl;
+    server_name stats.vaultwares.ca;
+
+    # Tailscale-issued cert (or Let's Encrypt if using tailscale cert)
+    ssl_certificate     /etc/nginx/certs/stats.vaultwares.ca.crt;
+    ssl_certificate_key /etc/nginx/certs/stats.vaultwares.ca.key;
+
+    root /var/www/stats.vaultwares.ca;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+Replace `100.x.x.x` with the actual Tailscale IP of `greencloud-vps`. Reload nginx:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+### TLS certificate for the internal vhost
+
+You have two options:
+
+- **`tailscale cert`** — generates a Let's Encrypt cert valid for the MagicDNS FQDN. Works if the vhost `server_name` matches the MagicDNS name.
+- **Existing Let's Encrypt cert** — if you already have a wildcard or SAN cert for `*.vaultwares.ca`, reuse it here.
+
+### ACL note
+
+No ACL change is needed for the web traffic itself — the existing rule `owner → tag:server : [80, 443]` already covers it. The Split DNS entry is the sole gate.
 ## Operational notes
 
 - Avoid tagging personal devices unless you intentionally want them to behave like “service accounts”.
