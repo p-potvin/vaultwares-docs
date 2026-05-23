@@ -26,6 +26,7 @@ Protocol categories are executed only when relevant.
 | SECURITY_POSTURE | Any security/crypto/auth/key handling | instructions/summaries/SECURITY_POSTURE.md | instructions/notes/SECURITY_POSTURE.md | security,crypto,jwt,api key,keys |
 | SECRETS_HANDLING | Tokens, credentials, env vars, secrets storage | instructions/summaries/SECRETS_HANDLING.md | instructions/notes/SECRETS_HANDLING.md | secret,.env,token,credential |
 | NETWORK_INFRASTRUCTURE | Any networking, SSH, VPN, VPS, ports, CI runner egress | instructions/summaries/NETWORK_INFRASTRUCTURE.md | instructions/notes/NETWORK_INFRASTRUCTURE.md | tailnet,tailscale,ssh,vps,nginx,ports,runner |
+| REQUEST_RATE_LIMITING | Any loop/batch of external or internal requests; translation/API/model/crawler/probe work | instructions/summaries/REQUEST_RATE_LIMITING.md | instructions/notes/REQUEST_RATE_LIMITING.md | requests,loop,batch,tcp,udp,api,translate,crawl,ollama,gemma |
 | BILINGUAL_STRINGS | Any user-facing strings/copy/UI text | instructions/summaries/BILINGUAL_STRINGS.md | instructions/notes/BILINGUAL_STRINGS.md | en,qc,french,translation,i18n |
 | BRAND_TOKENS_UI | Any UI/UX/design/branding/themes/tokens | instructions/summaries/BRAND_TOKENS_UI.md | instructions/notes/BRAND_TOKENS_UI.md | ui,ux,theme,tokens,brand |
 | CLEANUP_REFACTOR | Refactors, cleanup, re-org, simplification | instructions/summaries/CLEANUP_REFACTOR.md | instructions/notes/CLEANUP_REFACTOR.md | refactor,cleanup,rewrite,declutter |

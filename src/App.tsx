@@ -131,6 +131,38 @@ function DocPage({ entry, lang }: { entry: DocPageEntry; lang: DocsLang }) {
   )
 }
 
+function NavItemLabel({ entry, lang }: { entry: DocPageEntry; lang: DocsLang }) {
+  const [label, setLabel] = useState(formatRouteLabel(entry.routePath))
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadLabel() {
+      const moduleKey = getPreferredModuleKey(entry, lang)
+      if (!moduleKey) {
+        if (!cancelled) setLabel(formatRouteLabel(entry.routePath))
+        return
+      }
+
+      try {
+        const raw = await loadRawMdx(moduleKey)
+        const { data } = parseFrontmatter(raw)
+        if (!cancelled) setLabel(data.title || formatRouteLabel(entry.routePath))
+      } catch {
+        if (!cancelled) setLabel(formatRouteLabel(entry.routePath))
+      }
+    }
+
+    loadLabel()
+
+    return () => {
+      cancelled = true
+    }
+  }, [entry, lang])
+
+  return <>{label}</>
+}
+
 function AppLayout() {
   const [lang, setLang] = useState<DocsLang>('QC')
   const ui = UI_TEXT[lang]
@@ -139,19 +171,19 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen bg-vw-console-bg text-white">
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-vw-console-surface/95 backdrop-blur-md">
+      <header className="vw-warm-header sticky top-0 z-40 border-b backdrop-blur-md">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-3">
             <img src="/vaultwares-minimal-gold-filled.png" alt="VaultWares" className="h-8 w-8" />
             <div>
-              <div className="font-mono text-sm uppercase tracking-wide text-vw-console-gold">{ui.docsTitle}</div>
-              <div className="text-xs text-violet-100/60">{ui.subtitle}</div>
+              <div className="font-mono text-sm uppercase tracking-wide text-vw-gold">{ui.docsTitle}</div>
+              <div className="text-xs text-vw-muted">{ui.subtitle}</div>
             </div>
           </Link>
 
           <button
             onClick={() => setLang((prev) => (prev === 'EN' ? 'QC' : 'EN'))}
-            className="rounded-xl border border-white/10 bg-vw-console-raised px-3 py-1.5 font-mono text-xs text-violet-100/80 hover:text-white"
+            className="vw-warm-toggle rounded-lg px-3 py-1.5 font-mono text-xs"
           >
             {lang}
           </button>
@@ -159,10 +191,10 @@ function AppLayout() {
       </header>
 
       <div className="mx-auto flex w-full max-w-[1440px]">
-        <aside className="hidden h-[calc(100vh-57px)] w-80 overflow-y-auto border-r border-white/5 px-3 py-5 lg:block">
+        <aside className="vw-warm-sidebar hidden h-[calc(100vh-57px)] w-80 overflow-y-auto border-r px-3 py-5 lg:block">
           {navGroups.map((group) => (
             <section key={group.sectionKey} className="mb-6">
-              <h2 className="mb-2 px-3 font-mono text-[11px] uppercase tracking-widest text-violet-100/45">
+              <h2 className="mb-2 px-3 font-mono text-[11px] uppercase tracking-widest text-vw-muted">
                 {getSectionLabel(group.sectionKey, lang)}
               </h2>
               <div className="space-y-1">
@@ -171,15 +203,15 @@ function AppLayout() {
                     key={entry.routePath}
                     to={entry.routePath}
                     className={({ isActive }) =>
-                      `block rounded-xl px-3 py-2 text-sm transition-colors ${
+                      `vw-warm-nav-link block rounded-lg px-3 py-2 text-sm transition-colors ${
                         isActive
-                          ? 'bg-vw-console-raised text-vw-console-gold'
-                          : 'text-violet-100/65 hover:bg-vw-console-raised/70 hover:text-white'
+                          ? 'vw-warm-nav-link-active'
+                          : 'text-vw-muted hover:bg-vw-warm-raised hover:text-vw-ink'
                       }`
                     }
                     end={entry.routePath === '/'}
                   >
-                    {formatRouteLabel(entry.routePath)}
+                    <NavItemLabel entry={entry} lang={lang} />
                   </NavLink>
                 ))}
               </div>

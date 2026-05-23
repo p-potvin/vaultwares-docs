@@ -2,6 +2,7 @@
 This file is intentionally short. It routes work to the company protocol TOC.
 Always start at: `C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\instructions\ROUTER.md`
 Execute the ROUTER routine first (always): scan all protocol categories end-to-end, select relevant categories, then open only the selected summaries in category order.
+Request safety is mandatory: never run loops or batches of external or internal TCP/UDP/API requests without pausing and asking first. For high-volume helper work such as translation, prefer local Gemma4 at `http://localhost:11434` when applicable and stagger requests so the model and PC are not overloaded.
 Execute other routines only when relevant (tools/routines). Ledger is always the last step before replying.
 Estimate step (mandatory): compute `estimated_output_tokens` after reading required summaries; if >=8000 apply overlay `LONG_RUNNING_TASKS` and include/resume from `VW_STATE` without recomputing the estimate.
 Read full notes only when explicitly prompted: `read full notes`

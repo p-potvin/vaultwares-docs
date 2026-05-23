@@ -166,7 +166,8 @@
           {
             "group": "Assistant protocols",
             "pages": [
-              "ai-tools/assistant-protocols"
+              "ai-tools/assistant-protocols",
+              "ai-tools/assistant-protocols/request-rate-limiting"
             ]
           }
         ]
