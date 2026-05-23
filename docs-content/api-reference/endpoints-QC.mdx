@@ -1,0 +1,331 @@
+---
+title: "API endpoints"
+description: "Complete VaultWares REST API endpoint reference"
+---
+
+## Overview
+
+The VaultWares REST API provides programmatic access to all management functions. Use it to automate device management, enforce policies, manage users, query audit logs, and manage cryptographic keys and certificates.
+
+**Base URL**: `https://api.vaultwares.com/v1`
+
+All requests must be authenticated. See the [Authentication guide](/api-reference/authentication) for details.
+
+## Common conventions
+
+- All request and response bodies are JSON (`Content-Type: application/json`)
+- Timestamps are ISO 8601 format (`2024-11-15T14:30:00Z`)
+- Pagination uses `limit` and `cursor` parameters
+- Errors follow a consistent `{"error": {"code": "...", "message": "...", "type": "..."}}` format
+
+## Devices
+
+### List devices
+
+```http
+GET /v1/devices
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `type` | string | Filter by device type: `vaultdrive`, `vaulthsm`, `vaultscan`, `vaultgate` |
+| `status` | string | Filter by status: `online`, `offline`, `locked`, `error` |
+| `user_id` | string | Filter by assigned user |
+| `limit` | integer | Results per page (default: 20, max: 100) |
+| `cursor` | string | Pagination cursor from previous response |
+
+```bash
+curl https://api.vaultwares.com/v1/devices \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -G \
+  --data-urlencode "type=vaultdrive" \
+  --data-urlencode "status=online" \
+  --data-urlencode "limit=50"
+```
+
+```json
+{
+  "data": [
+    {
+      "id": "dev_VD-ENT-00247",
+      "type": "vaultdrive",
+      "model": "VaultDrive Enterprise",
+      "serial": "VD-ENT-00247",
+      "firmware_version": "3.2.0",
+      "status": "online",
+      "assigned_to": "user_alice123",
+      "last_seen": "2024-11-15T14:29:55Z",
+      "policy": "corporate-standard",
+      "encrypted": true,
+      "capacity_gb": 1024
+    }
+  ],
+  "pagination": {
+    "cursor": "cursor_abc123",
+    "has_more": true,
+    "total": 247
+  }
+}
+```
+
+### Get a device
+
+```http
+GET /v1/devices/{device_id}
+```
+
+### Update a device
+
+```http
+PATCH /v1/devices/{device_id}
+```
+
+```bash
+curl -X PATCH https://api.vaultwares.com/v1/devices/dev_VD-ENT-00247 \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "policy": "high-security",
+    "assigned_to": "user_bob456",
+    "metadata": {"department": "Finance", "asset_tag": "IT-00247"}
+  }'
+```
+
+### Lock / unlock a device
+
+```bash
+# Lock device
+curl -X POST https://api.vaultwares.com/v1/devices/dev_VD-ENT-00247/lock \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -d '{"reason": "Suspected loss"}'
+
+# Unlock device
+curl -X POST https://api.vaultwares.com/v1/devices/dev_VD-ENT-00247/unlock \
+  -H "X-API-Key: vw_live_1234567890abcdef"
+```
+
+### Crypto-erase a device
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/devices/dev_VD-ENT-00247/crypto-erase \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -d '{
+    "confirm": true,
+    "reason": "GDPR right-to-erasure request",
+    "audit_reference": "DSR-2024-1115-001"
+  }'
+```
+
+<Warning>
+  The `crypto-erase` endpoint is irreversible. All data on the device is permanently destroyed by wiping the encryption key.
+</Warning>
+
+## Policies
+
+### List policies
+
+```http
+GET /v1/policies
+```
+
+### Create a policy
+
+```http
+POST /v1/policies
+```
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/policies \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "high-security",
+    "description": "Policy for devices handling sensitive data",
+    "settings": {
+      "min_password_length": 16,
+      "require_2fa": true,
+      "auto_lock_minutes": 5,
+      "max_failed_attempts": 5,
+      "audit_logging": "all",
+      "require_mfa_for_unlock": true
+    }
+  }'
+```
+
+### Deploy policy to devices
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/policies/pol_abc123/deploy \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -d '{"device_ids": ["dev_VD-ENT-00247", "dev_VD-ENT-00248"], "force": false}'
+```
+
+## Users
+
+### List users
+
+```http
+GET /v1/users
+```
+
+### Create a user
+
+```http
+POST /v1/users
+```
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/users \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "charlie@example.com",
+    "first_name": "Charlie",
+    "last_name": "Brown",
+    "roles": ["StandardUser"],
+    "department": "Engineering",
+    "mfa_required": true,
+    "send_welcome_email": true
+  }'
+```
+
+```json
+{
+  "id": "user_charlie789",
+  "email": "charlie@example.com",
+  "first_name": "Charlie",
+  "last_name": "Brown",
+  "status": "active",
+  "roles": ["StandardUser"],
+  "mfa_enrolled": false,
+  "created_at": "2024-11-15T14:30:00Z"
+}
+```
+
+### Revoke all user sessions
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/users/user_charlie789/revoke-sessions \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -d '{"reason": "Security incident"}'
+```
+
+## Audit logs
+
+### Query audit logs
+
+```http
+GET /v1/audit
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `start` | ISO 8601 | Start of time range |
+| `end` | ISO 8601 | End of time range |
+| `user_id` | string | Filter by user |
+| `device_id` | string | Filter by device |
+| `event_type` | string | Filter by event type |
+| `limit` | integer | Results per page (max: 1000) |
+
+```bash
+curl https://api.vaultwares.com/v1/audit \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -G \
+  --data-urlencode "start=2024-11-15T00:00:00Z" \
+  --data-urlencode "end=2024-11-15T23:59:59Z" \
+  --data-urlencode "event_type=auth_failure" \
+  --data-urlencode "limit=100"
+```
+
+## Keys
+
+### List keys
+
+```http
+GET /v1/keys
+```
+
+### Generate a key
+
+```http
+POST /v1/keys
+```
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/keys \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "label": "App-Signing-Key-v2",
+    "type": "ecc",
+    "curve": "P-256",
+    "usage": ["sign", "verify"],
+    "extractable": false,
+    "hsm": "production-hsm"
+  }'
+```
+
+### Rotate a key
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/keys/key_abc123/rotate \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -d '{"keep_old_version": true, "deprecate_old_after_days": 90}'
+```
+
+## Certificates
+
+### List certificates
+
+```http
+GET /v1/certificates
+```
+
+### Issue a certificate
+
+```http
+POST /v1/certificates
+```
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/certificates \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "common_name": "api.example.com",
+    "sans": ["api.example.com", "api-v2.example.com"],
+    "key_label": "TLS-API-Key",
+    "validity_days": 365,
+    "ca": "internal-ca"
+  }'
+```
+
+## Error responses
+
+| HTTP Status | Error code | Description |
+|---|---|---|
+| 400 | `invalid_request` | Missing or malformed request parameter |
+| 401 | `invalid_api_key` | API key is invalid or revoked |
+| 403 | `insufficient_permissions` | API key lacks required permission |
+| 404 | `not_found` | Requested resource does not exist |
+| 409 | `conflict` | Resource already exists or state conflict |
+| 422 | `validation_error` | Request body failed validation |
+| 429 | `rate_limit_exceeded` | Too many requests |
+| 500 | `internal_error` | Server error — contact support |
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api-reference/authentication">
+    API keys, OAuth 2.0, and rate limits
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
+    Real-time event notifications
+  </Card>
+  <Card title="SDKs" icon="book-code" href="/api-reference/sdk">
+    Official client libraries
+  </Card>
+  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
+    Automate routine tasks with the API
+  </Card>
+</CardGroup>

@@ -1,0 +1,297 @@
+---
+title: "Hardware installation"
+description: "Step-by-step hardware setup guides"
+---
+
+## Overview
+
+This guide covers physical installation and initial power-on for all VaultWares hardware products. Follow the instructions for your specific device. Safety and regulatory warnings are included where applicable.
+
+<Warning>
+  Always power off your system and disconnect it from the mains supply before installing PCIe cards or making physical modifications. Work on an anti-static surface and use a grounding wrist strap when handling circuit boards.
+</Warning>
+
+---
+
+## VaultDrive encrypted storage
+
+VaultDrive devices are plug-and-play and do not require driver installation for basic operation.
+
+<Steps>
+  <Step title="Inspect the package">
+    Verify the tamper-evident seal on the packaging is intact before opening. If the seal is broken, do not use the device — contact [support@vaultwares.com](mailto:support@vaultwares.com) immediately.
+  </Step>
+  <Step title="Connect to host">
+    Plug the USB-C cable (included) into a USB 3.0 or higher port on your host computer. VaultDrive is bus-powered — no external power supply is required.
+
+    | LED color | Status |
+    |-----------|--------|
+    | Amber flashing | Awaiting authentication |
+    | Green solid | Unlocked and mounted |
+    | Red flashing | Failed authentication / lockout |
+    | Blue solid | Read-only mode active |
+  </Step>
+  <Step title="Run the setup utility">
+    The device exposes a small read-only partition on first connection. Launch the setup utility from that partition:
+
+    ```bash
+    # Linux
+    /media/$USER/VAULTDRIVE/vaultdrive-setup
+
+    # macOS
+    open /Volumes/VAULTDRIVE/VaultWares-Setup.app
+    ```
+  </Step>
+  <Step title="Set master password and configure policies">
+    Follow the on-screen prompts to set a master password. For enterprise deployments, import a pre-configured policy file:
+
+    ```bash
+    vw-storage apply-policy \
+      --device /dev/sdb \
+      --policy /etc/vaultdrive/corporate-policy.json
+    ```
+  </Step>
+  <Step title="Register with VaultWares Management Console">
+    ```bash
+    vw-storage register \
+      --device /dev/sdb \
+      --console https://console.corp.example.com \
+      --org-key ORG-KEY-XXXX
+    ```
+  </Step>
+</Steps>
+
+---
+
+## VaultHSM PCIe
+
+### Prerequisites
+
+- Available PCIe x4 slot (x8 or x16 slot compatible, physically x4)
+- PCIe 3.0 or higher recommended for maximum throughput
+- 25W available TDP budget on the PCIe slot
+- Linux kernel 4.18+ with PCIe hotplug support, or Windows Server 2016+
+
+### Installation
+
+<Steps>
+  <Step title="Prepare the server">
+    Power off the server and disconnect all power cables. Press the power button to discharge residual capacitors. Open the chassis and locate an available PCIe x4 slot.
+  </Step>
+  <Step title="Remove the slot cover">
+    Remove the corresponding I/O slot cover bracket from the chassis back panel. Retain the screw for securing the card.
+  </Step>
+  <Step title="Seat the card">
+    Remove the VaultHSM PCIe card from its anti-static bag. Align the gold contacts with the PCIe slot and press firmly and evenly until the retention latch clicks. Secure the bracket with the retained screw.
+
+    <Note>
+      The VaultHSM PCIe card has a half-height bracket pre-installed. A full-height bracket is included in the box for standard chassis installations.
+    </Note>
+  </Step>
+  <Step title="Reassemble and power on">
+    Reattach the chassis cover, reconnect power cables, and power on the server.
+  </Step>
+  <Step title="Install the driver">
+    ```bash
+    # Linux
+    sudo apt-get install vaulthsm-pcie-driver  # Debian/Ubuntu
+    sudo dnf install vaulthsm-pcie-driver       # RHEL/Rocky/Alma
+
+    # Verify the device is detected
+    lspci | grep VaultHSM
+    # Output: 0b:00.0 Encryption controller: VaultWares VaultHSM PCIe [1af4:1234]
+
+    journalctl -u vaulthsm --no-pager | tail -20
+    ```
+  </Step>
+  <Step title="Initialize the HSM">
+    ```bash
+    vw-hsm init \
+      --admin-pin <secure-admin-pin> \
+      --so-pin <security-officer-pin> \
+      --label "Production-PCIe-HSM-01"
+    ```
+  </Step>
+</Steps>
+
+---
+
+## VaultHSM Network appliance
+
+### Physical installation
+
+<Steps>
+  <Step title="Rack mounting">
+    The VaultHSM Network is a 1U appliance. Mount in a standard 19-inch rack using the provided rack ears and M6 cage nuts. Ensure at least 1U of clearance above and below for adequate airflow.
+
+    <Warning>
+      Do not block the front or rear ventilation slots. The appliance requires a minimum of 100 LFM (linear feet per minute) airflow from front to back.
+    </Warning>
+  </Step>
+  <Step title="Connect power">
+    The appliance ships with dual redundant power supplies. Connect both power cables to separate circuits or UPS units for maximum availability. The PSU status LEDs (rear panel) will illuminate green when power is applied.
+  </Step>
+  <Step title="Connect network">
+    Connect both Gigabit Ethernet ports (LAN0, LAN1) to your management network. LAN0 is the primary management interface; LAN1 is used for HA heartbeat or load-balanced client connections.
+  </Step>
+  <Step title="Initial network configuration">
+    Connect a serial console cable (RS-232, included) or use the front-panel LCD display to set the initial IP address:
+
+    ```bash
+    # Serial console: 9600 baud, 8-N-1
+    screen /dev/ttyUSB0 9600
+
+    # After login prompt (default: admin / VaultWares-Setup)
+    configure network
+    set ip 192.168.1.100/24
+    set gateway 192.168.1.1
+    set dns 8.8.8.8,8.8.4.4
+    commit
+    ```
+  </Step>
+  <Step title="Complete setup via CLI">
+    ```bash
+    # SSH to the appliance
+    ssh admin@192.168.1.100
+
+    # Initialize HSM
+    vw-hsm init \
+      --admin-pin <secure-admin-pin> \
+      --so-pin <security-officer-pin> \
+      --label "Production-Network-HSM-01"
+
+    # Configure NTP (critical for audit log timestamps)
+    vw-hsm ntp-config \
+      --server ntp.corp.example.com \
+      --backup-server pool.ntp.org
+    ```
+  </Step>
+</Steps>
+
+---
+
+## VaultScan biometric terminal
+
+### Mounting
+
+VaultScan can be desk-mounted or wall-mounted using the included hardware.
+
+<Steps>
+  <Step title="Choose mounting location">
+    Install at 90–120 cm height from the floor for comfortable use. Ensure a clear line of sight of at least 30 cm in front of the scanner. Avoid direct sunlight exposure to the iris scanner module.
+  </Step>
+  <Step title="Run cables">
+    VaultScan requires:
+    - **Power**: 12V DC 3A (PoE+ compatible — single cable option)
+    - **Network**: Gigabit Ethernet (for enrollment server communication)
+    - **USB** (optional): For wired connection to door access controller
+    - **Wiegand / OSDP** (optional): For integration with existing access control panels
+  </Step>
+  <Step title="Mount the backplate">
+    Secure the mounting backplate to the wall or desk surface using the provided screws and anchors. Route cables through the central opening.
+  </Step>
+  <Step title="Attach the terminal">
+    Clip the VaultScan terminal onto the mounted backplate. Connect all cables before clipping. Confirm the status LED turns solid amber (awaiting configuration).
+  </Step>
+  <Step title="Configure the terminal">
+    ```bash
+    # Discover VaultScan devices on the network
+    vw-biometric discover --subnet 192.168.1.0/24
+
+    # Configure a terminal
+    vw-biometric configure \
+      --device 192.168.1.51 \
+      --name "ServerRoom-Entry-01" \
+      --server https://vaultaccess.corp.example.com \
+      --access-group ServerRoomAccess \
+      --admin-pin <terminal-admin-pin>
+    ```
+  </Step>
+  <Step title="Enroll users">
+    ```bash
+    # Enroll a user's fingerprint + face
+    vw-biometric enroll \
+      --device 192.168.1.51 \
+      --user alice@example.com \
+      --modalities fingerprint,face \
+      --fingers right-index,right-middle
+    ```
+  </Step>
+</Steps>
+
+---
+
+## VaultGate network appliance
+
+### Physical installation
+
+<Steps>
+  <Step title="Rack mounting">
+    VaultGate is a 1U network appliance. Mount in a standard 19-inch rack. Ensure 1U clearance above and below for airflow.
+  </Step>
+  <Step title="Connect interfaces">
+    | Port | Purpose |
+    |------|---------|
+    | MGMT | Out-of-band management (dedicated) |
+    | WAN0 / WAN1 | Uplink to internet or upstream firewall |
+    | LAN0–LAN7 | Internal network segments |
+    | HA0 / HA1 | High-availability heartbeat (dual-unit deployments) |
+  </Step>
+  <Step title="Initial configuration">
+    Connect to the MGMT port and access the setup wizard:
+
+    ```bash
+    # Default MGMT IP: 192.168.0.1/24
+    ssh admin@192.168.0.1
+    # Default password: VaultGate-Setup (change on first login)
+
+    # Run initial setup wizard
+    vaultgate setup-wizard
+    ```
+  </Step>
+  <Step title="License activation">
+    ```bash
+    vaultgate license activate --key VWGT-XXXX-XXXX-XXXX-XXXX
+    ```
+  </Step>
+  <Step title="Configure security policies">
+    ```bash
+    # Import a pre-configured policy
+    vaultgate policy import --file /etc/vaultgate/corporate-security-policy.xml
+
+    # Apply and commit
+    vaultgate policy apply --confirm
+    ```
+  </Step>
+</Steps>
+
+## Cabling best practices
+
+<AccordionGroup>
+  <Accordion title="Cable labeling">
+    Label both ends of every cable at installation time. Use a consistent naming scheme: `[device]-[port]-[destination]`. For example: `HSM01-LAN0-SW01-PORT12`.
+  </Accordion>
+  <Accordion title="Cable management">
+    Use hook-and-loop cable ties (not zip ties) in rack environments for easy future changes. Route power cables separately from data cables to minimize interference.
+  </Accordion>
+  <Accordion title="Redundant paths">
+    For production HSM and VaultGate deployments, always connect both network interfaces to separate switches (or separate ports on a stack) for physical redundancy.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
+    Complete post-installation configuration
+  </Card>
+  <Card title="Software deployment" icon="server" href="/installation/software-deployment">
+    Deploy VaultCrypt and VaultAccess to endpoints
+  </Card>
+  <Card title="HSM documentation" icon="microchip" href="/hardware/hsm">
+    VaultHSM setup and key management
+  </Card>
+  <Card title="Support" icon="headset" href="/support/contact">
+    Get technical assistance
+  </Card>
+</CardGroup>

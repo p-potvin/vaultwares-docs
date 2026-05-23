@@ -1,0 +1,266 @@
+---
+title: Quick installation guide
+description: Get started with VaultWares products in minutes
+---
+
+## Before you begin
+
+Ensure you have reviewed the [system requirements](/getting-started/system-requirements) before proceeding with installation.
+
+<Check>
+  You will need administrator or root privileges to install VaultWares products.
+</Check>
+
+## Hardware installation
+
+### Encrypted storage devices
+
+<Steps>
+  <Step title="Connect the device">
+    Plug the encrypted storage device into an available USB 3.0 port on your computer.
+  </Step>
+  <Step title="Install drivers">
+    The device drivers will install automatically on Windows and macOS. For Linux, run:
+    ```bash
+    sudo apt-get install vaultwares-storage-drivers
+    ```
+  </Step>
+  <Step title="Initialize the device">
+    Launch the VaultWares Storage Manager and follow the initialization wizard to set your master password.
+  </Step>
+  <Step title="Verify encryption">
+    Check the device status in the Storage Manager to confirm encryption is active.
+  </Step>
+</Steps>
+
+### Hardware security modules (HSM)
+
+<Tabs>
+  <Tab title="PCIe HSM">
+    <Steps>
+      <Step title="Power down the server">
+        Shut down your server completely and disconnect from power.
+      </Step>
+      <Step title="Install the HSM card">
+        Insert the HSM card into an available PCIe x4 or higher slot.
+      </Step>
+      <Step title="Power on and install software">
+        Boot the server and install the HSM management software:
+        ```bash
+        sudo ./vaultwares-hsm-installer.sh
+        ```
+      </Step>
+      <Step title="Initialize the HSM">
+        Run the initialization command:
+        ```bash
+        vw-hsm init --admin-pin <your-pin>
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+  
+  <Tab title="Network HSM">
+    <Steps>
+      <Step title="Rack mount the appliance">
+        Install the network HSM in your server rack and connect power cables.
+      </Step>
+      <Step title="Connect network cables">
+        Connect both Ethernet ports for redundancy.
+      </Step>
+      <Step title="Access web interface">
+        Navigate to the default IP address: `https://192.168.1.100`
+      </Step>
+      <Step title="Complete setup wizard">
+        Follow the web-based setup wizard to configure network settings and initialize the HSM.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+### Biometric devices
+
+<Steps>
+  <Step title="Connect the device">
+    Plug the biometric reader into a USB port.
+  </Step>
+  <Step title="Install software">
+    Download and run the VaultWares Biometric Suite installer from the customer portal.
+  </Step>
+  <Step title="Enroll users">
+    Launch the Biometric Manager and enroll user fingerprints or facial profiles.
+  </Step>
+  <Step title="Test authentication">
+    Verify that enrolled users can successfully authenticate.
+  </Step>
+</Steps>
+
+## Software installation
+
+### Windows installation
+
+<Steps>
+  <Step title="Download the installer">
+    Download the latest Windows installer from the [customer portal](https://portal.vaultwares.com).
+  </Step>
+  <Step title="Run the installer">
+    Double-click `VaultWares-Setup.exe` and follow the installation wizard.
+  </Step>
+  <Step title="Enter license key">
+    When prompted, enter your license key received via email.
+  </Step>
+  <Step title="Complete installation">
+    Click Finish and restart your computer if prompted.
+  </Step>
+</Steps>
+
+### macOS installation
+
+<Steps>
+  <Step title="Download the installer">
+    Download `VaultWares.dmg` from the customer portal.
+  </Step>
+  <Step title="Mount and install">
+    Open the DMG file and drag VaultWares to your Applications folder.
+  </Step>
+  <Step title="Grant permissions">
+    Go to System Preferences > Security & Privacy and allow VaultWares to run.
+  </Step>
+  <Step title="Activate license">
+    Launch VaultWares and enter your license key.
+  </Step>
+</Steps>
+
+### Linux installation
+
+<Tabs>
+  <Tab title="Debian/Ubuntu">
+    ```bash
+    # Add VaultWares repository
+    wget -qO - https://repo.vaultwares.com/gpg.key | sudo apt-key add -
+    echo "deb https://repo.vaultwares.com/apt stable main" | sudo tee /etc/apt/sources.list.d/vaultwares.list
+    
+    # Update and install
+    sudo apt-get update
+    sudo apt-get install vaultwares
+    
+    # Start the service
+    sudo systemctl start vaultwares
+    sudo systemctl enable vaultwares
+    ```
+  </Tab>
+  
+  <Tab title="RHEL/CentOS">
+    ```bash
+    # Add VaultWares repository
+    sudo wget https://repo.vaultwares.com/rpm/vaultwares.repo -O /etc/yum.repos.d/vaultwares.repo
+    
+    # Install
+    sudo yum install vaultwares
+    
+    # Start the service
+    sudo systemctl start vaultwares
+    sudo systemctl enable vaultwares
+    ```
+  </Tab>
+</Tabs>
+
+### Docker deployment
+
+```bash
+# Pull the latest image
+docker pull vaultwares/security-suite:latest
+
+# Run the container
+docker run -d \
+  --name vaultwares \
+  -p 8443:8443 \
+  -v /var/vaultwares/data:/data \
+  -v /var/vaultwares/config:/config \
+  -e LICENSE_KEY=your-license-key \
+  vaultwares/security-suite:latest
+```
+
+## Initial configuration
+
+### Set up administrator account
+
+<Steps>
+  <Step title="Launch VaultWares">
+    Open the VaultWares application or navigate to the web interface.
+  </Step>
+  <Step title="Create admin account">
+    Enter your administrator email and create a strong password (minimum 12 characters).
+  </Step>
+  <Step title="Enable two-factor authentication">
+    Scan the QR code with your authenticator app and enter the verification code.
+  </Step>
+  <Step title="Configure security policies">
+    Set password policies, session timeouts, and access controls.
+  </Step>
+</Steps>
+
+### Connect to your infrastructure
+
+<CodeGroup>
+```bash Active Directory
+vw-config ad-connect \
+  --domain example.com \
+  --server dc1.example.com \
+  --admin-user administrator
+```
+
+```bash LDAP
+vw-config ldap-connect \
+  --host ldap.example.com \
+  --port 636 \
+  --base-dn "dc=example,dc=com" \
+  --bind-dn "cn=admin,dc=example,dc=com"
+```
+
+```bash SAML
+vw-config saml-setup \
+  --idp-url https://idp.example.com/saml \
+  --entity-id https://vaultwares.example.com \
+  --cert /path/to/idp-cert.pem
+```
+</CodeGroup>
+
+## Verify installation
+
+Run the diagnostic tool to verify your installation:
+
+```bash
+vw-diagnostic --full-check
+```
+
+Expected output:
+```
+✓ License valid
+✓ Database connection successful
+✓ Encryption modules loaded
+✓ Network connectivity verified
+✓ All services running
+
+Installation Status: READY
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Hardware installation" icon="microchip" href="/installation/hardware-installation">
+    Detailed hardware setup guides
+  </Card>
+  <Card title="Software deployment" icon="code" href="/installation/software-deployment">
+    Advanced software deployment options
+  </Card>
+  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
+    Integrate with existing systems
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Security best practices
+  </Card>
+</CardGroup>
+
+<Warning>
+  Always backup your encryption keys and store them in a secure location separate from your VaultWares deployment.
+</Warning>

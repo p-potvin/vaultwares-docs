@@ -1,0 +1,25 @@
+---
+title: "Tailscale (Private)"
+description: "How Tailnet is used for access control, SSH, and internal services."
+---
+
+# Tailscale (Private)
+
+## Policy goals
+
+- Tailnet is the **default control plane**.
+- VPS SSH is **tailnet-only**.
+- Services are explicitly allowed by policy (deny-by-default).
+
+## Key rules (current)
+
+- Owner can reach `tag:server` on `22`, `80`, `443`.
+- If we use split DNS with `greencloud-vps` as the nameserver, also allow `tag:server` on **DNS** (`53` TCP+UDP).
+- Owner can reach `100.71.101.21` on `3389` (RDP) and `9001` (pipelines API).
+- `tag:server` can reach `100.71.101.21:9001` (VPS reverse-proxy to PC).
+
+## Operational notes
+
+- Avoid tagging personal devices unless you intentionally want them to behave like “service accounts”.
+- Prefer dedicated tags for infrastructure: `tag:server`, `tag:vps-old`, `tag:vps-greencloud`.
+- Brume2 runs the home network; update Tailscale carefully to avoid disrupting routing.

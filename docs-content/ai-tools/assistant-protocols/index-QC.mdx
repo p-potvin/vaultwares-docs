@@ -1,0 +1,46 @@
+---
+title: "Assistant protocols"
+description: "Company protocols summaries for assistants"
+---
+
+# Assistant protocols
+
+This section mirrors `vaultwares-docs/instructions/summaries/*` for browsing.
+Notes are human reference and are read by assistants only when explicitly prompted: `read full notes`.
+
+## Routines (always)
+1) Safety+scope gate: ask clarifying questions when unsure or risky.
+2) Routing: scan all protocol categories; select relevant; open summaries in category order.
+3) Tools/routines: run MCP routines only if useful.
+4) Ledger: record work as the last step before replying.
+
+## Protocol categories
+| Category | Applies when | Summary |
+|---|---|---|
+| `SOURCE_OF_TRUTH` | Any VaultWares work; when unsure where to look | /ai-tools/assistant-protocols/source-of-truth |
+| `SUBMODULE_BOUNDARIES` | Work touches submodules or vendored copies | /ai-tools/assistant-protocols/submodule-boundaries |
+| `SECURITY_POSTURE` | Any security/crypto/auth/key handling | /ai-tools/assistant-protocols/security-posture |
+| `SECRETS_HANDLING` | Tokens, credentials, env vars, secrets storage | /ai-tools/assistant-protocols/secrets-handling |
+| `NETWORK_INFRASTRUCTURE` | Any networking, SSH, VPN, VPS, ports, CI runner egress | /ai-tools/assistant-protocols/network-infrastructure |
+| `BILINGUAL_STRINGS` | Any user-facing strings/copy/UI text | /ai-tools/assistant-protocols/bilingual-strings |
+| `BRAND_TOKENS_UI` | Any UI/UX/design/branding/themes/tokens | /ai-tools/assistant-protocols/brand-tokens-ui |
+| `CLEANUP_REFACTOR` | Refactors, cleanup, re-org, simplification | /ai-tools/assistant-protocols/cleanup-refactor |
+| `FILE_CHANGES` | Creating/moving/deleting files/folders | /ai-tools/assistant-protocols/file-changes |
+| `RENAMING` | Renaming a GitHub repo, Jira project, or any cross-system tracked identifier | /ai-tools/assistant-protocols/renaming |
+| `DEPENDENCY_POLICY` | Adding/updating deps, toolchains, lockfiles | /ai-tools/assistant-protocols/dependency-policy |
+| `GIT_BRANCH_POLICY` | Branching/commits/main branch rules | /ai-tools/assistant-protocols/git-branch-policy |
+| `PR_POLICY` | Publishing PRs, reviewers, CI expectations | /ai-tools/assistant-protocols/pr-policy |
+| `VERIFICATION` | Any claim of working/correct/complete | /ai-tools/assistant-protocols/verification |
+| `GUI_VERIFICATION` | Web UI changes or docs UI changes | /ai-tools/assistant-protocols/gui-verification |
+| `DOCS_STANDARDS` | Writing docs pages, frontmatter, navigation | /ai-tools/assistant-protocols/docs-standards |
+| `GLOBAL_INSTRUCTION_SYNC` | Editing Tier-1 global instructions | /ai-tools/assistant-protocols/global-instruction-sync |
+| `KNOWLEDGE_SYNC` | Maintaining durable knowledge across repos | /ai-tools/assistant-protocols/knowledge-sync |
+| `KNOWLEDGE_SCOUT` | Consulting or updating KNOWLEDGE_SCOUT.md | /ai-tools/assistant-protocols/knowledge-scout |
+| `MULTI_AGENT_FLOW` | Trigger phrases or multi-agent orchestration | /ai-tools/assistant-protocols/multi-agent-flow |
+| `AUTOMATION_POLICY` | Monitors, schedules, background jobs | /ai-tools/assistant-protocols/automation-policy |
+| `DEPLOYMENT_POLICY` | Deploy/release ops, VPS changes | /ai-tools/assistant-protocols/deployment-policy |
+| `BACKUP_EXPORT_POLICY` | Backups, exports, restore testing | /ai-tools/assistant-protocols/backup-export-policy |
+| `LONG_RUNNING_TASKS` | Overlay: estimated_output_tokens >= 8000 | /ai-tools/assistant-protocols/long-running-tasks |
+| `HANDLING_BUGS` | Bugs, defects, unexpected behavior | /ai-tools/assistant-protocols/handling-bugs |
+| `INCIDENT_RESPONSE` | Prod incident, outage, security event | /ai-tools/assistant-protocols/incident-response |
+| `LEGAL_COMPLIANCE` | Compliance/legal/process constraints | /ai-tools/assistant-protocols/legal-compliance |

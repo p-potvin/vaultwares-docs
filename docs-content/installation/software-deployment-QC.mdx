@@ -1,0 +1,408 @@
+---
+title: "Software deployment"
+description: "Enterprise software deployment strategies"
+---
+
+## Overview
+
+VaultWares software products (VaultCrypt, VaultAccess, VaultBackup, VaultMonitor) support a range of enterprise deployment strategies, from manual installation to fully automated pipelines. This guide covers silent installation, MDM/endpoint management, Group Policy (GPO), Docker, and Kubernetes deployments.
+
+## Supported platforms
+
+| Product | Windows | macOS | Linux | Docker | Kubernetes |
+|---------|---------|-------|-------|--------|------------|
+| VaultCrypt | ✓ | ✓ | ✓ | ✓ | - |
+| VaultAccess | ✓ | ✓ | ✓ | ✓ | ✓ |
+| VaultBackup | ✓ | ✓ | ✓ | ✓ | ✓ |
+| VaultMonitor | ✓ | - | ✓ | ✓ | ✓ |
+
+## Silent installation
+
+Silent (unattended) installation is the recommended method for large-scale endpoint deployments.
+
+<Tabs>
+  <Tab title="Windows MSI">
+    ```cmd
+    :: Silent install with all defaults
+    msiexec /i VaultCrypt-Enterprise-3.2.0-x64.msi /quiet /norestart
+
+    :: Silent install with custom parameters
+    msiexec /i VaultCrypt-Enterprise-3.2.0-x64.msi ^
+      /quiet /norestart ^
+      LICENSEKEY="VWCR-XXXX-XXXX-XXXX-XXXX" ^
+      INSTALLDIR="C:\Program Files\VaultWares\VaultCrypt" ^
+      ACTIVATEONSINSTALL=1 ^
+      CONSOLEURL="https://console.corp.example.com" ^
+      ORGKEY="ORG-KEY-XXXX" ^
+      /log C:\Logs\vaultcrypt-install.log
+    ```
+
+    ```powershell
+    # PowerShell wrapper for deployment via SCCM/Intune
+    $msiPath = "\\deploy\vaultwares\VaultCrypt-Enterprise-3.2.0-x64.msi"
+    $logPath = "C:\Logs\vaultcrypt-install.log"
+    $args = @(
+        "/i", $msiPath,
+        "/quiet", "/norestart",
+        "LICENSEKEY=VWCR-XXXX-XXXX-XXXX-XXXX",
+        "CONSOLEURL=https://console.corp.example.com",
+        "ORGKEY=ORG-KEY-XXXX",
+        "/log", $logPath
+    )
+    Start-Process msiexec -ArgumentList $args -Wait -NoNewWindow
+    if ($LASTEXITCODE -eq 0) {
+        Write-Output "VaultCrypt installed successfully"
+    } else {
+        Write-Error "Installation failed with exit code $LASTEXITCODE"
+    }
+    ```
+  </Tab>
+  <Tab title="macOS PKG">
+    ```bash
+    # Silent install via installer command
+    sudo installer \
+      -pkg VaultCrypt-Enterprise-3.2.0.pkg \
+      -target / \
+      -verboseR 2>&1 | tee /var/log/vaultcrypt-install.log
+
+    # Post-install activation
+    sudo vaultcrypt activate \
+      --key VWCR-XXXX-XXXX-XXXX-XXXX \
+      --console https://console.corp.example.com \
+      --org-key ORG-KEY-XXXX
+    ```
+  </Tab>
+  <Tab title="Linux DEB/RPM">
+    ```bash
+    # Debian/Ubuntu
+    sudo apt-get install -y ./vaultcrypt-enterprise_3.2.0_amd64.deb
+
+    # RHEL/CentOS/Rocky/Alma
+    sudo dnf install -y ./vaultcrypt-enterprise-3.2.0-1.x86_64.rpm
+
+    # Post-install configuration
+    sudo vaultcrypt activate \
+      --key VWCR-XXXX-XXXX-XXXX-XXXX \
+      --console https://console.corp.example.com \
+      --org-key ORG-KEY-XXXX
+
+    # Enable and start service
+    sudo systemctl enable --now vaultcrypt
+    ```
+  </Tab>
+</Tabs>
+
+## MDM deployment
+
+### Microsoft Intune
+
+<Steps>
+  <Step title="Upload the installer">
+    1. Navigate to **Intune admin center** → **Apps** → **All apps** → **Add**
+    2. Select **Windows app (Win32)** for MSI deployments, or **macOS LOB app** for PKG files
+    3. Upload the VaultCrypt installer package
+  </Step>
+  <Step title="Configure detection rules">
+    Set a detection rule to confirm successful installation:
+    - **Rule type**: File
+    - **Path**: `C:\Program Files\VaultWares\VaultCrypt`
+    - **File or folder**: `vaultcrypt.exe`
+    - **Detection method**: File or folder exists
+  </Step>
+  <Step title="Set install command">
+    ```cmd
+    msiexec /i VaultCrypt-Enterprise-3.2.0-x64.msi /quiet /norestart LICENSEKEY="VWCR-XXXX-XXXX-XXXX-XXXX" CONSOLEURL="https://console.corp.example.com" ORGKEY="ORG-KEY-XXXX"
+    ```
+  </Step>
+  <Step title="Assign to device group">
+    Assign the app to the target device group and set deployment type to **Required**.
+  </Step>
+</Steps>
+
+### Jamf Pro (macOS)
+
+```bash
+# Create a Jamf policy script
+#!/bin/bash
+# vaultcrypt-deploy.sh
+
+INSTALLER="/Library/Application Support/JAMF/Waiting Room/VaultCrypt-Enterprise-3.2.0.pkg"
+LICENSE_KEY="VWCR-XXXX-XXXX-XXXX-XXXX"
+CONSOLE_URL="https://console.corp.example.com"
+ORG_KEY="ORG-KEY-XXXX"
+
+# Install package
+/usr/sbin/installer -pkg "$INSTALLER" -target / 2>&1
+
+# Activate license
+/usr/local/bin/vaultcrypt activate \
+  --key "$LICENSE_KEY" \
+  --console "$CONSOLE_URL" \
+  --org-key "$ORG_KEY" \
+  --headless
+
+exit $?
+```
+
+## Group Policy (GPO) deployment
+
+### Software installation via GPO
+
+<Steps>
+  <Step title="Copy installer to network share">
+    ```powershell
+    # Copy MSI to software deployment share
+    Copy-Item "VaultCrypt-Enterprise-3.2.0-x64.msi" `
+      -Destination "\\ad.corp.example.com\NETLOGON\VaultWares\"
+    ```
+  </Step>
+  <Step title="Create a GPO">
+    1. Open **Group Policy Management Console** (gpmc.msc)
+    2. Create a new GPO: `VaultWares - VaultCrypt Deployment`
+    3. Link to the target OU (e.g., `OU=Workstations,DC=corp,DC=example,DC=com`)
+  </Step>
+  <Step title="Configure software installation">
+    Navigate to: **Computer Configuration** → **Policies** → **Software Settings** → **Software installation**
+
+    Add the MSI package from the network share using the UNC path.
+  </Step>
+  <Step title="Configure VaultCrypt settings via Registry GPO">
+    Create an **Administrative Template** (.admx) from the VaultCrypt GPO template package:
+
+    ```xml
+    <!-- VaultCrypt.admx excerpt -->
+    <policy name="VaultCrypt_ConsoleURL"
+            class="Machine"
+            displayName="$(string.VaultCrypt_ConsoleURL)"
+            explainText="$(string.VaultCrypt_ConsoleURL_Help)"
+            key="SOFTWARE\VaultWares\VaultCrypt\Config"
+            valueName="ConsoleURL">
+      <parentCategory ref="VaultCrypt" />
+      <supportedOn ref="SUPPORTED_WIN10_AND_ABOVE" />
+      <elements>
+        <text id="ConsoleURL_Value" valueName="ConsoleURL" required="true"/>
+      </elements>
+    </policy>
+    ```
+  </Step>
+</Steps>
+
+### VaultCrypt ADMX template registry settings
+
+| Registry key | Value name | Type | Description |
+|---|---|---|---|
+| `SOFTWARE\VaultWares\VaultCrypt\Config` | `ConsoleURL` | REG_SZ | Management console URL |
+| `SOFTWARE\VaultWares\VaultCrypt\Config` | `OrgKey` | REG_SZ | Organization enrollment key |
+| `SOFTWARE\VaultWares\VaultCrypt\Config` | `RequireHSM` | REG_DWORD | 1 = require HSM for key storage |
+| `SOFTWARE\VaultWares\VaultCrypt\Policy` | `AutoLockMinutes` | REG_DWORD | Idle auto-lock timeout |
+| `SOFTWARE\VaultWares\VaultCrypt\Policy` | `AllowUserKeyChange` | REG_DWORD | 0 = prevent users from changing keys |
+
+## Docker deployment
+
+VaultAccess, VaultBackup, and VaultMonitor are available as Docker images from the VaultWares container registry.
+
+```bash
+# Authenticate to VaultWares container registry
+docker login registry.vaultwares.com \
+  --username your-portal-username \
+  --password-stdin
+
+# Pull images
+docker pull registry.vaultwares.com/vaultaccess:3.2.0
+docker pull registry.vaultwares.com/vaultbackup:3.2.0
+docker pull registry.vaultwares.com/vaultmonitor:3.2.0
+```
+
+### Docker Compose
+
+```yaml
+# docker-compose.yml
+version: "3.9"
+
+services:
+  vaultaccess:
+    image: registry.vaultwares.com/vaultaccess:3.2.0
+    container_name: vaultaccess
+    restart: unless-stopped
+    ports:
+      - "443:8443"
+    environment:
+      - VW_LICENSE_KEY=VWAC-XXXX-XXXX-XXXX-XXXX
+      - VW_CONSOLE_URL=https://console.corp.example.com
+      - VW_DB_URL=postgresql://vaultaccess:${DB_PASSWORD}@postgres:5432/vaultaccess
+      - VW_LDAP_URL=ldap://dc01.corp.example.com:389
+      - VW_LDAP_BIND_DN=CN=svc_vaultaccess,OU=Services,DC=corp,DC=example,DC=com
+      - VW_LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD}
+      - VW_HSM_HOST=hsm01.corp.example.com
+      - VW_HSM_SLOT=0
+      - VW_HSM_PIN=${HSM_PIN}
+    volumes:
+      - vaultaccess-data:/var/lib/vaultaccess
+      - /etc/vaultwares/tls:/certs:ro
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "vw-admin", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  vaultbackup:
+    image: registry.vaultwares.com/vaultbackup:3.2.0
+    container_name: vaultbackup
+    restart: unless-stopped
+    environment:
+      - VW_LICENSE_KEY=VWBK-XXXX-XXXX-XXXX-XXXX
+      - VW_BACKUP_REPO=s3://my-vaultbackup-bucket/vaults
+      - VW_ENCRYPT_KEY=hsm:DB-Backup-Key
+    volumes:
+      - /data:/data:ro
+      - vaultbackup-config:/etc/vaultbackup
+
+  vaultmonitor:
+    image: registry.vaultwares.com/vaultmonitor:3.2.0
+    container_name: vaultmonitor
+    restart: unless-stopped
+    ports:
+      - "8514:514/udp"
+      - "8515:515/tcp"
+    environment:
+      - VW_LICENSE_KEY=VWMN-XXXX-XXXX-XXXX-XXXX
+      - VW_SIEM_URL=https://splunk.corp.example.com:8088
+      - VW_SIEM_TOKEN=${SPLUNK_HEC_TOKEN}
+    volumes:
+      - vaultmonitor-data:/var/lib/vaultmonitor
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=vaultaccess
+      - POSTGRES_USER=vaultaccess
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  vaultaccess-data:
+  vaultbackup-config:
+  vaultmonitor-data:
+  postgres-data:
+```
+
+```bash
+# Deploy the stack
+docker compose up -d
+
+# Check status
+docker compose ps
+
+# View logs
+docker compose logs -f vaultaccess
+```
+
+## Kubernetes deployment
+
+### Helm chart installation
+
+```bash
+# Add the VaultWares Helm repository
+helm repo add vaultwares https://charts.vaultwares.com
+helm repo update
+
+# Create namespace
+kubectl create namespace vaultwares
+
+# Create secrets
+kubectl create secret generic vaultwares-secrets \
+  --namespace vaultwares \
+  --from-literal=license-key=VWAC-XXXX-XXXX-XXXX-XXXX \
+  --from-literal=db-password=<secure-password> \
+  --from-literal=ldap-bind-password=<ldap-password> \
+  --from-literal=hsm-pin=<hsm-pin>
+
+# Install VaultAccess
+helm install vaultaccess vaultwares/vaultaccess \
+  --namespace vaultwares \
+  --set image.tag=3.2.0 \
+  --set replicaCount=3 \
+  --set ingress.enabled=true \
+  --set ingress.hostname=vaultaccess.corp.example.com \
+  --set hsm.host=hsm01.corp.example.com \
+  --set hsm.slot=0 \
+  --values /etc/vaultwares/helm/vaultaccess-values.yaml
+```
+
+### Kubernetes values file
+
+```yaml
+# vaultaccess-values.yaml
+replicaCount: 3
+
+image:
+  registry: registry.vaultwares.com
+  repository: vaultaccess
+  tag: "3.2.0"
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+  limits:
+    cpu: "2000m"
+    memory: "2Gi"
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: vaultaccess.corp.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: vaultaccess-tls
+      hosts:
+        - vaultaccess.corp.example.com
+
+persistence:
+  enabled: true
+  storageClass: fast-ssd
+  size: 50Gi
+
+hsm:
+  host: hsm01.corp.example.com
+  port: 1792
+  slot: 0
+
+ldap:
+  url: ldap://dc01.corp.example.com:389
+  baseDN: DC=corp,DC=example,DC=com
+  bindDN: CN=svc_vaultaccess,OU=Services,DC=corp,DC=example,DC=com
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
+    Post-deployment configuration steps
+  </Card>
+  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
+    Connect to AD, LDAP, SAML, and SIEM
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Hardening and security recommendations
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
+    Diagnose deployment issues
+  </Card>
+</CardGroup>

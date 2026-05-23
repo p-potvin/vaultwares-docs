@@ -1,0 +1,313 @@
+---
+title: "Security monitoring"
+description: "Real-time threat detection and security analytics"
+---
+
+## Overview
+
+VaultMonitor is VaultWares' unified security monitoring platform. It collects telemetry from all VaultWares hardware and software products, correlates events across your environment, and surfaces actionable alerts in real-time. VaultMonitor ships with out-of-the-box SIEM integrations for Splunk, IBM QRadar, Microsoft Sentinel, and others, as well as a built-in dashboard for organizations without an existing SIEM.
+
+## Product editions
+
+<CardGroup cols={2}>
+  <Card title="VaultMonitor Professional" icon="chart-line">
+    **Best for**: Single-site deployments  
+    **Retention**: 90 days  
+    **Features**: Real-time alerts, built-in dashboard, email/SMS notifications, Splunk integration  
+    **Ingestion**: Up to 5,000 events/second
+  </Card>
+  <Card title="VaultMonitor Enterprise" icon="tower-broadcast">
+    **Best for**: Multi-site and MSSP deployments  
+    **Retention**: Up to 7 years (configurable)  
+    **Features**: + Anomaly detection ML, threat intelligence feeds, SOAR integration, multi-tenant  
+    **Ingestion**: Unlimited (horizontal scaling)
+  </Card>
+</CardGroup>
+
+## Key features
+
+### Real-time event collection
+
+VaultMonitor collects events from all VaultWares products and external sources:
+
+```bash
+# View current ingestion status
+vw-monitor status --ingestion
+
+# Output:
+# Source                       Events/sec   Status
+# VaultDrive (fleet)           342          Active
+# VaultHSM (cluster)           1,204        Active
+# VaultScan (terminals)        87           Active
+# VaultGate (network)          4,832        Active
+# VaultAccess (IAM)            621          Active
+# Windows Event Log (DC-01)    1,103        Active
+# Syslog (firewall)            2,871        Active
+# ---
+# Total                        11,060       Healthy
+```
+
+### Threat detection rules
+
+VaultMonitor ships with over 500 pre-built detection rules tuned for VaultWares environments. Custom rules use a simple YAML-based rule language:
+
+```yaml
+# Custom detection rule: Brute-force attack on VaultDrive fleet
+name: VaultDrive_BruteForce_Attack
+description: >
+  Detects repeated failed authentication attempts on VaultDrive devices,
+  indicating a potential brute-force attack.
+severity: high
+tags: [brute-force, encrypted-storage, lateral-movement]
+
+detection:
+  source: vaultdrive.authentication
+  filter:
+    event_type: auth_failure
+  groupby:
+    - device_id
+    - source_ip
+  threshold:
+    count: 5
+    timeframe: 5m
+
+response:
+  alert: true
+  severity: high
+  actions:
+    - type: notify
+      channels: [email, slack, pagerduty]
+    - type: api_call
+      endpoint: https://api.vaultwares.com/v1/devices/{device_id}/lock
+      method: POST
+    - type: create_ticket
+      integration: jira
+      project: SEC
+      priority: P1
+```
+
+```bash
+# Apply a custom rule
+vw-monitor rules apply --file /etc/vaultmonitor/rules/brute-force.yaml
+
+# List all active rules
+vw-monitor rules list --status active
+
+# Test a rule against historical data
+vw-monitor rules test \
+  --rule VaultDrive_BruteForce_Attack \
+  --timeframe "2024-11-01T00:00:00Z/2024-11-15T23:59:59Z" \
+  --dry-run
+```
+
+### Anomaly detection
+
+Enterprise edition includes machine learning-based anomaly detection:
+
+<AccordionGroup>
+  <Accordion title="User behavior analytics (UBA)">
+    Builds a behavioral baseline for each user and alerts when activity deviates significantly. Detects credential theft, insider threats, and account compromise.
+
+    ```bash
+    # View anomaly scores for users
+    vw-monitor anomaly user-scores \
+      --top 10 \
+      --timeframe 24h \
+      --min-score 70
+
+    # Output:
+    # User                 Score  Anomalies
+    # charlie@example.com  94     Off-hours HSM access, new device
+    # dave@example.com     78     Bulk file exports from VaultDrive
+    ```
+  </Accordion>
+  <Accordion title="Device behavior analytics">
+    Monitors device telemetry for unusual patterns: abnormal data volumes, unexpected geographic locations, unusual operation sequences.
+  </Accordion>
+  <Accordion title="Network traffic analysis">
+    Integrates with VaultGate to detect anomalous network flows, command-and-control beaconing, and data exfiltration patterns.
+  </Accordion>
+</AccordionGroup>
+
+### Alert configuration
+
+```json
+{
+  "alert_policy": {
+    "name": "CriticalAlertPolicy",
+    "channels": {
+      "email": {
+        "recipients": ["security@example.com", "soc@example.com"],
+        "min_severity": "medium",
+        "digest_interval_minutes": 60
+      },
+      "pagerduty": {
+        "service_key": "pd_svc_key_here",
+        "min_severity": "high",
+        "escalation_policy": "24x7-Security"
+      },
+      "slack": {
+        "webhook_url": "https://hooks.slack.com/services/...",
+        "channel": "#security-alerts",
+        "min_severity": "medium"
+      },
+      "webhook": {
+        "url": "https://soar.example.com/api/incidents",
+        "method": "POST",
+        "headers": {"Authorization": "Bearer soar-token"},
+        "min_severity": "high"
+      }
+    }
+  }
+}
+```
+
+```bash
+# Apply alert policy
+vw-monitor alerts set-policy --config /etc/vaultmonitor/alerts.json
+
+# Test alert delivery
+vw-monitor alerts test --channel email --recipient security@example.com
+
+# Acknowledge an alert
+vw-monitor alerts acknowledge --id alert_abc123 --comment "Investigating"
+
+# Escalate an alert
+vw-monitor alerts escalate --id alert_abc123 --to soc-lead@example.com
+```
+
+## SIEM integration
+
+### Splunk
+
+<Tabs>
+  <Tab title="Splunk HEC">
+    ```bash
+    # Configure Splunk HEC output
+    vw-monitor siem configure splunk \
+      --type hec \
+      --url https://splunk.example.com:8088 \
+      --token <splunk-hec-token> \
+      --index vaultwares \
+      --sourcetype vaultwares:events \
+      --tls-verify true
+
+    # Verify connectivity
+    vw-monitor siem test --integration splunk
+    ```
+  </Tab>
+  <Tab title="Splunk forwarder">
+    ```bash
+    # Forward events via Syslog to Splunk Universal Forwarder
+    vw-monitor siem configure syslog \
+      --host splunk-uf.example.com \
+      --port 5514 \
+      --protocol tcp \
+      --format rfc5424 \
+      --tls true
+    ```
+  </Tab>
+</Tabs>
+
+### IBM QRadar
+
+```bash
+# Configure QRadar DSM integration
+vw-monitor siem configure qradar \
+  --host qradar.example.com \
+  --port 514 \
+  --protocol syslog-tls \
+  --log-source-type "VaultWares Monitor" \
+  --device-support-module /opt/vaultmonitor/dsm/vaultwares-qradar-dsm.zip
+```
+
+### Microsoft Sentinel
+
+```bash
+# Configure Azure Sentinel via Log Analytics workspace
+vw-monitor siem configure sentinel \
+  --workspace-id <log-analytics-workspace-id> \
+  --shared-key <primary-key> \
+  --table-name VaultWaresEvents \
+  --batch-size 500
+```
+
+### Generic syslog / CEF
+
+```bash
+# Configure CEF output for any SIEM
+vw-monitor siem configure cef \
+  --host siem.example.com \
+  --port 514 \
+  --protocol udp \
+  --vendor VaultWares \
+  --product VaultMonitor \
+  --version 3.0
+```
+
+## Dashboards and reporting
+
+```bash
+# Generate compliance report (HIPAA)
+vw-monitor report generate \
+  --template hipaa-security-rule \
+  --start "2024-10-01" \
+  --end "2024-10-31" \
+  --format pdf \
+  --output /reports/hipaa-oct-2024.pdf
+
+# Generate executive summary
+vw-monitor report generate \
+  --template executive-summary \
+  --start "2024-11-01" \
+  --end "2024-11-15" \
+  --format html \
+  --output /reports/exec-summary.html
+
+# List available dashboard templates
+vw-monitor dashboard list-templates
+```
+
+## Log management
+
+```bash
+# Query events with filters
+vw-monitor query \
+  --source vaultdrive \
+  --event-type auth_failure \
+  --start "2024-11-15T00:00:00Z" \
+  --end "2024-11-15T23:59:59Z" \
+  --user alice@example.com \
+  --format json \
+  --limit 100
+
+# Export logs for forensic analysis
+vw-monitor export \
+  --start "2024-11-01T00:00:00Z" \
+  --end "2024-11-15T23:59:59Z" \
+  --sources all \
+  --format json \
+  --output /forensics/nov2024-export.json.gz \
+  --sign-with hsm:AuditLog-Signing-Key
+```
+
+<Note>
+  Exported logs are digitally signed by default when a VaultHSM signing key is configured, providing cryptographic proof of log integrity for forensic and compliance purposes.
+</Note>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
+    Integrate VaultMonitor with your SIEM and ticketing systems
+  </Card>
+  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
+    Daily log review and alert management workflows
+  </Card>
+  <Card title="Troubleshooting guide" icon="wrench" href="/guides/troubleshooting">
+    Diagnose VaultMonitor collection and alerting issues
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/endpoints">
+    Query events and manage alerts via the REST API
+  </Card>
+</CardGroup>

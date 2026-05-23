@@ -1,0 +1,288 @@
+---
+title: Frequently asked questions
+description: Common questions about VaultWares products and services
+---
+
+## General
+
+<AccordionGroup>
+  <Accordion title="What is VaultWares?">
+    VaultWares provides enterprise-grade data protection and security solutions, including encrypted storage devices, hardware security modules (HSMs), biometric authentication devices, network security appliances, and encryption software.
+  </Accordion>
+  
+  <Accordion title="Which product is right for me?">
+    - **Small business**: VaultDrive Pro + VaultCrypt Professional
+    - **Enterprise**: VaultHSM + VaultGate + VaultCrypt Enterprise
+    - **Individual users**: VaultDrive Pro + VaultCrypt Standard
+    - **Developers**: VaultHSM + API access
+    
+    Contact our [sales team](https://vaultwares.com/contact) for personalized recommendations.
+  </Accordion>
+  
+  <Accordion title="Do you offer free trials?">
+    Yes, we offer 30-day free trials for all software products. Hardware products can be evaluated through our demo program. Contact sales@vaultwares.com for details.
+  </Accordion>
+  
+  <Accordion title="What certifications do your products have?">
+    Our products are certified to:
+    - FIPS 140-2 Level 3 and FIPS 140-3 Level 4
+    - Common Criteria EAL4+ and EAL5+
+    - ISO 27001
+    - SOC 2 Type II
+    - FBI PIV-071006 (biometric devices)
+  </Accordion>
+</AccordionGroup>
+
+## Licensing and pricing
+
+<AccordionGroup>
+  <Accordion title="How does licensing work?">
+    - **Hardware products**: Perpetual license included with purchase
+    - **Software products**: Annual or perpetual licenses available
+    - **Enterprise**: Volume licensing with centralized management
+    - **Cloud HSM**: Pay-per-use or reserved capacity pricing
+  </Accordion>
+  
+  <Accordion title="Can I transfer my license?">
+    Yes, licenses can be transferred between devices. Contact support@vaultwares.com with your license key and new device information.
+  </Accordion>
+  
+  <Accordion title="What happens when my license expires?">
+    - **Hardware**: Continues to function normally
+    - **Software**: Grace period of 30 days, then features are limited
+    - **Updates**: No access to updates or new features after expiration
+    - **Support**: Technical support ends with license expiration
+  </Accordion>
+  
+  <Accordion title="Do you offer educational or non-profit discounts?">
+    Yes, we offer 30% discounts for educational institutions and registered non-profit organizations. Contact sales@vaultwares.com with proof of status.
+  </Accordion>
+</AccordionGroup>
+
+## Technical questions
+
+<AccordionGroup>
+  <Accordion title="What encryption algorithms do you use?">
+    - **Symmetric**: AES-256-XTS, AES-256-GCM
+    - **Asymmetric**: RSA-2048/4096, ECC (P-256, P-384, P-521)
+    - **Hashing**: SHA-256, SHA-384, SHA-512
+    - **Key derivation**: PBKDF2, HKDF
+    
+    All algorithms are FIPS 140-2 validated.
+  </Accordion>
+  
+  <Accordion title="Can I use VaultWares products in virtual environments?">
+    Yes, our software products fully support:
+    - VMware vSphere 7.0+
+    - Microsoft Hyper-V
+    - KVM
+    - Docker containers
+    
+    Note: HSMs require PCIe passthrough or network-attached models for virtualized environments.
+  </Accordion>
+  
+  <Accordion title="Do you support cloud deployments?">
+    Yes, VaultWares products work on:
+    - Amazon Web Services (AWS)
+    - Microsoft Azure
+    - Google Cloud Platform (GCP)
+    - Private cloud environments
+    
+    VaultHSM Cloud is specifically designed for cloud deployments.
+  </Accordion>
+  
+  <Accordion title="What operating systems are supported?">
+    - **Windows**: 10, 11, Server 2016+
+    - **macOS**: 11 (Big Sur) and later
+    - **Linux**: Ubuntu 20.04+, RHEL 8+, CentOS 8+, Debian 11+
+    
+    See [system requirements](/getting-started/system-requirements) for details.
+  </Accordion>
+  
+  <Accordion title="Can I integrate VaultWares with my existing infrastructure?">
+    Yes, we support integration with:
+    - Active Directory / LDAP
+    - SAML / OAuth / OpenID Connect
+    - SIEM systems (Splunk, QRadar, ArcSight)
+    - PKI infrastructure
+    - Physical access control systems
+    
+    See our [integration guides](/installation/integration-guides) for details.
+  </Accordion>
+</AccordionGroup>
+
+## Security and compliance
+
+<AccordionGroup>
+  <Accordion title="How secure is my data?">
+    - All data is encrypted with AES-256 encryption
+    - Keys are stored in tamper-resistant hardware
+    - Multi-factor authentication available
+    - Regular security audits and penetration testing
+    - Zero-knowledge architecture (we cannot access your data)
+  </Accordion>
+  
+  <Accordion title="Are you GDPR compliant?">
+    Yes, VaultWares products are designed to help you comply with GDPR requirements:
+    - Data encryption (Article 32)
+    - Right to erasure (Article 17)
+    - Data portability (Article 20)
+    - Privacy by design (Article 25)
+    
+    See our [GDPR compliance guide](/compliance/gdpr) for details.
+  </Accordion>
+  
+  <Accordion title="Do you comply with HIPAA?">
+    Yes, VaultWares products meet HIPAA Security Rule requirements for:
+    - Encryption of ePHI at rest and in transit
+    - Access controls and audit logging
+    - Integrity controls
+    - Transmission security
+    
+    See our [HIPAA compliance guide](/compliance/hipaa) for details.
+  </Accordion>
+  
+  <Accordion title="What happens if I forget my password?">
+    - **Hardware devices**: Contact support with proof of ownership. Data cannot be recovered without the password due to hardware encryption.
+    - **Software**: Use recovery key generated during setup
+    - **Enterprise**: Administrators can reset passwords via management console
+    - **HSM**: Security Officer can reset user PINs
+  </Accordion>
+  
+  <Accordion title="Can VaultWares access my encrypted data?">
+    No. VaultWares uses zero-knowledge encryption. We do not have access to your encryption keys or data. Only you can decrypt your data.
+  </Accordion>
+</AccordionGroup>
+
+## Support and maintenance
+
+<AccordionGroup>
+  <Accordion title="What support options are available?">
+    - **Standard**: Email support (24-hour response time)
+    - **Professional**: Email + phone support (4-hour response time)
+    - **Enterprise**: 24/7 phone support + dedicated account manager (1-hour response time)
+    - **Community**: Free community forum
+  </Accordion>
+  
+  <Accordion title="How do I get technical support?">
+    - **Email**: support@vaultwares.com
+    - **Phone**: +1-800-VAULT-WARE (Enterprise customers)
+    - **Portal**: https://support.vaultwares.com
+    - **Community**: https://community.vaultwares.com
+  </Accordion>
+  
+  <Accordion title="How often are updates released?">
+    - **Security updates**: As needed (critical vulnerabilities)
+    - **Feature updates**: Quarterly
+    - **Firmware updates**: Semi-annually
+    - **Signature updates**: Daily (for network appliances)
+  </Accordion>
+  
+  <Accordion title="What is your warranty policy?">
+    - **Hardware**: 3-7 years depending on product
+    - **Defects**: Free replacement for manufacturing defects
+    - **Damage**: Advanced replacement available (fee applies)
+    - **Extended warranty**: Available for purchase
+    
+    See [warranty information](/support/warranty) for details.
+  </Accordion>
+  
+  <Accordion title="Do you offer professional services?">
+    Yes, we offer:
+    - Implementation and deployment services
+    - Security consulting
+    - Custom integration development
+    - Training and certification programs
+    - Managed services
+    
+    Contact services@vaultwares.com for details.
+  </Accordion>
+</AccordionGroup>
+
+## Product-specific questions
+
+### Encrypted storage devices
+
+<AccordionGroup>
+  <Accordion title="Can I use VaultDrive on multiple computers?">
+    Yes, VaultDrive devices work on any computer with a USB port. No software installation required.
+  </Accordion>
+  
+  <Accordion title="What happens if I enter the wrong password too many times?">
+    After 10 failed attempts, the device locks for 30 minutes. After 20 failed attempts, the device performs cryptographic key erasure (all data is permanently lost).
+  </Accordion>
+  
+  <Accordion title="Can I recover data if the device fails?">
+    If the device fails mechanically, data may be recoverable by our data recovery service. If the encryption chip fails, data cannot be recovered. Always maintain backups of critical data.
+  </Accordion>
+</AccordionGroup>
+
+### Hardware security modules
+
+<AccordionGroup>
+  <Accordion title="What's the difference between PCIe and network HSMs?">
+    - **PCIe HSM**: Installed inside a server, lower latency, single server access
+    - **Network HSM**: Standalone appliance, accessible by multiple servers, easier to cluster
+  </Accordion>
+  
+  <Accordion title="Can I cluster HSMs for high availability?">
+    Yes, VaultHSM supports active-active and active-passive clustering with automatic failover.
+  </Accordion>
+  
+  <Accordion title="How do I backup HSM keys?">
+    Use M-of-N key splitting to create secure backups distributed among multiple custodians. See [HSM documentation](/hardware/hsm) for details.
+  </Accordion>
+</AccordionGroup>
+
+### Biometric devices
+
+<AccordionGroup>
+  <Accordion title="How accurate are your biometric devices?">
+    - **False Acceptance Rate (FAR)**: < 0.001% (fingerprint), < 0.0001% (face)
+    - **False Rejection Rate (FRR)**: < 0.1% (fingerprint), < 0.1% (face)
+  </Accordion>
+  
+  <Accordion title="Can biometric data be stolen?">
+    No. We store only mathematical templates, not actual fingerprints or facial images. Templates are encrypted and cannot be reverse-engineered.
+  </Accordion>
+  
+  <Accordion title="What if my fingerprint changes (injury, aging)?">
+    Enroll multiple fingers during setup. You can also re-enroll at any time to update your biometric template.
+  </Accordion>
+</AccordionGroup>
+
+### Network appliances
+
+<AccordionGroup>
+  <Accordion title="Can VaultGate replace my existing firewall?">
+    Yes, VaultGate is a complete next-generation firewall solution with IDS/IPS, VPN, web filtering, and more.
+  </Accordion>
+  
+  <Accordion title="How many VPN users can connect simultaneously?">
+    - VaultGate 1000: 50 concurrent VPN users
+    - VaultGate 5000: 250 concurrent VPN users
+    - VaultGate 10000: 1,000 concurrent VPN users
+    - VaultGate Enterprise: Unlimited
+  </Accordion>
+  
+  <Accordion title="Do you support SD-WAN?">
+    Yes, VaultGate 5000 and higher models include SD-WAN capabilities with intelligent path selection and application-aware routing.
+  </Accordion>
+</AccordionGroup>
+
+## Still have questions?
+
+<CardGroup cols={2}>
+  <Card title="Contact support" icon="envelope" href="/support/contact">
+    Get help from our technical team
+  </Card>
+  <Card title="Community forum" icon="users" href="https://community.vaultwares.com">
+    Ask the community
+  </Card>
+  <Card title="Knowledge base" icon="book" href="https://kb.vaultwares.com">
+    Search our knowledge base
+  </Card>
+  <Card title="Contact sales" icon="phone" href="https://vaultwares.com/contact">
+    Speak with a sales representative
+  </Card>
+</CardGroup>

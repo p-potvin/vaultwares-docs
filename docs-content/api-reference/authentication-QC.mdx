@@ -1,0 +1,413 @@
+---
+title: Authentication
+description: Authenticate with the VaultWares API
+---
+
+## Overview
+
+The VaultWares API uses API keys for authentication. All API requests must include a valid API key in the request headers. API keys are associated with your organization and can be scoped to specific permissions.
+
+## Getting an API key
+
+<Steps>
+  <Step title="Log in to the portal">
+    Navigate to [portal.vaultwares.com](https://portal.vaultwares.com) and log in with your credentials.
+  </Step>
+  <Step title="Navigate to API settings">
+    Go to **Settings** > **API Keys** in the left sidebar.
+  </Step>
+  <Step title="Create new API key">
+    Click **Create API Key** and provide:
+    - Key name (for identification)
+    - Permissions (read-only, read-write, admin)
+    - Expiration date (optional)
+  </Step>
+  <Step title="Save your key">
+    Copy the API key immediately. It will only be shown once for security reasons.
+  </Step>
+</Steps>
+
+<Warning>
+  Store your API key securely. Never commit API keys to version control or share them publicly.
+</Warning>
+
+## Authentication methods
+
+### API key in header (recommended)
+
+Include your API key in the `X-API-Key` header:
+
+```bash
+curl https://api.vaultwares.com/v1/devices \
+  -H "X-API-Key: vw_live_1234567890abcdef"
+```
+
+### Bearer token
+
+Alternatively, use the `Authorization` header with Bearer token:
+
+```bash
+curl https://api.vaultwares.com/v1/devices \
+  -H "Authorization: Bearer vw_live_1234567890abcdef"
+```
+
+## API key types
+
+<Tabs>
+  <Tab title="Live keys">
+    **Prefix**: `vw_live_`
+    
+    - Used for production environments
+    - Access to real data and devices
+    - Rate limits apply
+    - All operations are permanent
+    
+    ```bash
+    X-API-Key: vw_live_1234567890abcdef
+    ```
+  </Tab>
+  
+  <Tab title="Test keys">
+    **Prefix**: `vw_test_`
+    
+    - Used for development and testing
+    - Access to sandbox environment
+    - Higher rate limits
+    - Data is isolated from production
+    
+    ```bash
+    X-API-Key: vw_test_1234567890abcdef
+    ```
+  </Tab>
+  
+  <Tab title="Restricted keys">
+    **Prefix**: `vw_restricted_`
+    
+    - Limited to specific operations
+    - Read-only access
+    - Cannot modify or delete resources
+    - Useful for monitoring and reporting
+    
+    ```bash
+    X-API-Key: vw_restricted_1234567890abcdef
+    ```
+  </Tab>
+</Tabs>
+
+## Permissions
+
+API keys can be scoped to specific permissions:
+
+| Permission | Description | Operations |
+|------------|-------------|------------|
+| `devices:read` | View device information | GET /devices, GET /devices/:id |
+| `devices:write` | Manage devices | POST, PUT, PATCH /devices |
+| `devices:delete` | Delete devices | DELETE /devices/:id |
+| `policies:read` | View policies | GET /policies |
+| `policies:write` | Manage policies | POST, PUT, PATCH /policies |
+| `users:read` | View users | GET /users |
+| `users:write` | Manage users | POST, PUT, PATCH /users |
+| `audit:read` | View audit logs | GET /audit |
+| `admin` | Full access | All operations |
+
+### Creating scoped API keys
+
+```bash
+curl https://api.vaultwares.com/v1/api-keys \
+  -H "X-API-Key: vw_live_admin_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Monitoring Key",
+    "permissions": ["devices:read", "audit:read"],
+    "expires_at": "2025-12-31T23:59:59Z"
+  }'
+```
+
+## OAuth 2.0 (Enterprise)
+
+Enterprise customers can use OAuth 2.0 for user-delegated access.
+
+### Authorization code flow
+
+<Steps>
+  <Step title="Redirect user to authorization URL">
+    ```
+    https://auth.vaultwares.com/oauth/authorize?
+      client_id=your_client_id&
+      redirect_uri=https://yourapp.com/callback&
+      response_type=code&
+      scope=devices:read+devices:write
+    ```
+  </Step>
+  <Step title="User authorizes application">
+    User logs in and grants permissions to your application.
+  </Step>
+  <Step title="Receive authorization code">
+    VaultWares redirects to your callback URL with an authorization code:
+    ```
+    https://yourapp.com/callback?code=AUTH_CODE
+    ```
+  </Step>
+  <Step title="Exchange code for access token">
+    ```bash
+    curl https://auth.vaultwares.com/oauth/token \
+      -d grant_type=authorization_code \
+      -d code=AUTH_CODE \
+      -d client_id=your_client_id \
+      -d client_secret=your_client_secret \
+      -d redirect_uri=https://yourapp.com/callback
+    ```
+  </Step>
+  <Step title="Use access token">
+    ```bash
+    curl https://api.vaultwares.com/v1/devices \
+      -H "Authorization: Bearer ACCESS_TOKEN"
+    ```
+  </Step>
+</Steps>
+
+### Refresh tokens
+
+Access tokens expire after 1 hour. Use refresh tokens to obtain new access tokens:
+
+```bash
+curl https://auth.vaultwares.com/oauth/token \
+  -d grant_type=refresh_token \
+  -d refresh_token=REFRESH_TOKEN \
+  -d client_id=your_client_id \
+  -d client_secret=your_client_secret
+```
+
+## Rate limiting
+
+API requests are rate limited to ensure fair usage and system stability.
+
+### Rate limit tiers
+
+| Tier | Requests per minute | Requests per hour |
+|------|---------------------|-------------------|
+| Free | 60 | 1,000 |
+| Professional | 300 | 10,000 |
+| Enterprise | 1,000 | 100,000 |
+| Custom | Negotiable | Negotiable |
+
+### Rate limit headers
+
+Every API response includes rate limit information:
+
+```http
+HTTP/1.1 200 OK
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 987
+X-RateLimit-Reset: 1640995200
+```
+
+- `X-RateLimit-Limit`: Maximum requests allowed in the current window
+- `X-RateLimit-Remaining`: Requests remaining in the current window
+- `X-RateLimit-Reset`: Unix timestamp when the rate limit resets
+
+### Handling rate limits
+
+When you exceed the rate limit, you'll receive a `429 Too Many Requests` response:
+
+```json
+{
+  "error": {
+    "code": "rate_limit_exceeded",
+    "message": "Rate limit exceeded. Please retry after 60 seconds.",
+    "retry_after": 60
+  }
+}
+```
+
+Implement exponential backoff in your application:
+
+```python
+import time
+import requests
+
+def make_request_with_retry(url, headers, max_retries=3):
+    for attempt in range(max_retries):
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 429:
+            retry_after = int(response.headers.get('Retry-After', 60))
+            time.sleep(retry_after)
+            continue
+            
+        return response
+    
+    raise Exception("Max retries exceeded")
+```
+
+## Security best practices
+
+### Rotate API keys regularly
+
+```bash
+# Create new API key
+NEW_KEY=$(curl https://api.vaultwares.com/v1/api-keys \
+  -H "X-API-Key: vw_live_current_key" \
+  -d '{"name": "Rotated Key", "permissions": ["admin"]}' \
+  | jq -r '.key')
+
+# Update your application to use new key
+# ...
+
+# Delete old API key
+curl -X DELETE https://api.vaultwares.com/v1/api-keys/old_key_id \
+  -H "X-API-Key: $NEW_KEY"
+```
+
+### Use environment variables
+
+Never hardcode API keys in your application:
+
+```bash
+# .env file
+VAULTWARES_API_KEY=vw_live_1234567890abcdef
+```
+
+```python
+import os
+from vaultwares import VaultWaresAPI
+
+api_key = os.environ.get('VAULTWARES_API_KEY')
+client = VaultWaresAPI(api_key=api_key)
+```
+
+### Restrict by IP address
+
+Limit API key usage to specific IP addresses:
+
+```bash
+curl https://api.vaultwares.com/v1/api-keys/key_id \
+  -X PATCH \
+  -H "X-API-Key: vw_live_admin_key" \
+  -d '{
+    "allowed_ips": ["203.0.113.0/24", "198.51.100.10"]
+  }'
+```
+
+### Monitor API key usage
+
+```bash
+# Get API key usage statistics
+curl https://api.vaultwares.com/v1/api-keys/key_id/usage \
+  -H "X-API-Key: vw_live_admin_key"
+
+# Response:
+{
+  "key_id": "key_abc123",
+  "requests_today": 1247,
+  "requests_this_month": 45678,
+  "last_used_at": "2024-01-15T14:32:10Z",
+  "last_used_ip": "203.0.113.42"
+}
+```
+
+## Webhook signatures
+
+Verify webhook authenticity using HMAC signatures.
+
+### Verify webhook signature
+
+```python
+import hmac
+import hashlib
+
+def verify_webhook(payload, signature, secret):
+    expected_signature = hmac.new(
+        secret.encode(),
+        payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    
+    return hmac.compare_digest(signature, expected_signature)
+
+# Usage
+webhook_secret = os.environ.get('VAULTWARES_WEBHOOK_SECRET')
+payload = request.body
+signature = request.headers.get('X-VaultWares-Signature')
+
+if verify_webhook(payload, signature, webhook_secret):
+    # Process webhook
+    pass
+else:
+    # Reject webhook
+    return 401
+```
+
+## Testing authentication
+
+### Test API key validity
+
+```bash
+curl https://api.vaultwares.com/v1/auth/verify \
+  -H "X-API-Key: vw_live_1234567890abcdef"
+
+# Response:
+{
+  "valid": true,
+  "key_id": "key_abc123",
+  "permissions": ["admin"],
+  "organization_id": "org_xyz789",
+  "expires_at": null
+}
+```
+
+### Test OAuth token
+
+```bash
+curl https://api.vaultwares.com/v1/auth/verify \
+  -H "Authorization: Bearer ACCESS_TOKEN"
+
+# Response:
+{
+  "valid": true,
+  "user_id": "user_123",
+  "scopes": ["devices:read", "devices:write"],
+  "expires_at": "2024-01-15T15:30:00Z"
+}
+```
+
+## Error responses
+
+### Authentication errors
+
+```json
+{
+  "error": {
+    "code": "invalid_api_key",
+    "message": "The provided API key is invalid or has been revoked.",
+    "type": "authentication_error"
+  }
+}
+```
+
+Common authentication error codes:
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `invalid_api_key` | 401 | API key is invalid or revoked |
+| `expired_api_key` | 401 | API key has expired |
+| `insufficient_permissions` | 403 | API key lacks required permissions |
+| `ip_not_allowed` | 403 | Request from unauthorized IP address |
+| `rate_limit_exceeded` | 429 | Too many requests |
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="API endpoints" icon="code" href="/api-reference/endpoints">
+    Explore available API endpoints
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
+    Set up webhook notifications
+  </Card>
+  <Card title="SDKs" icon="book-code" href="/api-reference/sdk">
+    Use official SDKs
+  </Card>
+  <Card title="Examples" icon="lightbulb" href="/api-reference/examples">
+    View code examples
+  </Card>
+</CardGroup>

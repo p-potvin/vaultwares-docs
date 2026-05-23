@@ -1,0 +1,152 @@
+---
+title: "Zero-knowledge encryption standard"
+description: "VaultWares-wide normative standard for client-side, post-quantum, zero-knowledge encryption."
+---
+
+<Note>
+**Tier 1 source of truth.** This document is normative for all VaultWares projects.
+A project that cannot satisfy these requirements MUST add `NOTE.encryption.md`
+to its repository root explaining the technical reason and the chosen fallback.
+</Note>
+
+## Scope
+
+This standard governs every place where a VaultWares project encrypts user data
+client-side under user-controlled secrets — local vaults, encrypted backups,
+device-to-device sync payloads, end-to-end messaging, and any flow where the
+server must not be able to read user content.
+
+It does **not** govern transport encryption (TLS) or storage encryption performed
+by VaultWares hardware products under enterprise key custody — those are covered
+by [Encryption protocols](./encryption-protocols).
+
+## Mandatory architecture
+
+Client-side encryption MUST use **ML-KEM (FIPS 203)** as the key encapsulation
+mechanism, layered with **AES-256-GCM** as the symmetric data cipher, in the
+envelope-encryption pattern below.
+
+```
+PIN / passphrase
+   │
+   ▼  Argon2id (m = 64 MiB, t = 3, p = 1, salt = 16 random bytes)
+master KEK (AES-256)
+   │
+   ├──► wraps the long-term ML-KEM private key (AES-256-GCM)
+   │
+   │    long-term ML-KEM public key  ── stored plaintext, exportable
+   │    long-term ML-KEM private key  ── only ever in memory after PIN entry
+   │
+   ▼
+For each blob (preview, message, backup chunk):
+   1. Generate random 32-byte DEK (crypto.getRandomValues)
+   2. Encrypt blob with AES-256-GCM under DEK; store ciphertext + IV + tag
+   3. ML-KEM encapsulate against public key → (ML-KEM ciphertext, shared secret K_s)
+   4. AES-256-Key-Wrap (RFC 5649) the DEK under K_s
+   5. Persist: ML-KEM ciphertext ‖ wrapped DEK ‖ blob ciphertext
+```
+
+## Parameter selection
+
+| Tier | Parameter set | When to use |
+|------|---------------|-------------|
+| **Default** | **ML-KEM-1024** | All long-term confidential data. NIST security level 5. |
+| **Allowed minimum** | **ML-KEM-512** | Only when decapsulation latency directly degrades user-perceived performance (e.g. real-time preview decoding on hot paths). NIST security level 1. Document the latency budget that justified the choice in `NOTE.encryption.md`. |
+| **Fallback (with note)** | **AES-256-GCM only**, no PQ layer | Only when ML-KEM cannot be implemented in the project's runtime (e.g. hard SDK constraints, no audited PQ library available). Requires `NOTE.encryption.md` at repo root. |
+
+ML-KEM-768 is intentionally not listed — projects either need quantum-grade margin
+(use 1024) or are latency-bound (use 512). Picking the middle is rarely the right
+answer; if you think it is, write the trade-off down in `NOTE.encryption.md` and
+escalate.
+
+## Required properties
+
+A compliant implementation MUST guarantee all of the following.
+
+### Zero-knowledge
+
+- The server MUST NOT receive the PIN, the master KEK, the private key, the DEK,
+  or plaintext blobs.
+- Backups uploaded for cross-device sync MUST be encrypted with the public key
+  before leaving the device.
+- Telemetry, logs, and crash reports MUST NOT contain key material or plaintext.
+
+### Key handling
+
+- PINs are NEVER stored in any reversible form. Store only the Argon2id-derived
+  hash for verification, with a per-user random salt.
+- The Argon2id salt MUST be stored alongside the verification hash.
+- Symmetric keys MUST NOT be derived directly from a PIN without a slow KDF.
+- Direct use of a PIN as an AES key is prohibited.
+- Private keys MUST be wrapped under the master KEK whenever persisted.
+- DEKs MUST be ephemeral (regenerated per blob) — never reuse a DEK across blobs.
+
+### Cryptographic agility
+
+- The on-disk format MUST include an algorithm identifier and version field so
+  the parameter set can change in a future release without breaking existing
+  vaults.
+- A documented migration path MUST exist for upgrading older vaults to the
+  current parameter set.
+
+## Implementation guidance
+
+### Recommended libraries
+
+| Runtime | Library | Notes |
+|---------|---------|-------|
+| Browser / Node (TypeScript) | [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum) | Audited, zero-dependency, MIT |
+| Browser / Node (TypeScript) | [`liboqs-js`](https://github.com/open-quantum-safe/liboqs) | NIST reference algorithms, larger payload |
+| Native (Rust) | [`pqcrypto`](https://github.com/rustpq/pqcrypto) | Wraps PQClean reference implementations |
+| Python | [`pyoqs`](https://github.com/open-quantum-safe/liboqs-python) | OQS bindings |
+
+Pick a library that has a third-party security audit on the ML-KEM
+implementation. If none is available for your runtime, document the gap in
+`NOTE.encryption.md` and prefer the AES-256-GCM fallback over an unaudited PQ
+implementation.
+
+### `NOTE.encryption.md` template
+
+When a fallback or a deviation from this standard is unavoidable, add the
+following file to the repository root:
+
+```markdown
+# Encryption Note
+
+**Standard reference:** vaultwares-docs/security/zero-knowledge-encryption-standard
+
+**Deviation:** <ML-KEM-512 instead of -1024 / AES-only fallback / etc.>
+
+**Reason:** <one paragraph: technical constraint, latency budget, library gap>
+
+**Mitigation:** <what we do instead, what we monitor, when we plan to revisit>
+
+**Owner:** <name / role>
+**Reviewed:** <YYYY-MM-DD>
+```
+
+## Forbidden patterns
+
+The following patterns are non-compliant and MUST be removed when discovered:
+
+- Storing the user's PIN, password, or recovery phrase in plaintext or in any
+  reversible form
+- Using a PIN, password, or low-entropy secret directly as an AES key
+- Using a fast hash (SHA-1, SHA-256 single round, MD5) as a password hash
+- Reusing a DEK across multiple blobs
+- Sending unencrypted user data to any server, even temporarily, even "for
+  diagnostics"
+- Hardcoded encryption keys in source, build artifacts, or environment files
+- "Encrypted" data whose key is shipped alongside it (so-called encryption
+  theatre)
+
+## Audit & review
+
+- Every project subject to this standard MUST be reviewed annually against the
+  current version of this document. The review date and reviewer go in
+  `NOTE.encryption.md` even when the project is fully compliant.
+- New implementations MUST have their cryptographic flow reviewed by at least
+  one engineer who did not write the implementation.
+- The wire format and on-disk format MUST be documented in the project's own
+  README or security-notes file so the format can be parsed by recovery tooling
+  in the future.

@@ -1,0 +1,324 @@
+---
+title: "Access control"
+description: "Zero-trust access control and identity management"
+---
+
+## Overview
+
+VaultAccess is VaultWares' zero-trust access control and identity management platform. It enforces least-privilege policies across your entire infrastructure — from endpoint authentication to privileged access management — and integrates natively with Active Directory, LDAP, SAML 2.0, and OAuth 2.0 providers.
+
+## Product editions
+
+<CardGroup cols={3}>
+  <Card title="VaultAccess Standard" icon="shield">
+    **Best for**: Small teams (up to 50 users)  
+    **Features**: RBAC, MFA, AD/LDAP integration  
+    **License**: Per-user annual subscription
+  </Card>
+  <Card title="VaultAccess Professional" icon="shield-halved">
+    **Best for**: Mid-size organizations (up to 500 users)  
+    **Features**: RBAC, ABAC, SSO, PAM, SIEM integration  
+    **License**: Per-user annual subscription
+  </Card>
+  <Card title="VaultAccess Enterprise" icon="shield-check">
+    **Best for**: Large enterprises (unlimited users)  
+    **Features**: Full zero-trust, adaptive MFA, API access, custom policies  
+    **License**: Site license or per-user
+  </Card>
+</CardGroup>
+
+## Core features
+
+### Role-based access control (RBAC)
+
+VaultAccess provides a hierarchical RBAC model with built-in roles and full support for custom role definitions.
+
+```json
+{
+  "role": {
+    "name": "EncryptedStorageAdmin",
+    "description": "Administer VaultDrive fleet",
+    "permissions": [
+      "storage:devices:read",
+      "storage:devices:write",
+      "storage:policies:read",
+      "storage:policies:write",
+      "audit:read"
+    ],
+    "scope": "department:IT",
+    "inherits_from": "BaseEmployee"
+  }
+}
+```
+
+```bash
+# Create a custom role
+vw-admin role create \
+  --name "EncryptedStorageAdmin" \
+  --permissions storage:devices:read,storage:devices:write,audit:read \
+  --scope department:IT
+
+# Assign role to user
+vw-admin user assign-role \
+  --user alice@example.com \
+  --role EncryptedStorageAdmin
+
+# List all roles
+vw-admin role list --format table
+```
+
+### Attribute-based access control (ABAC)
+
+ABAC policies evaluate multiple contextual attributes at access time, enabling fine-grained control beyond simple role assignments.
+
+```json
+{
+  "policy": {
+    "name": "HSMAccessPolicy",
+    "effect": "allow",
+    "principal": {
+      "role": ["SecurityOfficer", "CryptoAdmin"]
+    },
+    "action": ["hsm:sign", "hsm:generate-key"],
+    "resource": "arn:vaultwares:hsm:us-east-1:org123:VaultHSM-Prod-*",
+    "condition": {
+      "StringEquals": {
+        "user:department": "Security",
+        "request:mfa_authenticated": "true"
+      },
+      "IpAddress": {
+        "request:source_ip": ["10.0.0.0/8", "192.168.1.0/24"]
+      },
+      "DateGreaterThan": {
+        "request:time": "08:00:00"
+      },
+      "DateLessThan": {
+        "request:time": "18:00:00"
+      }
+    }
+  }
+}
+```
+
+### Zero-trust architecture
+
+VaultAccess implements zero-trust principles: every access request is verified regardless of network location.
+
+<Steps>
+  <Step title="Identity verification">
+    Every user and device must authenticate with at least two factors before any access is granted. Certificates, biometrics, and hardware tokens are supported.
+  </Step>
+  <Step title="Device posture check">
+    Before granting access, VaultAccess checks that the requesting device meets your security baseline: OS patch level, disk encryption status, EDR agent presence, and certificate validity.
+  </Step>
+  <Step title="Least-privilege enforcement">
+    Users receive only the permissions required for the specific task. Time-limited access tokens expire automatically; standing access is minimized.
+  </Step>
+  <Step title="Continuous monitoring">
+    Access sessions are monitored in real-time. Anomalous behavior (unusual hours, new location, excessive failed operations) triggers step-up authentication or automatic session termination.
+  </Step>
+</Steps>
+
+### Multi-factor authentication (MFA)
+
+<AccordionGroup>
+  <Accordion title="Supported MFA methods">
+    - **TOTP** (Google Authenticator, Authy, Microsoft Authenticator)
+    - **FIDO2 / WebAuthn** hardware security keys (YubiKey, VaultScan biometric terminal)
+    - **Push notifications** via VaultWares Authenticator mobile app
+    - **SMS / Email OTP** (for legacy compatibility — not recommended for high-security environments)
+    - **Smart card / PIV** (X.509 certificate-based authentication)
+    - **Biometric** via VaultScan devices
+  </Accordion>
+  <Accordion title="Adaptive MFA">
+    Enterprise edition supports adaptive MFA, which escalates authentication requirements based on risk signals:
+    - First login from a new device or location → require hardware key
+    - Access from outside corporate network → push notification required
+    - Privileged operation (HSM key generation) → smart card required
+  </Accordion>
+</AccordionGroup>
+
+```bash
+# Configure MFA policy
+vw-admin mfa-policy set \
+  --require-mfa true \
+  --methods totp,fido2,push \
+  --grace-period-hours 0 \
+  --apply-to-group AllUsers
+
+# Enroll a hardware key for a user
+vw-admin mfa enroll-fido2 \
+  --user alice@example.com \
+  --device "YubiKey 5C"
+```
+
+### Single sign-on (SSO)
+
+<Tabs>
+  <Tab title="SAML 2.0">
+    ```xml
+    <!-- SAML SP metadata for VaultAccess -->
+    <EntityDescriptor entityID="https://vaultaccess.example.com/saml/sp">
+      <SPSSODescriptor>
+        <AssertionConsumerService
+          Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+          Location="https://vaultaccess.example.com/saml/acs"
+          index="1"/>
+        <NameIDFormat>
+          urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress
+        </NameIDFormat>
+      </SPSSODescriptor>
+    </EntityDescriptor>
+    ```
+
+    ```bash
+    # Configure SAML IdP
+    vw-admin sso configure-saml \
+      --idp-metadata-url https://idp.example.com/saml/metadata \
+      --entity-id https://vaultaccess.example.com/saml/sp \
+      --acs-url https://vaultaccess.example.com/saml/acs \
+      --sign-requests true
+    ```
+  </Tab>
+  <Tab title="OAuth 2.0 / OIDC">
+    ```bash
+    # Configure OIDC provider (e.g., Okta, Azure AD, Auth0)
+    vw-admin sso configure-oidc \
+      --provider okta \
+      --issuer https://yourorg.okta.com/oauth2/default \
+      --client-id <your-client-id> \
+      --client-secret <your-client-secret> \
+      --scopes "openid,profile,email,groups"
+    ```
+  </Tab>
+  <Tab title="Active Directory">
+    ```bash
+    # Join VaultAccess to Active Directory domain
+    vw-admin ad join \
+      --domain corp.example.com \
+      --dc dc01.corp.example.com \
+      --username CORP\\svc_vaultaccess \
+      --password <service-account-password> \
+      --ou "OU=VaultWares,DC=corp,DC=example,DC=com"
+
+    # Sync AD groups to VaultAccess roles
+    vw-admin ad sync-groups \
+      --map "CN=SecurityTeam,OU=Groups,DC=corp,DC=example,DC=com:SecurityOfficer" \
+      --map "CN=ITAdmins,OU=Groups,DC=corp,DC=example,DC=com:EncryptedStorageAdmin" \
+      --schedule "0 * * * *"
+    ```
+  </Tab>
+</Tabs>
+
+### Privileged access management (PAM)
+
+PAM capabilities are available in Professional and Enterprise editions.
+
+```bash
+# Create a privileged session for HSM administration
+vw-admin pam request-session \
+  --target hsm01.corp.example.com \
+  --role SecurityOfficer \
+  --justification "Emergency key rotation - Incident INC-20241115" \
+  --duration 2h
+
+# Session ID returned: psess_abc123
+
+# All commands in the session are recorded
+vw-admin pam connect --session psess_abc123
+
+# Terminate session when done
+vw-admin pam end-session --session psess_abc123
+
+# Review session recording
+vw-admin pam replay --session psess_abc123
+```
+
+## API examples
+
+```bash
+# Create user via API
+curl -X POST https://api.vaultwares.com/v1/users \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "bob@example.com",
+    "first_name": "Bob",
+    "last_name": "Smith",
+    "roles": ["ITAdmin"],
+    "mfa_required": true,
+    "department": "IT"
+  }'
+
+# Get user access summary
+curl https://api.vaultwares.com/v1/users/user_abc123/access-summary \
+  -H "X-API-Key: vw_live_1234567890abcdef"
+
+# Revoke all sessions for a user (emergency lockout)
+curl -X POST https://api.vaultwares.com/v1/users/user_abc123/revoke-all-sessions \
+  -H "X-API-Key: vw_live_1234567890abcdef"
+```
+
+## Policy configuration reference
+
+```json
+{
+  "access_policy": {
+    "version": "2024-01",
+    "password_policy": {
+      "min_length": 14,
+      "require_uppercase": true,
+      "require_lowercase": true,
+      "require_numbers": true,
+      "require_special_chars": true,
+      "max_age_days": 90,
+      "history_count": 12,
+      "lockout_threshold": 5,
+      "lockout_duration_minutes": 30
+    },
+    "session_policy": {
+      "max_session_duration_hours": 8,
+      "idle_timeout_minutes": 15,
+      "require_reauthentication_for_privileged_ops": true
+    },
+    "network_policy": {
+      "allowed_ip_ranges": ["10.0.0.0/8", "192.168.0.0/16"],
+      "vpn_required_for_external_access": true,
+      "geo_restrictions": {
+        "allowed_countries": ["US", "CA", "GB", "DE"]
+      }
+    }
+  }
+}
+```
+
+## Compliance and certifications
+
+<AccordionGroup>
+  <Accordion title="NIST SP 800-207 Zero Trust Architecture">
+    VaultAccess implements all seven tenets of the NIST Zero Trust Architecture, including device trust, dynamic policy enforcement, and continuous monitoring.
+  </Accordion>
+  <Accordion title="ISO 27001 / ISO 27002">
+    Supports controls A.9 (Access Control) and A.6.1.2 (Segregation of Duties) from ISO 27001 Annex A.
+  </Accordion>
+  <Accordion title="SOC 2 Type II">
+    VaultAccess audit logs and access control mechanisms satisfy the CC6 (Logical and Physical Access Controls) criteria of the SOC 2 Trust Service Criteria.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
+    Connect VaultAccess to AD, LDAP, and SAML providers
+  </Card>
+  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
+    Set up admin accounts and LDAP synchronization
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/endpoints">
+    Manage users and policies via the REST API
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Zero-trust deployment recommendations
+  </Card>
+</CardGroup>

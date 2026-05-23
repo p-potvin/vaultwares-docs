@@ -1,0 +1,315 @@
+---
+title: Contact support
+description: Get help from the VaultWares support team
+---
+
+## Support channels
+
+<CardGroup cols={2}>
+  <Card title="Email support" icon="envelope">
+    **support@vaultwares.com**  
+    Available 24/7  
+    Response time: Based on support tier
+  </Card>
+  <Card title="Phone support" icon="phone">
+    **+1-800-VAULT-WARE**  
+    Professional & Enterprise customers  
+    Mon-Fri 8AM-8PM EST
+  </Card>
+  <Card title="Support portal" icon="ticket">
+    **portal.vaultwares.com/support**  
+    Submit and track tickets  
+    Access knowledge base
+  </Card>
+  <Card title="Live chat" icon="message">
+    **Available on website**  
+    Mon-Fri 9AM-6PM EST  
+    Instant assistance
+  </Card>
+</CardGroup>
+
+## Support tiers
+
+<Tabs>
+  <Tab title="Standard">
+    **Included with all purchases**
+    
+    - Email support
+    - 24-hour response time (business days)
+    - Access to knowledge base and documentation
+    - Community forum access
+    - Software updates and patches
+    
+    **Best for**: Individual users and small teams
+  </Tab>
+  
+  <Tab title="Professional">
+    **$499/year per organization**
+    
+    - Email and phone support
+    - 4-hour response time (24/7)
+    - Priority ticket handling
+    - Remote assistance
+    - Quarterly product training webinars
+    - Early access to new features
+    
+    **Best for**: Growing businesses
+  </Tab>
+  
+  <Tab title="Enterprise">
+    **$2,499/year per organization**
+    
+    - 24/7 phone and email support
+    - 1-hour response time for critical issues
+    - Dedicated account manager
+    - On-site support available
+    - Custom training sessions
+    - Architecture and design consultation
+    - Direct access to engineering team
+    - Annual security review
+    
+    **Best for**: Large organizations with mission-critical deployments
+  </Tab>
+</Tabs>
+
+## Before contacting support
+
+To help us assist you quickly, please have the following information ready:
+
+<Steps>
+  <Step title="Product information">
+    - Product name and model
+    - Software version or firmware version
+    - License key or serial number
+  </Step>
+  <Step title="System information">
+    - Operating system and version
+    - Hardware specifications
+    - Network configuration (if applicable)
+  </Step>
+  <Step title="Issue details">
+    - Detailed description of the problem
+    - Steps to reproduce the issue
+    - Error messages or codes
+    - Screenshots or logs (if available)
+  </Step>
+  <Step title="Impact assessment">
+    - How many users are affected?
+    - Is this blocking critical operations?
+    - When did the issue start?
+  </Step>
+</Steps>
+
+## Collect diagnostic information
+
+### Windows
+
+```powershell
+# Generate diagnostic report
+vw-diagnostic --full-report --output C:\vw-diagnostic.zip
+
+# Collect system logs
+Get-EventLog -LogName Application -Source VaultWares* | 
+  Export-Csv C:\vw-logs.csv
+
+# Check service status
+Get-Service | Where-Object {$_.Name -like "VaultWares*"}
+```
+
+### macOS
+
+```bash
+# Generate diagnostic report
+vw-diagnostic --full-report --output ~/vw-diagnostic.zip
+
+# Collect system logs
+log show --predicate 'subsystem == "com.vaultwares"' --last 24h > ~/vw-logs.txt
+
+# Check service status
+launchctl list | grep com.vaultwares
+```
+
+### Linux
+
+```bash
+# Generate diagnostic report
+sudo vw-diagnostic --full-report --output /tmp/vw-diagnostic.zip
+
+# Collect system logs
+sudo journalctl -u vaultwares* --since "24 hours ago" > /tmp/vw-logs.txt
+
+# Check service status
+sudo systemctl status vaultwares*
+```
+
+## Submit a support ticket
+
+<Steps>
+  <Step title="Log in to support portal">
+    Visit [portal.vaultwares.com/support](https://portal.vaultwares.com/support) and log in with your account credentials.
+  </Step>
+  <Step title="Create new ticket">
+    Click "New Ticket" and select the appropriate category:
+    - Technical issue
+    - License or billing
+    - Feature request
+    - General inquiry
+  </Step>
+  <Step title="Provide details">
+    Fill in all required fields and attach diagnostic files if available.
+  </Step>
+  <Step title="Set priority">
+    - **Critical**: System down, data loss, security breach
+    - **High**: Major functionality impaired
+    - **Medium**: Minor functionality issue
+    - **Low**: General question or enhancement request
+  </Step>
+  <Step title="Submit and track">
+    Submit your ticket and track progress via email notifications or the support portal.
+  </Step>
+</Steps>
+
+## Emergency support
+
+For **critical security incidents** or **system outages** affecting production environments:
+
+<Warning>
+  **Emergency Hotline**: +1-800-VAULT-911  
+  Available 24/7 for Enterprise customers only
+</Warning>
+
+Emergency support is for:
+- Active security breaches
+- Complete system failures
+- Data loss incidents
+- Compliance violations
+
+## Regional support offices
+
+### North America
+**VaultWares Inc.**  
+123 Security Boulevard  
+San Francisco, CA 94105  
+Phone: +1-800-VAULT-WARE  
+Email: support-na@vaultwares.com
+
+### Europe
+**VaultWares Europe Ltd.**  
+45 Encryption Street  
+London, UK EC2A 4BX  
+Phone: +44-20-VAULT-WARE  
+Email: support-eu@vaultwares.com
+
+### Asia Pacific
+**VaultWares Asia Pacific Pte Ltd.**  
+88 Cyber Security Road  
+Singapore 018956  
+Phone: +65-VAULT-WARE  
+Email: support-apac@vaultwares.com
+
+## Community resources
+
+<CardGroup cols={2}>
+  <Card title="Community forum" icon="users" href="https://community.vaultwares.com">
+    Ask questions and share knowledge with other users
+  </Card>
+  <Card title="Knowledge base" icon="book" href="https://kb.vaultwares.com">
+    Search articles, guides, and troubleshooting tips
+  </Card>
+  <Card title="Video tutorials" icon="video" href="https://youtube.com/vaultwares">
+    Watch step-by-step video guides
+  </Card>
+  <Card title="Developer docs" icon="code" href="/api-reference/authentication">
+    API documentation and integration guides
+  </Card>
+</CardGroup>
+
+## Professional services
+
+Need help with implementation, migration, or custom development?
+
+<CardGroup cols={2}>
+  <Card title="Implementation services" icon="rocket">
+    Expert deployment and configuration assistance
+  </Card>
+  <Card title="Security consulting" icon="shield-check">
+    Architecture review and security best practices
+  </Card>
+  <Card title="Training programs" icon="graduation-cap">
+    On-site or virtual training for your team
+  </Card>
+  <Card title="Custom development" icon="code">
+    Custom integrations and feature development
+  </Card>
+</CardGroup>
+
+**Contact**: services@vaultwares.com
+
+## Feedback and suggestions
+
+We value your feedback! Help us improve VaultWares products and services:
+
+- **Feature requests**: Submit via support portal or email feedback@vaultwares.com
+- **Bug reports**: Use support portal with detailed reproduction steps
+- **Documentation feedback**: Click "Edit this page" at the bottom of any doc page
+- **Product reviews**: Share your experience on G2, Capterra, or Gartner Peer Insights
+
+## Service level agreements (SLA)
+
+### Response times
+
+| Priority | Standard | Professional | Enterprise |
+|----------|----------|--------------|------------|
+| Critical | 24 hours | 4 hours | 1 hour |
+| High | 48 hours | 8 hours | 4 hours |
+| Medium | 5 business days | 24 hours | 8 hours |
+| Low | 10 business days | 48 hours | 24 hours |
+
+### Resolution targets
+
+| Priority | Target Resolution Time |
+|----------|----------------------|
+| Critical | 4 business hours (Enterprise: 2 hours) |
+| High | 2 business days (Enterprise: 1 day) |
+| Medium | 5 business days (Enterprise: 3 days) |
+| Low | 10 business days (Enterprise: 5 days) |
+
+<Info>
+  Resolution times are targets, not guarantees. Complex issues may require additional time. We'll keep you informed throughout the process.
+</Info>
+
+## Escalation process
+
+If you're not satisfied with the support you're receiving:
+
+<Steps>
+  <Step title="Contact your support engineer">
+    Discuss your concerns with the assigned support engineer.
+  </Step>
+  <Step title="Request escalation">
+    Ask for your ticket to be escalated to a senior engineer or team lead.
+  </Step>
+  <Step title="Contact support manager">
+    Email support-manager@vaultwares.com with your ticket number.
+  </Step>
+  <Step title="Executive escalation">
+    For unresolved critical issues, contact: escalations@vaultwares.com
+  </Step>
+</Steps>
+
+## Additional resources
+
+<CardGroup cols={2}>
+  <Card title="System status" icon="signal" href="https://status.vaultwares.com">
+    Check service availability and planned maintenance
+  </Card>
+  <Card title="Security advisories" icon="shield-alert" href="https://security.vaultwares.com">
+    Latest security updates and advisories
+  </Card>
+  <Card title="Release notes" icon="file-text" href="https://releases.vaultwares.com">
+    Product updates and changelogs
+  </Card>
+  <Card title="API status" icon="activity" href="https://api-status.vaultwares.com">
+    API uptime and performance metrics
+  </Card>
+</CardGroup>

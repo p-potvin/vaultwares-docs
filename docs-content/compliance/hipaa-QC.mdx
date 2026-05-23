@@ -1,0 +1,221 @@
+---
+title: "HIPAA compliance"
+description: "Health Insurance Portability and Accountability Act compliance"
+---
+
+## Overview
+
+The HIPAA Security Rule (45 CFR Part 164) requires covered entities and business associates to implement administrative, physical, and technical safeguards to protect electronic protected health information (ePHI). VaultWares products address the technical safeguard requirements directly.
+
+<Note>
+  This guide provides technical guidance on how VaultWares products support HIPAA compliance. Consult your compliance officer and legal counsel for a complete HIPAA risk analysis.
+</Note>
+
+## Technical safeguard requirements
+
+The HIPAA Security Rule defines technical safeguards at 45 CFR § 164.312.
+
+<Tabs>
+  <Tab title="Access Control (§164.312(a))">
+    **Required**: Unique user identification, emergency access procedure, automatic logoff, encryption/decryption
+
+    | Specification | Status | VaultWares Control |
+    |---|---|---|
+    | Unique user IDs | Required | VaultAccess unique user accounts; no shared credentials |
+    | Emergency access | Required | VaultAccess PAM break-glass procedure |
+    | Automatic logoff | Addressable | VaultAccess idle session timeout; VaultDrive auto-lock |
+    | Encryption/decryption | Addressable | VaultCrypt ePHI volume encryption; VaultHSM key management |
+
+    ```bash
+    # Configure automatic session timeout for ePHI systems
+    vw-admin policy create \
+      --name HIPAA-ePHI-Access \
+      --idle-timeout-minutes 15 \
+      --require-mfa true \
+      --require-hardware-key-for-privileged true \
+      --apply-to-systems "ehr.corp.example.com,phi-db01.corp.example.com"
+
+    # Configure VaultDrive auto-lock for clinical staff
+    vw-storage set-policy \
+      --policy clinical-staff \
+      --auto-lock-minutes 5 \
+      --require-reauthentication true
+    ```
+  </Tab>
+  <Tab title="Audit Controls (§164.312(b))">
+    **Required**: Hardware, software, and procedural mechanisms to record and examine activity in information systems containing ePHI
+
+    ```bash
+    # Enable comprehensive ePHI audit logging
+    vw-admin audit configure \
+      --scope ephi-systems \
+      --log-level detailed \
+      --capture-read-access true \
+      --capture-write-access true \
+      --capture-delete-access true \
+      --capture-authentication-events true \
+      --capture-failed-attempts true \
+      --retention-days 2190 \  # 6 years (HIPAA minimum)
+      --sign-with hsm:AuditLog-Signing-Key \
+      --tamper-evident true
+
+    # Generate audit report for a period
+    vw-monitor report generate \
+      --template hipaa-access-audit \
+      --start "2024-10-01" \
+      --end "2024-10-31" \
+      --scope ephi \
+      --format pdf \
+      --output /reports/hipaa-audit-oct-2024.pdf
+    ```
+
+    Audit events captured by VaultMonitor for HIPAA:
+
+    | Event | Detail level |
+    |---|---|
+    | ePHI file access (read) | User, timestamp, resource, source IP |
+    | ePHI file modification | User, timestamp, resource, change summary |
+    | ePHI file deletion / crypto-erasure | User, timestamp, resource, reason |
+    | Authentication attempts | User, timestamp, result, source IP, MFA method |
+    | Privileged access sessions | Full session recording (PAM) |
+    | Key management operations | HSM audit log — key ID, operation, user |
+  </Tab>
+  <Tab title="Integrity (§164.312(c))">
+    **Required**: Mechanisms to authenticate ePHI; electronic mechanisms to corroborate that ePHI has not been altered or destroyed
+
+    ```bash
+    # Enable file integrity monitoring on ePHI directories
+    vw-monitor integrity-monitor enable \
+      --directories /data/phi,/var/lib/ehr \
+      --hash-algorithm SHA-256 \
+      --check-interval 15m \
+      --alert-on-change true \
+      --baseline-signed-with hsm:Integrity-Key
+
+    # Verify ePHI backup integrity
+    vw-backup verify-all \
+      --repo backup://nas01/vaults/phi \
+      --decrypt-key hsm:PHI-Backup-Key \
+      --generate-integrity-report \
+      --output /reports/phi-backup-integrity-$(date +%Y%m%d).json
+    ```
+  </Tab>
+  <Tab title="Transmission Security (§164.312(e))">
+    **Required**: Guard against unauthorized access to ePHI transmitted over electronic networks
+
+    ```bash
+    # Enforce TLS 1.2+ for all ePHI transmission
+    vaultgate policy create \
+      --name HIPAA-ePHI-Transmission \
+      --min-tls-version TLSv1.2 \
+      --require-mutual-tls true \
+      --allowed-cipher-suites "TLS_AES_256_GCM_SHA384,ECDHE-RSA-AES256-GCM-SHA384" \
+      --deny-plaintext-for-hosts "ehr.corp.example.com,phi-db01.corp.example.com" \
+      --alert-on-policy-violation true
+    ```
+  </Tab>
+</Tabs>
+
+## ePHI protection configuration
+
+### Encrypting ePHI at rest
+
+```bash
+# Create dedicated encrypted volume for ePHI
+vaultcrypt create-container \
+  --output /data/phi/phi-vault.vc \
+  --size 500G \
+  --algorithm AES-256-XTS \
+  --key-source hsm \
+  --key-label "PHI-Data-Key" \
+  --require-2fa true \
+  --auto-mount-on-boot true \
+  --audit-all-access true
+
+# Policy: encrypt all data written to ePHI directories
+vaultcrypt policy set \
+  --name PHI-Always-Encrypted \
+  --paths /data/phi,/var/lib/ehr/attachments \
+  --algorithm AES-256-XTS \
+  --key-label "PHI-Data-Key" \
+  --enforce-no-plaintext true
+```
+
+### VaultDrive deployment for clinical staff
+
+```bash
+# Deploy HIPAA-compliant policy to clinical staff VaultDrives
+vw-admin deploy-config \
+  --policy hipaa-clinical-staff \
+  --device-group ClinicalStaff-VaultDrives \
+  --settings '{
+    "auto_lock_minutes": 5,
+    "require_2fa": true,
+    "require_pin_on_sleep": true,
+    "audit_logging": "all",
+    "allow_readonly_mode": true,
+    "max_failed_attempts": 5,
+    "crypto_erase_on_max_failures": false
+  }'
+```
+
+## Business Associate Agreement (BAA)
+
+VaultWares executes Business Associate Agreements with covered entities. A BAA confirms that VaultWares:
+
+- Protects the security and confidentiality of ePHI
+- Reports security incidents and breaches to the covered entity
+- Returns or destroys ePHI upon contract termination
+- Ensures subcontractors (including cloud providers) execute BAAs
+
+Contact [compliance@vaultwares.com](mailto:compliance@vaultwares.com) to request a BAA.
+
+## HIPAA compliance checklist
+
+<AccordionGroup>
+  <Accordion title="Access control">
+    - [ ] Unique user IDs enforced for all ePHI access (no shared accounts)
+    - [ ] MFA required for all ePHI systems
+    - [ ] Automatic session timeout ≤ 15 minutes configured
+    - [ ] Emergency access (break-glass) procedure documented and tested
+    - [ ] Access reviews completed quarterly
+    - [ ] Terminated employee access removed within 24 hours
+  </Accordion>
+  <Accordion title="Encryption">
+    - [ ] All ePHI encrypted at rest (AES-256)
+    - [ ] All ePHI encrypted in transit (TLS 1.2+)
+    - [ ] Encryption keys managed by FIPS 140-2+ validated HSM
+    - [ ] Key rotation schedule documented
+    - [ ] Encrypted backup of ePHI tested monthly
+  </Accordion>
+  <Accordion title="Audit controls">
+    - [ ] Audit logging enabled for all ePHI access (read, write, delete)
+    - [ ] Audit logs retained for minimum 6 years
+    - [ ] Audit log integrity protection enabled (HSM signing)
+    - [ ] Audit logs reviewed regularly (weekly minimum)
+    - [ ] Automated alerting on suspicious access patterns
+  </Accordion>
+  <Accordion title="Breach response">
+    - [ ] VaultMonitor alerts configured for ePHI breach indicators
+    - [ ] 60-day breach notification runbook documented (HIPAA Breach Notification Rule)
+    - [ ] Forensic log export procedure tested
+    - [ ] Incident response team trained on HIPAA breach response
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Encryption protocols" icon="lock" href="/security/encryption-protocols">
+    Technical details on HIPAA-compliant encryption algorithms
+  </Card>
+  <Card title="Access control" icon="shield-halved" href="/software/access-control">
+    Configure VaultAccess for HIPAA compliance
+  </Card>
+  <Card title="GDPR compliance" icon="flag" href="/compliance/gdpr">
+    EU data protection requirements
+  </Card>
+  <Card title="PCI DSS compliance" icon="credit-card" href="/compliance/pci-dss">
+    Payment card data security requirements
+  </Card>
+</CardGroup>

@@ -1,0 +1,24 @@
+---
+title: "File Changes"
+description: "Assistant protocol summary: File Changes"
+---
+
+# Modifications de fichiers
+
+- ID de catégorie : `FILE_CHANGES`
+- Source du résumé : `instructions/summaries/FILE_CHANGES.md`
+- Source des notes : `instructions/notes/FILE_CHANGES.md`
+
+S'applique lorsque : créer/déplacer/supprimer/renommer des fichiers ou des dossiers.
+Faire :
+- Gardez les changements minimes et intentionnels ; éviter les gros désabonnements.
+- Lors de la suppression, confirmez que les références sont supprimées et que les builds/tests réussissent toujours.
+- Utiliser des chemins sécuritaires et explicites ; évitez les suppressions de caractères génériques.
+Pas :
+- Supprimez les chemins ambigus sans confirmer la portée.
+Fais quand :
+- Les compilations/tests/vérifications du dépôt réussissent et aucun lien mort ne reste.
+
+## Remarques
+Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
+Chemin des notes : `instructions/notes/FILE_CHANGES.md`

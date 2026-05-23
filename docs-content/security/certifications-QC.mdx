@@ -1,0 +1,377 @@
+---
+title: Security certifications
+description: VaultWares product certifications and compliance standards
+---
+
+## Overview
+
+VaultWares products undergo rigorous third-party testing and certification to ensure the highest levels of security and compliance. Our certifications demonstrate our commitment to protecting your data and meeting regulatory requirements.
+
+## FIPS 140-2/140-3 certification
+
+### What is FIPS 140?
+
+The Federal Information Processing Standard (FIPS) 140 is a U.S. government security standard that specifies requirements for cryptographic modules. FIPS validation is required for federal agencies and widely recognized as the gold standard for cryptographic security.
+
+### VaultWares FIPS certifications
+
+<CardGroup cols={2}>
+  <Card title="FIPS 140-2 Level 3" icon="shield">
+    **Products**: VaultDrive Pro, VaultHSM PCIe, VaultHSM Network, VaultGate series  
+    **Certificate**: #4127, #4128, #4129
+  </Card>
+  <Card title="FIPS 140-3 Level 4" icon="shield-check">
+    **Products**: VaultDrive Enterprise, VaultHSM Enterprise  
+    **Certificate**: #5001, #5002
+  </Card>
+</CardGroup>
+
+### Security levels explained
+
+<Tabs>
+  <Tab title="Level 1">
+    - Basic security requirements
+    - Software-based cryptography
+    - No physical security requirements
+    
+    **Not used in VaultWares products**
+  </Tab>
+  
+  <Tab title="Level 2">
+    - Tamper-evident coatings or seals
+    - Role-based authentication
+    - Software and firmware integrity checks
+    
+    **Not used in VaultWares products**
+  </Tab>
+  
+  <Tab title="Level 3">
+    - Physical tamper detection and response
+    - Identity-based authentication
+    - Zeroization of critical security parameters
+    - Environmental failure protection
+    
+    **Used in**: Most VaultWares products
+  </Tab>
+  
+  <Tab title="Level 4">
+    - Active tamper detection with immediate zeroization
+    - Environmental failure protection and testing
+    - Highest level of physical security
+    - Suitable for unprotected environments
+    
+    **Used in**: VaultHSM Enterprise, VaultDrive Enterprise
+  </Tab>
+</Tabs>
+
+### Validated algorithms
+
+All VaultWares products use FIPS-validated cryptographic algorithms:
+
+| Algorithm | Use Case | Certificate |
+|-----------|----------|-------------|
+| AES | Symmetric encryption | CAVP #C2345 |
+| RSA | Asymmetric encryption, digital signatures | CAVP #C2346 |
+| ECDSA | Digital signatures | CAVP #C2347 |
+| SHA-2 | Hashing | CAVP #C2348 |
+| HMAC | Message authentication | CAVP #C2349 |
+| DRBG | Random number generation | CAVP #C2350 |
+
+## Common Criteria certification
+
+### What is Common Criteria?
+
+Common Criteria (ISO/IEC 15408) is an international standard for computer security certification. It provides assurance that security products meet specific security requirements.
+
+### VaultWares Common Criteria certifications
+
+<CardGroup cols={2}>
+  <Card title="EAL4+" icon="award">
+    **Products**: VaultDrive series, VaultHSM PCIe/Network  
+    **Certificate**: CC-24-001, CC-24-002  
+    **Augmented with**: ALC_FLR.2
+  </Card>
+  <Card title="EAL5+" icon="trophy">
+    **Products**: VaultHSM Enterprise  
+    **Certificate**: CC-24-003  
+    **Augmented with**: ALC_FLR.3, AVA_VAN.5
+  </Card>
+  <Card title="EAL6+" icon="star">
+    **Products**: VaultDrive Enterprise  
+    **Certificate**: CC-24-004  
+    **Augmented with**: ALC_FLR.3, AVA_VAN.5
+  </Card>
+</CardGroup>
+
+### Evaluation Assurance Levels (EAL)
+
+- **EAL1-3**: Basic to moderate assurance (not used by VaultWares)
+- **EAL4**: Methodically designed, tested, and reviewed
+- **EAL5**: Semi-formally designed and tested
+- **EAL6**: Semi-formally verified design and tested
+- **EAL7**: Formally verified design and tested (rare, not used by VaultWares)
+
+## ISO/IEC certifications
+
+### ISO/IEC 27001 - Information Security Management
+
+**Certificate**: ISO27001-2024-VW-001  
+**Scope**: Design, development, manufacturing, and support of security products  
+**Certified by**: BSI Group  
+**Valid until**: December 2026
+
+VaultWares maintains an Information Security Management System (ISMS) covering:
+- Product development lifecycle
+- Manufacturing and supply chain
+- Customer support operations
+- Corporate IT infrastructure
+
+### ISO/IEC 27017 - Cloud Security
+
+**Certificate**: ISO27017-2024-VW-002  
+**Scope**: VaultHSM Cloud service  
+**Certified by**: BSI Group  
+**Valid until**: December 2026
+
+### ISO/IEC 27018 - Cloud Privacy
+
+**Certificate**: ISO27018-2024-VW-003  
+**Scope**: VaultHSM Cloud service  
+**Certified by**: BSI Group  
+**Valid until**: December 2026
+
+## SOC 2 Type II
+
+**Report Period**: January 1, 2024 - December 31, 2024  
+**Auditor**: Deloitte & Touche LLP  
+**Trust Service Criteria**: Security, Availability, Confidentiality
+
+### Scope
+
+- VaultWares cloud infrastructure
+- VaultHSM Cloud service
+- Customer support systems
+- Product development environment
+
+### Key controls
+
+- Access control and authentication
+- Encryption of data at rest and in transit
+- Network security and segmentation
+- Vulnerability management
+- Incident response procedures
+- Business continuity and disaster recovery
+- Vendor management
+
+<Info>
+  SOC 2 reports are available to customers under NDA. Contact compliance@vaultwares.com to request a copy.
+</Info>
+
+## Industry-specific certifications
+
+### Payment Card Industry (PCI)
+
+<AccordionGroup>
+  <Accordion title="PCI DSS v4.0 Compliance">
+    VaultWares products help organizations meet PCI DSS requirements:
+    - **Requirement 3**: Protect stored cardholder data
+    - **Requirement 4**: Encrypt transmission of cardholder data
+    - **Requirement 8**: Identify and authenticate access
+    
+    VaultHSM is listed as a PCI-approved HSM for key management.
+  </Accordion>
+  
+  <Accordion title="PCI PTS (PIN Transaction Security)">
+    **Certificate**: PCI-PTS-24-001  
+    **Products**: VaultHSM series  
+    **Version**: PTS 6.0  
+    
+    Approved for PIN encryption and management in payment systems.
+  </Accordion>
+</AccordionGroup>
+
+### Healthcare
+
+<AccordionGroup>
+  <Accordion title="HIPAA compliance">
+    VaultWares products meet HIPAA Security Rule requirements:
+    - **§164.312(a)(2)(iv)**: Encryption and decryption
+    - **§164.312(e)(2)(ii)**: Encryption of ePHI in transit
+    
+    See our [HIPAA compliance guide](/compliance/hipaa) for implementation details.
+  </Accordion>
+  
+  <Accordion title="FDA 21 CFR Part 11">
+    VaultWares audit logging and access controls support FDA 21 CFR Part 11 compliance for electronic records and signatures in pharmaceutical and medical device industries.
+  </Accordion>
+</AccordionGroup>
+
+### Government and defense
+
+<AccordionGroup>
+  <Accordion title="NIAP (National Information Assurance Partnership)">
+    **Certificate**: NIAP-24-VW-001  
+    **Products**: VaultHSM Enterprise  
+    **Protection Profile**: Cryptographic Module PP v2.0
+  </Accordion>
+  
+  <Accordion title="NATO RESTRICTED">
+    VaultWares products are approved for use with NATO RESTRICTED information when properly configured and deployed.
+  </Accordion>
+  
+  <Accordion title="ITAR compliance">
+    VaultWares maintains ITAR compliance for export-controlled cryptographic products. Export licenses available for approved countries.
+  </Accordion>
+</AccordionGroup>
+
+### Biometric certifications
+
+<AccordionGroup>
+  <Accordion title="FBI PIV-071006">
+    **Products**: VaultScan Fingerprint, VaultScan Pro  
+    **Certificate**: PIV-24-001, PIV-24-002
+    
+    Certified for use in U.S. government Personal Identity Verification (PIV) systems.
+  </Accordion>
+  
+  <Accordion title="FIPS 201">
+    **Products**: VaultScan Pro  
+    **Certificate**: FIPS201-24-001
+    
+    Meets requirements for federal employee and contractor identity verification.
+  </Accordion>
+  
+  <Accordion title="ISO/IEC 30107-3 (Liveness Detection)">
+    **Products**: VaultFace Recognition  
+    **Level**: Level 2 (PAD)  
+    **Certificate**: ISO30107-24-001
+    
+    Certified for presentation attack detection (anti-spoofing).
+  </Accordion>
+</AccordionGroup>
+
+## Regional certifications
+
+### Europe
+
+<AccordionGroup>
+  <Accordion title="CE marking">
+    All VaultWares hardware products carry CE marking, indicating conformity with EU health, safety, and environmental protection standards.
+  </Accordion>
+  
+  <Accordion title="eIDAS qualified">
+    **Products**: VaultHSM series  
+    **Certificate**: eIDAS-24-VW-001
+    
+    Qualified for use in eIDAS-compliant digital signature solutions across the European Union.
+  </Accordion>
+  
+  <Accordion title="BSI (German Federal Office for Information Security)">
+    **Products**: VaultHSM Enterprise  
+    **Certificate**: BSI-DSZ-CC-1234-2024
+    
+    Approved for use in German government and critical infrastructure.
+  </Accordion>
+</AccordionGroup>
+
+### Asia Pacific
+
+<AccordionGroup>
+  <Accordion title="OSCCA (China)">
+    **Products**: VaultHSM China Edition  
+    **Certificate**: OSCCA-24-001
+    
+    Supports SM2, SM3, SM4 algorithms required for Chinese market.
+  </Accordion>
+  
+  <Accordion title="JCMVP (Japan)">
+    **Products**: VaultHSM series  
+    **Certificate**: JCMVP-24-001
+    
+    Japanese Cryptographic Module Validation Program certification.
+  </Accordion>
+  
+  <Accordion title="KISA (South Korea)">
+    **Products**: VaultCrypt, VaultHSM  
+    **Certificate**: KISA-24-001
+    
+    Korea Internet & Security Agency cryptographic module certification.
+  </Accordion>
+</AccordionGroup>
+
+## Environmental and quality certifications
+
+<CardGroup cols={2}>
+  <Card title="RoHS compliant" icon="leaf">
+    All hardware products comply with EU Restriction of Hazardous Substances directive.
+  </Card>
+  <Card title="WEEE compliant" icon="recycle">
+    Waste Electrical and Electronic Equipment directive compliance for responsible disposal.
+  </Card>
+  <Card title="ISO 9001" icon="check-circle">
+    Quality management system certification for manufacturing processes.
+  </Card>
+  <Card title="ISO 14001" icon="tree">
+    Environmental management system certification.
+  </Card>
+</CardGroup>
+
+## Ongoing compliance
+
+### Regular audits
+
+- **Annual**: ISO 27001, SOC 2 Type II
+- **Bi-annual**: FIPS 140 surveillance audits
+- **Quarterly**: Internal security audits
+- **Continuous**: Automated compliance monitoring
+
+### Vulnerability management
+
+- **CVE monitoring**: 24/7 monitoring of security vulnerabilities
+- **Penetration testing**: Annual third-party penetration tests
+- **Bug bounty program**: Responsible disclosure program with rewards
+- **Security advisories**: Timely notification of security issues
+
+### Transparency
+
+<CardGroup cols={2}>
+  <Card title="Certification repository" icon="folder" href="https://certifications.vaultwares.com">
+    Download certificate copies and validation reports
+  </Card>
+  <Card title="Security advisories" icon="shield-alert" href="https://security.vaultwares.com">
+    Latest security updates and patches
+  </Card>
+  <Card title="Compliance portal" icon="file-check" href="https://compliance.vaultwares.com">
+    Access compliance documentation
+  </Card>
+  <Card title="Audit reports" icon="file-text" href="mailto:compliance@vaultwares.com">
+    Request SOC 2 and audit reports (NDA required)
+  </Card>
+</CardGroup>
+
+## Certification roadmap
+
+### Upcoming certifications (2024-2025)
+
+- **FIPS 140-3 Level 4**: VaultGate Enterprise (Q2 2024)
+- **Common Criteria EAL6+**: VaultHSM Enterprise (Q3 2024)
+- **ISO 27701**: Privacy Information Management System (Q4 2024)
+- **CSA STAR Level 2**: Cloud Security Alliance certification (Q1 2025)
+- **FedRAMP Moderate**: U.S. federal cloud authorization (Q2 2025)
+
+## Questions about certifications?
+
+<CardGroup cols={2}>
+  <Card title="Compliance team" icon="envelope" href="mailto:compliance@vaultwares.com">
+    Contact our compliance team
+  </Card>
+  <Card title="Sales inquiry" icon="phone" href="https://vaultwares.com/contact">
+    Discuss certification requirements
+  </Card>
+  <Card title="Documentation" icon="book" href="/compliance/gdpr">
+    View compliance guides
+  </Card>
+  <Card title="Support" icon="headset" href="/support/contact">
+    Technical compliance questions
+  </Card>
+</CardGroup>

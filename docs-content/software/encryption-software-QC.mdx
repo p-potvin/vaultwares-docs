@@ -1,0 +1,471 @@
+---
+title: Encryption software
+description: Full-disk and file-level encryption solutions
+---
+
+## Overview
+
+VaultWares encryption software provides comprehensive data protection through full-disk encryption (FDE), file-level encryption, and folder encryption. Protect data at rest on workstations, servers, and removable media with military-grade AES-256 encryption.
+
+## Product editions
+
+<CardGroup cols={2}>
+  <Card title="VaultCrypt Standard" icon="lock">
+    **Use case**: Individual workstations  
+    **Encryption**: Full-disk, file, folder  
+    **Management**: Local only
+  </Card>
+  <Card title="VaultCrypt Professional" icon="shield">
+    **Use case**: Small business  
+    **Encryption**: Full-disk, file, folder, removable media  
+    **Management**: Centralized console
+  </Card>
+  <Card title="VaultCrypt Enterprise" icon="building">
+    **Use case**: Large organizations  
+    **Encryption**: All types + cloud storage  
+    **Management**: Enterprise console + API
+  </Card>
+  <Card title="VaultCrypt Server" icon="server">
+    **Use case**: Server environments  
+    **Encryption**: Boot volumes, data volumes  
+    **Management**: Headless operation
+  </Card>
+</CardGroup>
+
+## Key features
+
+### Encryption capabilities
+- **Full-disk encryption**: Encrypt entire system drives including boot sectors
+- **File-level encryption**: Selective encryption of individual files
+- **Folder encryption**: Automatic encryption of designated folders
+- **Removable media**: Encrypt USB drives and external storage
+- **Cloud storage**: Encrypt files before uploading to cloud services
+- **Email encryption**: Integrate with email clients for encrypted messages
+
+### Security features
+- **AES-256-XTS encryption**: Military-grade encryption standard
+- **Pre-boot authentication**: Secure boot process before OS loads
+- **Multi-factor authentication**: Password + TPM + biometric + smart card
+- **Self-encrypting drive (SED) support**: Hardware-accelerated encryption
+- **Secure key management**: TPM-based key storage
+- **Emergency recovery**: Secure key escrow and recovery procedures
+
+### Management features
+- **Centralized console**: Manage encryption across entire organization
+- **Policy enforcement**: Automated encryption policies
+- **Compliance reporting**: Detailed encryption status reports
+- **Remote management**: Deploy, configure, and monitor remotely
+- **Active Directory integration**: User and group policy management
+- **Audit logging**: Complete encryption operation logs
+
+## System requirements
+
+### Minimum requirements
+- **OS**: Windows 10/11, Windows Server 2016+, macOS 11+, Linux (Ubuntu 20.04+, RHEL 8+)
+- **CPU**: 2 GHz dual-core processor
+- **RAM**: 4GB (8GB recommended)
+- **Disk space**: 500MB for software, additional space for encrypted containers
+- **TPM**: TPM 1.2 or 2.0 (recommended for full-disk encryption)
+
+### Supported platforms
+- Physical machines
+- Virtual machines (VMware, Hyper-V, KVM)
+- Cloud instances (AWS, Azure, GCP)
+- Containers (encryption of persistent volumes)
+
+## Installation
+
+### Windows installation
+
+<Steps>
+  <Step title="Download installer">
+    Download VaultCrypt from the [customer portal](https://portal.vaultwares.com).
+  </Step>
+  <Step title="Run installer">
+    ```powershell
+    # Silent installation
+    VaultCrypt-Setup.exe /S /LICENSE=your-license-key
+    ```
+  </Step>
+  <Step title="Reboot system">
+    Restart your computer to complete installation.
+  </Step>
+  <Step title="Configure encryption">
+    Launch VaultCrypt and follow the encryption wizard.
+  </Step>
+</Steps>
+
+### macOS installation
+
+```bash
+# Install via Homebrew
+brew tap vaultwares/tap
+brew install vaultcrypt
+
+# Or download DMG
+curl -O https://downloads.vaultwares.com/vaultcrypt-latest.dmg
+open vaultcrypt-latest.dmg
+```
+
+### Linux installation
+
+<Tabs>
+  <Tab title="Debian/Ubuntu">
+    ```bash
+    # Add repository
+    wget -qO - https://repo.vaultwares.com/gpg.key | sudo apt-key add -
+    echo "deb https://repo.vaultwares.com/apt stable main" | \
+      sudo tee /etc/apt/sources.list.d/vaultwares.list
+    
+    # Install
+    sudo apt update
+    sudo apt install vaultcrypt
+    
+    # Activate license
+    sudo vaultcrypt-cli activate --license your-license-key
+    ```
+  </Tab>
+  
+  <Tab title="RHEL/CentOS">
+    ```bash
+    # Add repository
+    sudo wget https://repo.vaultwares.com/rpm/vaultwares.repo \
+      -O /etc/yum.repos.d/vaultwares.repo
+    
+    # Install
+    sudo yum install vaultcrypt
+    
+    # Activate license
+    sudo vaultcrypt-cli activate --license your-license-key
+    ```
+  </Tab>
+</Tabs>
+
+## Usage
+
+### Full-disk encryption
+
+<CodeGroup>
+```powershell Windows
+# Encrypt system drive
+vaultcrypt-cli encrypt-disk `
+  --drive C: `
+  --algorithm aes-256-xts `
+  --auth-method password+tpm `
+  --recovery-key-file C:\recovery-key.txt
+
+# Check encryption status
+vaultcrypt-cli status C:
+```
+
+```bash macOS
+# Encrypt system volume
+sudo vaultcrypt encrypt-volume \
+  --volume / \
+  --algorithm aes-256-xts \
+  --auth-method password+filevault \
+  --recovery-key-file ~/recovery-key.txt
+
+# Check encryption status
+vaultcrypt status /
+```
+
+```bash Linux
+# Encrypt root partition
+sudo vaultcrypt encrypt-disk \
+  --device /dev/sda1 \
+  --algorithm aes-256-xts \
+  --auth-method password+tpm \
+  --recovery-key-file /root/recovery-key.txt
+
+# Check encryption status
+sudo vaultcrypt status /dev/sda1
+```
+</CodeGroup>
+
+### File and folder encryption
+
+```bash
+# Encrypt a file
+vaultcrypt encrypt-file \
+  --input sensitive-document.pdf \
+  --output sensitive-document.pdf.enc \
+  --password "your-password"
+
+# Decrypt a file
+vaultcrypt decrypt-file \
+  --input sensitive-document.pdf.enc \
+  --output sensitive-document.pdf \
+  --password "your-password"
+
+# Create encrypted folder
+vaultcrypt create-vault \
+  --path ~/SecureDocuments \
+  --size 10GB \
+  --password "your-password"
+
+# Mount encrypted folder
+vaultcrypt mount ~/SecureDocuments
+
+# Unmount encrypted folder
+vaultcrypt unmount ~/SecureDocuments
+```
+
+### Removable media encryption
+
+```bash
+# Encrypt USB drive
+vaultcrypt encrypt-removable \
+  --device /dev/sdb1 \
+  --label "Secure USB" \
+  --password "your-password" \
+  --portable-mode enable
+
+# Portable mode allows the drive to be used on systems
+# without VaultCrypt installed (includes portable app)
+```
+
+## Enterprise management
+
+### Deploy via Group Policy (Windows)
+
+```powershell
+# Create GPO for VaultCrypt deployment
+New-GPO -Name "VaultCrypt Deployment" | New-GPLink -Target "OU=Workstations,DC=example,DC=com"
+
+# Configure encryption policy
+Set-GPRegistryValue -Name "VaultCrypt Deployment" `
+  -Key "HKLM\Software\VaultWares\VaultCrypt\Policy" `
+  -ValueName "RequireEncryption" -Type DWord -Value 1
+
+Set-GPRegistryValue -Name "VaultCrypt Deployment" `
+  -Key "HKLM\Software\VaultWares\VaultCrypt\Policy" `
+  -ValueName "EncryptionAlgorithm" -Type String -Value "AES-256-XTS"
+
+Set-GPRegistryValue -Name "VaultCrypt Deployment" `
+  -Key "HKLM\Software\VaultWares\VaultCrypt\Policy" `
+  -ValueName "RequireTPM" -Type DWord -Value 1
+```
+
+### Centralized management console
+
+```bash
+# Connect to management server
+vaultcrypt-admin connect \
+  --server mgmt.example.com \
+  --username admin \
+  --password "admin-password"
+
+# Deploy encryption policy
+vaultcrypt-admin policy deploy \
+  --name "Corporate Encryption Policy" \
+  --targets "OU=Workstations" \
+  --require-fde true \
+  --algorithm aes-256-xts \
+  --auth-methods password,tpm \
+  --compliance-check daily
+
+# Generate compliance report
+vaultcrypt-admin report generate \
+  --type compliance \
+  --format pdf \
+  --output compliance-report-$(date +%Y%m%d).pdf
+```
+
+### API integration
+
+```python
+from vaultwares import VaultCryptAPI
+
+# Initialize API client
+api = VaultCryptAPI(
+    server='https://mgmt.example.com',
+    api_key='your-api-key'
+)
+
+# Get encryption status for all devices
+devices = api.devices.list()
+for device in devices:
+    status = api.devices.get_encryption_status(device.id)
+    print(f"{device.hostname}: {status.encryption_percentage}% encrypted")
+
+# Deploy encryption policy
+policy = api.policies.create(
+    name='New Hire Encryption',
+    require_fde=True,
+    algorithm='aes-256-xts',
+    auth_methods=['password', 'tpm']
+)
+
+# Apply policy to device group
+api.policies.apply(policy.id, group='new-hires')
+```
+
+## Recovery procedures
+
+### User-initiated recovery
+
+```bash
+# Generate recovery key during encryption
+vaultcrypt encrypt-disk \
+  --drive C: \
+  --recovery-key-file recovery-key.txt \
+  --recovery-key-print
+
+# User can recover using recovery key at pre-boot screen
+# Enter recovery key when prompted
+```
+
+### Administrator recovery
+
+```bash
+# Connect to management console
+vaultcrypt-admin connect --server mgmt.example.com
+
+# Retrieve recovery key for user
+vaultcrypt-admin recovery get-key \
+  --user john.doe \
+  --device LAPTOP-12345 \
+  --reason "User forgot password" \
+  --approver admin@example.com
+
+# Reset user password
+vaultcrypt-admin recovery reset-password \
+  --user john.doe \
+  --device LAPTOP-12345 \
+  --new-password "temporary-password"
+```
+
+### Emergency access
+
+```bash
+# Create emergency access disk
+vaultcrypt-admin emergency-disk create \
+  --output emergency-access.iso \
+  --include-recovery-keys \
+  --authorized-admins admin1,admin2
+
+# Boot from emergency disk to access encrypted system
+```
+
+## Performance optimization
+
+### Hardware acceleration
+
+```bash
+# Enable AES-NI acceleration (Intel/AMD CPUs)
+vaultcrypt config set --hardware-acceleration enable
+
+# Use self-encrypting drives (SED)
+vaultcrypt config set --sed-support enable --opal-version 2.0
+
+# Check performance
+vaultcrypt benchmark
+# Output:
+# Encryption speed: 2.5 GB/s
+# Decryption speed: 2.8 GB/s
+# CPU overhead: 3%
+```
+
+### Optimization settings
+
+```bash
+# Optimize for performance
+vaultcrypt config optimize --profile performance
+
+# Optimize for security
+vaultcrypt config optimize --profile security
+
+# Custom optimization
+vaultcrypt config set \
+  --cache-size 256MB \
+  --io-priority high \
+  --background-conversion true
+```
+
+## Compliance and auditing
+
+### Generate compliance reports
+
+```bash
+# Encryption compliance report
+vaultcrypt-admin report compliance \
+  --standard pci-dss \
+  --output pci-compliance-report.pdf
+
+# Audit log export
+vaultcrypt-admin audit export \
+  --start-date 2024-01-01 \
+  --end-date 2024-01-31 \
+  --format json \
+  --output audit-log.json
+```
+
+### Compliance standards supported
+
+<AccordionGroup>
+  <Accordion title="PCI DSS">
+    Meets PCI DSS Requirement 3.4 for rendering PAN unreadable through encryption.
+  </Accordion>
+  
+  <Accordion title="HIPAA">
+    Satisfies HIPAA Security Rule addressable implementation specification for encryption of ePHI.
+  </Accordion>
+  
+  <Accordion title="GDPR">
+    Provides technical measures for data protection as required by GDPR Article 32.
+  </Accordion>
+  
+  <Accordion title="FIPS 140-2">
+    Uses FIPS 140-2 validated cryptographic modules for encryption operations.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Encryption is slow">
+    - Enable hardware acceleration: `vaultcrypt config set --hardware-acceleration enable`
+    - Check CPU usage during encryption
+    - Consider using SED drives for better performance
+    - Schedule encryption during off-hours
+  </Accordion>
+  
+  <Accordion title="Cannot boot after encryption">
+    - Boot from recovery media
+    - Enter recovery key at pre-boot screen
+    - Check BIOS/UEFI settings (Secure Boot, TPM)
+    - Contact support with error code
+  </Accordion>
+  
+  <Accordion title="TPM errors">
+    - Clear TPM in BIOS/UEFI
+    - Reinitialize TPM: `vaultcrypt tpm-init`
+    - Update TPM firmware
+    - Use password-only authentication as fallback
+  </Accordion>
+  
+  <Accordion title="Performance degradation">
+    - Check disk health: `vaultcrypt disk-health`
+    - Verify sufficient free space (20% minimum)
+    - Disable real-time antivirus scanning of encrypted volumes
+    - Update VaultCrypt to latest version
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Encryption best practices
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/endpoints">
+    Programmatic management
+  </Card>
+  <Card title="Compliance" icon="shield-check" href="/compliance/gdpr">
+    Compliance guides
+  </Card>
+  <Card title="Support" icon="headset" href="/support/contact">
+    Get technical assistance
+  </Card>
+</CardGroup>

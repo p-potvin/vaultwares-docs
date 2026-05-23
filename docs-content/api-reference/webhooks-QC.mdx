@@ -1,0 +1,337 @@
+---
+title: "Webhooks"
+description: "Receive real-time notifications via webhooks"
+---
+
+## Overview
+
+VaultWares webhooks deliver real-time notifications to your application when events occur in your environment. Use webhooks to trigger automated workflows, update your SIEM, or integrate with ticketing systems.
+
+## Event types
+
+<Tabs>
+  <Tab title="Device events">
+    | Event type | Description |
+    |---|---|
+    | `device.connected` | A device connected to a host |
+    | `device.disconnected` | A device was safely ejected or disconnected |
+    | `device.locked` | A device was locked (remote or automatic) |
+    | `device.unlocked` | A device was unlocked |
+    | `device.auth_failed` | Authentication attempt failed |
+    | `device.auth_lockout` | Device entered lockout state after failed attempts |
+    | `device.crypto_erase` | Cryptographic erasure was initiated |
+    | `device.firmware_updated` | Firmware update completed |
+    | `device.policy_applied` | A new policy was applied to the device |
+    | `device.tamper_detected` | Physical tamper event detected |
+  </Tab>
+  <Tab title="User events">
+    | Event type | Description |
+    |---|---|
+    | `user.created` | A new user was created |
+    | `user.updated` | User attributes were modified |
+    | `user.disabled` | User account was disabled |
+    | `user.deleted` | User account was deleted |
+    | `user.login_success` | User logged in successfully |
+    | `user.login_failed` | User login attempt failed |
+    | `user.mfa_enrolled` | User enrolled an MFA device |
+    | `user.password_changed` | User password was changed |
+    | `user.sessions_revoked` | All user sessions were revoked |
+  </Tab>
+  <Tab title="Key events">
+    | Event type | Description |
+    |---|---|
+    | `key.generated` | A new cryptographic key was generated |
+    | `key.rotated` | A key was rotated |
+    | `key.deprecated` | A key was marked as deprecated |
+    | `key.destroyed` | A key was permanently destroyed |
+    | `key.expiring_soon` | A key is expiring within the configured threshold |
+    | `key.exported` | A key was exported (if allowed by policy) |
+    | `key.backup_created` | A key backup was created |
+  </Tab>
+  <Tab title="Security events">
+    | Event type | Description |
+    |---|---|
+    | `security.alert_triggered` | A VaultMonitor detection rule fired |
+    | `security.anomaly_detected` | ML anomaly detection flagged activity |
+    | `security.policy_violation` | A security policy was violated |
+    | `security.compliance_change` | Compliance status changed |
+    | `security.incident_opened` | An incident was automatically opened |
+  </Tab>
+</Tabs>
+
+## Payload format
+
+All webhook payloads follow this structure:
+
+```json
+{
+  "id": "evt_1234567890abcdef",
+  "type": "device.auth_lockout",
+  "created_at": "2024-11-15T14:32:10Z",
+  "api_version": "v1",
+  "organization_id": "org_xyz789",
+  "data": {
+    "object": {
+      "id": "dev_VD-ENT-00247",
+      "type": "vaultdrive",
+      "serial": "VD-ENT-00247",
+      "status": "locked",
+      "assigned_to": "user_alice123",
+      "failed_attempts": 5,
+      "lockout_until": "2024-11-15T15:02:10Z"
+    },
+    "previous_attributes": {
+      "status": "online",
+      "failed_attempts": 4
+    }
+  }
+}
+```
+
+## Configure webhooks
+
+### Create a webhook endpoint
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/webhooks \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://yourapp.example.com/webhooks/vaultwares",
+    "events": [
+      "device.auth_lockout",
+      "device.tamper_detected",
+      "device.crypto_erase",
+      "security.alert_triggered",
+      "key.expiring_soon"
+    ],
+    "secret": "whsec_your-webhook-secret-here",
+    "active": true,
+    "description": "Security event handler"
+  }'
+```
+
+### Update a webhook
+
+```bash
+curl -X PATCH https://api.vaultwares.com/v1/webhooks/wh_abc123 \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -d '{
+    "events": ["device.auth_lockout", "device.tamper_detected", "user.login_failed"],
+    "active": true
+  }'
+```
+
+### Test a webhook
+
+```bash
+curl -X POST https://api.vaultwares.com/v1/webhooks/wh_abc123/test \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -d '{"event_type": "device.auth_lockout"}'
+```
+
+## Signature verification
+
+VaultWares signs every webhook payload with an HMAC-SHA256 signature. Always verify the signature before processing the payload.
+
+The signature is in the `X-VaultWares-Signature` header, in the format:
+`t=<timestamp>,v1=<signature>`
+
+<CodeGroup>
+```python Python
+import hmac
+import hashlib
+import time
+
+def verify_webhook_signature(payload: bytes, header: str, secret: str, tolerance: int = 300) -> bool:
+    """
+    Verify a VaultWares webhook signature.
+    
+    Args:
+        payload: Raw request body bytes
+        header: X-VaultWares-Signature header value
+        secret: Webhook secret from portal
+        tolerance: Maximum age of the event in seconds (default 5 minutes)
+    """
+    parts = dict(part.split("=", 1) for part in header.split(","))
+    timestamp = parts.get("t")
+    signature = parts.get("v1")
+
+    if not timestamp or not signature:
+        return False
+
+    # Check timestamp to prevent replay attacks
+    if abs(int(timestamp) - int(time.time())) > tolerance:
+        return False
+
+    # Compute expected signature
+    signed_payload = f"{timestamp}.{payload.decode('utf-8')}"
+    expected = hmac.new(
+        secret.encode("utf-8"),
+        signed_payload.encode("utf-8"),
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(signature, expected)
+
+# Flask example
+from flask import Flask, request, abort
+import os
+
+app = Flask(__name__)
+WEBHOOK_SECRET = os.environ["VAULTWARES_WEBHOOK_SECRET"]
+
+@app.route("/webhooks/vaultwares", methods=["POST"])
+def handle_webhook():
+    sig_header = request.headers.get("X-VaultWares-Signature", "")
+    
+    if not verify_webhook_signature(request.data, sig_header, WEBHOOK_SECRET):
+        abort(400, "Invalid signature")
+    
+    event = request.json
+    
+    if event["type"] == "device.auth_lockout":
+        handle_lockout(event["data"]["object"])
+    elif event["type"] == "device.tamper_detected":
+        handle_tamper(event["data"]["object"])
+    
+    return "", 200
+
+def handle_lockout(device):
+    # Trigger your incident workflow
+    print(f"Device {device['serial']} locked out — {device['failed_attempts']} failed attempts")
+
+def handle_tamper(device):
+    # Escalate immediately
+    print(f"CRITICAL: Tamper detected on device {device['serial']}")
+```
+
+```javascript Node.js
+import crypto from "crypto";
+import express from "express";
+
+const app = express();
+const WEBHOOK_SECRET = process.env.VAULTWARES_WEBHOOK_SECRET;
+
+// Use raw body middleware for signature verification
+app.use("/webhooks/vaultwares", express.raw({ type: "application/json" }));
+
+function verifySignature(payload, header, secret, tolerance = 300) {
+  const parts = Object.fromEntries(
+    header.split(",").map((p) => p.split("="))
+  );
+  const { t: timestamp, v1: signature } = parts;
+
+  if (!timestamp || !signature) return false;
+
+  // Replay attack prevention
+  if (Math.abs(Date.now() / 1000 - parseInt(timestamp)) > tolerance) {
+    return false;
+  }
+
+  const signedPayload = `${timestamp}.${payload.toString("utf8")}`;
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(signedPayload)
+    .digest("hex");
+
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expected)
+  );
+}
+
+app.post("/webhooks/vaultwares", (req, res) => {
+  const sigHeader = req.headers["x-vaultwares-signature"] || "";
+
+  if (!verifySignature(req.body, sigHeader, WEBHOOK_SECRET)) {
+    return res.status(400).json({ error: "Invalid signature" });
+  }
+
+  const event = JSON.parse(req.body);
+  console.log(`Received event: ${event.type}`);
+
+  switch (event.type) {
+    case "device.auth_lockout":
+      handleLockout(event.data.object);
+      break;
+    case "device.tamper_detected":
+      handleTamper(event.data.object);
+      break;
+    case "key.expiring_soon":
+      handleKeyExpiry(event.data.object);
+      break;
+  }
+
+  res.status(200).send();
+});
+
+app.listen(3000);
+```
+</CodeGroup>
+
+## Retry logic
+
+If your endpoint returns a non-2xx status code or does not respond within 30 seconds, VaultWares retries the delivery with exponential backoff:
+
+| Attempt | Delay |
+|---------|-------|
+| 1 | Immediate |
+| 2 | 5 seconds |
+| 3 | 30 seconds |
+| 4 | 2 minutes |
+| 5 | 10 minutes |
+| 6 | 1 hour |
+| 7 | 6 hours |
+
+After 7 failed attempts, the event is marked as failed and you can replay it manually from the portal.
+
+```bash
+# Replay a failed webhook event
+curl -X POST https://api.vaultwares.com/v1/webhooks/wh_abc123/replay \
+  -H "X-API-Key: vw_live_1234567890abcdef" \
+  -d '{"event_id": "evt_1234567890abcdef"}'
+
+# List failed events for a webhook endpoint
+curl https://api.vaultwares.com/v1/webhooks/wh_abc123/events?status=failed \
+  -H "X-API-Key: vw_live_1234567890abcdef"
+```
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Use HTTPS endpoints only">
+    VaultWares only delivers webhooks to HTTPS endpoints with valid TLS certificates. HTTP endpoints are not supported.
+  </Accordion>
+  <Accordion title="Respond quickly">
+    Return a 200 response as quickly as possible (before doing any processing). Process events asynchronously to avoid timeouts triggering retries. Use a queue (e.g., Redis, SQS) to decouple receipt from processing.
+  </Accordion>
+  <Accordion title="Handle duplicate deliveries">
+    Store processed event IDs and check for duplicates before processing. Webhook deliveries are at-least-once; in rare cases the same event may be delivered more than once.
+  </Accordion>
+  <Accordion title="Rotate webhook secrets regularly">
+    ```bash
+    # Rotate webhook secret
+    curl -X POST https://api.vaultwares.com/v1/webhooks/wh_abc123/rotate-secret \
+      -H "X-API-Key: vw_live_1234567890abcdef"
+    ```
+    Update your application with the new secret before the old one expires (a 24-hour overlap is provided).
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api-reference/authentication">
+    API keys and security best practices
+  </Card>
+  <Card title="API endpoints" icon="code" href="/api-reference/endpoints">
+    Full REST API reference
+  </Card>
+  <Card title="SDKs" icon="book-code" href="/api-reference/sdk">
+    Webhook handling in official SDKs
+  </Card>
+  <Card title="Security monitoring" icon="chart-line" href="/software/security-monitoring">
+    Route webhook events to VaultMonitor
+  </Card>
+</CardGroup>

@@ -1,0 +1,247 @@
+---
+title: "Encryption protocols"
+description: "Cryptographic algorithms and protocols used by VaultWares"
+---
+
+## Overview
+
+VaultWares products use only well-reviewed, standards-based cryptographic algorithms. This document provides a technical deep-dive into the encryption protocols, key derivation functions, and protocol configurations used across the VaultWares product family.
+
+## Symmetric encryption
+
+### AES-256-XTS (storage encryption)
+
+All VaultWares storage products (VaultDrive, VaultCrypt) use AES-256-XTS for disk and volume encryption.
+
+**Why XTS?**  
+XTS (XEX-based Tweaked CodeBook mode with ciphertext Stealing) is the IEEE 1619-2007 standard for storage encryption. Unlike ECB or CBC modes, XTS eliminates patterns in ciphertext even when plaintext blocks are similar, because each 512-byte sector is encrypted with a unique tweak derived from the sector number.
+
+```
+XTS-AES-256 key structure:
+  Key = Key₁ (256-bit) ‖ Key₂ (256-bit) = 512 bits total
+  Key₁: used to encrypt the sector data
+  Key₂: used to encrypt the sector number (the tweak)
+  Ciphertext[i] = AES_K₁(Plaintext[i] ⊕ T[i]) ⊕ T[i]
+  T[i] = AES_K₂(SectorNumber) · α^i  (in GF(2^128))
+```
+
+| Parameter | Value |
+|-----------|-------|
+| Key size | 256 bits (each sub-key) |
+| Block size | 128 bits |
+| Sector size | 512 bytes (hardware), configurable in software |
+| Standard | IEEE 1619-2007, NIST SP 800-38E |
+
+### AES-256-GCM (data in transit)
+
+All TLS connections and API communications use AES-256-GCM, which provides both confidentiality and authentication (AEAD mode).
+
+```python
+# Example: AES-256-GCM encryption using VaultWares Python SDK
+from vaultwares import VaultWaresClient
+
+client = VaultWaresClient(api_key="vw_live_...")
+
+# Encrypt data with a key managed by VaultHSM
+result = client.crypto.encrypt(
+    key_label="App-Data-Key",
+    algorithm="AES-256-GCM",
+    plaintext=b"sensitive data",
+    aad=b"application-context-string"  # Additional Authenticated Data
+)
+
+ciphertext = result.ciphertext  # bytes
+iv = result.iv                  # 96-bit nonce
+auth_tag = result.auth_tag      # 128-bit authentication tag
+
+# Decrypt
+plaintext = client.crypto.decrypt(
+    key_label="App-Data-Key",
+    algorithm="AES-256-GCM",
+    ciphertext=ciphertext,
+    iv=iv,
+    auth_tag=auth_tag,
+    aad=b"application-context-string"
+)
+```
+
+## Asymmetric cryptography
+
+### RSA
+
+RSA is used for key encapsulation, certificate signatures, and legacy compatibility.
+
+| Use case | Key size | Padding | Standard |
+|----------|----------|---------|----------|
+| TLS server certificates | 2048–4096 bits | PKCS#1 v2.1 OAEP / PSS | NIST SP 800-56B |
+| Key wrapping (DEKs) | 4096 bits recommended | OAEP with SHA-256 | NIST SP 800-56B |
+| Code signing | 4096 bits | PSS with SHA-384 | FIPS 186-5 |
+
+<Warning>
+  VaultWares no longer supports RSA-1024. All new key generation defaults to RSA-4096. Existing RSA-2048 keys are accepted but flagged for rotation in the key management console.
+</Warning>
+
+### Elliptic Curve Cryptography (ECC)
+
+ECC provides equivalent security to RSA at much smaller key sizes, reducing computational overhead — important for HSM throughput.
+
+| Curve | Key size | Equivalent RSA | Primary use |
+|-------|----------|---------------|-------------|
+| P-256 (secp256r1) | 256 bits | RSA-3072 | TLS, ECDSA signing |
+| P-384 (secp384r1) | 384 bits | RSA-7680 | High-security signing, Suite B |
+| P-521 (secp521r1) | 521 bits | RSA-15360 | Long-term key material |
+| X25519 | 255 bits | — | ECDH key exchange (TLS 1.3) |
+| Ed25519 | 255 bits | — | Fast digital signatures |
+
+```bash
+# Generate an ECC key pair on VaultHSM
+vw-hsm generate-key \
+  --type ecc \
+  --curve P-384 \
+  --label "Signing-Key-ECDSA-P384" \
+  --usage sign,verify \
+  --extractable false
+
+# Sign a document
+vw-hsm sign \
+  --key "Signing-Key-ECDSA-P384" \
+  --algorithm ECDSA-SHA384 \
+  --input document.pdf \
+  --output document.sig
+```
+
+## TLS configuration
+
+### TLS 1.3 (preferred)
+
+All VaultWares server components prefer TLS 1.3. TLS 1.2 is supported for legacy client compatibility but is configurable.
+
+**TLS 1.3 cipher suites supported by VaultWares:**
+
+| Cipher suite | Key exchange | Authentication | Encryption | Hash |
+|---|---|---|---|---|
+| `TLS_AES_256_GCM_SHA384` | X25519/P-256 | — | AES-256-GCM | SHA-384 |
+| `TLS_CHACHA20_POLY1305_SHA256` | X25519 | — | ChaCha20-Poly1305 | SHA-256 |
+| `TLS_AES_128_GCM_SHA256` | X25519/P-256 | — | AES-128-GCM | SHA-256 |
+
+**TLS 1.2 cipher suites (when required for compatibility):**
+
+| Cipher suite |
+|---|
+| `ECDHE-ECDSA-AES256-GCM-SHA384` |
+| `ECDHE-RSA-AES256-GCM-SHA384` |
+| `ECDHE-ECDSA-CHACHA20-POLY1305` |
+
+```bash
+# Configure TLS settings
+vw-admin tls configure \
+  --min-version TLSv1.2 \
+  --prefer-TLS13 true \
+  --ciphers "TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:ECDHE-ECDSA-AES256-GCM-SHA384" \
+  --session-tickets false \
+  --renegotiation disabled \
+  --hsts-max-age 31536000
+```
+
+## Key derivation functions
+
+### PBKDF2 (password-based key derivation)
+
+VaultDrive uses PBKDF2 to derive the volume encryption key from the user's password.
+
+```
+PBKDF2-HMAC-SHA512:
+  DK = PBKDF2(PRF, Password, Salt, c, dkLen)
+  PRF: HMAC-SHA512
+  Salt: 256-bit random, stored in the device's secure element
+  c: ≥ 600,000 iterations (NIST SP 800-132 recommendation for SHA-512)
+  dkLen: 512 bits (used as the XTS key pair for AES-256-XTS)
+```
+
+<Note>
+  The iteration count on VaultDrive hardware is tied to a hardware timer rather than a software loop, making it time-constant regardless of host CPU speed. This prevents the iteration count from being trivially bypassed on high-performance machines.
+</Note>
+
+### HKDF (HMAC-based key derivation)
+
+Used for deriving session keys and key material from master keys.
+
+```
+HKDF (RFC 5869):
+  HKDF-Extract: PRK = HMAC-Hash(Salt, IKM)
+  HKDF-Expand: OKM = T(1) ‖ T(2) ‖ ... ‖ T(⌈L/HashLen⌉)
+  Hash: SHA-256 or SHA-384
+```
+
+```python
+# Using HKDF for session key derivation (VaultWares SDK)
+from vaultwares.crypto import derive_key
+
+session_key = derive_key(
+    algorithm="HKDF-SHA256",
+    master_key_label="App-Master-Key",
+    info=b"session-2024-11-15T14:00:00Z",
+    length=32  # 256 bits
+)
+```
+
+### X9.63 KDF (HSM key agreement)
+
+Used in ECIES (Elliptic Curve Integrated Encryption Scheme) key agreement within VaultHSM.
+
+## Hashing algorithms
+
+| Algorithm | Output size | Standard | Use in VaultWares |
+|-----------|-------------|----------|-------------------|
+| SHA-256 | 256 bits | FIPS 180-4 | HMAC, TLS, general integrity |
+| SHA-384 | 384 bits | FIPS 180-4 | Certificate signatures (P-384 keys) |
+| SHA-512 | 512 bits | FIPS 180-4 | PBKDF2, high-security HMAC |
+| SHA3-256 | 256 bits | FIPS 202 | Available in VaultHSM Enterprise |
+| BLAKE3 | 256 bits | — | High-performance checksums in VaultBackup |
+
+<Warning>
+  MD5 and SHA-1 are not supported in any VaultWares product for security purposes. Configuration files or integrations that reference these algorithms will be rejected.
+</Warning>
+
+## Post-quantum readiness
+
+VaultWares is actively preparing for the post-quantum cryptography transition.
+
+<AccordionGroup>
+  <Accordion title="Current status">
+    VaultHSM Enterprise (firmware 5.5+) supports the following NIST Post-Quantum Cryptography (PQC) algorithms in preview mode:
+    - **ML-KEM** (CRYSTALS-Kyber) — key encapsulation, NIST FIPS 203
+    - **ML-DSA** (CRYSTALS-Dilithium) — digital signatures, NIST FIPS 204
+    - **SLH-DSA** (SPHINCS+) — hash-based signatures, NIST FIPS 205
+  </Accordion>
+  <Accordion title="Hybrid key exchange">
+    For critical infrastructure, VaultWares recommends hybrid key exchange: combining classical ECDH (X25519) with ML-KEM to protect against both classical and quantum attacks during the transition period.
+
+    ```bash
+    # Enable hybrid TLS key exchange on VaultGate
+    vaultgate tls-policy set \
+      --key-exchange "X25519+ML-KEM-768" \
+      --experimental-pqc true
+    ```
+  </Accordion>
+  <Accordion title="Migration timeline">
+    VaultWares targets full PQC support in the stable channel by 2026, aligned with NIST's recommended migration timeline. Contact [security@vaultwares.com](mailto:security@vaultwares.com) for enterprise migration planning.
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Industry standards" icon="certificate" href="/security/industry-standards">
+    NIST, ISO 27001, and zero-trust framework compliance
+  </Card>
+  <Card title="HSM documentation" icon="microchip" href="/hardware/hsm">
+    VaultHSM key management capabilities
+  </Card>
+  <Card title="GDPR compliance" icon="shield" href="/compliance/gdpr">
+    Encryption and data protection requirements
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/endpoints">
+    Cryptographic operations via REST API
+  </Card>
+</CardGroup>

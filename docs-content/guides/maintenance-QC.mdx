@@ -1,0 +1,351 @@
+---
+title: "Maintenance guide"
+description: "Keep VaultWares products running optimally"
+---
+
+## Overview
+
+Regular maintenance keeps your VaultWares deployment secure, performant, and compliant. This guide covers firmware updates, software updates, key rotation, hardware maintenance tasks, and backup verification.
+
+<Note>
+  Schedule maintenance activities during approved change windows. For high-availability deployments, many tasks can be performed with zero downtime using rolling update procedures.
+</Note>
+
+## Firmware updates
+
+### Check for available updates
+
+```bash
+# Check all managed hardware for available firmware updates
+vw-admin updates check \
+  --scope firmware \
+  --include-beta false \
+  --format table
+
+# Output:
+# Device               Current     Available   Channel   Severity
+# VaultDrive Fleet     3.1.2       3.2.0       Stable    Security
+# VaultHSM PCIe-01     5.4.1       5.5.0       Stable    Feature
+# VaultScan-01         2.3.0       2.3.1       Stable    Bugfix
+# VaultGate-01         4.2.3       4.3.0       Stable    Security
+```
+
+### VaultDrive firmware update
+
+```bash
+# Update a single device
+vw-storage firmware-update \
+  --device /dev/sdb \
+  --version latest \
+  --verify-signature true
+
+# Update an entire fleet via Management Console
+vw-admin fleet-update firmware \
+  --device-group AllVaultDrives \
+  --version 3.2.0 \
+  --schedule "2024-11-20T02:00:00" \
+  --batch-size 50 \
+  --rollback-on-failure true
+
+# Monitor fleet update progress
+vw-admin fleet-update status --job job_abc123
+```
+
+### VaultHSM firmware update
+
+<Warning>
+  HSM firmware updates are critical operations. Always back up all keys before updating. For network HSMs in a cluster, update one node at a time.
+</Warning>
+
+<Steps>
+  <Step title="Backup all keys">
+    ```bash
+    vw-hsm backup create \
+      --all-keys \
+      --output /secure/backup/hsm-backup-$(date +%Y%m%d).enc \
+      --split 3-of-5 \
+      --custodians alice,bob,charlie,diana,erin
+    ```
+  </Step>
+  <Step title="Verify backup">
+    ```bash
+    vw-hsm backup verify \
+      --input /secure/backup/hsm-backup-$(date +%Y%m%d).enc \
+      --custodian-keys alice.key,bob.key,charlie.key
+    ```
+  </Step>
+  <Step title="Download and verify firmware package">
+    ```bash
+    # Download firmware
+    curl -O https://updates.vaultwares.com/hsm/firmware/vaulthsm-5.5.0.pkg
+
+    # Verify signature
+    vw-hsm firmware verify \
+      --package vaulthsm-5.5.0.pkg \
+      --signature vaulthsm-5.5.0.pkg.sig \
+      --public-key /etc/vaultwares/firmware-signing.pub
+    ```
+  </Step>
+  <Step title="Update (cluster: one node at a time)">
+    ```bash
+    # Remove node from cluster before update
+    vw-hsm cluster drain --node hsm01 --graceful
+
+    # Apply firmware update
+    vw-hsm firmware-update \
+      --host hsm01.corp.example.com \
+      --package vaulthsm-5.5.0.pkg \
+      --confirm
+
+    # Wait for reboot and verify
+    sleep 120
+    vw-hsm status --host hsm01.corp.example.com
+
+    # Re-add to cluster
+    vw-hsm cluster add-member --node hsm01
+    vw-hsm cluster sync --force
+    ```
+  </Step>
+</Steps>
+
+### VaultGate firmware update
+
+```bash
+# VaultGate supports hot-swap upgrade with zero downtime (HA pairs)
+# Upgrade the standby unit first
+vaultgate ha failover --to vaultgate-02 --graceful
+
+# Update the now-standby vaultgate-01
+vaultgate firmware-update \
+  --target vaultgate-01 \
+  --version 4.3.0 \
+  --verify-signature
+
+# Fail back after update completes
+vaultgate ha failback --graceful
+```
+
+## Software updates
+
+### Update channels
+
+| Channel | Description | Recommended for |
+|---------|-------------|-----------------|
+| **Stable** | Thoroughly tested releases | All production environments |
+| **LTS** | Long-term support with extended security patches | Regulated environments, minimal change windows |
+| **Beta** | Pre-release testing | Non-production environments only |
+
+```bash
+# Configure update channel
+vw-admin updates set-channel \
+  --channel stable \
+  --auto-download true \
+  --auto-install false \
+  --notify-email security@example.com
+
+# View available software updates
+vw-admin updates check --scope software --format table
+```
+
+### VaultCrypt update
+
+```bash
+# Linux (systemd)
+sudo apt-get update && sudo apt-get install vaultcrypt-enterprise
+sudo systemctl restart vaultcrypt
+
+# Windows (PowerShell — requires admin)
+Invoke-WebRequest "https://releases.vaultwares.com/vaultcrypt/3.2.1/vaultcrypt-3.2.1-x64.msi" -OutFile vaultcrypt-update.msi
+Start-Process msiexec -ArgumentList "/i vaultcrypt-update.msi /quiet /norestart" -Wait
+
+# Verify version after update
+vaultcrypt --version
+```
+
+### VaultAccess update (Docker)
+
+```bash
+# Pull new image
+docker pull registry.vaultwares.com/vaultaccess:3.2.1
+
+# Perform rolling update with docker compose
+docker compose pull vaultaccess
+docker compose up -d --no-deps vaultaccess
+
+# Or with Kubernetes (zero-downtime rolling update)
+kubectl set image deployment/vaultaccess \
+  vaultaccess=registry.vaultwares.com/vaultaccess:3.2.1 \
+  -n vaultwares
+
+kubectl rollout status deployment/vaultaccess -n vaultwares
+```
+
+## Key rotation schedule
+
+### Automated key rotation
+
+```bash
+# Configure automated rotation for TLS keys
+vw-admin key-rotation schedule \
+  --key-pattern "TLS-*" \
+  --interval 365d \
+  --notification-lead 30d \
+  --auto-rotate true \
+  --alert-email security@example.com
+
+# Configure rotation for data encryption keys
+vw-admin key-rotation schedule \
+  --key-pattern "DEK-*" \
+  --interval 365d \
+  --notification-lead 45d \
+  --auto-rotate false \
+  --require-approval-from security-officer@example.com
+```
+
+### Manual key rotation procedure
+
+```bash
+# 1. Generate new key version
+vw-hsm generate-key \
+  --type aes \
+  --size 256 \
+  --label "DB-Master-Key-v2" \
+  --extractable false
+
+# 2. Re-wrap DEKs with the new master key
+vw-hsm key-rewrap \
+  --old-kek "DB-Master-Key-v1" \
+  --new-kek "DB-Master-Key-v2" \
+  --target-deks "DB-PII-DEK-v1,DB-Financial-DEK-v1"
+
+# 3. Update application configuration to reference new key label
+vw-admin config update \
+  --key master_key_label \
+  --value "DB-Master-Key-v2"
+
+# 4. Verify applications are using the new key
+vw-admin key-rotation verify --key "DB-Master-Key-v2"
+
+# 5. Schedule deprecation of old key (keep for decryption of old backups)
+vw-hsm key deprecate \
+  --label "DB-Master-Key-v1" \
+  --deprecation-date "2025-11-01"
+```
+
+## Hardware maintenance
+
+### Regular inspection checklist
+
+<AccordionGroup>
+  <Accordion title="Monthly hardware inspection">
+    - [ ] Check status LEDs on all VaultHSM appliances (all should be green)
+    - [ ] Verify UPS or dual-PSU health via management console
+    - [ ] Inspect cable connections — check for loose or damaged cables
+    - [ ] Clean rack equipment with compressed air (avoid liquids near electronics)
+    - [ ] Check server room temperature and humidity logs
+    - [ ] Verify tamper-evident seals on all VaultHSM units are intact
+  </Accordion>
+  <Accordion title="VaultHSM battery / capacitor maintenance">
+    VaultHSM units use a supercapacitor to preserve RAM-resident keys during brief power interruptions. The capacitor should be tested annually.
+
+    ```bash
+    # Test supercapacitor health
+    vw-hsm hardware-test --component supercap --node hsm01
+
+    # Output:
+    # Supercapacitor status: HEALTHY
+    # Estimated hold-up time: 42 seconds (nominal: 30-60s)
+    # Last test: 2024-06-01
+    ```
+  </Accordion>
+  <Accordion title="Fan and temperature">
+    ```bash
+    # Check HSM appliance temperature and fan speed
+    vw-hsm hardware-status --node hsm01 --component thermal
+
+    # Output:
+    # CPU temperature:  42°C (max: 70°C)
+    # Board temperature: 38°C (max: 60°C)
+    # Fan 1 speed:      3,200 RPM (status: Normal)
+    # Fan 2 speed:      3,150 RPM (status: Normal)
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Backup verification
+
+```bash
+# Monthly backup verification
+vw-backup verify-all \
+  --repo backup://nas01/vaults/prod \
+  --decrypt-key hsm:DB-Backup-Key \
+  --threads 4 \
+  --output-report /reports/backup-verify-$(date +%Y%m).json
+
+# Quarterly restore test
+vw-backup restore \
+  --repo backup://nas01/vaults/prod \
+  --recovery-point "$(vw-backup recovery-points list --latest)" \
+  --destination /data/restore-test-$(date +%Y%m) \
+  --decrypt-key hsm:DB-Backup-Key
+
+# Verify restore completeness
+vw-backup verify-restore \
+  --source /data/restore-test-$(date +%Y%m) \
+  --compare-to-backup \
+  --format report \
+  --output /reports/restore-test-$(date +%Y%m).html
+```
+
+## Maintenance window procedures
+
+### Pre-maintenance checklist
+
+```bash
+# Pre-maintenance health snapshot
+vw-admin health-check --full --output /reports/pre-maint-$(date +%Y%m%d).json
+
+# Notify monitoring system
+vw-monitor maintenance-mode enable \
+  --duration 2h \
+  --suppress-alerts \
+  --reason "Scheduled firmware updates"
+
+# Verify backups are current
+vw-backup jobs list --status success --since 24h
+```
+
+### Post-maintenance validation
+
+```bash
+# Post-maintenance health check
+vw-admin health-check --full --output /reports/post-maint-$(date +%Y%m%d).json
+
+# Compare pre- and post-maintenance configs
+vw-admin config diff \
+  --before /reports/pre-maint-$(date +%Y%m%d).json \
+  --after /reports/post-maint-$(date +%Y%m%d).json
+
+# Restore normal monitoring
+vw-monitor maintenance-mode disable
+
+# Verify all services are healthy
+vw-admin service status --all
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Updates and releases" icon="circle-arrow-up" href="/support/updates">
+    Release notes and update history
+  </Card>
+  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
+    Routine operational tasks
+  </Card>
+  <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
+    Diagnose common issues
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Security and operational recommendations
+  </Card>
+</CardGroup>

@@ -1,0 +1,25 @@
+---
+title: "Gui Verification"
+description: "Assistant protocol summary: Gui Verification"
+---
+
+# Vérification Gui
+
+- ID de catégorie : `GUI_VERIFICATION`
+- Source du résumé : `instructions/summaries/GUI_VERIFICATION.md`
+- Source des notes : `instructions/notes/GUI_VERIFICATION.md`
+
+S'applique lorsque : interface utilisateur Web, interface utilisateur du site de documentation, tableaux de bord, panneaux d'administration, SPA.
+Faire :
+- Naviguez sur au moins 2 liens en profondeur et en arrière.
+- Vérifiez la console DevTools et le réseau pour bloquer les erreurs.
+- Déclenchez un état de survol/mise au point et un état vide/erreur pertinent au changement.
+- Vérifiez par recoupement avec une deuxième modalité lorsque cela est possible (curl/Invoke-WebRequest ou Playwright).
+Pas :
+- Marquez « travail » à partir d'une seule capture d'écran ou 200 OK.
+Fais quand :
+- Vous pouvez énumérer les pages visitées et ce que vous avez inspecté.
+
+## Notes
+Assistants read full notes only when explicitly prompted: `read full notes`.
+Notes path: `instructions/notes/GUI_VERIFICATION.md`

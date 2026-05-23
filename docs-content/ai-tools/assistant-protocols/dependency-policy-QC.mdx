@@ -1,0 +1,24 @@
+---
+title: "Dependency Policy"
+description: "Assistant protocol summary: Dependency Policy"
+---
+
+# Politique de dépendance
+
+- ID de catégorie : `DEPENDENCY_POLICY`
+- Source du résumé : `instructions/summaries/DEPENDENCY_POLICY.md`
+- Source des notes : `instructions/notes/DEPENDENCY_POLICY.md`
+
+S'applique lorsque : l'ajout/la mise à jour de dépendances, de chaînes d'outils, de fichiers de verrouillage, de gestionnaires de packages.
+Faire :
+- N'ajoutez pas de nouvelles dépendances à moins que cela ne soit explicitement demandé ou clairement nécessaire et justifié.
+- Préférer les bibliothèques/utilitaires existants déjà utilisés dans le dépôt.
+- Enregistrez les changements de dépendance et pourquoi.
+Pas :
+- Introduire de nouveaux outils « juste parce que ».
+Fais quand :
+- Le changement de dépendance est minime, justifié et vérifié (build/tests).
+
+## Remarques
+Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
+Chemin des notes : `instructions/notes/DEPENDENCY_POLICY.md`

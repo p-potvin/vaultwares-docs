@@ -1,0 +1,196 @@
+---
+title: "Updates & releases"
+description: "Software updates, firmware upgrades, and release notes"
+---
+
+## Overview
+
+VaultWares releases software and firmware updates regularly. Updates may include security patches, bug fixes, new features, and performance improvements. Staying current with updates is an important part of your security posture.
+
+## Update channels
+
+| Channel | Description | Recommended for |
+|---------|-------------|-----------------|
+| **Stable** | Thoroughly tested releases, released approximately quarterly | All production environments |
+| **LTS** | Long-term support with 5-year security patch commitment | Regulated environments with infrequent change windows |
+| **Security** | Out-of-band patches for critical security vulnerabilities | All environments — prioritize immediately |
+| **Beta** | Pre-release testing | Lab and non-production environments only |
+
+## How to check for updates
+
+```bash
+# Check all managed products for available updates
+vw-admin updates check --all --format table
+
+# Output:
+# Product          Current     Available   Channel  Severity   Release date
+# VaultCrypt       3.1.2       3.2.0       Stable   Security   2024-11-01
+# VaultAccess      3.1.5       3.2.0       Stable   Feature    2024-11-01
+# VaultBackup      3.0.8       3.2.0       Stable   Feature    2024-11-01
+# VaultMonitor     3.1.1       3.2.0       Stable   Feature    2024-11-01
+# VaultDrive FW    3.1.2       3.2.0       Stable   Security   2024-10-15
+# VaultHSM FW      5.4.1       5.5.0       Stable   Feature    2024-10-20
+# VaultGate FW     4.2.3       4.3.0       Stable   Security   2024-11-05
+
+# Subscribe to security advisories via email
+vw-admin updates subscribe \
+  --email security@example.com \
+  --channels security,stable \
+  --products all
+```
+
+## Software update procedures
+
+### Automatic update notifications
+
+```bash
+# Configure automatic update checks and email notifications
+vw-admin updates configure \
+  --check-frequency daily \
+  --notify-email security@example.com \
+  --auto-download true \
+  --auto-install false \  # Review before installing in production
+  --channel stable
+```
+
+### Manual update (Linux)
+
+```bash
+# Update VaultCrypt
+sudo apt-get update && sudo apt-get install --only-upgrade vaultcrypt-enterprise
+
+# Update VaultAccess
+sudo apt-get update && sudo apt-get install --only-upgrade vaultaccess
+
+# Verify installed versions
+vaultcrypt --version
+vw-admin --version
+vw-monitor --version
+vw-backup --version
+```
+
+### Kubernetes rolling update
+
+```bash
+# Update all VaultWares deployments to latest stable
+for deployment in vaultaccess vaultbackup vaultmonitor; do
+  kubectl set image deployment/$deployment \
+    $deployment=registry.vaultwares.com/$deployment:3.2.0 \
+    -n vaultwares
+  kubectl rollout status deployment/$deployment -n vaultwares
+done
+```
+
+## Release history
+
+<AccordionGroup>
+  <Accordion title="Version 3.2.0 — November 2024">
+    **Release date**: November 1, 2024  
+    **Channel**: Stable  
+    **Severity**: Security + Feature
+
+    **Security fixes**:
+    - CVE-2024-XXXXX: Fixed an authentication bypass in VaultAccess SAML assertion parsing (CVSS 8.1 — High). Affects VaultAccess 3.0.x–3.1.x. Upgrade strongly recommended.
+    - Upgraded OpenSSL dependency from 3.1.x to 3.3.x to address downstream vulnerabilities
+
+    **New features**:
+    - VaultAccess: ML-based anomaly detection (Enterprise edition)
+    - VaultBackup: Immutable storage support for Azure Blob
+    - VaultMonitor: Microsoft Sentinel native connector (replaces CEF syslog)
+    - VaultCrypt: Post-quantum preview (ML-KEM key encapsulation on VaultHSM Enterprise)
+    - API v1: New `/v1/keys/rotate` endpoint with zero-downtime rotation
+
+    **Bug fixes**:
+    - VaultBackup: Fixed incremental backup failing on ZFS volumes with compression
+    - VaultAccess: Fixed LDAP sync timeout on large directories (>100,000 users)
+    - VaultMonitor: Fixed false-positive alerts for NTP adjustment events
+    - VaultCrypt: Fixed auto-mount failure after kernel updates on RHEL 9.3
+  </Accordion>
+
+  <Accordion title="Version 3.1.5 — August 2024">
+    **Release date**: August 15, 2024  
+    **Channel**: Stable  
+    **Severity**: Security
+
+    **Security fixes**:
+    - CVE-2024-YYYYY: Hardened TLS certificate validation in VaultAccess OIDC token validation
+    - Fixed potential token reuse vulnerability in VaultAccess refresh token rotation
+
+    **Bug fixes**:
+    - VaultMonitor: Fixed Splunk HEC batch delivery dropping events under high load
+    - VaultBackup: Fixed S3 replication failing on buckets with SSE-KMS
+  </Accordion>
+
+  <Accordion title="Version 3.1.2 — May 2024">
+    **Release date**: May 3, 2024  
+    **Channel**: Stable  
+    **Severity**: Feature + Bugfix
+
+    **New features**:
+    - VaultAccess: SCIM 2.0 provisioning support (automated user lifecycle from Okta, Azure AD, etc.)
+    - VaultBackup: Native GCP Cloud Storage target
+    - VaultCrypt: macOS Sequoia (15.x) support
+
+    **Bug fixes**:
+    - VaultAccess: Fixed group membership sync with deeply nested AD groups (>10 levels)
+    - VaultCrypt: Fixed occasional hang during volume mount on NVMe drives
+  </Accordion>
+
+  <Accordion title="Version 3.0.0 — January 2024">
+    **Release date**: January 15, 2024  
+    **Channel**: Stable  
+    **Severity**: Major release
+
+    **Breaking changes**:
+    - Python SDK: Minimum Python version raised from 3.8 to 3.10
+    - API: `/v1/audit/logs` endpoint renamed to `/v1/audit` (old path returns 301 redirect until 2025-01-01)
+    - VaultAccess: Legacy RADIUS authentication removed (use OIDC or SAML)
+
+    **New features**:
+    - VaultMonitor Enterprise: ML anomaly detection engine
+    - VaultAccess: Privileged Access Management (PAM) module generally available
+    - VaultHSM: FIPS 140-3 Level 4 certification for Enterprise model
+    - Docker and Kubernetes deployment support for all software products
+    - Post-quantum cryptography preview (VaultHSM Enterprise)
+  </Accordion>
+</AccordionGroup>
+
+## Firmware release history
+
+| Product | Version | Date | Highlights |
+|---------|---------|------|------------|
+| VaultDrive | 3.2.0 | Oct 2024 | Security hardening, faster PBKDF2 |
+| VaultDrive | 3.1.0 | Jun 2024 | FIDO2 support, new LED patterns |
+| VaultHSM | 5.5.0 | Oct 2024 | ML-KEM/ML-DSA preview, FIPS 140-3 updates |
+| VaultHSM | 5.4.0 | Apr 2024 | Ed25519 support, performance +15% |
+| VaultScan | 2.3.1 | Oct 2024 | Improved liveness detection, bugfixes |
+| VaultGate | 4.3.0 | Nov 2024 | TLS 1.3 by default, IPS rule updates |
+
+## Security advisories
+
+Subscribe to receive security advisories by email:  
+[portal.vaultwares.com/security-advisories](https://portal.vaultwares.com/security-advisories)
+
+Critical security updates (CVSS 7.0+) are announced via:
+- Email to all registered product owners
+- Portal banner notification
+- RSS feed: `https://security.vaultwares.com/advisories.rss`
+
+VaultWares follows [responsible disclosure](https://security.vaultwares.com/disclosure) and coordinates with researchers through [security@vaultwares.com](mailto:security@vaultwares.com).
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Maintenance guide" icon="wrench" href="/guides/maintenance">
+    Step-by-step update procedures
+  </Card>
+  <Card title="Warranty information" icon="file-certificate" href="/support/warranty">
+    Warranty terms and coverage
+  </Card>
+  <Card title="Contact support" icon="headset" href="/support/contact">
+    Get help with updates
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/support/faq">
+    Update-related frequently asked questions
+  </Card>
+</CardGroup>

@@ -1,0 +1,339 @@
+---
+title: "Troubleshooting guide"
+description: "Diagnose and resolve common issues"
+---
+
+## Overview
+
+Use this guide to diagnose and resolve common issues with VaultWares hardware and software. If an issue is not covered here, consult the [support portal](https://portal.vaultwares.com/support) or contact [support@vaultwares.com](mailto:support@vaultwares.com).
+
+## Diagnostic commands
+
+Run these commands first to gather information for any troubleshooting session:
+
+```bash
+# System-wide health check
+vw-admin health-check --full --output /tmp/health-$(date +%Y%m%d%H%M).json
+
+# Collect a diagnostic bundle (for support escalation)
+vw-admin diag collect \
+  --include-logs 48h \
+  --include-config true \
+  --output /tmp/diag-$(hostname)-$(date +%Y%m%d%H%M).tar.gz
+
+# Check service status
+vw-admin service status --all
+```
+
+---
+
+## Encrypted storage troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Device not recognized by the operating system">
+    **Symptoms**: VaultDrive does not appear as a drive in File Explorer / Finder / `lsblk`.
+
+    **Diagnosis**:
+    ```bash
+    # Check if the device is seen by the USB subsystem
+    lsusb | grep -i vault
+    dmesg | tail -20
+    ```
+
+    **Resolution steps**:
+    1. Try a different USB port (must be USB 3.0 or higher)
+    2. Try the device on another computer to isolate the issue
+    3. On Linux, check for module conflicts: `sudo modprobe uas`
+    4. On Windows, update USB drivers from Device Manager
+    5. Inspect the USB-C connector for physical damage
+    6. If none of the above work, [file an RMA](/support/rma)
+  </Accordion>
+
+  <Accordion title="Authentication always fails (correct password)">
+    **Symptoms**: Password entry is accepted but authentication fails repeatedly.
+
+    **Diagnosis**:
+    ```bash
+    vw-storage device-info --device /dev/sdb
+    # Check: failed_attempts, lockout_status, firmware_version
+    ```
+
+    **Resolution steps**:
+    1. Ensure Caps Lock is not enabled
+    2. Check if the device is in lockout state: look for a red flashing LED
+    3. If locked out, wait for the lockout duration (default 30 minutes) or contact support with proof of ownership
+    4. Check if an enterprise policy is overriding the password — policy-managed devices may require an admin PIN
+    5. Update device firmware: `vw-storage firmware-update --device /dev/sdb`
+  </Accordion>
+
+  <Accordion title="Slow transfer speeds">
+    **Symptoms**: Transfer speeds significantly below rated specifications.
+
+    **Diagnosis**:
+    ```bash
+    # Check USB negotiation speed
+    udevadm info -a -n /dev/sdb | grep speed
+
+    # Benchmark the device
+    vw-storage benchmark --device /dev/sdb
+    ```
+
+    **Resolution steps**:
+    1. Confirm you are using a USB 3.0+ port (blue color or SuperSpeed logo)
+    2. Use the included USB-C cable; third-party cables may limit speeds
+    3. Disable real-time antivirus scanning on the destination path temporarily to test
+    4. Ensure the host computer is not in a power-saving mode that throttles USB
+    5. Reformat the device (note: this erases all data) to resolve file system fragmentation
+  </Accordion>
+
+  <Accordion title="Biometric sensor not enrolling fingerprint">
+    **Symptoms**: Fingerprint enrollment fails after multiple attempts.
+
+    **Resolution steps**:
+    1. Clean the sensor with a dry, lint-free cloth
+    2. Ensure your finger is dry and free of cuts or abrasions
+    3. Try a different finger
+    4. Update firmware: `vw-storage firmware-update --device /dev/sdb`
+    5. Re-initialize the biometric module: `vw-storage biometric-reset --device /dev/sdb` (requires admin PIN)
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## HSM troubleshooting
+
+<AccordionGroup>
+  <Accordion title="HSM not detected after installation">
+    **Symptoms**: `vw-hsm status` reports no devices found.
+
+    **Diagnosis**:
+    ```bash
+    # PCIe models
+    lspci | grep -i vault
+    lsmod | grep vaulthsm
+    journalctl -u vaulthsm --no-pager -n 50
+
+    # Network models
+    ping hsm01.corp.example.com
+    curl -k https://hsm01.corp.example.com:8443/api/status
+    ```
+
+    **Resolution**:
+    ```bash
+    # Reinstall driver (PCIe)
+    sudo systemctl stop vaulthsm
+    sudo rmmod vaulthsm_pcie
+    sudo modprobe vaulthsm_pcie
+    sudo systemctl start vaulthsm
+
+    # Check network reachability (Network models)
+    vw-hsm network-test --host hsm01.corp.example.com --port 1792
+    ```
+  </Accordion>
+
+  <Accordion title="PKCS#11 CKR_TOKEN_NOT_PRESENT">
+    **Symptoms**: Applications report `CKR_TOKEN_NOT_PRESENT` or `CKR_SLOT_ID_INVALID`.
+
+    **Resolution**:
+    ```bash
+    # List available tokens
+    vw-hsm slot list
+
+    # Verify PKCS#11 library path
+    echo $PKCS11_MODULE
+    ls -la /usr/lib/vaulthsm-pkcs11.so
+
+    # Test PKCS#11 with pkcs11-tool
+    pkcs11-tool --module /usr/lib/vaulthsm-pkcs11.so --list-slots
+    ```
+  </Accordion>
+
+  <Accordion title="High operation latency">
+    **Symptoms**: Cryptographic operations taking significantly longer than expected.
+
+    **Diagnosis**:
+    ```bash
+    # Check HSM performance metrics
+    vw-hsm monitor --metrics latency,queue-depth,errors --interval 5s
+
+    # Check host resource utilization
+    top -bn1 | grep -E "Cpu|Mem"
+
+    # Review HSM queue depth
+    vw-hsm status --verbose | grep queue
+    ```
+
+    **Resolution**:
+    1. If queue depth is high (>100), consider adding HSMs to the cluster
+    2. Verify network latency between client and network HSM: `vw-hsm network-test --latency`
+    3. Check for resource contention on the HSM host (PCIe models)
+    4. Review operation patterns — ensure bulk operations are batched appropriately
+  </Accordion>
+
+  <Accordion title="Cluster synchronization failure">
+    **Resolution**:
+    ```bash
+    # Check cluster status
+    vw-hsm cluster status
+
+    # Check NTP synchronization (clock skew can break cluster sync)
+    timedatectl status
+    chronyc tracking
+
+    # Force resynchronization
+    vw-hsm cluster sync --force --from hsm01
+
+    # Review cluster logs
+    vw-hsm logs --component cluster --level debug --last 100
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Biometric device troubleshooting
+
+<AccordionGroup>
+  <Accordion title="VaultScan not connecting to enrollment server">
+    **Diagnosis**:
+    ```bash
+    vw-biometric test-connection \
+      --device 192.168.1.51 \
+      --server https://vaultaccess.corp.example.com
+    ```
+
+    **Resolution**:
+    1. Verify the server URL and port are accessible from the device subnet
+    2. Check TLS certificate validity (expired cert is a common cause)
+    3. Confirm the device has correct DNS resolution: check via LCD menu → Network → DNS Test
+    4. Review VaultScan firewall requirements: TCP 443 outbound to enrollment server
+  </Accordion>
+
+  <Accordion title="False rejection rate too high">
+    **Resolution**:
+    1. Increase the matching threshold sensitivity: `vw-biometric set-threshold --device 192.168.1.51 --threshold medium` (options: low, medium, high, very-high)
+    2. Re-enroll users with better quality samples
+    3. Clean the scanner surfaces
+    4. Ensure adequate lighting for face recognition modules
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Software troubleshooting
+
+<AccordionGroup>
+  <Accordion title="VaultCrypt volume fails to mount after reboot">
+    **Symptoms**: Encrypted volume does not automatically mount after system restart.
+
+    **Diagnosis**:
+    ```bash
+    vaultcrypt status
+    journalctl -u vaultcrypt --no-pager -n 50
+    ```
+
+    **Resolution**:
+    ```bash
+    # Check auto-mount configuration
+    vaultcrypt auto-mount list
+
+    # Re-register auto-mount entry
+    vaultcrypt auto-mount \
+      --volume /dev/sdc \
+      --key-source hsm \
+      --hsm-slot 1 \
+      --at-boot
+
+    # Verify HSM connectivity (required for HSM-keyed volumes)
+    vw-hsm status
+    ```
+  </Accordion>
+
+  <Accordion title="VaultAccess LDAP sync failing">
+    **Diagnosis**:
+    ```bash
+    vw-admin ad sync --dry-run --verbose
+    vw-admin ldap test --verbose
+    ```
+
+    **Resolution**:
+    1. Verify service account password has not expired
+    2. Confirm network connectivity: `telnet dc01.corp.example.com 389`
+    3. Check for LDAP certificate issues if using LDAPS: `openssl s_client -connect dc01.corp.example.com:636`
+    4. Review LDAP search filter for syntax errors
+  </Accordion>
+
+  <Accordion title="VaultBackup jobs consistently failing">
+    **Diagnosis**:
+    ```bash
+    vw-backup jobs get --id <job-id> --verbose
+    vw-backup logs --job <job-id> --level debug
+    ```
+
+    **Common causes**:
+    - Backup repository full: `vw-backup repo stats --name local-nas`
+    - HSM unreachable for key wrapping: `vw-hsm status`
+    - Insufficient permissions on destination path
+    - Network timeout for off-site replication: check bandwidth and connectivity
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Log locations
+
+| Product | Log file / command |
+|---------|-------------------|
+| VaultCrypt | `/var/log/vaultcrypt/vaultcrypt.log` |
+| VaultAccess | `/var/log/vaultaccess/vaultaccess.log` |
+| VaultBackup | `/var/log/vaultbackup/vaultbackup.log` |
+| VaultMonitor | `/var/log/vaultmonitor/vaultmonitor.log` |
+| VaultHSM driver | `journalctl -u vaulthsm` |
+| VaultHSM audit | `vw-hsm audit-query --last 100` |
+| VaultDrive | `vw-storage logs --device /dev/sdb` |
+| VaultScan | `vw-biometric logs --device 192.168.1.51` |
+| VaultGate | `vaultgate logs --component all --last 500` |
+
+---
+
+## Escalation procedure
+
+If you cannot resolve an issue using this guide:
+
+<Steps>
+  <Step title="Collect diagnostics">
+    ```bash
+    vw-admin diag collect \
+      --include-logs 72h \
+      --include-config true \
+      --output /tmp/diag-$(hostname)-$(date +%Y%m%d%H%M).tar.gz
+    ```
+  </Step>
+  <Step title="Open a support ticket">
+    Log into [portal.vaultwares.com/support](https://portal.vaultwares.com/support) and create a new ticket. Include:
+    - Detailed description of the issue and steps to reproduce
+    - Diagnostic bundle from the previous step
+    - Affected product versions: `vw-admin version --all`
+    - Urgency (P1 production outage through P4 question)
+  </Step>
+  <Step title="Emergency support">
+    For P1 production outages, call the 24/7 emergency support line listed in your support contract, or email [emergency@vaultwares.com](mailto:emergency@vaultwares.com) with **[P1]** in the subject line.
+  </Step>
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
+    Routine monitoring and management tasks
+  </Card>
+  <Card title="Maintenance guide" icon="wrench" href="/guides/maintenance">
+    Firmware and software update procedures
+  </Card>
+  <Card title="Support contact" icon="headset" href="/support/contact">
+    Contact the VaultWares support team
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/support/faq">
+    Frequently asked questions
+  </Card>
+</CardGroup>

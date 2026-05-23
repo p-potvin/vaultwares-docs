@@ -1,0 +1,318 @@
+---
+title: "Initial configuration"
+description: "Configure VaultWares after installation"
+---
+
+## Overview
+
+This guide walks through the initial configuration steps that should be completed after installing any VaultWares product. Follow these steps in order for a smooth deployment.
+
+<Tip>
+  Run through these steps in your staging environment first. Many settings (particularly directory integration and HSM initialization) are difficult to change after production data has been associated with them.
+</Tip>
+
+## Step 1: Admin account setup
+
+<Steps>
+  <Step title="Log in with the default credentials">
+    After installation, the VaultWares Management Console is accessible at `https://<server>:8443`. Log in with the initial administrator credentials:
+
+    - **Username**: `admin`
+    - **Password**: Printed on the product's Quick Start card, or displayed at the end of the installer
+
+    <Warning>
+      Change the default password immediately. Default credentials are the same for all VaultWares deployments and are publicly documented.
+    </Warning>
+  </Step>
+  <Step title="Change the default admin password">
+    ```bash
+    vw-admin password change \
+      --user admin \
+      --current-password <default-password> \
+      --new-password <strong-new-password>
+    ```
+  </Step>
+  <Step title="Create named administrator accounts">
+    Avoid using the generic `admin` account for day-to-day operations. Create named accounts for each administrator:
+
+    ```bash
+    # Create an administrator account
+    vw-admin user create \
+      --username alice \
+      --email alice@example.com \
+      --role Administrator \
+      --require-mfa true \
+      --send-welcome-email
+
+    # Create a security officer account (for HSM operations)
+    vw-admin user create \
+      --username bob-so \
+      --email bob@example.com \
+      --role SecurityOfficer \
+      --require-mfa true \
+      --require-hardware-key true
+    ```
+  </Step>
+  <Step title="Disable or restrict the default admin account">
+    ```bash
+    # Lock the default admin account after named accounts are configured
+    vw-admin user disable --username admin
+
+    # Or restrict to console access only
+    vw-admin user restrict \
+      --username admin \
+      --allow-console-only \
+      --require-mfa true
+    ```
+  </Step>
+</Steps>
+
+## Step 2: License activation
+
+```bash
+# Activate license online
+vw-admin license activate --key VWXX-XXXX-XXXX-XXXX-XXXX
+
+# Verify license status
+vw-admin license status
+
+# Output:
+# Product:         VaultAccess Enterprise
+# License key:     VWAC-XXXX-XXXX-XXXX-XXXX
+# Status:          Active
+# Seats licensed:  500
+# Seats in use:    0
+# Valid until:     2026-12-31
+# Features:        RBAC, ABAC, PAM, SSO, SIEM integration
+
+# Offline activation (for air-gapped environments)
+vw-admin license request-offline-token --key VWXX-XXXX-XXXX-XXXX-XXXX
+# Submit the token at https://portal.vaultwares.com/offline-activation
+# Then apply the activation response:
+vw-admin license apply-offline-response --file activation-response.json
+```
+
+## Step 3: TLS certificate configuration
+
+Replace the self-signed certificate installed by default with a CA-signed certificate.
+
+```bash
+# Generate a CSR
+vw-admin tls generate-csr \
+  --common-name vaultaccess.corp.example.com \
+  --san "DNS:vaultaccess.corp.example.com,DNS:vault.corp.example.com" \
+  --key-size 2048 \
+  --output /etc/vaultwares/tls/server.csr
+
+# After obtaining the signed certificate from your CA:
+vw-admin tls install \
+  --cert /etc/vaultwares/tls/server.crt \
+  --key /etc/vaultwares/tls/server.key \
+  --ca-chain /etc/vaultwares/tls/ca-chain.crt
+
+# Restart services to apply
+vw-admin service restart --all
+```
+
+## Step 4: Active Directory / LDAP integration
+
+<Tabs>
+  <Tab title="Active Directory">
+    ```bash
+    # Test AD connectivity before joining
+    vw-admin ad test-connection \
+      --domain corp.example.com \
+      --dc dc01.corp.example.com
+
+    # Join the domain
+    vw-admin ad join \
+      --domain corp.example.com \
+      --dc dc01.corp.example.com \
+      --username CORP\\svc_vaultaccess \
+      --password <service-account-password> \
+      --ou "OU=VaultWares,DC=corp,DC=example,DC=com"
+
+    # Configure group synchronization
+    vw-admin ad configure-sync \
+      --base-dn "DC=corp,DC=example,DC=com" \
+      --user-filter "(&(objectClass=user)(memberOf=CN=VaultWaresUsers,OU=Groups,DC=corp,DC=example,DC=com))" \
+      --group-sync true \
+      --sync-interval 60m \
+      --nested-groups true
+
+    # Run initial sync
+    vw-admin ad sync --force
+    ```
+  </Tab>
+  <Tab title="LDAP">
+    ```bash
+    # Configure LDAP connection
+    vw-admin ldap configure \
+      --url ldap://ldap.example.com:389 \
+      --bind-dn "cn=svc_vaultaccess,ou=services,dc=example,dc=com" \
+      --bind-password <bind-password> \
+      --base-dn "dc=example,dc=com" \
+      --user-search-filter "(objectClass=inetOrgPerson)" \
+      --group-search-filter "(objectClass=groupOfNames)" \
+      --tls-ca-cert /etc/vaultwares/tls/ldap-ca.crt \
+      --start-tls true
+
+    # Test LDAP configuration
+    vw-admin ldap test --user alice
+
+    # Enable LDAP authentication
+    vw-admin ldap enable
+    ```
+  </Tab>
+</Tabs>
+
+## Step 5: Email notification setup
+
+```bash
+# Configure SMTP for email notifications
+vw-admin email configure \
+  --smtp-host smtp.example.com \
+  --smtp-port 587 \
+  --smtp-tls starttls \
+  --smtp-username noreply@example.com \
+  --smtp-password <smtp-password> \
+  --from-address "VaultWares Alerts <noreply@example.com>" \
+  --from-name "VaultWares"
+
+# Send a test email
+vw-admin email test --recipient admin@example.com
+
+# Configure notification recipients
+vw-admin notifications configure \
+  --security-alerts security@example.com \
+  --system-alerts sysadmin@example.com \
+  --compliance-reports compliance@example.com \
+  --backup-reports backup@example.com
+```
+
+## Step 6: Initial backup configuration
+
+Configure at least one backup destination before the system goes into production.
+
+```bash
+# Add a local backup repository
+vw-backup repo add \
+  --name local-nas \
+  --type nfs \
+  --path //nas01.corp.example.com/vaultbackup \
+  --encrypt-key hsm:Backup-Master-Key
+
+# Add a cloud backup repository
+vw-backup repo add \
+  --name aws-s3-backup \
+  --type s3 \
+  --bucket corp-vaultbackup-vault \
+  --region us-east-1 \
+  --access-key $AWS_ACCESS_KEY_ID \
+  --secret-key $AWS_SECRET_ACCESS_KEY \
+  --encrypt-key hsm:Backup-Master-Key \
+  --immutable-retention-days 30
+
+# Create and apply initial backup schedule
+vw-backup schedule create \
+  --name SystemConfiguration \
+  --source /etc/vaultwares \
+  --destination local-nas \
+  --type full \
+  --cron "0 3 * * *" \
+  --retention-days 90
+```
+
+## Step 7: HSM integration
+
+If you have a VaultHSM, integrate it before creating any production keys.
+
+```bash
+# Add HSM to the key management configuration
+vw-admin hsm add \
+  --name production-hsm \
+  --host hsm01.corp.example.com \
+  --slot 0 \
+  --pin <hsm-user-pin> \
+  --tls-cert /etc/vaultwares/tls/hsm-client.crt \
+  --tls-key /etc/vaultwares/tls/hsm-client.key
+
+# Verify HSM connectivity and generate master key
+vw-admin hsm test --name production-hsm
+
+# Generate system master key on HSM
+vw-admin hsm generate-master-key \
+  --hsm production-hsm \
+  --label "VaultWares-Master-Key-v1" \
+  --algorithm AES-256
+```
+
+## Step 8: Verify the installation
+
+```bash
+# Run the built-in configuration health check
+vw-admin health-check --full
+
+# Output:
+# [✓] License: Active (500 seats, expires 2026-12-31)
+# [✓] TLS certificate: Valid (CN=vaultaccess.corp.example.com)
+# [✓] Database: Connected, 0ms latency
+# [✓] Active Directory: Connected (dc01.corp.example.com), 15ms latency
+# [✓] SMTP: Reachable (smtp.example.com:587)
+# [✓] HSM: Connected (hsm01.corp.example.com, FIPS 140-2 Level 3)
+# [✓] Backup repository: Accessible (nas01, 45ms)
+# [✓] Admin accounts: 2 named administrators, default admin disabled
+# [!] MFA: 1 administrator account without MFA enrolled (bob@example.com)
+
+# Address any warnings before going live
+vw-admin user enforce-mfa --user bob@example.com
+```
+
+## Configuration reference
+
+```json
+{
+  "system": {
+    "hostname": "vaultaccess.corp.example.com",
+    "timezone": "America/New_York",
+    "ntp_servers": ["ntp.corp.example.com", "pool.ntp.org"],
+    "log_level": "info",
+    "audit_log_retention_days": 365
+  },
+  "directory": {
+    "type": "active_directory",
+    "domain": "corp.example.com",
+    "sync_interval_minutes": 60,
+    "nested_group_sync": true
+  },
+  "email": {
+    "smtp_host": "smtp.example.com",
+    "smtp_port": 587,
+    "smtp_tls": "starttls",
+    "from_address": "noreply@example.com"
+  },
+  "security": {
+    "min_tls_version": "1.2",
+    "cipher_suites": "TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256",
+    "require_mfa": true,
+    "session_timeout_minutes": 30
+  }
+}
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
+    Connect to SSO, SIEM, PKI, and cloud providers
+  </Card>
+  <Card title="Access control" icon="shield-halved" href="/software/access-control">
+    Configure RBAC policies and user groups
+  </Card>
+  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
+    Day-to-day management tasks
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Security hardening recommendations
+  </Card>
+</CardGroup>

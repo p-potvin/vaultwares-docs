@@ -1,0 +1,249 @@
+---
+title: "PCI DSS compliance"
+description: "Payment Card Industry Data Security Standard compliance"
+---
+
+## Overview
+
+PCI DSS v4.0 (effective March 2024) establishes requirements for protecting cardholder data (CHD). Organizations that store, process, or transmit cardholder data must comply. VaultWares products address several of the 12 PCI DSS requirements directly.
+
+<Note>
+  Compliance with PCI DSS requires validation by a Qualified Security Assessor (QSA). This guide maps VaultWares capabilities to PCI DSS requirements; it does not constitute a PCI DSS assessment.
+</Note>
+
+## PCI DSS requirements mapping
+
+<Tabs>
+  <Tab title="Requirement 3 — Protect stored data">
+    **Requirement 3.5**: Primary Account Numbers (PANs) must be secured anywhere they are stored.
+
+    | Sub-requirement | VaultWares Control |
+    |---|---|
+    | 3.5.1: PAN rendered unreadable | VaultCrypt AES-256 encryption of CHD storage volumes |
+    | 3.5.1.2: Disk/partition encryption with keys not in same AD | VaultHSM stores keys separately from encrypted data |
+    | 3.6: Key management procedures | VaultHSM FIPS 140-3 key lifecycle management |
+    | 3.7.1: Key generation using approved methods | VaultHSM TRNG-based key generation (FIPS 186-5) |
+    | 3.7.2: Secure key distribution | Encrypted key wrapping; never plaintext transport |
+    | 3.7.4: Key changes at end of cryptoperiod | VaultHSM automated key rotation with configurable cryptoperiods |
+    | 3.7.6: M-of-N knowledge for split keys | VaultHSM M-of-N key custodianship |
+    | 3.7.7: Prevention of unauthorized key substitution | Hardware tamper detection; key access audit logs |
+    | 3.7.9: Document key management policies | VaultHSM generates cryptographic audit trails |
+
+    ```bash
+    # Configure CHD volume encryption
+    vaultcrypt policy set \
+      --name PCI-CHD-Encryption \
+      --algorithm AES-256-XTS \
+      --key-source hsm \
+      --key-label "CHD-Encryption-Key" \
+      --apply-to-volumes /data/cardholder \
+      --audit-all-access true \
+      --require-mfa true
+
+    # Generate a dedicated CHD encryption key
+    vw-hsm generate-key \
+      --type aes \
+      --size 256 \
+      --label "CHD-Encryption-Key" \
+      --extractable false \
+      --usage encrypt,decrypt \
+      --cryptoperiod-days 365
+    ```
+  </Tab>
+  <Tab title="Requirement 4 — Protect in transit">
+    **Requirement 4.2**: Strong cryptography must be used to safeguard PAN during transmission over open, public networks.
+
+    ```bash
+    # Enforce TLS 1.2+ for all CHD transmission via VaultGate
+    vaultgate policy create \
+      --name PCI-CHD-Transmission \
+      --min-tls-version TLSv1.2 \
+      --deny-weak-ciphers true \
+      --deny-ssl-v3 true \
+      --deny-tls10 true \
+      --deny-tls11 true \
+      --require-valid-certificates true \
+      --apply-to-networks "cardholder-data-environment" \
+      --alert-on-violation true
+    ```
+
+    Approved cipher suites for PCI DSS:
+
+    | Cipher suite | Key exchange | PCI DSS status |
+    |---|---|---|
+    | `TLS_AES_256_GCM_SHA384` | X25519 | ✓ Approved |
+    | `TLS_AES_128_GCM_SHA256` | X25519 | ✓ Approved |
+    | `ECDHE-ECDSA-AES256-GCM-SHA384` | ECDHE | ✓ Approved |
+    | `ECDHE-RSA-AES256-GCM-SHA384` | ECDHE | ✓ Approved |
+    | `TLS_RSA_WITH_AES_256_CBC_SHA256` | RSA | ⚠ Avoid (no PFS) |
+    | Any RC4 cipher | — | ✗ Prohibited |
+    | SSL 3.0 / TLS 1.0 / TLS 1.1 | — | ✗ Prohibited |
+  </Tab>
+  <Tab title="Requirement 7 — Restrict access">
+    **Requirement 7**: Restrict access to system components and cardholder data by business need to know.
+
+    ```bash
+    # Create CHD-scoped role with minimal permissions
+    vw-admin role create \
+      --name CHD-Reader \
+      --permissions "storage:chd:read" \
+      --scope "environment:cardholder-data" \
+      --require-mfa true \
+      --require-justification true
+
+    # Apply ABAC policy: CHD access only during business hours from approved IPs
+    cat <<'EOF' > /etc/vaultaccess/policies/chd-access.json
+    {
+      "policy": {
+        "name": "CHD-Access-Policy",
+        "effect": "allow",
+        "principal": {"role": ["CHD-Reader", "CHD-Admin"]},
+        "action": ["storage:chd:read", "storage:chd:write"],
+        "resource": "arn:vaultwares:storage:*:*:chd-*",
+        "condition": {
+          "IpAddress": {"request:source_ip": ["10.50.0.0/16"]},
+          "StringEquals": {"request:mfa_authenticated": "true"},
+          "DateGreaterThan": {"request:utc_time": "08:00:00"},
+          "DateLessThan": {"request:utc_time": "20:00:00"}
+        }
+      }
+    }
+    EOF
+
+    vw-admin policy apply --file /etc/vaultaccess/policies/chd-access.json
+    ```
+  </Tab>
+  <Tab title="Requirement 8 — User identification">
+    **Requirement 8.3**: All user access to system components must be authenticated using at least one factor; privileged access requires MFA.
+
+    ```bash
+    # Enforce MFA for all users in the CHD environment
+    vw-admin mfa-policy set \
+      --name PCI-MFA-Policy \
+      --require-mfa true \
+      --allowed-methods totp,fido2,push \
+      --apply-to-group CHD-Environment-Users
+
+    # Enforce hardware key for privileged access
+    vw-admin mfa-policy set \
+      --name PCI-Admin-MFA-Policy \
+      --require-mfa true \
+      --require-hardware-key true \
+      --apply-to-roles CHD-Admin,SecurityOfficer
+    ```
+
+    **Requirement 8.6.1**: Shared/generic accounts are prohibited.
+
+    ```bash
+    # Audit report: detect any shared or generic accounts
+    vw-admin audit report shared-accounts \
+      --check-last-used true \
+      --flag-generic-names true \
+      --output /reports/pci-shared-accounts-$(date +%Y%m%d).csv
+    ```
+  </Tab>
+  <Tab title="Requirement 10 — Audit logs">
+    **Requirement 10.2**: Audit logs must capture specific events for all system components in the CHD environment.
+
+    ```bash
+    # Configure PCI-compliant audit logging
+    vw-admin audit configure \
+      --scope chd-environment \
+      --capture-events "user-access,admin-actions,audit-log-access,invalid-access,use-of-identification,init-stop-restart-audit,system-component-creation-deletion,key-management" \
+      --retention-days 365 \
+      --immediate-export-to-siem true \
+      --sign-with hsm:AuditLog-Signing-Key
+
+    # Generate PCI DSS Requirement 10 compliance report
+    vw-monitor report generate \
+      --template pci-req10-audit \
+      --start "2024-10-01" \
+      --end "2024-10-31" \
+      --format pdf \
+      --output /reports/pci-req10-oct-2024.pdf
+    ```
+
+    **Requirement 10.5.1**: Audit logs must be protected from destruction and unauthorized modifications.
+
+    VaultMonitor uses HSM-signed audit logs and immutable log storage to prevent tampering. Log entries include a cryptographic chain that can be independently verified.
+  </Tab>
+</Tabs>
+
+## Cardholder Data Environment (CDE) segmentation
+
+```bash
+# Configure VaultGate to enforce CDE network segmentation
+vaultgate segment create \
+  --name CDE \
+  --networks "10.50.0.0/16" \
+  --isolation-level strict
+
+# Allow only specific services from outside the CDE
+vaultgate rule create \
+  --name Allow-Payment-API \
+  --from internet \
+  --to CDE:10.50.1.10:443 \
+  --protocol tcp \
+  --tls-inspection true \
+  --log-all true
+
+# Block all other inbound traffic to CDE
+vaultgate rule create \
+  --name Deny-All-CDE-Inbound \
+  --from any \
+  --to CDE \
+  --action deny \
+  --log true
+```
+
+## PCI DSS compliance checklist
+
+<AccordionGroup>
+  <Accordion title="Requirements 3 and 4 — Data protection">
+    - [ ] All stored PANs encrypted with AES-256 (VaultCrypt)
+    - [ ] Encryption keys in FIPS 140-2+ HSM (VaultHSM)
+    - [ ] Key rotation schedule matches PCI cryptoperiod requirements
+    - [ ] M-of-N key custodianship documented and in place
+    - [ ] TLS 1.2+ enforced for all CHD transmission
+    - [ ] Weak cipher suites disabled (RC4, SSL 3.0, TLS 1.0/1.1)
+  </Accordion>
+  <Accordion title="Requirements 7 and 8 — Access control">
+    - [ ] Least-privilege RBAC applied to CHD systems (VaultAccess)
+    - [ ] MFA required for all CHD system access
+    - [ ] Hardware key required for privileged/admin access
+    - [ ] No shared or generic accounts in CDE
+    - [ ] Access reviews completed quarterly
+    - [ ] Unique user IDs for all accounts
+  </Accordion>
+  <Accordion title="Requirement 10 — Audit logging">
+    - [ ] Audit logging enabled on all CDE system components
+    - [ ] All required event types captured (Req. 10.2)
+    - [ ] Audit logs retained for 12 months (3 months online)
+    - [ ] Log integrity protection (HSM signing)
+    - [ ] Logs forwarded to SIEM within 5 minutes
+    - [ ] Daily log review procedure in place
+  </Accordion>
+  <Accordion title="Requirement 12 — Security policies">
+    - [ ] Security policy updated to reference VaultWares controls
+    - [ ] Incident response plan includes VaultWares forensic procedures
+    - [ ] Key management policy documented per Req. 3.7.9
+    - [ ] Annual security awareness training includes encryption practices
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Encryption protocols" icon="lock" href="/security/encryption-protocols">
+    Technical details on PCI-approved cryptography
+  </Card>
+  <Card title="HSM documentation" icon="microchip" href="/hardware/hsm">
+    VaultHSM key management for PCI DSS Req. 3
+  </Card>
+  <Card title="Access control" icon="shield-halved" href="/software/access-control">
+    VaultAccess for PCI DSS Req. 7 and 8
+  </Card>
+  <Card title="Industry standards" icon="certificate" href="/security/industry-standards">
+    VaultWares framework compliance overview
+  </Card>
+</CardGroup>

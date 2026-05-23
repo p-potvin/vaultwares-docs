@@ -1,0 +1,477 @@
+---
+title: "SDKs & libraries"
+description: "Official VaultWares SDKs and client libraries"
+---
+
+## Overview
+
+VaultWares provides official SDKs for the most popular languages. Each SDK wraps the REST API with idiomatic, type-safe methods and handles authentication, retries, and pagination for you.
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python" href="#python-sdk">
+    `pip install vaultwares`
+  </Card>
+  <Card title="Node.js SDK" icon="js" href="#nodejs-sdk">
+    `npm install @vaultwares/sdk`
+  </Card>
+  <Card title="Java SDK" icon="java" href="#java-sdk">
+    `com.vaultwares:vaultwares-sdk:3.2.0`
+  </Card>
+  <Card title="Go SDK" icon="golang" href="#go-sdk">
+    `go get github.com/vaultwares/vaultwares-go`
+  </Card>
+</CardGroup>
+
+---
+
+## Python SDK
+
+### Installation
+
+```bash
+pip install vaultwares
+
+# Or with optional extras
+pip install "vaultwares[async]"   # async/await support
+pip install "vaultwares[hsm]"     # PKCS#11 / HSM direct integration
+```
+
+### Authentication
+
+```python
+from vaultwares import VaultWaresClient
+import os
+
+# Initialize with API key
+client = VaultWaresClient(api_key=os.environ["VAULTWARES_API_KEY"])
+
+# Initialize with OAuth 2.0 access token
+client = VaultWaresClient(access_token=os.environ["VAULTWARES_ACCESS_TOKEN"])
+
+# Initialize for a specific base URL (on-premises deployments)
+client = VaultWaresClient(
+    api_key=os.environ["VAULTWARES_API_KEY"],
+    base_url="https://vaultapi.corp.example.com/v1"
+)
+```
+
+### Device management
+
+```python
+from vaultwares import VaultWaresClient
+from vaultwares.models import DeviceType, DeviceStatus
+
+client = VaultWaresClient(api_key="vw_live_...")
+
+# List all online VaultDrive devices
+devices = client.devices.list(
+    type=DeviceType.VAULTDRIVE,
+    status=DeviceStatus.ONLINE,
+    limit=50
+)
+
+for device in devices.auto_paginate():
+    print(f"{device.serial}: {device.status} — {device.assigned_to}")
+
+# Get a specific device
+device = client.devices.get("dev_VD-ENT-00247")
+print(f"Firmware: {device.firmware_version}")
+
+# Lock a device
+client.devices.lock("dev_VD-ENT-00247", reason="Suspected loss")
+
+# Apply a policy to a device
+client.devices.apply_policy("dev_VD-ENT-00247", policy="high-security")
+```
+
+### User management
+
+```python
+from vaultwares.models import UserCreateRequest
+
+# Create a user
+user = client.users.create(UserCreateRequest(
+    email="charlie@example.com",
+    first_name="Charlie",
+    last_name="Brown",
+    roles=["StandardUser"],
+    department="Engineering",
+    mfa_required=True,
+    send_welcome_email=True
+))
+print(f"Created user: {user.id}")
+
+# Disable a user and revoke sessions
+client.users.disable(user.id, reason="Employment terminated")
+client.users.revoke_sessions(user.id)
+```
+
+### Cryptographic operations (via VaultHSM)
+
+```python
+from vaultwares.models import KeyType, KeyCurve, KeyUsage
+
+# Generate a signing key
+key = client.keys.generate(
+    label="App-Signing-Key-v2",
+    type=KeyType.ECC,
+    curve=KeyCurve.P256,
+    usage=[KeyUsage.SIGN, KeyUsage.VERIFY],
+    extractable=False
+)
+print(f"Generated key: {key.id}")
+
+# Sign data
+import base64
+data = b"critical document contents"
+result = client.crypto.sign(
+    key_label="App-Signing-Key-v2",
+    algorithm="ECDSA-SHA256",
+    data=base64.b64encode(data).decode()
+)
+signature = result.signature
+
+# Verify the signature
+verified = client.crypto.verify(
+    key_label="App-Signing-Key-v2",
+    algorithm="ECDSA-SHA256",
+    data=base64.b64encode(data).decode(),
+    signature=signature
+)
+print(f"Signature valid: {verified}")
+```
+
+### Async support
+
+```python
+import asyncio
+from vaultwares.async_client import AsyncVaultWaresClient
+
+async def main():
+    async with AsyncVaultWaresClient(api_key="vw_live_...") as client:
+        devices = await client.devices.list(type="vaultdrive")
+        async for device in devices.auto_paginate_async():
+            print(device.serial)
+
+asyncio.run(main())
+```
+
+---
+
+## Node.js SDK
+
+### Installation
+
+```bash
+npm install @vaultwares/sdk
+
+# TypeScript types are included
+```
+
+### Authentication
+
+```typescript
+import { VaultWaresClient } from "@vaultwares/sdk";
+
+const client = new VaultWaresClient({
+  apiKey: process.env.VAULTWARES_API_KEY!,
+  // For on-premises deployments:
+  // baseUrl: "https://vaultapi.corp.example.com/v1"
+});
+```
+
+### Device management
+
+```typescript
+import { VaultWaresClient, DeviceType, DeviceStatus } from "@vaultwares/sdk";
+
+const client = new VaultWaresClient({ apiKey: process.env.VAULTWARES_API_KEY! });
+
+// List devices with auto-pagination
+const devices = await client.devices.list({
+  type: DeviceType.VaultDrive,
+  status: DeviceStatus.Online,
+});
+
+for await (const device of devices.autoPaginate()) {
+  console.log(`${device.serial}: ${device.status}`);
+}
+
+// Lock a device
+await client.devices.lock("dev_VD-ENT-00247", { reason: "Suspected theft" });
+
+// Crypto-erase (irreversible!)
+await client.devices.cryptoErase("dev_VD-ENT-00247", {
+  confirm: true,
+  reason: "GDPR erasure request",
+  auditReference: "DSR-2024-1115-001",
+});
+```
+
+### Webhook handling
+
+```typescript
+import express from "express";
+import { WebhookVerifier } from "@vaultwares/sdk";
+import type { VaultWaresEvent } from "@vaultwares/sdk";
+
+const app = express();
+const verifier = new WebhookVerifier(process.env.VAULTWARES_WEBHOOK_SECRET!);
+
+app.post(
+  "/webhooks/vaultwares",
+  express.raw({ type: "application/json" }),
+  (req, res) => {
+    let event: VaultWaresEvent;
+    try {
+      event = verifier.constructEvent(
+        req.body,
+        req.headers["x-vaultwares-signature"] as string
+      );
+    } catch (err) {
+      return res.status(400).send(`Webhook error: ${err}`);
+    }
+
+    switch (event.type) {
+      case "device.auth_lockout":
+        console.log("Device locked out:", event.data.object.serial);
+        break;
+      case "device.tamper_detected":
+        console.error("TAMPER DETECTED:", event.data.object.serial);
+        break;
+      case "key.expiring_soon":
+        console.warn("Key expiring:", event.data.object.label);
+        break;
+    }
+
+    res.status(200).send();
+  }
+);
+```
+
+---
+
+## Java SDK
+
+### Installation
+
+<Tabs>
+  <Tab title="Maven">
+    ```xml
+    <dependency>
+      <groupId>com.vaultwares</groupId>
+      <artifactId>vaultwares-sdk</artifactId>
+      <version>3.2.0</version>
+    </dependency>
+    ```
+  </Tab>
+  <Tab title="Gradle">
+    ```groovy
+    implementation 'com.vaultwares:vaultwares-sdk:3.2.0'
+    ```
+  </Tab>
+</Tabs>
+
+### Basic usage
+
+```java
+import com.vaultwares.VaultWaresClient;
+import com.vaultwares.model.*;
+import com.vaultwares.request.*;
+
+import java.util.List;
+
+public class Example {
+    public static void main(String[] args) {
+        VaultWaresClient client = VaultWaresClient.builder()
+            .apiKey(System.getenv("VAULTWARES_API_KEY"))
+            .build();
+
+        // List online VaultDrive devices
+        DeviceListRequest request = DeviceListRequest.builder()
+            .type(DeviceType.VAULTDRIVE)
+            .status(DeviceStatus.ONLINE)
+            .limit(50)
+            .build();
+
+        DevicePage page = client.devices().list(request);
+        for (Device device : page.getAutoPaginated()) {
+            System.out.printf("%s: %s%n", device.getSerial(), device.getStatus());
+        }
+
+        // Generate a key
+        GenerateKeyRequest keyRequest = GenerateKeyRequest.builder()
+            .label("App-Signing-Key-v2")
+            .type(KeyType.ECC)
+            .curve(KeyCurve.P256)
+            .usage(List.of(KeyUsage.SIGN, KeyUsage.VERIFY))
+            .extractable(false)
+            .build();
+
+        Key key = client.keys().generate(keyRequest);
+        System.out.println("Generated key: " + key.getId());
+    }
+}
+```
+
+### Spring Boot integration
+
+```java
+import com.vaultwares.spring.EnableVaultWares;
+import com.vaultwares.spring.VaultWaresProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@EnableVaultWares
+@EnableConfigurationProperties(VaultWaresProperties.class)
+public class SecurityConfig {
+    // VaultWaresClient is auto-configured from application.properties
+}
+```
+
+```properties
+# application.properties
+vaultwares.api-key=${VAULTWARES_API_KEY}
+vaultwares.base-url=https://api.vaultwares.com/v1
+vaultwares.connection-timeout-ms=5000
+vaultwares.read-timeout-ms=30000
+```
+
+---
+
+## Go SDK
+
+### Installation
+
+```bash
+go get github.com/vaultwares/vaultwares-go@v3.2.0
+```
+
+### Basic usage
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "os"
+
+    vw "github.com/vaultwares/vaultwares-go"
+)
+
+func main() {
+    client := vw.NewClient(
+        vw.WithAPIKey(os.Getenv("VAULTWARES_API_KEY")),
+    )
+
+    ctx := context.Background()
+
+    // List online VaultDrive devices
+    devices, err := client.Devices.List(ctx, &vw.DeviceListParams{
+        Type:   vw.DeviceTypeVaultDrive,
+        Status: vw.DeviceStatusOnline,
+        Limit:  vw.Int64(50),
+    })
+    if err != nil {
+        log.Fatalf("Error listing devices: %v", err)
+    }
+
+    // Auto-paginate
+    iter := devices.Iter()
+    for iter.Next() {
+        device := iter.Device()
+        fmt.Printf("%s: %s\n", device.Serial, device.Status)
+    }
+    if err := iter.Err(); err != nil {
+        log.Fatalf("Pagination error: %v", err)
+    }
+
+    // Generate a cryptographic key
+    key, err := client.Keys.Generate(ctx, &vw.GenerateKeyParams{
+        Label:       "App-Signing-Key-v2",
+        Type:        vw.KeyTypeECC,
+        Curve:       vw.KeyCurveP256,
+        Usage:       []vw.KeyUsage{vw.KeyUsageSign, vw.KeyUsageVerify},
+        Extractable: vw.Bool(false),
+    })
+    if err != nil {
+        log.Fatalf("Error generating key: %v", err)
+    }
+    fmt.Printf("Generated key: %s\n", key.ID)
+}
+```
+
+### Webhook handler
+
+```go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "log"
+    "net/http"
+    "os"
+
+    vw "github.com/vaultwares/vaultwares-go"
+    "github.com/vaultwares/vaultwares-go/webhook"
+)
+
+func main() {
+    secret := os.Getenv("VAULTWARES_WEBHOOK_SECRET")
+
+    http.HandleFunc("/webhooks/vaultwares", func(w http.ResponseWriter, r *http.Request) {
+        event, err := webhook.ConstructEvent(r, secret)
+        if err != nil {
+            http.Error(w, fmt.Sprintf("Webhook error: %v", err), http.StatusBadRequest)
+            return
+        }
+
+        switch event.Type {
+        case vw.EventTypeDeviceAuthLockout:
+            var device vw.Device
+            if err := json.Unmarshal(event.Data.Object, &device); err == nil {
+                log.Printf("Device locked out: %s", device.Serial)
+            }
+        case vw.EventTypeDeviceTamperDetected:
+            log.Printf("CRITICAL: Tamper detected on device")
+        }
+
+        w.WriteHeader(http.StatusOK)
+    })
+
+    log.Fatal(http.ListenAndServe(":3000", nil))
+}
+```
+
+---
+
+## SDK versioning policy
+
+| SDK version | API version | Support status |
+|---|---|---|
+| 3.x | v1 | ✓ Active (current) |
+| 2.x | v1 | ⚠ Security patches only (until 2025-12-31) |
+| 1.x | v1 | ✗ End of life |
+
+Pin your SDK version in production and subscribe to [release notes](/support/updates) for security advisories.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="key" href="/api-reference/authentication">
+    API keys and OAuth 2.0
+  </Card>
+  <Card title="API endpoints" icon="code" href="/api-reference/endpoints">
+    Full REST API reference
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
+    Real-time event handling
+  </Card>
+  <Card title="Support" icon="headset" href="/support/contact">
+    SDK issues and feature requests
+  </Card>
+</CardGroup>

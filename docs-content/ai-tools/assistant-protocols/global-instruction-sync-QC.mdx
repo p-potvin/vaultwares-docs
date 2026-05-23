@@ -1,0 +1,23 @@
+---
+title: "Global Instruction Sync"
+description: "Assistant protocol summary: Global Instruction Sync"
+---
+
+# Synchronisation globale des instructions
+
+- ID de catégorie : `GLOBAL_INSTRUCTION_SYNC`
+- Source du résumé : `instructions/summaries/GLOBAL_INSTRUCTION_SYNC.md`
+- Source des notes : `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`
+
+S'applique lorsque : modification de vaultwares-docs/AGENTS.md (instructions globales de niveau 1).
+Faire :
+- Après avoir modifié vaultwares-docs/AGENTS.md, exécutez : vaultwares-docs/scripts/sync-global-instructions.ps1
+- Synchronisez uniquement les préinstructions/pointeurs ; ne dupliquez pas la bibliothèque de protocoles complète dans les cibles hôtes.
+Pas :
+- Laissez les cibles hôtes obsolètes après les modifications d'AGENTS.md.
+Fais quand :
+- La synchronisation s'est déroulée avec succès (ou l'échec et la raison sont enregistrés).
+
+## Remarques
+Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
+Chemin des notes : `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`

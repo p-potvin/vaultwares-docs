@@ -1,0 +1,574 @@
+---
+title: Network security appliances
+description: Enterprise firewall and network protection solutions
+---
+
+## Overview
+
+VaultWares network security appliances provide comprehensive network protection with integrated firewall, intrusion detection/prevention, VPN, and deep packet inspection capabilities. These rack-mountable appliances are designed for high-performance enterprise environments.
+
+## Product lineup
+
+<CardGroup cols={2}>
+  <Card title="VaultGate 1000" icon="shield-halved">
+    **Throughput**: 1 Gbps  
+    **Users**: Up to 100  
+    **Form factor**: 1U rack-mount
+  </Card>
+  <Card title="VaultGate 5000" icon="shield">
+    **Throughput**: 5 Gbps  
+    **Users**: Up to 500  
+    **Form factor**: 1U rack-mount
+  </Card>
+  <Card title="VaultGate 10000" icon="shield-check">
+    **Throughput**: 10 Gbps  
+    **Users**: Up to 2,000  
+    **Form factor**: 2U rack-mount
+  </Card>
+  <Card title="VaultGate Enterprise" icon="server">
+    **Throughput**: 40 Gbps  
+    **Users**: Unlimited  
+    **Form factor**: 2U rack-mount
+  </Card>
+</CardGroup>
+
+## Key features
+
+### Network security
+- **Next-generation firewall**: Application-aware filtering and control
+- **IDS/IPS**: Real-time intrusion detection and prevention
+- **Deep packet inspection**: Layer 7 traffic analysis
+- **Anti-malware**: Inline malware scanning and blocking
+- **Web filtering**: URL categorization and content filtering
+- **DDoS protection**: Automatic attack mitigation
+
+### VPN capabilities
+- **IPsec VPN**: Site-to-site and remote access
+- **SSL VPN**: Clientless browser-based access
+- **WireGuard**: Modern, high-performance VPN protocol
+- **Split tunneling**: Selective traffic routing
+- **Multi-factor authentication**: Integrated 2FA/MFA for VPN access
+
+### High availability
+- **Active-passive failover**: Automatic failover with state synchronization
+- **Active-active clustering**: Load balancing across multiple units
+- **Link aggregation**: LACP support for increased bandwidth
+- **Redundant power**: Dual hot-swappable PSUs
+
+## Technical specifications
+
+<Tabs>
+  <Tab title="VaultGate 1000">
+    | Specification | Details |
+    |--------------|---------|
+    | Firewall throughput | 1 Gbps |
+    | VPN throughput | 500 Mbps |
+    | IPS throughput | 750 Mbps |
+    | Concurrent sessions | 500,000 |
+    | New sessions/sec | 25,000 |
+    | Network ports | 8x GbE RJ45, 2x GbE SFP |
+    | Management | 1x GbE dedicated, console |
+    | Storage | 256GB SSD |
+    | Memory | 16GB DDR4 |
+    | Power | Single PSU, 100-240V AC, 150W |
+    | Dimensions | 1U (44mm x 430mm x 400mm) |
+    | Operating temp | 0°C to 40°C |
+    | Warranty | 3 years |
+  </Tab>
+  
+  <Tab title="VaultGate 5000">
+    | Specification | Details |
+    |--------------|---------|
+    | Firewall throughput | 5 Gbps |
+    | VPN throughput | 2.5 Gbps |
+    | IPS throughput | 3.5 Gbps |
+    | Concurrent sessions | 2,000,000 |
+    | New sessions/sec | 100,000 |
+    | Network ports | 12x GbE RJ45, 4x 10GbE SFP+ |
+    | Management | 1x GbE dedicated, console |
+    | Storage | 512GB SSD |
+    | Memory | 32GB DDR4 |
+    | Power | Dual redundant PSU, 100-240V AC, 300W |
+    | Dimensions | 1U (44mm x 430mm x 500mm) |
+    | Operating temp | 0°C to 40°C |
+    | Warranty | 5 years |
+  </Tab>
+  
+  <Tab title="VaultGate 10000">
+    | Specification | Details |
+    |--------------|---------|
+    | Firewall throughput | 10 Gbps |
+    | VPN throughput | 5 Gbps |
+    | IPS throughput | 7 Gbps |
+    | Concurrent sessions | 5,000,000 |
+    | New sessions/sec | 250,000 |
+    | Network ports | 16x GbE RJ45, 8x 10GbE SFP+ |
+    | Management | 1x GbE dedicated, console, IPMI |
+    | Storage | 1TB NVMe SSD |
+    | Memory | 64GB DDR4 |
+    | Power | Dual redundant PSU, 100-240V AC, 500W |
+    | Dimensions | 2U (88mm x 430mm x 550mm) |
+    | Operating temp | 0°C to 40°C |
+    | Warranty | 5 years |
+  </Tab>
+  
+  <Tab title="VaultGate Enterprise">
+    | Specification | Details |
+    |--------------|---------|
+    | Firewall throughput | 40 Gbps |
+    | VPN throughput | 20 Gbps |
+    | IPS throughput | 30 Gbps |
+    | Concurrent sessions | 20,000,000 |
+    | New sessions/sec | 1,000,000 |
+    | Network ports | 24x 10GbE SFP+, 4x 40GbE QSFP+ |
+    | Management | 1x GbE dedicated, console, IPMI |
+    | Storage | 2TB NVMe SSD RAID |
+    | Memory | 128GB DDR4 |
+    | Power | Dual redundant PSU, 100-240V AC, 800W |
+    | Dimensions | 2U (88mm x 430mm x 650mm) |
+    | Operating temp | 0°C to 40°C |
+    | Warranty | 7 years |
+  </Tab>
+</Tabs>
+
+## Setup and configuration
+
+### Initial setup
+
+<Steps>
+  <Step title="Physical installation">
+    Rack mount the appliance and connect power cables. For models with dual PSUs, connect both for redundancy.
+  </Step>
+  <Step title="Connect management port">
+    Connect a laptop to the dedicated management port (default IP: 192.168.1.1).
+  </Step>
+  <Step title="Access web interface">
+    Navigate to `https://192.168.1.1` and login with default credentials (admin/admin).
+  </Step>
+  <Step title="Run setup wizard">
+    Complete the initial configuration wizard to set hostname, admin password, and network interfaces.
+  </Step>
+</Steps>
+
+### Network interface configuration
+
+```bash
+# Configure WAN interface
+vw-network interface set wan1 \
+  --mode dhcp \
+  --mtu 1500
+
+# Configure LAN interface
+vw-network interface set lan1 \
+  --ip 10.0.0.1 \
+  --netmask 255.255.255.0 \
+  --dhcp-server enable \
+  --dhcp-range 10.0.0.100-10.0.0.200
+
+# Configure DMZ interface
+vw-network interface set dmz1 \
+  --ip 172.16.0.1 \
+  --netmask 255.255.255.0
+```
+
+### Firewall rules
+
+<CodeGroup>
+```bash CLI configuration
+# Allow HTTP/HTTPS from LAN to WAN
+vw-firewall rule add \
+  --name "Allow Web Traffic" \
+  --source lan1 \
+  --destination wan1 \
+  --service http,https \
+  --action allow
+
+# Block all inbound traffic except established
+vw-firewall rule add \
+  --name "Block Inbound" \
+  --source wan1 \
+  --destination lan1 \
+  --state new \
+  --action deny
+
+# Allow specific server in DMZ
+vw-firewall rule add \
+  --name "Web Server" \
+  --source wan1 \
+  --destination 172.16.0.10 \
+  --service https \
+  --action allow
+```
+
+```json JSON configuration
+{
+  "firewall_rules": [
+    {
+      "name": "Allow Web Traffic",
+      "source": "lan1",
+      "destination": "wan1",
+      "services": ["http", "https"],
+      "action": "allow",
+      "logging": true
+    },
+    {
+      "name": "Block Inbound",
+      "source": "wan1",
+      "destination": "lan1",
+      "state": "new",
+      "action": "deny",
+      "logging": true
+    },
+    {
+      "name": "Web Server",
+      "source": "wan1",
+      "destination": "172.16.0.10",
+      "services": ["https"],
+      "action": "allow",
+      "nat": {
+        "type": "dnat",
+        "public_ip": "203.0.113.10"
+      }
+    }
+  ]
+}
+```
+</CodeGroup>
+
+## VPN configuration
+
+### IPsec site-to-site VPN
+
+```bash
+# Configure IPsec tunnel
+vw-vpn ipsec create \
+  --name "Branch Office" \
+  --local-gateway 203.0.113.10 \
+  --remote-gateway 198.51.100.20 \
+  --local-network 10.0.0.0/24 \
+  --remote-network 10.1.0.0/24 \
+  --psk "your-pre-shared-key" \
+  --encryption aes256 \
+  --authentication sha256 \
+  --dh-group 14
+
+# Enable the tunnel
+vw-vpn ipsec enable "Branch Office"
+```
+
+### SSL VPN for remote access
+
+```bash
+# Configure SSL VPN
+vw-vpn ssl configure \
+  --port 443 \
+  --ip-pool 10.10.0.0/24 \
+  --dns 8.8.8.8,8.8.4.4 \
+  --split-tunnel enable \
+  --routes 10.0.0.0/8,172.16.0.0/12
+
+# Add VPN user
+vw-vpn ssl user add \
+  --username john.doe \
+  --password "secure-password" \
+  --2fa enable \
+  --groups remote-workers
+
+# Generate client configuration
+vw-vpn ssl client-config \
+  --user john.doe \
+  --output john-doe-vpn.ovpn
+```
+
+### WireGuard VPN
+
+```bash
+# Initialize WireGuard
+vw-vpn wireguard init \
+  --interface wg0 \
+  --port 51820 \
+  --address 10.20.0.1/24
+
+# Add peer
+vw-vpn wireguard peer add \
+  --name "Mobile Device" \
+  --public-key "peer-public-key" \
+  --allowed-ips 10.20.0.2/32 \
+  --persistent-keepalive 25
+
+# Show configuration
+vw-vpn wireguard show wg0
+```
+
+## Intrusion prevention
+
+### Enable IPS
+
+```bash
+# Enable IPS engine
+vw-ips enable \
+  --mode prevention \
+  --interfaces wan1,dmz1
+
+# Update signatures
+vw-ips update-signatures
+
+# Configure IPS policy
+vw-ips policy set \
+  --profile high-security \
+  --block-severity high,critical \
+  --alert-severity medium \
+  --log-all true
+```
+
+### Custom IPS rules
+
+```bash
+# Create custom rule
+vw-ips rule create \
+  --name "Block SQL Injection" \
+  --pattern "union.*select|select.*from.*where" \
+  --protocol http \
+  --action block \
+  --severity high
+
+# Import Snort rules
+vw-ips import-rules \
+  --format snort \
+  --file custom-rules.rules
+```
+
+## Web filtering
+
+### Configure content filtering
+
+```bash
+# Enable web filtering
+vw-webfilter enable \
+  --mode proxy \
+  --port 8080
+
+# Block categories
+vw-webfilter category block \
+  --categories adult,gambling,malware,phishing
+
+# Allow specific sites
+vw-webfilter whitelist add \
+  --url example.com \
+  --comment "Corporate website"
+
+# Block specific sites
+vw-webfilter blacklist add \
+  --url badsite.com \
+  --comment "Known malware distributor"
+```
+
+### SSL inspection
+
+```bash
+# Enable SSL inspection
+vw-webfilter ssl-inspection enable \
+  --ca-cert /etc/vaultwares/ca.crt \
+  --ca-key /etc/vaultwares/ca.key
+
+# Exclude sites from inspection
+vw-webfilter ssl-inspection exclude \
+  --domains banking.com,healthcare.gov \
+  --reason "Privacy/compliance"
+```
+
+## High availability
+
+### Configure HA cluster
+
+```bash
+# Initialize HA on primary
+vw-ha init \
+  --role primary \
+  --peer-ip 192.168.100.2 \
+  --sync-interface ha0 \
+  --virtual-ip 203.0.113.100 \
+  --password "ha-sync-password"
+
+# Initialize HA on secondary
+vw-ha init \
+  --role secondary \
+  --peer-ip 192.168.100.1 \
+  --sync-interface ha0 \
+  --password "ha-sync-password"
+
+# Verify HA status
+vw-ha status
+
+# Output:
+# HA Status: Active
+# Role: Primary
+# Peer Status: Online
+# Sync Status: In Sync
+# Failover: Ready
+```
+
+### Test failover
+
+```bash
+# Trigger manual failover
+vw-ha failover --force
+
+# Monitor failover
+vw-ha monitor --live
+```
+
+## Monitoring and logging
+
+### Real-time monitoring
+
+```bash
+# View live traffic
+vw-monitor traffic --interface wan1 --live
+
+# View active sessions
+vw-monitor sessions --top 20
+
+# View threat dashboard
+vw-monitor threats --last 24h
+```
+
+### Configure logging
+
+```bash
+# Configure syslog
+vw-logging syslog add \
+  --server syslog.example.com \
+  --port 514 \
+  --protocol udp \
+  --facility local0
+
+# Configure SIEM integration
+vw-logging siem configure \
+  --type splunk \
+  --server splunk.example.com:8088 \
+  --token "your-hec-token" \
+  --format json
+
+# Export logs
+vw-logging export \
+  --start-date "2024-01-01" \
+  --end-date "2024-01-31" \
+  --format csv \
+  --output firewall-logs.csv
+```
+
+## Performance optimization
+
+### Traffic shaping
+
+```bash
+# Configure QoS
+vw-qos policy create \
+  --name "VoIP Priority" \
+  --interface wan1 \
+  --priority high \
+  --bandwidth-guarantee 2Mbps \
+  --protocol udp \
+  --ports 5060-5061,10000-20000
+
+# Bandwidth limits
+vw-qos limit set \
+  --interface wan1 \
+  --upload 100Mbps \
+  --download 500Mbps \
+  --per-user-limit 10Mbps
+```
+
+### Connection optimization
+
+```bash
+# Enable connection pooling
+vw-optimize connection-pool enable \
+  --max-connections 1000000 \
+  --timeout 3600
+
+# Enable TCP optimization
+vw-optimize tcp \
+  --window-scaling enable \
+  --selective-ack enable \
+  --timestamps enable
+```
+
+## Backup and restore
+
+### Configuration backup
+
+```bash
+# Create backup
+vw-backup create \
+  --output /backup/vaultgate-$(date +%Y%m%d).tar.gz \
+  --encrypt \
+  --password "backup-password"
+
+# Automated backups
+vw-backup schedule \
+  --frequency daily \
+  --time 02:00 \
+  --retention 30days \
+  --destination sftp://backup.example.com/vaultgate/
+```
+
+### Restore configuration
+
+```bash
+# Restore from backup
+vw-backup restore \
+  --input /backup/vaultgate-20240115.tar.gz \
+  --password "backup-password" \
+  --reboot
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No internet connectivity">
+    - Verify WAN interface configuration: `vw-network interface show wan1`
+    - Check default gateway: `vw-network route show`
+    - Test DNS resolution: `vw-network dns-test google.com`
+    - Review firewall rules: `vw-firewall rule list`
+  </Accordion>
+  
+  <Accordion title="VPN connection fails">
+    - Verify VPN service is running: `vw-vpn status`
+    - Check firewall allows VPN ports (UDP 500, 4500 for IPsec)
+    - Review VPN logs: `vw-vpn logs --tail 100`
+    - Test connectivity to remote gateway: `vw-network ping <remote-ip>`
+  </Accordion>
+  
+  <Accordion title="High CPU usage">
+    - Check active sessions: `vw-monitor sessions --count`
+    - Review IPS load: `vw-ips stats`
+    - Disable SSL inspection temporarily if enabled
+    - Consider upgrading to higher-capacity model
+  </Accordion>
+  
+  <Accordion title="HA synchronization issues">
+    - Verify HA interface connectivity: `vw-ha test-connection`
+    - Check time synchronization (NTP): `vw-system time show`
+    - Review HA logs: `vw-ha logs`
+    - Force resync: `vw-ha sync --force`
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Installation guide" icon="download" href="/installation/hardware-installation">
+    Detailed setup instructions
+  </Card>
+  <Card title="Best practices" icon="star" href="/guides/best-practices">
+    Security recommendations
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/endpoints">
+    Programmatic management
+  </Card>
+  <Card title="Support" icon="headset" href="/support/contact">
+    Get technical assistance
+  </Card>
+</CardGroup>

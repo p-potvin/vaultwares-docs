@@ -64,62 +64,50 @@ const VaultIcon = ({ mode, className = 'w-8 h-8' }: { mode: 'light' | 'dark'; cl
 const Card = ({ title, icon, href, children }: { title: string; icon: string; href: string; children: React.ReactNode }) => (
   <Link
     to={href}
-    className="group p-6 rounded-xl border transition-all duration-200 block no-underline mb-4"
-    style={{
-      background: 'var(--surface-alt)',
-      borderColor: 'var(--border)',
-    }}
-    onMouseEnter={e => {
-      (e.currentTarget as HTMLElement).style.background = 'var(--surface-elevated)';
-      (e.currentTarget as HTMLElement).style.borderColor = 'var(--accent)';
-    }}
-    onMouseLeave={e => {
-      (e.currentTarget as HTMLElement).style.background = 'var(--surface-alt)';
-      (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
-    }}
+    className="group p-6 rounded-xl border border-border bg-surface-alt transition-all duration-200 block no-underline mb-4 hover:bg-surface-elevated hover:border-accent"
   >
     <div className="flex items-start gap-4">
-      <div className="p-2 rounded-lg transition-colors" style={{ background: 'color-mix(in srgb, var(--accent) 12%, transparent)' }}>
-        <span className="text-xl" style={{ color: 'var(--accent)' }}>
+      <div className="p-2 rounded-lg transition-colors bg-[color-mix(in_srgb,var(--accent)_12%,transparent)]">
+        <span className="text-xl text-accent">
           {icon === 'rocket' ? '🚀' : icon === 'microchip' ? '🔬' : icon === 'shield-halved' || icon === 'shield-check' ? '🛡️' : icon === 'code' ? '💻' : icon === 'headset' ? '🎧' : icon === 'envelope' ? '✉️' : icon === 'circle-question' ? '❓' : '📁'}
         </span>
       </div>
       <div>
-        <h3 className="text-lg font-bold mb-1 mt-0 transition-colors" style={{ color: 'var(--text-primary)' }}>{title}</h3>
-        <div className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{children}</div>
+        <h3 className="text-lg font-bold mb-1 mt-0 transition-colors text-text-primary group-hover:text-accent">{title}</h3>
+        <div className="text-sm leading-relaxed text-text-secondary">{children}</div>
       </div>
     </div>
   </Link>
 );
 
 const CardGroup = ({ children, cols = 2 }: { children: React.ReactNode; cols?: number }) => (
-  <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: '1rem', margin: '2rem 0' }}>
+  <div className="grid gap-4 my-8" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
     {children}
   </div>
 );
 
 const Note = ({ children }: { children: React.ReactNode }) => (
-  <div className="p-4 my-6 rounded-r-lg" style={{ background: 'var(--info-bg)', borderLeft: '3px solid var(--info)' }}>
+  <div className="p-4 my-6 rounded-r-lg bg-info-bg border-l-[3px] border-info">
     <div className="flex gap-3">
-      <span className="font-bold" style={{ color: 'var(--info)' }}>ℹ️</span>
-      <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{children}</div>
+      <span className="font-bold text-info">ℹ️</span>
+      <div className="text-sm text-text-secondary">{children}</div>
     </div>
   </div>
 );
 
 // Steps/Step are Mintlify MDX components used in some docs — render gracefully
 const Steps = ({ children }: { children: React.ReactNode }) => (
-  <ol className="space-y-4 my-6 pl-0" style={{ listStyle: 'none' }}>{children}</ol>
+  <ol className="space-y-4 my-6 pl-0 list-none">{children}</ol>
 );
 
 const Step = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <li className="flex gap-4 p-4 rounded-lg" style={{ background: 'var(--surface-alt)', border: '1px solid var(--border)' }}>
-    <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mt-0.5" style={{ background: 'var(--accent)', color: 'var(--text-inverse)' }}>
+  <li className="flex gap-4 p-4 rounded-lg bg-surface-alt border border-border">
+    <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 bg-accent text-text-inverse">
       ›
     </div>
     <div>
-      <div className="font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{title}</div>
-      <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>{children}</div>
+      <div className="font-semibold mb-1 text-text-primary">{title}</div>
+      <div className="text-sm text-text-secondary">{children}</div>
     </div>
   </li>
 );
@@ -268,7 +256,15 @@ function MarkdownViewer({ lang }: { lang: Lang }) {
     }
 
     const loadContent = async () => {
-      const module = mdxModules[filePath];
+      let module = mdxModules[filePath];
+      // Attempt to load Quebecois translation if selected
+      if (lang === 'QC') {
+        const qcPath = filePath.replace('.mdx', '-QC.mdx');
+        if (mdxModules[qcPath]) {
+          module = mdxModules[qcPath];
+        }
+      }
+
       if (module) {
         try {
           const raw = await module() as string;
@@ -286,7 +282,15 @@ function MarkdownViewer({ lang }: { lang: Lang }) {
       } else {
         // Try with index.mdx suffix for directory paths
         const indexPath = filePath.replace('.mdx', '/index.mdx');
-        const indexModule = mdxModules[indexPath];
+        let indexModule = mdxModules[indexPath];
+        
+        if (lang === 'QC') {
+          const indexQcPath = indexPath.replace('.mdx', '-QC.mdx');
+          if (mdxModules[indexQcPath]) {
+            indexModule = mdxModules[indexQcPath];
+          }
+        }
+
         if (indexModule) {
           try {
             const raw = await indexModule() as string;
@@ -315,7 +319,7 @@ function MarkdownViewer({ lang }: { lang: Lang }) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="prose-vault"
+      className="prose prose-vault max-w-none"
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}

@@ -1,0 +1,73 @@
+---
+title: "Backups (Private)"
+description: "GreenCloud VPS hourly backups to Google Drive via rclone (encrypted)."
+---
+
+# Backups (Private)
+
+Hourly backups run on `greencloud-vps` (`vaultwares-1`) using `rclone` to your Google Drive.
+
+## What is backed up
+
+The hourly job creates a `.tgz` containing (includes secrets):
+
+- `/etc/nginx` (sites + nginx.conf)
+- `/etc/systemd/system` (custom units/timers)
+- `/etc/vw-secretsd` (VaultWarden config)
+- `/etc/vw-deployd` (webhook receiver config)
+- `/etc/letsencrypt` (TLS keys + renewal config)
+- `/opt/actions-runner` (self-hosted GitHub runner config)
+- `/opt/vw-jira-sync`
+- `/opt/vault-warden`
+- `/opt/vaultwares-webhooks`
+
+## Encryption
+
+Backups are uploaded to a **crypt** remote (`vw_gdrive_crypt:`) so Google Drive only sees encrypted filenames + encrypted contents.
+
+The crypt keys are stored in VaultWarden as:
+
+- `vw_rclone_crypt_password`
+- `vw_rclone_crypt_password2`
+
+Do not paste these values into docs, issues, or chat.
+
+## Where it runs
+
+- Script: `/usr/local/bin/vw-backup.sh`
+- Systemd unit: `/etc/systemd/system/vw-backup.service`
+- Timer: `/etc/systemd/system/vw-backup.timer` (`OnCalendar=hourly`)
+- rclone config: `/etc/vw-backup/rclone.conf` (root-only)
+- Log: `/var/log/vaultwares/vw-backup.log`
+
+## One-time Google Drive authorization
+
+Google Drive OAuth needs to be completed once on the VPS (headless flow):
+
+```bash
+sudo rclone --config /etc/vw-backup/rclone.conf config reconnect vw_gdrive:
+```
+
+Then verify:
+
+```bash
+sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive:
+sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive_crypt:
+```
+
+## Control / troubleshooting
+
+```bash
+sudo systemctl status vw-backup.timer
+sudo systemctl status vw-backup.service
+sudo journalctl -u vw-backup.service -n 200 --no-pager
+tail -n 200 /var/log/vaultwares/vw-backup.log
+```
+
+If OAuth is missing, `vw-backup.service` fails fast with an error telling you to run `config reconnect`.
+
+## Restore (high-level)
+
+1. Download the desired `.tgz` from `vw_gdrive_crypt:VaultWares/backups/vaultwares-1/` (host folder name depends on hostname).
+2. Extract it to a staging directory.
+3. Restore selected paths (nginx/systemd/letsencrypt) and then reload nginx/systemd.

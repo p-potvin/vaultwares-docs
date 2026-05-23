@@ -1,0 +1,140 @@
+---
+title: System requirements
+description: Hardware and software requirements for VaultWares products
+---
+
+## Hardware requirements
+
+### Minimum specifications
+
+<AccordionGroup>
+  <Accordion title="Encrypted storage devices">
+    - **Interface**: USB 3.0 or higher
+    - **Power**: USB-powered (no external power required)
+    - **Operating temperature**: 0°C to 45°C
+    - **Storage temperature**: -20°C to 85°C
+  </Accordion>
+
+  <Accordion title="Hardware security modules (HSM)">
+    - **Form factor**: PCIe x4 or network-attached
+    - **Power**: 25W maximum
+    - **Cooling**: Active cooling required for rack-mounted units
+    - **Network**: Gigabit Ethernet (for network HSMs)
+  </Accordion>
+
+  <Accordion title="Biometric devices">
+    - **Interface**: USB 2.0 or higher
+    - **Power**: USB-powered
+    - **Sensor resolution**: 500 DPI minimum
+    - **Operating temperature**: 10°C to 35°C
+  </Accordion>
+
+  <Accordion title="Network security appliances">
+    - **Rack space**: 1U or 2U rack-mountable
+    - **Power**: Dual redundant PSU (100-240V AC)
+    - **Network**: Dual Gigabit Ethernet minimum
+    - **Storage**: 256GB SSD minimum
+  </Accordion>
+</AccordionGroup>
+
+## Software requirements
+
+### Operating system compatibility
+
+<Tabs>
+  <Tab title="Windows">
+    - Windows 10 (64-bit) or later
+    - Windows Server 2016 or later
+    - .NET Framework 4.8 or later
+    - 4GB RAM minimum (8GB recommended)
+    - 500MB available disk space
+  </Tab>
+
+  <Tab title="macOS">
+    - macOS 11 (Big Sur) or later
+    - 4GB RAM minimum (8GB recommended)
+    - 500MB available disk space
+    - Administrator privileges for installation
+  </Tab>
+
+  <Tab title="Linux">
+    - Ubuntu 20.04 LTS or later
+    - Red Hat Enterprise Linux 8 or later
+    - CentOS 8 or later
+    - Debian 11 or later
+    - 4GB RAM minimum (8GB recommended)
+    - 500MB available disk space
+    - Root access for installation
+  </Tab>
+</Tabs>
+
+### Network requirements
+
+- **Bandwidth**: 10 Mbps minimum (100 Mbps recommended)
+- **Ports**: HTTPS (443), SSH (22), custom ports for API access
+- **Firewall**: Outbound HTTPS access for license validation and updates
+- **DNS**: Functional DNS resolution required
+
+### Browser compatibility
+
+For web-based management interfaces:
+
+- Google Chrome 90 or later
+- Mozilla Firefox 88 or later
+- Microsoft Edge 90 or later
+- Safari 14 or later
+
+## Database requirements
+
+For enterprise deployments with centralized management:
+
+- **PostgreSQL**: 12 or later
+- **MySQL**: 8.0 or later
+- **Microsoft SQL Server**: 2017 or later
+- **Oracle Database**: 19c or later
+
+## Virtualization support
+
+VaultWares software is compatible with:
+
+- VMware vSphere 7.0 or later
+- Microsoft Hyper-V (Windows Server 2016 or later)
+- KVM (kernel 4.15 or later)
+- Docker containers (for microservices deployment)
+
+<Warning>
+  Hardware security modules (HSMs) require direct hardware access and cannot be virtualized. Use PCIe passthrough or network-attached HSMs for virtualized environments.
+</Warning>
+
+## Cloud platform support
+
+- Amazon Web Services (AWS)
+- Microsoft Azure
+- Google Cloud Platform (GCP)
+- Private cloud environments
+
+## Additional requirements
+
+### For API integration
+
+- TLS 1.2 or later
+- Valid SSL/TLS certificates
+- API key management system
+- JSON parsing capabilities
+
+### For compliance features
+
+- Network Time Protocol (NTP) for accurate timestamping
+- Syslog server for centralized logging
+- SIEM integration capabilities
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Quick installation" icon="download" href="/getting-started/quick-installation">
+    Install VaultWares products
+  </Card>
+  <Card title="Hardware products" icon="microchip" href="/hardware/encrypted-storage">
+    Explore hardware solutions
+  </Card>
+</CardGroup>

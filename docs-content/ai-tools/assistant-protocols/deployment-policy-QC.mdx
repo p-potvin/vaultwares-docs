@@ -1,0 +1,23 @@
+---
+title: "Deployment Policy"
+description: "Assistant protocol summary: Deployment Policy"
+---
+
+# Politique de déploiement
+
+- ID de catégorie : `DEPLOYMENT_POLICY`
+- Source du résumé : `instructions/summaries/DEPLOYMENT_POLICY.md`
+- Source des notes : `instructions/notes/DEPLOYMENT_POLICY.md`
+
+S'applique lorsque : déploiement, modifications VPS, opérations de publication, routage de production.
+Faire :
+- Administrateur Tailnet-premier ; minimiser le rayon de l'explosion ; conserver le chemin de restauration.
+- Vérifier le comportement de déploiement à l'aide de sondes concrètes et de vérifications de l'interface utilisateur, le cas échéant.
+Pas :
+- Déployer à partir d'hypothèses ; vérifier l'état réel de l'environnement.
+Fais quand :
+- Les étapes de déploiement et les preuves de vérification sont enregistrées.
+
+## Remarques
+Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
+Chemin des notes : `instructions/notes/DEPLOYMENT_POLICY.md`
