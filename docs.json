@@ -1,6 +1,6 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "$schema": "https://vaultwares.ca/schemas/docs.json",
+  "theme": "vaultwares-console",
   "name": "VaultWares Documentation",
   "colors": {
     "primary": "#CC9B21",

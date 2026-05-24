@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Ops log — 2026-05-21 (Private)",
+    "description": "Verification + infra changes performed on 2026-05-21.",
+    "body": "\n# Ops log — 2026-05-21\n\n## Network verification\n\n- Confirmed tailnet DNS for private services resolves to the GreenCloud VPS tailnet IP:\n  - `docs.vaultwares.ca` → `100.73.93.84`\n  - `secrets.vaultwares.ca` → `100.73.93.84`\n- Confirmed private services are **blocked** on the public IP path:\n  - Forcing `docs.vaultwares.ca` and `secrets.vaultwares.ca` to `173.249.194.15` returns `403 Forbidden`.\n\n## Secrets\n\n- `secrets.vaultwares.ca` now serves **VaultWarden** (first-party secrets service) behind nginx.\n- Legacy `vaultwarden/server` container removed from `greencloud-vps` after taking a backup (stored on the VPS under `/opt`).\n\n## Notes\n\n- Do not paste secret values into docs/logs; only reference secret names and locations.\n"
+  },
+  "QC": {
+    "title": "Journal des opérations — 2026-05-21 (Privé)",
+    "description": "Vérification et changements d'infrastructure effectués le 2026-05-21.",
+    "body": "\n# Journal des opérations — 2026-05-21\n\n## Vérification du réseau\n\n- Confirmé que le DNS tailnet pour les services privés résout vers l'IP tailnet GreenCloud VPS :\n  - `docs.vaultwares.ca` → `100.73.93.84`\n  - `secrets.vaultwares.ca` → `100.73.93.84`\n- Confirmé que les services privés sont **bloqués** sur le chemin IP public :\n  - Forcer `docs.vaultwares.ca` et `secrets.vaultwares.ca` à `173.249.194.15` renvoie `403 Forbidden`.\n\n## Secrets\n\n- `secrets.vaultwares.ca` sert maintenant **VaultWarden** (service de secrets interne) derrière nginx.\n- Le conteneur hérité `vaultwarden/server` a été retiré de `greencloud-vps` après avoir effectué une sauvegarde (stockée sur le VPS sous `/opt`).\n\n## Notes\n\n- Ne collez pas les valeurs de secrets dans les docs/journaux; référencez uniquement les noms et les emplacements des secrets.\n"
+  }
+}

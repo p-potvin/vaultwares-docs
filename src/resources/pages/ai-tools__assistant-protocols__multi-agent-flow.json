@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Multi Agent Flow",
+    "description": "Assistant protocol summary: Multi Agent Flow",
+    "body": "\n# Multi Agent Flow\n\n- Category ID: `MULTI_AGENT_FLOW`\n- Summary source: `instructions/summaries/MULTI_AGENT_FLOW.md`\n- Notes source: `instructions/notes/MULTI_AGENT_FLOW.md`\n\nApplies when: user uses trigger phrases or requests multi-agent execution.\nDo:\n- On trigger phrases, follow the canonical flow defined in vaultwares-adk/docs/MULTI_AGENT_FLOW.md and related schema docs.\n- Do not improvise the phases.\nDo not:\n- Start delegation without the required reads.\nDone when:\n- TASKS.md and telemetry expectations are followed for the run.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/MULTI_AGENT_FLOW.md`"
+  },
+  "QC": {
+    "title": "Flux Multi-Agents",
+    "description": "Résumé du protocole de l'assistant : Flux Multi-Agents",
+    "body": "\n# Flux Multi-Agents\n\n- Category ID: `MULTI_AGENT_FLOW`\n- Summary source: `instructions/summaries/MULTI_AGENT_FLOW.md`\n- Notes source: `instructions/notes/MULTI_AGENT_FLOW.md`\n\nS'applique quand : l'utilisateur utilise des phrases déclencheuses ou demande une exécution multi-agents.\nÀ faire :\n- Sur les phrases déclencheuses, suivre le flux canonique défini dans vaultwares-adk/docs/MULTI_AGENT_FLOW.md et les documents de schéma connexes.\n- Ne pas improviser les phases.\nNe pas :\n- Démarrer la délégation sans les lectures requises.\nTerminé quand :\n- TASKS.md et les attentes de télémétrie sont suivis pour l'exécution.\n\n## Notes\nLes assistants lisent les notes complètes seulement quand on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/MULTI_AGENT_FLOW.md`\n"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Knowledge Scout",
+    "description": "Assistant protocol summary: Knowledge Scout",
+    "body": "\n# Knowledge Scout\n\n- Category ID: `KNOWLEDGE_SCOUT`\n- Summary source: `instructions/summaries/KNOWLEDGE_SCOUT.md`\n- Notes source: `instructions/notes/KNOWLEDGE_SCOUT.md`\n\nApplies when: high-cost debugging, hard-to-find quirks, or repeated discovery.\nDo:\n- Consult vaultwares-docs/KNOWLEDGE_SCOUT.md when initialization or SoT lookup fails, or for expensive ops tasks.\n- Append a row when you save >3 tool calls or >5 minutes of research.\nDo not:\n- Put secrets into the scout report.\nDone when:\n- The scout entry is concise and actionable.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/KNOWLEDGE_SCOUT.md`"
+  },
+  "QC": {
+    "title": "Knowledge Scout",
+    "description": "Résumé du protocole de l'assistant : Knowledge Scout",
+    "body": "\n# Knowledge Scout\n\n- ID de catégorie : `KNOWLEDGE_SCOUT`\n- Source de résumé : `instructions/summaries/KNOWLEDGE_SCOUT.md`\n- Source de notes : `instructions/notes/KNOWLEDGE_SCOUT.md`\n\nS'applique lorsque : le débogage coûteux, les particularités difficiles à trouver, ou la découverte répétée.\nFaire :\n- Consulter vaultwares-docs/KNOWLEDGE_SCOUT.md lorsque l'initialisation ou la recherche SoT échoue, ou pour des tâches d'opérations coûteuses.\n- Ajouter une ligne lorsque vous enregistrez plus de 3 appels d'outils ou plus de 5 minutes de recherche.\nNe pas faire :\n- Mettre des secrets dans le rapport de reconnaissance.\nTerminé lorsque :\n- L'entrée de reconnaissance est concise et exploitable.\n\n## Notes\nLes assistants lisent les notes complètes uniquement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/KNOWLEDGE_SCOUT.md`\n"
+  }
+}

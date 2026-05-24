@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Dependency Policy",
+    "description": "Assistant protocol summary: Dependency Policy",
+    "body": "\n# Dependency Policy\n\n- Category ID: `DEPENDENCY_POLICY`\n- Summary source: `instructions/summaries/DEPENDENCY_POLICY.md`\n- Notes source: `instructions/notes/DEPENDENCY_POLICY.md`\n\nApplies when: adding/updating dependencies, toolchains, lockfiles, package managers.\nDo:\n- Do not add new dependencies unless explicitly requested or clearly necessary and justified.\n- Prefer existing libs/utilities already used in the repo.\n- Record dependency changes and why.\nDo not:\n- Introduce new tooling “just because”.\nDone when:\n- Dependency change is minimal, justified, and verified (build/tests).\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/DEPENDENCY_POLICY.md`"
+  },
+  "QC": {
+    "title": "Politique de dépendances",
+    "description": "Résumé du protocole de l'assistant : Politique de dépendances",
+    "body": "\n# Politique de dépendances\n\n- ID de catégorie : `DEPENDENCY_POLICY`\n- Source de résumé : `instructions/summaries/DEPENDENCY_POLICY.md`\n- Source de notes : `instructions/notes/DEPENDENCY_POLICY.md`\n\nS'applique lors de : l'ajout ou la mise à jour de dépendances, de chaînes d'outils (toolchains), de fichiers de verrouillage (lockfiles), de gestionnaires de paquets.\nÀ faire :\n- Ne pas ajouter de nouvelles dépendances sauf si explicitement demandé ou clairement nécessaire et justifié.\n- Préférer les bibliothèques/utilitaires existants déjà utilisés dans le dépôt.\n- Enregistrer les changements de dépendances et pourquoi.\nÀ ne pas faire :\n- Introduire de nouveaux outils « juste parce que ».\nTerminé lorsque :\n- Le changement de dépendance est minimal, justifié et vérifié (build/tests).\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/DEPENDENCY_POLICY.md`\n"
+  }
+}

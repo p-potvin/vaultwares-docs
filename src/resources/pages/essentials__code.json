@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Code blocks",
+    "description": "Display inline code and code blocks",
+    "body": "\n## Inline code\n\nTo denote a `word` or `phrase` as code, enclose it in backticks (`).\n\n```\nTo denote a `word` or `phrase` as code, enclose it in backticks (`).\n```\n\n## Code blocks\n\nUse [fenced code blocks](https://www.markdownguide.org/extended-syntax/#fenced-code-blocks) by enclosing code in three backticks and follow the leading ticks with the programming language of your snippet to get syntax highlighting. Optionally, you can also write the name of your code after the programming language.\n\n```java HelloWorld.java\nclass HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n```\n\n````md\n```java HelloWorld.java\nclass HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n```\n````\n"
+  },
+  "QC": {
+    "title": "Blocs de code",
+    "description": "Afficher du code en ligne et des blocs de code",
+    "body": "\n## Code en ligne\n\nPour désigner un `mot` ou une `phrase` comme du code, encadrez-le avec des accents graves (`` ` ``).\n\n```\nTo denote a `word` or `phrase` as code, enclose it in backticks (`).\n```\n\n## Blocs de code\n\nUtilisez les [blocs de code délimités](https://www.markdownguide.org/extended-syntax/#fenced-code-blocks) en encadrant le code avec trois accents graves et suivez les accents graves de tête avec le langage de programmation de votre extrait pour obtenir une coloration syntaxique. Optionnellement, vous pouvez également écrire le nom de votre code après le langage de programmation.\n\n```java HelloWorld.java\nclass HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n```\n\n````md\n```java HelloWorld.java\nclass HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n```\n````\n"
+  }
+}

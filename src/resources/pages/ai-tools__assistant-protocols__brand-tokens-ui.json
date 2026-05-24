@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Brand Tokens Ui",
+    "description": "Assistant protocol summary: Brand Tokens Ui",
+    "body": "\n# Brand Tokens Ui\n\n- Category ID: `BRAND_TOKENS_UI`\n- Summary source: `instructions/summaries/BRAND_TOKENS_UI.md`\n- Notes source: `instructions/notes/BRAND_TOKENS_UI.md`\n\nApplies when: UI/UX, styling, layout, branding, themes, tokens, icons, visual rules.\nDo:\n- Use the VaultWares design system (updated May 17, 2026) as SoT.\n- Read and follow:\n  - vaultwares-themes/AGENTS.md\n  - vaultwares-themes/brand/ui-kit.md\n  - vaultwares-themes/brand/tokens/tokens.ts\n  - vaultwares-themes/brand/tokens/tailwind.config.ts\n- Never hardcode reusable colors, fonts, spacing, radii, motion; use named tokens.\nDo not:\n- Add new UI without token usage.\nDone when:\n- Visual changes are expressed via tokens and follow brand rules.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/BRAND_TOKENS_UI.md`"
+  },
+  "QC": {
+    "title": "Interface utilisateur des jetons de marque",
+    "description": "Résumé du protocole de l'assistant : Jetons de marque pour l'interface utilisateur",
+    "body": "\n# Interface utilisateur des jetons de marque\n\n- ID de catégorie : `BRAND_TOKENS_UI`\n- Source du résumé : `instructions/summaries/BRAND_TOKENS_UI.md`\n- Source des notes : `instructions/notes/BRAND_TOKENS_UI.md`\n\nS'applique lorsque : UI/UX, style, mise en page, marque, thèmes, jetons, icônes, règles visuelles.\nÀ faire :\n- Utiliser le système de conception VaultWares (mis à jour le 17 mai 2026) comme source de vérité (SoT).\n- Lire et suivre :\n  - vaultwares-themes/AGENTS.md\n  - vaultwares-themes/brand/ui-kit.md\n  - vaultwares-themes/brand/tokens/tokens.ts\n  - vaultwares-themes/brand/tokens/tailwind.config.ts\n- Ne jamais coder en dur les couleurs, polices, espacements, rayons ou animations réutilisables ; utiliser des jetons nommés.\nNe pas :\n- Ajouter de nouvelle interface utilisateur sans utiliser de jetons.\nTerminé lorsque :\n- Les changements visuels sont exprimés via des jetons et suivent les règles de la marque.\n\n## Notes\nLes assistants lisent les notes complètes uniquement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/BRAND_TOKENS_UI.md`\n"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Knowledge Sync",
+    "description": "Assistant protocol summary: Knowledge Sync",
+    "body": "\n# Knowledge Sync\n\n- Category ID: `KNOWLEDGE_SYNC`\n- Summary source: `instructions/summaries/KNOWLEDGE_SYNC.md`\n- Notes source: `instructions/notes/KNOWLEDGE_SYNC.md`\n\nApplies when: rules are drifting, recurring guidance is repeated, or a durable runbook is needed.\nDo:\n- Prefer updating the canonical protocol summary (instructions/summaries) over repeating ad-hoc guidance.\n- For “expensive” discoveries, update KNOWLEDGE_SCOUT.md.\nDo not:\n- Scatter “tribal knowledge” into random PR comments only.\nDone when:\n- The durable source is updated and linked.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/KNOWLEDGE_SYNC.md`"
+  },
+  "QC": {
+    "title": "Synchronisation des connaissances",
+    "description": "Résumé du protocole de l'assistant : Synchronisation des connaissances",
+    "body": "\n# Synchronisation des connaissances\n\n- ID de catégorie : `KNOWLEDGE_SYNC`\n- Source de résumé : `instructions/summaries/KNOWLEDGE_SYNC.md`\n- Source de notes : `instructions/notes/KNOWLEDGE_SYNC.md`\n\nS'applique quand : les règles dérivent, des conseils récurrents sont répétés, ou qu'un guide de référence durable est nécessaire.\nÀ faire :\n- Préférer mettre à jour le résumé de protocole canonique (instructions/summaries) plutôt que de répéter des conseils ad hoc.\n- Pour les découvertes « coûteuses », mettre à jour KNOWLEDGE_SCOUT.md.\nÀ ne pas faire :\n- Disperser les « connaissances tribales » dans des commentaires de PR aléatoires seulement.\nTerminé quand :\n- La source durable est mise à jour et liée.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/KNOWLEDGE_SYNC.md`\n"
+  }
+}

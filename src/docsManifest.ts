@@ -1,126 +1,61 @@
-export type DocsLang = 'EN' | 'QC'
+import { PAGE_RESOURCE_ENTRIES, type PageResourceEntry } from './resources/pageResourcesManifest'
+import { SECTION_LABELS, type DocsLang } from './resources/uiResources'
 
-type RawMdxLoader = () => Promise<string>
+export type { DocsLang } from './resources/uiResources'
 
-const RAW_DOC_MODULES = import.meta.glob('../docs-content/**/*.mdx', {
-  query: '?raw',
+export interface DocPageLocale {
+  title: string
+  description: string
+  body: string
+}
+
+interface PageLocaleResource {
+  EN: DocPageLocale
+  QC: DocPageLocale | null
+}
+
+export interface DocPageEntry extends PageResourceEntry {}
+
+const PAGE_RESOURCE_MODULES = import.meta.glob('./resources/pages/*.json', {
   import: 'default',
-}) as Record<string, RawMdxLoader>
+}) as Record<string, () => Promise<PageLocaleResource>>
 
-export interface DocPageEntry {
-  routePath: string
-  routeKey: string
-  sectionKey: string
-  enModuleKey?: string
-  qcModuleKey?: string
+const pageResourceCache = new Map<string, PageLocaleResource>()
+
+export const DOC_PAGE_ENTRIES: DocPageEntry[] = [...PAGE_RESOURCE_ENTRIES].sort((a, b) =>
+  a.routePath.localeCompare(b.routePath)
+)
+
+function toResourceModuleKey(resourceKey: string): string {
+  return `./resources/pages/${resourceKey}.json`
 }
 
-function toRoutePath(relativePath: string): string {
-  let noExt = relativePath.replace(/\.mdx$/i, '')
-  if (noExt.endsWith('-QC')) {
-    noExt = noExt.slice(0, -3)
-  }
-  if (noExt.endsWith('/index')) {
-    noExt = noExt.slice(0, -'/index'.length)
-  }
-  if (noExt === 'index') {
-    return '/'
-  }
-  return `/${noExt}`
-}
+export async function loadPageResource(entry: DocPageEntry): Promise<PageLocaleResource | undefined> {
+  const cacheHit = pageResourceCache.get(entry.resourceKey)
+  if (cacheHit) return cacheHit
 
-function toRouteKey(routePath: string): string {
-  if (routePath === '/') return 'index'
-  return routePath.replace(/^\//, '')
-}
-
-function toSectionKey(routePath: string): string {
-  if (routePath === '/') return 'root'
-  return routePath.replace(/^\//, '').split('/')[0] || 'root'
-}
-
-function buildDocPageEntries(): DocPageEntry[] {
-  const entriesByRoute = new Map<string, DocPageEntry>()
-
-  for (const moduleKey of Object.keys(RAW_DOC_MODULES)) {
-    const relativePath = moduleKey.replace(/^\.\.\/docs-content\//, '')
-    const routePath = toRoutePath(relativePath)
-    const existing = entriesByRoute.get(routePath)
-    const next: DocPageEntry = existing
-      ? { ...existing }
-      : {
-          routePath,
-          routeKey: toRouteKey(routePath),
-          sectionKey: toSectionKey(routePath),
-        }
-
-    if (relativePath.endsWith('-QC.mdx')) {
-      next.qcModuleKey = moduleKey
-    } else {
-      next.enModuleKey = moduleKey
-    }
-
-    entriesByRoute.set(routePath, next)
+  const moduleKey = toResourceModuleKey(entry.resourceKey)
+  const loader = PAGE_RESOURCE_MODULES[moduleKey]
+  if (!loader) {
+    return undefined
   }
 
-  return [...entriesByRoute.values()].sort((a, b) => a.routePath.localeCompare(b.routePath))
+  const data = await loader()
+  pageResourceCache.set(entry.resourceKey, data)
+  return data
 }
 
-export const DOC_PAGE_ENTRIES = buildDocPageEntries()
-
-const SECTION_LABELS_EN: Record<string, string> = {
-  root: 'Overview',
-  'getting-started': 'Getting Started',
-  essentials: 'Essentials',
-  hardware: 'Hardware',
-  software: 'Software',
-  installation: 'Installation',
-  guides: 'Guides',
-  operations: 'Operations',
-  security: 'Security',
-  compliance: 'Compliance',
-  'api-reference': 'API Reference',
-  support: 'Support',
-  'ai-tools': 'AI Tools',
-  branding: 'Branding',
-}
-
-const SECTION_LABELS_QC: Record<string, string> = {
-  root: 'Aperçu',
-  'getting-started': 'Commencer',
-  essentials: 'Essentiels',
-  hardware: 'Matériel',
-  software: 'Logiciel',
-  installation: 'Installation',
-  guides: 'Guides',
-  operations: 'Opérations',
-  security: 'Sécurité',
-  compliance: 'Conformité',
-  'api-reference': 'Référence API',
-  support: 'Assistance',
-  'ai-tools': 'Outils IA',
-  branding: 'Image de marque',
+export async function loadPageLocale(entry: DocPageEntry, lang: DocsLang): Promise<DocPageLocale | undefined> {
+  const data = await loadPageResource(entry)
+  if (!data) return undefined
+  if (lang === 'QC') return data.QC ?? data.EN
+  return data.EN
 }
 
 export function getSectionLabel(sectionKey: string, lang: DocsLang): string {
   const normalized = sectionKey.toLowerCase()
   if (lang === 'QC') {
-    return SECTION_LABELS_QC[normalized] || normalized
+    return SECTION_LABELS.QC[normalized] || normalized
   }
-  return SECTION_LABELS_EN[normalized] || normalized
-}
-
-export function getPreferredModuleKey(entry: DocPageEntry, lang: DocsLang): string | undefined {
-  if (lang === 'QC' && entry.qcModuleKey) {
-    return entry.qcModuleKey
-  }
-  return entry.enModuleKey || entry.qcModuleKey
-}
-
-export function loadRawMdx(moduleKey: string): Promise<string> {
-  const loader = RAW_DOC_MODULES[moduleKey]
-  if (!loader) {
-    return Promise.reject(new Error(`Missing MDX module key: ${moduleKey}`))
-  }
-  return loader()
+  return SECTION_LABELS.EN[normalized] || normalized
 }

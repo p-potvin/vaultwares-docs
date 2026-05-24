@@ -3,6 +3,13 @@ export interface FrontmatterData {
   description?: string
 }
 
+export function stripTopLevelEsm(input: string): string {
+  return input
+    .split('\n')
+    .filter((line) => !line.trim().startsWith('import ') && !line.trim().startsWith('export '))
+    .join('\n')
+}
+
 function applyReplacementsOutsideCodeBlocks(input: string, replacer: (segment: string) => string): string {
   const chunks = input.split(/(```[\s\S]*?```)/g)
   return chunks
@@ -47,13 +54,19 @@ export function parseFrontmatter(raw: string): { body: string; data: Frontmatter
   return { body, data }
 }
 
-export function normalizeMdxForMarkdown(rawBody: string): string {
-  const withoutMdxImports = rawBody
-    .split('\n')
-    .filter((line) => !line.trim().startsWith('import ') && !line.trim().startsWith('export '))
-    .join('\n')
+export function prepareMdxSource(rawBody: string): string {
+  const normalized = rawBody.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  return applyReplacementsOutsideCodeBlocks(normalized, (segment) => {
+    return segment
+      .replace(/<=/g, '&lt;=')
+      .replace(/<repo>/g, '&lt;repo&gt;')
+      .replace(/^(\s*-\s*[A-Za-z0-9_-]+:)\{([^}]+)\}/gm, '$1&#123;$2&#125;')
+  })
+}
 
-  return applyReplacementsOutsideCodeBlocks(withoutMdxImports, (segment) =>
+export function normalizeMdxForMarkdown(rawBody: string): string {
+  const prepared = stripTopLevelEsm(prepareMdxSource(rawBody))
+  return applyReplacementsOutsideCodeBlocks(prepared, (segment) =>
     segment
       .replace(/<(\/?)([A-Z][A-Za-z0-9]*)\b/g, (_, slash, tagName: string) => `<${slash}${tagName.toLowerCase()}`)
       .replace(/(\w+)=\{['"]([^'"]+)['"]\}/g, '$1="$2"')

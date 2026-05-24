@@ -9,6 +9,7 @@ type GenericProps = {
 type CardProps = GenericProps & {
   href?: string
   title?: string
+  horizontal?: boolean | string
 }
 
 type CardGroupProps = GenericProps & {
@@ -53,9 +54,14 @@ function Callout({ tone, children }: { tone: 'info' | 'tip' | 'warn' | 'ok'; chi
 function Card(props: CardProps) {
   const href = props.href ? String(props.href) : ''
   const title = props.title ? String(props.title) : 'Card'
+  const horizontal = props.horizontal === '' || props.horizontal === true || props.horizontal === 'true'
   const children = props.children
   const shell = (
-    <div className="vw-card h-full rounded-2xl p-4 transition-colors hover:bg-vw-console-elevated/80">
+    <div
+      className={`vw-card h-full rounded-2xl p-4 transition-colors hover:bg-vw-console-elevated/80 ${
+        horizontal ? 'md:flex md:items-start md:gap-4' : ''
+      }`}
+    >
       <h3 className="mb-2 font-mono text-sm font-semibold text-white">{title}</h3>
       {toChildren(children)}
     </div>
@@ -137,7 +143,38 @@ function FieldBlock(props: FieldProps) {
   )
 }
 
-export const markdownComponents = {
+const components = {
+  Card: (props: GenericProps) => <Card {...(props as CardProps)} />,
+  CardGroup: (props: GenericProps) => <CardGroup {...(props as CardGroupProps)} />,
+  Note: ({ children }: GenericProps) => <Callout tone="info">{children}</Callout>,
+  Info: ({ children }: GenericProps) => <Callout tone="info">{children}</Callout>,
+  Tip: ({ children }: GenericProps) => <Callout tone="tip">{children}</Callout>,
+  Warning: ({ children }: GenericProps) => <Callout tone="warn">{children}</Callout>,
+  Check: ({ children }: GenericProps) => <Callout tone="ok">{children}</Callout>,
+  Steps: ({ children }: GenericProps) => <Steps>{children}</Steps>,
+  Step: (props: GenericProps) => <Step {...(props as TitleProps)} />,
+  Tabs: ({ children }: GenericProps) => <Tabs>{children}</Tabs>,
+  Tab: (props: GenericProps) => <Tab {...(props as TitleProps)} />,
+  AccordionGroup: ({ children }: GenericProps) => <AccordionGroup>{children}</AccordionGroup>,
+  Accordion: (props: GenericProps) => <Accordion {...(props as TitleProps)} />,
+  CodeGroup: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  RequestExample: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  ResponseExample: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  Frame: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  Tooltip: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  Update: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  Expandable: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  ParamField: (props: GenericProps) => <FieldBlock {...(props as FieldProps)} />,
+  ResponseField: (props: GenericProps) => <FieldBlock {...(props as FieldProps)} />,
+
+  // Common documentation placeholders that may appear in translated or example pages.
+  Latex: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  SnippetIntro: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  MyComponent: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  MySnippet: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  YYYY: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+  ML: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
+
   card: (props: GenericProps) => <Card {...(props as CardProps)} />,
   cardgroup: (props: GenericProps) => <CardGroup {...(props as CardGroupProps)} />,
   note: ({ children }: GenericProps) => <Callout tone="info">{children}</Callout>,
@@ -161,3 +198,6 @@ export const markdownComponents = {
   paramfield: (props: GenericProps) => <FieldBlock {...(props as FieldProps)} />,
   responsefield: (props: GenericProps) => <FieldBlock {...(props as FieldProps)} />,
 }
+
+export const mdxComponents = components
+export const markdownComponents = components

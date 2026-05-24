@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Verification",
+    "description": "Assistant protocol summary: Verification",
+    "body": "\n# Verification\n\n- Category ID: `VERIFICATION`\n- Summary source: `instructions/summaries/VERIFICATION.md`\n- Notes source: `instructions/notes/VERIFICATION.md`\n\nApplies when: claiming anything works or is complete.\nDo:\n- Prefer the smallest verification that proves the change.\n- Record what was actually run/checked (commands, pages visited, outputs).\nDo not:\n- Claim “working” from a single 200 OK.\nDone when:\n- Verification evidence is recorded and repeatable.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/VERIFICATION.md`"
+  },
+  "QC": {
+    "title": "Vérification",
+    "description": "Résumé du protocole de l'assistant : Vérification",
+    "body": "\n# Vérification\n\n- ID de catégorie : `VERIFICATION`\n- Source du résumé : `instructions/summaries/VERIFICATION.md`\n- Source des notes : `instructions/notes/VERIFICATION.md`\n\nS'applique quand : on affirme que quelque chose fonctionne ou est terminé.\nÀ faire :\n- Préférer la vérification la plus simple qui prouve le changement.\n- Enregistrer ce qui a été réellement exécuté/vérifié (commandes, pages visitées, résultats).\nÀ ne pas faire :\n- Affirmer que ça « fonctionne » juste à cause d'un seul 200 OK.\nTerminé quand :\n- Les preuves de vérification sont enregistrées et reproductibles.\n\n## Notes\nLes assistants lisent les notes complètes seulement quand on les y invite explicitement : `read full notes`.\nChemin des notes : `instructions/notes/VERIFICATION.md`\n"
+  }
+}

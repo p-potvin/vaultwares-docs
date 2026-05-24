@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "File Changes",
+    "description": "Assistant protocol summary: File Changes",
+    "body": "\n# File Changes\n\n- Category ID: `FILE_CHANGES`\n- Summary source: `instructions/summaries/FILE_CHANGES.md`\n- Notes source: `instructions/notes/FILE_CHANGES.md`\n\nApplies when: create/move/delete/rename files or folders.\nDo:\n- Keep changes minimal and intentional; avoid large churn.\n- When deleting, confirm references are removed and builds/tests still pass.\n- Use safe, explicit paths; avoid wildcard deletes.\nDo not:\n- Delete ambiguous paths without confirming scope.\nDone when:\n- Repo builds/tests/verification succeed and no dead links remain.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/FILE_CHANGES.md`"
+  },
+  "QC": {
+    "title": "Modifications de fichiers",
+    "description": "Résumé du protocole de l'assistant : Modifications de fichiers",
+    "body": "\n# Modifications de fichiers\n\n- ID de catégorie : `FILE_CHANGES`\n- Source du résumé : `instructions/summaries/FILE_CHANGES.md`\n- Source des notes : `instructions/notes/FILE_CHANGES.md`\n\nS'applique quand : création/déplacement/suppression/renommage de fichiers ou de dossiers.\nFaire :\n- Garder les changements minimaux et intentionnels; éviter les changements massifs.\n- Lors de la suppression, confirmer que les références sont retirées et que les constructions/tests passent toujours.\n- Utiliser des chemins sûrs et explicites; éviter les suppressions par joker.\nNe pas :\n- Supprimer des chemins ambigus sans confirmer la portée.\nTerminé quand :\n- Les constructions/tests/vérifications du dépôt réussissent et qu'aucun lien mort ne subsiste.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/FILE_CHANGES.md`\n"
+  }
+}

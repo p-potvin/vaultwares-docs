@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Security Posture",
+    "description": "Assistant protocol summary: Security Posture",
+    "body": "\n# Security Posture\n\n- Category ID: `SECURITY_POSTURE`\n- Summary source: `instructions/summaries/SECURITY_POSTURE.md`\n- Notes source: `instructions/notes/SECURITY_POSTURE.md`\n\nApplies when: auth, crypto, keys, tokens, access control, threat model, security UX.\nDo:\n- Privacy first. Security in service of privacy.\n- Use post-quantum cryptography with ML-KEM where security UX or protocols require PQC.\n- Ensure servers never read, persist, or reconstruct private keys or shared decryption keys.\nDo not:\n- Add features that imply impersonation, KYC bypass, or document forgery.\nDone when:\n- You can explain how the change preserves zero-knowledge/key-separation constraints.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/SECURITY_POSTURE.md`"
+  },
+  "QC": {
+    "title": "Posture de sécurité",
+    "description": "Résumé du protocole de l'assistant : Posture de sécurité",
+    "body": "\n# Posture de sécurité\n\n- ID de catégorie : `SECURITY_POSTURE`\n- Source du résumé : `instructions/summaries/SECURITY_POSTURE.md`\n- Source des notes : `instructions/notes/SECURITY_POSTURE.md`\n\nS'applique aux cas où : auth, crypto, keys, tokens, contrôle d'accès, modèle de menace, expérience utilisateur de sécurité (UX).\nÀ faire :\n- La confidentialité d'abord. La sécurité au service de la confidentialité.\n- Utiliser la cryptographie post-quantique avec ML-KEM lorsque l'UX de sécurité ou les protocoles exigent la PQC.\n- S'assurer que les serveurs ne lisent jamais, ne conservent jamais et ne reconstruisent jamais les clés privées ou les clés de déchiffrement partagées.\nÀ ne pas faire :\n- Ajouter des fonctionnalités qui impliquent l'usurpation d'identité, le contournement de KYC ou la falsification de documents.\nFait lorsque :\n- Vous pouvez expliquer comment le changement préserve les contraintes de connaissance nulle/séparation des clés.\n\n## Notes\nLes assistants lisent les notes complètes uniquement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/SECURITY_POSTURE.md`\n"
+  }
+}

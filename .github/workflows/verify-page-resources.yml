@@ -1,0 +1,42 @@
+name: Verify Page Resources
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs-content/**
+      - scripts/generate-doc-page-resources.mjs
+      - src/resources/**
+      - package.json
+      - package-lock.json
+      - .github/workflows/verify-page-resources.yml
+  pull_request:
+    paths:
+      - docs-content/**
+      - scripts/generate-doc-page-resources.mjs
+      - src/resources/**
+      - package.json
+      - package-lock.json
+      - .github/workflows/verify-page-resources.yml
+
+jobs:
+  generated-page-resources:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Regenerate page resources
+        run: npm run generate:page-resources
+
+      - name: Verify generated files are committed
+        run: git diff --exit-code -- src/resources/pageResourcesManifest.ts src/resources/pages

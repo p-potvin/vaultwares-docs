@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Global Instruction Sync",
+    "description": "Assistant protocol summary: Global Instruction Sync",
+    "body": "\n# Global Instruction Sync\n\n- Category ID: `GLOBAL_INSTRUCTION_SYNC`\n- Summary source: `instructions/summaries/GLOBAL_INSTRUCTION_SYNC.md`\n- Notes source: `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`\n\nApplies when: editing vaultwares-docs/AGENTS.md (Tier-1 global instructions).\nDo:\n- After modifying vaultwares-docs/AGENTS.md, run: vaultwares-docs/scripts/sync-global-instructions.ps1\n- Sync only pre-instructions/pointers; do not duplicate the full protocol library into host targets.\nDo not:\n- Leave host targets stale after AGENTS.md changes.\nDone when:\n- Sync ran successfully (or failure and reason are recorded).\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`"
+  },
+  "QC": {
+    "title": "Synchronisation globale des instructions",
+    "description": "Résumé du protocole de l'assistant : Synchronisation globale des instructions",
+    "body": "\n# Synchronisation globale des instructions\n\n- ID de catégorie : `GLOBAL_INSTRUCTION_SYNC`\n- Source de résumé : `instructions/summaries/GLOBAL_INSTRUCTION_SYNC.md`\n- Source de notes : `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`\n\nS'applique lorsque : on modifie `vaultwares-docs/AGENTS.md` (instructions globales de niveau 1).\nÀ faire :\n- Après avoir modifié `vaultwares-docs/AGENTS.md`, exécuter : `vaultwares-docs/scripts/sync-global-instructions.ps1`\n- Synchroniser uniquement les pré-instructions/pointeurs ; ne pas dupliquer la bibliothèque de protocole complète dans les cibles hôtes.\nÀ ne pas faire :\n- Laisser les cibles hôtes obsolètes après les changements dans `AGENTS.md`.\nTerminé lorsque :\n- La synchronisation a réussi (ou qu'un échec et la raison sont enregistrés).\n\n## Notes\nLes assistants lisent les notes complètes uniquement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`\n"
+  }
+}

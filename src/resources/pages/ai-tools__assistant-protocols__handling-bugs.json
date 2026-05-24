@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Handling Bugs",
+    "description": "Assistant protocol summary: Handling Bugs",
+    "body": "\n# Handling Bugs\n\n- Category ID: `HANDLING_BUGS`\n- Summary source: `instructions/summaries/HANDLING_BUGS.md`\n- Notes source: `instructions/notes/HANDLING_BUGS.md`\n\nApplies when: a bug/defect is reported or discovered.\nDo:\n- Create a GitHub issue first (title, reproduction, expected vs actual, environment).\n- Decide fix-now vs assign using token budget: fix now only if the full loop (diagnose+patch+verify+reply) is expected to fit within <=6000 tokens.\n- If not fix-now: assign the issue to the user and link it in the reply.\nDo not:\n- Start large bugfix work without an issue link.\nDone when:\n- Issue exists and is linked; fix is either merged via PR or clearly deferred with ownership.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/HANDLING_BUGS.md`"
+  },
+  "QC": {
+    "title": "Gestion des bogues",
+    "description": "Résumé du protocole de l'assistant : Gestion des bogues",
+    "body": "\n# Gestion des bogues\n\n- ID de catégorie : `HANDLING_BUGS`\n- Source du résumé : `instructions/summaries/HANDLING_BUGS.md`\n- Source des notes : `instructions/notes/HANDLING_BUGS.md`\n\nS'applique quand : un bogue/défaut est signalé ou découvert.\nÀ faire :\n- Créer un problème GitHub d'abord (titre, reproduction, attendu vs réel, environnement).\n- Décider de corriger immédiatement ou d'assigner en utilisant le budget de jetons : corriger immédiatement seulement si le cycle complet (diagnostic+patch+vérification+réponse) est censé tenir dans <=6000 jetons.\n- Si ce n'est pas une correction immédiate : assigner le problème à l'utilisateur et y faire référence dans la réponse.\nÀ ne pas faire :\n- Commencer un travail de correction de bogue important sans lien de problème.\nTerminé quand :\n- Le problème existe et est lié ; la correction est soit fusionnée via une PR, soit clairement reportée avec un responsable.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/HANDLING_BUGS.md`\n"
+  }
+}

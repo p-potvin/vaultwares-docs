@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Pr Policy",
+    "description": "Assistant protocol summary: Pr Policy",
+    "body": "\n# Pr Policy\n\n- Category ID: `PR_POLICY`\n- Summary source: `instructions/summaries/PR_POLICY.md`\n- Notes source: `instructions/notes/PR_POLICY.md`\n\nApplies when: creating or updating PRs, requesting review, CI enforcement.\nDo:\n- Keep PR scope tight; include verification steps and evidence.\n- Add the required reviewers specified by repo policy.\nDo not:\n- Merge directly to main unless explicitly instructed.\nDone when:\n- PR is published and includes what changed, how verified, and remaining risks.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/PR_POLICY.md`"
+  },
+  "QC": {
+    "title": "Politique de PR",
+    "description": "Résumé du protocole de l'assistant : Politique de PR",
+    "body": "\n# Politique de PR\n\n- ID de catégorie : `PR_POLICY`\n- Source de résumé : `instructions/summaries/PR_POLICY.md`\n- Source de notes : `instructions/notes/PR_POLICY.md`\n\nS'applique quand : création ou mise à jour des PR, demande de révision, application par CI.\nÀ faire :\n- Maintenir le périmètre de la PR restreint ; inclure les étapes de vérification et les preuves.\n- Ajouter les réviseurs requis spécifiés par la politique du dépôt.\nÀ ne pas faire :\n- Fusionner directement dans `main` sauf instruction explicite.\nTerminé quand :\n- La PR est publiée et inclut ce qui a changé, comment c'est vérifié, et les risques restants.\n\n## Notes\nLes assistants lisent les notes complètes seulement quand on les leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/PR_POLICY.md`\n"
+  }
+}

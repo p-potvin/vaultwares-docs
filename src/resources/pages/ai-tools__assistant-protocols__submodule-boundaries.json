@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Submodule Boundaries",
+    "description": "Assistant protocol summary: Submodule Boundaries",
+    "body": "\n# Submodule Boundaries\n\n- Category ID: `SUBMODULE_BOUNDARIES`\n- Summary source: `instructions/summaries/SUBMODULE_BOUNDARIES.md`\n- Notes source: `instructions/notes/SUBMODULE_BOUNDARIES.md`\n\nApplies when: the path you are editing is a git submodule or a mirrored vendor copy.\nDo:\n- If the change targets vaultwares-themes, vaultwares-adk, or agent-ledger, prefer editing the standalone repo under C:\\\\Users\\\\Administrator\\\\Desktop\\\\Github Repos\\\\<repo> (not a submodule checkout).\n- If you must read a submodule copy to understand behavior, treat it as read-only.\nDo not:\n- Patch Tier-2 repos inside another repo's submodule directory.\nDone when:\n- The final patch is applied in the standalone repo checkout.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/SUBMODULE_BOUNDARIES.md`"
+  },
+  "QC": {
+    "title": "Limites de sous-modules",
+    "description": "Résumé du protocole de l'assistant : Limites de sous-modules",
+    "body": "\n# Limites de sous-modules\n\n- Category ID: `SUBMODULE_BOUNDARIES`\n- Summary source: `instructions/summaries/SUBMODULE_BOUNDARIES.md`\n- Notes source: `instructions/notes/SUBMODULE_BOUNDARIES.md`\n\nS'applique lorsque : le chemin que vous modifiez est un sous-module git ou une copie de fournisseur miroir.\nÀ faire :\n- Si le changement cible `vaultwares-themes`, `vaultwares-adk`, ou `agent-ledger`, préférez modifier le dépôt autonome sous C:\\\\Users\\\\Administrator\\\\Desktop\\\\Github Repos\\\\<repo> (pas un *checkout* de sous-module).\n- Si vous devez lire une copie de sous-module pour comprendre le comportement, traitez-la comme étant en lecture seule.\nÀ ne pas faire :\n- Appliquer de correctifs aux dépôts de Niveau 2 à l'intérieur du répertoire de sous-module d'un autre dépôt.\nTerminé lorsque :\n- Le correctif final est appliqué dans le *checkout* du dépôt autonome.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on leur demande explicitement : `read full notes`.\nNotes path: `instructions/notes/SUBMODULE_BOUNDARIES.md`\n"
+  }
+}

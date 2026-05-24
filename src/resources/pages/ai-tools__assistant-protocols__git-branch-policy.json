@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Git Branch Policy",
+    "description": "Assistant protocol summary: Git Branch Policy",
+    "body": "\n# Git Branch Policy\n\n- Category ID: `GIT_BRANCH_POLICY`\n- Summary source: `instructions/summaries/GIT_BRANCH_POLICY.md`\n- Notes source: `instructions/notes/GIT_BRANCH_POLICY.md`\n\nApplies when: any git workflow action, commits, branches, pushes.\nDo:\n- If on branch main: do not commit unless the user explicitly requested commits in the current prompt.\n- Prefer a feature branch (default prefix: vw-codex-).\n- Keep unrelated changes out of the branch.\nDo not:\n- Commit/push on main without explicit instruction.\nDone when:\n- Branch state is clean, isolated, and ready for review.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/GIT_BRANCH_POLICY.md`"
+  },
+  "QC": {
+    "title": "Politique des branches Git",
+    "description": "Résumé du protocole de l'assistant : Politique des branches Git",
+    "body": "\n# Politique des branches Git\n\n- ID de catégorie : `GIT_BRANCH_POLICY`\n- Source du résumé : `instructions/summaries/GIT_BRANCH_POLICY.md`\n- Source des notes : `instructions/notes/GIT_BRANCH_POLICY.md`\n\nS'applique quand : toute action de flux de travail Git, les commits, les branches, les pushes.\nÀ faire :\n- Si sur la branche `main` : ne pas commiter à moins que l'utilisateur n'ait explicitement demandé des commits dans l'invite actuelle.\n- Préférer une branche de fonctionnalité (préfixe par défaut : vw-codex-).\n- Garder les changements non liés hors de la branche.\nÀ ne pas faire :\n- Commiter/pousser sur `main` sans instruction explicite.\nTerminé quand :\n- L'état de la branche est propre, isolé et prêt pour examen.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/GIT_BRANCH_POLICY.md`\n"
+  }
+}

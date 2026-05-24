@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Incident Response",
+    "description": "Assistant protocol summary: Incident Response",
+    "body": "\n# Incident Response\n\n- Category ID: `INCIDENT_RESPONSE`\n- Summary source: `instructions/summaries/INCIDENT_RESPONSE.md`\n- Notes source: `instructions/notes/INCIDENT_RESPONSE.md`\n\nApplies when: outage, production breakage, security incident, urgent regression.\nDo:\n- Stabilize first (stop bleed), then diagnose, then fix.\n- Keep an incident timeline and note what was verified.\nDo not:\n- Make irreversible changes without a rollback plan.\nDone when:\n- Service is stable and incident notes exist.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/INCIDENT_RESPONSE.md`"
+  },
+  "QC": {
+    "title": "Réponse aux incidents",
+    "description": "Résumé des protocoles d'assistance : Réponse aux incidents",
+    "body": "\n# Réponse aux incidents\n\n- ID de catégorie : `INCIDENT_RESPONSE`\n- Source du résumé : `instructions/summaries/INCIDENT_RESPONSE.md`\n- Source des notes : `instructions/notes/INCIDENT_RESPONSE.md`\n\nS'applique quand : panne, rupture en production, incident de sécurité, régression urgente.\nÀ faire :\n- Stabiliser d'abord (arrêter l'hémorragie), puis diagnostiquer, puis corriger.\n- Tenir une chronologie de l'incident et noter ce qui a été vérifié.\nÀ ne pas faire :\n- Effectuer des changements irréversibles sans un plan de restauration.\nTerminé quand :\n- Le service est stable et que des notes d'incident existent.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/INCIDENT_RESPONSE.md`\n"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Cleanup Refactor",
+    "description": "Assistant protocol summary: Cleanup Refactor",
+    "body": "\n# Cleanup Refactor\n\n- Category ID: `CLEANUP_REFACTOR`\n- Summary source: `instructions/summaries/CLEANUP_REFACTOR.md`\n- Notes source: `instructions/notes/CLEANUP_REFACTOR.md`\n\nApplies when: refactoring, decluttering, reorganizing, large edits without new user-facing functionality.\nDo:\n- Write a cleanup plan before editing.\n- Lock behavior with tests or concrete verification steps first.\n- Prefer deletion over addition; keep diffs small and reversible.\nDo not:\n- Mix refactor with unrelated feature work.\nDone when:\n- Behavior is unchanged (or explicitly declared) and verification evidence exists.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/CLEANUP_REFACTOR.md`"
+  },
+  "QC": {
+    "title": "Nettoyage et Refactorisation",
+    "description": "Résumé du protocole de l'assistant : Nettoyage et Refactorisation",
+    "body": "\n# Nettoyage et Refactorisation\n\n- ID de catégorie : `CLEANUP_REFACTOR`\n- Source du résumé : `instructions/summaries/CLEANUP_REFACTOR.md`\n- Source des notes : `instructions/notes/CLEANUP_REFACTOR.md`\n\nS'applique quand : refactorisation, désencombrement, réorganisation, grandes modifications sans nouvelle fonctionnalité visible par l'utilisateur.\nÀ faire :\n- Écrire un plan de nettoyage avant de modifier.\n- Verrouiller le comportement avec des tests ou des étapes de vérification concrètes en premier.\n- Préférer la suppression plutôt que l'ajout; garder les différences (diffs) petites et réversibles.\nÀ ne pas faire :\n- Mélanger la refactorisation avec des fonctionnalités sans rapport.\nTerminé quand :\n- Le comportement n'a pas changé (ou est explicitement déclaré) et des preuves de vérification existent.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/CLEANUP_REFACTOR.md`\n"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Gui Verification",
+    "description": "Assistant protocol summary: Gui Verification",
+    "body": "\n# Gui Verification\n\n- Category ID: `GUI_VERIFICATION`\n- Summary source: `instructions/summaries/GUI_VERIFICATION.md`\n- Notes source: `instructions/notes/GUI_VERIFICATION.md`\n\nApplies when: web UI, docs site UI, dashboards, admin panels, SPAs.\nDo:\n- Navigate at least 2 links deep and back.\n- Check DevTools Console and Network for blocking errors.\n- Trigger hover/focus state and an empty/error state relevant to the change.\n- Cross-check with a second modality when feasible (curl/Invoke-WebRequest or Playwright).\nDo not:\n- Mark “working” from a single screenshot or 200 OK.\nDone when:\n- You can list pages visited and what you inspected.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/GUI_VERIFICATION.md`"
+  },
+  "QC": {
+    "title": "Vérification de l'interface graphique",
+    "description": "Résumé du protocole de l'assistant : Vérification de l'interface graphique",
+    "body": "\n# Vérification de l'interface graphique\n\n- ID de catégorie : `GUI_VERIFICATION`\n- Source du résumé : `instructions/summaries/GUI_VERIFICATION.md`\n- Source des notes : `instructions/notes/GUI_VERIFICATION.md`\n\nS'applique quand : interface web, site de documentation, tableaux de bord, panneaux d'administration, SPA.\nÀ faire :\n- Naviguer sur au moins 2 liens de profondeur et revenir en arrière.\n- Vérifier la console et le réseau des outils de développement pour les erreurs bloquantes.\n- Déclencher les états de survol/focus et un état vide/d'erreur pertinent au changement.\n- Vérifier avec une deuxième modalité si possible (curl/Invoke-WebRequest ou Playwright).\nÀ ne pas faire :\n- Marquer comme « fonctionnel » à partir d'une seule capture d'écran ou d'un 200 OK.\nTerminé quand :\n- Vous pouvez lister les pages visitées et ce que vous avez inspecté.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/GUI_VERIFICATION.md`\n"
+  }
+}

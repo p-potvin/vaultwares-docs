@@ -1,4 +1,4 @@
-@import "../vaultwares-themes/assets/tokens/css-variables.css";
+@import "../vaultwares-themes/vaultwares-revisited/revisited.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -29,7 +29,7 @@ body {
   margin: 0;
   background: var(--vault-console-bg);
   color: #fff;
-  font-family: var(--vault-font-sans);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -63,7 +63,7 @@ body {
 .prose-vw h2,
 .prose-vw h3,
 .prose-vw h4 {
-  font-family: var(--vault-font-sans);
+  font-family: var(--font-sans);
   letter-spacing: -0.01em;
 }
 

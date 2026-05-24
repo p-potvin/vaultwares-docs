@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Bilingual Strings",
+    "description": "Assistant protocol summary: Bilingual Strings",
+    "body": "\n# Bilingual Strings\n\n- Category ID: `BILINGUAL_STRINGS`\n- Summary source: `instructions/summaries/BILINGUAL_STRINGS.md`\n- Notes source: `instructions/notes/BILINGUAL_STRINGS.md`\n\nApplies when: any user-facing string, UI label, nav, marketing copy, error messages.\nDo:\n- Provide English (EN) and Quebec French (QC) versions.\n- Design for QC strings being 15-20% longer than EN.\nDo not:\n- Ship new user-facing strings in EN only.\nDone when:\n- Both EN and QC are present and layout is tolerant.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/BILINGUAL_STRINGS.md`"
+  },
+  "QC": {
+    "title": "Chaînes bilingues",
+    "description": "Résumé du protocole de l'assistant : Chaînes bilingues",
+    "body": "\n# Chaînes bilingues\n\n- ID de catégorie : `BILINGUAL_STRINGS`\n- Source de résumé : `instructions/summaries/BILINGUAL_STRINGS.md`\n- Source de notes : `instructions/notes/BILINGUAL_STRINGS.md`\n\nS'applique quand : toute chaîne visible par l'utilisateur, étiquette d'interface utilisateur, navigation, contenu marketing, messages d'erreur.\nFaire :\n- Fournir les versions anglais (EN) et français québécois (QC).\n- Concevoir en tenant compte du fait que les chaînes QC sont 15 à 20 % plus longues que les EN.\nNe pas faire :\n- Livrer de nouvelles chaînes visibles par l'utilisateur en EN seulement.\nComplété quand :\n- Les versions EN et QC sont présentes et la mise en page est tolérante.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/BILINGUAL_STRINGS.md`\n"
+  }
+}

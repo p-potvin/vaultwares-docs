@@ -1,7 +1,7 @@
 # vaultwares-docs
 
-VaultWares documentation site (Mintlify-style MDX content rendered by a custom
-React + Vite app).
+VaultWares documentation site (native MDX content rendered by a custom
+React + Vite docs app).
 
 Primary goals:
 - Provide public product documentation and private ops onboarding docs.
@@ -10,9 +10,11 @@ Primary goals:
 
 ## Repo layout
 
-- `docs-content/` — documentation pages as `.mdx` (frontmatter required).
+- `docs-content/` — source documentation pages as `.mdx` (frontmatter required, internal source).
 - `docs.json` — navigation structure (SoT for docs ordering/sections).
-- `src/App.tsx` — router + nav rendering + MDX/markdown rendering.
+- `src/resources/pages/*.json` — generated EN/QC page resources consumed by the frontend.
+- `src/resources/pageResourcesManifest.ts` — generated route/resource index.
+- `src/App.tsx` — router + nav rendering + locale resource rendering.
 - `public/` — static assets.
 - `vaultwares-themes/` — design tokens & brand system (submodule).
 - `vaultwares-adk/` — agent workflow docs (submodule).
@@ -34,11 +36,13 @@ description: "One sentence description"
 
 ### Add a new page
 
-1) Add a file under `docs-content/` (example: `docs-content/getting-started/foo.mdx`).
+1) Add EN + QC source files under `docs-content/` (example: `docs-content/getting-started/foo.mdx` and `foo-QC.mdx`).
 2) Add the page to `docs.json` navigation.
-3) Keep nav labels bilingual (English + Quebec French):
-   - update the nav list in `src/App.tsx` (search `NAV_SECTIONS`).
-4) Verify the route renders (see “Verification”).
+3) Regenerate frontend page resources:
+   - `npm run generate:page-resources`
+4) Keep nav labels bilingual (English + Quebec French):
+   - update section labels/order in `src/resources/uiResources.ts`.
+5) Verify the route renders (see “Verification”).
 
 ## Development
 

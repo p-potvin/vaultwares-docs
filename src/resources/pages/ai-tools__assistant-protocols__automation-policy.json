@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Automation Policy",
+    "description": "Assistant protocol summary: Automation Policy",
+    "body": "\n# Automation Policy\n\n- Category ID: `AUTOMATION_POLICY`\n- Summary source: `instructions/summaries/AUTOMATION_POLICY.md`\n- Notes source: `instructions/notes/AUTOMATION_POLICY.md`\n\nApplies when: cron, monitors, recurring automations, background jobs, schedulers.\nDo:\n- Prefer explicit, inspectable configs; avoid hidden state.\n- Record what runs where, and how to stop/rollback.\nDo not:\n- Create automations that run outside the tailnet policy.\nDone when:\n- Automation is documented and verifiable.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/AUTOMATION_POLICY.md`"
+  },
+  "QC": {
+    "title": "Politique d'automatisation",
+    "description": "Résumé du protocole de l'assistant : Politique d'automatisation",
+    "body": "\n# Politique d'automatisation\n\n- Category ID: `AUTOMATION_POLICY`\n- Summary source: `instructions/summaries/AUTOMATION_POLICY.md`\n- Notes source: `instructions/notes/AUTOMATION_POLICY.md`\n\nS'applique quand : cron, moniteurs, automatisations récurrentes, tâches en arrière-plan, planificateurs.\nFaire :\n- Préférer les configurations explicites et inspectables; éviter l'état caché.\n- Enregistrer ce qui s'exécute où, et comment arrêter/annuler.\nNe pas :\n- Créer des automatisations qui s'exécutent en dehors de la politique tailnet.\nTerminé quand :\n- L'automatisation est documentée et vérifiable.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/AUTOMATION_POLICY.md`\n"
+  }
+}

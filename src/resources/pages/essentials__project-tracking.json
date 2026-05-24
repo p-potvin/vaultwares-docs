@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Project Tracking",
+    "description": "How to manage tasks, milestones, and roadmaps in VaultWares repositories",
+    "body": "\nVaultWares utilizes a tiered tracking system to maintain grounding and visibility across short-term execution and long-term vision.\n\n## 1. Documentation Hierarchy\n\n| File | Scope | Level |\n| ---- | ----- | ----- |\n| `TASKS.md` | Active run execution items | Atomic |\n| `TODO.md` | Short-term backlog and immediate next steps | Project |\n| `ROADMAP.md` | Long-term reference and strategic vision | Global |\n\n## 2. Maintenance\n\nAgents are responsible for maintaining these files during the Multi-Agent Flow:\n- **Phase 1**: Read `TODO.md` and `ROADMAP.md` to ground the new task list.\n- **Phase 6**: Update `TODO.md` with completed items and identify new backlog entries.\n\n## 3. Telemetry\n\nAll project tracking data is supplemented by the **Agent Telemetry** system. Performance statistics are archived every **2 weeks** to keep the active tracking files efficient.\n"
+  },
+  "QC": {
+    "title": "Suivi de projet",
+    "description": "Comment gérer les tâches, les jalons et les feuilles de route dans les dépôts VaultWares",
+    "body": "\nVaultWares utilise un système de suivi à niveaux pour maintenir la cohérence et la visibilité entre l'exécution à court terme et la vision à long terme.\n\n## 1. Hiérarchie de la documentation\n\n| File | Scope | Level |\n| ---- | ----- | ----- |\n| `TASKS.md` | Éléments d'exécution de course actifs | Atomique |\n| `TODO.md` | Arriéré à court terme et prochaines étapes immédiates | Projet |\n| `ROADMAP.md` | Référence à long terme et vision stratégique | Global |\n\n## 2. Maintenance\n\nLes agents sont responsables de la maintenance de ces fichiers pendant le Flux Multi-Agents :\n- **Phase 1**: Lire `TODO.md` et `ROADMAP.md` pour établir la base de la nouvelle liste de tâches.\n- **Phase 6**: Mettre à jour `TODO.md` avec les éléments complétés et identifier les nouvelles entrées d'arriéré.\n\n## 3. Télémétrie\n\nToutes les données de suivi de projet sont complétées par le **système de Télémétrie des Agents**. Les statistiques de performance sont archivées toutes les **2 semaines** pour maintenir les fichiers de suivi actifs efficaces.\n"
+  }
+}

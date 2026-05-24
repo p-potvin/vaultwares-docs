@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Source of Truth",
+    "description": "Assistant protocol summary: Source of Truth",
+    "body": "\n# Source of Truth\n\n- Category ID: `SOURCE_OF_TRUTH`\n- Summary source: `instructions/summaries/SOURCE_OF_TRUTH.md`\n- Notes source: `instructions/notes/SOURCE_OF_TRUTH.md`\n\nApplies when: any VaultWares task; any time you are unsure where to look.\nDo:\n- Identify the governing tier for the change (Tier1 vaultwares-docs; Tier2 vaultwares-themes, vaultwares-adk, agent-ledger; Tier3 per-repo).\n- Prefer the narrowest in-scope SoT file over repo-wide searching.\n- If a referenced SoT file is missing, say so and propose the next-best canonical location; do not invent new SoT paths silently.\nDo not:\n- Duplicate global protocols into random repos.\nDone when:\n- You can name the exact SoT files you followed and why.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/SOURCE_OF_TRUTH.md`"
+  },
+  "QC": {
+    "title": "Source de Vérité",
+    "description": "Résumé du protocole assistant : Source de Vérité",
+    "body": "\n# Source de Vérité\n\n- ID de catégorie : `SOURCE_OF_TRUTH`\n- Source de résumé : `instructions/summaries/SOURCE_OF_TRUTH.md`\n- Source de notes : `instructions/notes/SOURCE_OF_TRUTH.md`\n\nS'applique quand : toute tâche VaultWares; n'importe quand vous n'êtes pas sûr de savoir où chercher.\nÀ faire :\n- Identifier le niveau de gouvernance pour le changement (Tier1 vaultwares-docs; Tier2 vaultwares-themes, vaultwares-adk, agent-ledger; Tier3 par dépôt).\n- Préférer le fichier SoT le plus précis (dans le périmètre) plutôt que de chercher dans tout le dépôt.\n- Si un fichier SoT référencé est manquant, le signaler et proposer l'emplacement canonique le plus approprié; ne pas inventer de nouveaux chemins SoT en silence.\nÀ ne pas faire :\n- Dupliquer les protocoles globaux dans des dépôts aléatoires.\nTerminé quand :\n- Vous pouvez nommer les fichiers SoT exacts que vous avez suivis et pourquoi.\n\n## Notes\nLes assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/SOURCE_OF_TRUTH.md`\n"
+  }
+}

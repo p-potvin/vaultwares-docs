@@ -1,0 +1,12 @@
+{
+  "EN": {
+    "title": "Legal Compliance",
+    "description": "Assistant protocol summary: Legal Compliance",
+    "body": "\n# Legal Compliance\n\n- Category ID: `LEGAL_COMPLIANCE`\n- Summary source: `instructions/summaries/LEGAL_COMPLIANCE.md`\n- Notes source: `instructions/notes/LEGAL_COMPLIANCE.md`\n\nApplies when: compliance requirements, legal constraints, policy enforcement.\nDo:\n- When unsure, ask and do not guess.\n- Prefer minimal claims; avoid promising certifications/guarantees without evidence.\nDo not:\n- Provide legal advice as certainty.\nDone when:\n- Constraints are explicit and reflected in the implementation plan.\n\n## Notes\nAssistants read full notes only when explicitly prompted: `read full notes`.\nNotes path: `instructions/notes/LEGAL_COMPLIANCE.md`"
+  },
+  "QC": {
+    "title": "Conformité légale",
+    "description": "Résumé du protocole de l'assistant : Conformité légale",
+    "body": "\n# Conformité légale\n\n- ID de catégorie : `LEGAL_COMPLIANCE`\n- Source du résumé : `instructions/summaries/LEGAL_COMPLIANCE.md`\n- Source des notes : `instructions/notes/LEGAL_COMPLIANCE.md`\n\nS'applique quand : exigences de conformité, contraintes légales, application des politiques.\nÀ faire :\n- Quand on n'est pas sûr, on demande et on ne devine pas.\n- Préférer des affirmations minimales; éviter de promettre des certifications/garanties sans preuve.\nÀ ne pas faire :\n- Donner des conseils juridiques comme une certitude.\nTerminé quand :\n- Les contraintes sont explicites et reflétées dans le plan de mise en œuvre.\n\n## Notes\nLes assistants lisent les notes complètes seulement quand on leur demande explicitement : `read full notes`.\nChemin des notes : `instructions/notes/LEGAL_COMPLIANCE.md`\n"
+  }
+}

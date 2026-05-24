@@ -1,51 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BrowserRouter, Link, NavLink, Navigate, Route, Routes } from 'react-router-dom'
-import ReactMarkdown from 'react-markdown'
-import type { Components } from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
-import remarkGfm from 'remark-gfm'
-import { DOC_PAGE_ENTRIES, getPreferredModuleKey, getSectionLabel, loadRawMdx, type DocPageEntry, type DocsLang } from './docsManifest'
-import { markdownComponents } from './markdownComponents'
-import { formatRouteLabel, normalizeMdxForMarkdown, parseFrontmatter } from './mdxUtils'
+import {
+  DOC_PAGE_ENTRIES,
+  getSectionLabel,
+  loadPageLocale,
+  type DocPageEntry,
+  type DocsLang,
+} from './docsManifest'
+import { MdxDocument } from './MdxDocument'
+import { formatRouteLabel, prepareMdxSource } from './mdxUtils'
+import { SECTION_ORDER, UI_TEXT } from './resources/uiResources'
+import { Led } from './revisited/Led'
+import { Shell } from './revisited/Shell'
 import './index.css'
-
-const UI_TEXT = {
-  EN: {
-    docsTitle: 'VaultWares Docs',
-    subtitle: 'Privacy first. Security in service.',
-    pageMissingTitle: 'Page Missing',
-    pageMissingBody: 'This page is not available in this build.',
-    renderErrorTitle: 'Render Error',
-    renderErrorBody: 'The document could not be rendered. Please check source formatting.',
-    missingIndex: 'Missing docs index page',
-  },
-  QC: {
-    docsTitle: 'Documentation VaultWares',
-    subtitle: 'Confidentialité d’abord. Sécurité en service.',
-    pageMissingTitle: 'Page introuvable',
-    pageMissingBody: 'Cette page n’est pas disponible dans cette version.',
-    renderErrorTitle: 'Erreur de rendu',
-    renderErrorBody: 'Le document n’a pas pu être affiché. Vérifiez le format source.',
-    missingIndex: 'Page index de la documentation introuvable',
-  },
-} as const
-
-const SECTION_ORDER = [
-  'root',
-  'getting-started',
-  'essentials',
-  'hardware',
-  'software',
-  'installation',
-  'guides',
-  'operations',
-  'security',
-  'compliance',
-  'api-reference',
-  'support',
-  'ai-tools',
-  'branding',
-] as const
 
 function groupEntriesBySection(entries: DocPageEntry[]): Array<{ sectionKey: string; items: DocPageEntry[] }> {
   const groups = new Map<string, DocPageEntry[]>()
@@ -84,22 +51,20 @@ function DocPage({ entry, lang }: { entry: DocPageEntry; lang: DocsLang }) {
     let cancelled = false
 
     async function load() {
-      const moduleKey = getPreferredModuleKey(entry, lang)
-      if (!moduleKey) {
-        if (!cancelled) {
-          setTitle(ui.pageMissingTitle)
-          setContent(ui.pageMissingBody)
-        }
-        return
-      }
-
       try {
-        const raw = await loadRawMdx(moduleKey)
-        const { body, data } = parseFrontmatter(raw)
+        const page = await loadPageLocale(entry, lang)
+        if (!page) {
+          if (!cancelled) {
+            setTitle(ui.pageMissingTitle)
+            setContent(ui.pageMissingBody)
+          }
+          return
+        }
+
         if (!cancelled) {
-          const computedTitle = data.title || formatRouteLabel(entry.routePath)
+          const computedTitle = page.title || formatRouteLabel(entry.routePath)
           setTitle(computedTitle)
-          setContent(normalizeMdxForMarkdown(body))
+          setContent(prepareMdxSource(page.body))
           document.title = `${computedTitle} | ${ui.docsTitle}`
         }
       } catch {
@@ -120,13 +85,7 @@ function DocPage({ entry, lang }: { entry: DocPageEntry; lang: DocsLang }) {
   return (
     <article className="prose prose-vw max-w-none">
       <h1>{title || formatRouteLabel(entry.routePath)}</h1>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw]}
-        components={markdownComponents as unknown as Components}
-      >
-        {content}
-      </ReactMarkdown>
+      <MdxDocument source={content} />
     </article>
   )
 }
@@ -138,18 +97,15 @@ function NavItemLabel({ entry, lang }: { entry: DocPageEntry; lang: DocsLang }) 
     let cancelled = false
 
     async function loadLabel() {
-      const moduleKey = getPreferredModuleKey(entry, lang)
-      if (!moduleKey) {
-        if (!cancelled) setLabel(formatRouteLabel(entry.routePath))
-        return
-      }
-
       try {
-        const raw = await loadRawMdx(moduleKey)
-        const { data } = parseFrontmatter(raw)
-        if (!cancelled) setLabel(data.title || formatRouteLabel(entry.routePath))
+        const page = await loadPageLocale(entry, lang)
+        if (!cancelled) {
+          setLabel(page?.title || formatRouteLabel(entry.routePath))
+        }
       } catch {
-        if (!cancelled) setLabel(formatRouteLabel(entry.routePath))
+        if (!cancelled) {
+          setLabel(formatRouteLabel(entry.routePath))
+        }
       }
     }
 
@@ -170,7 +126,7 @@ function AppLayout() {
   const homeEntry = DOC_PAGE_ENTRIES.find((entry) => entry.routePath === '/')
 
   return (
-    <div className="min-h-screen bg-vw-console-bg text-white">
+    <Shell mode="console">
       <header className="sticky top-0 z-40 border-b border-white/5 bg-vw-console-surface/95 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-3">
@@ -181,42 +137,47 @@ function AppLayout() {
             </div>
           </Link>
 
-          <button
-            onClick={() => setLang((prev) => (prev === 'EN' ? 'QC' : 'EN'))}
-            className="rounded-xl border border-white/10 bg-vw-console-raised px-3 py-1.5 font-mono text-xs text-violet-100/80 hover:text-white"
-          >
-            {lang}
-          </button>
+          <div className="flex items-center gap-3">
+            <Led status="sync" size={9} pulse />
+            <button
+              onClick={() => setLang((prev) => (prev === 'EN' ? 'QC' : 'EN'))}
+              className="rounded-xl border border-white/10 bg-vw-console-raised px-3 py-1.5 font-mono text-xs text-violet-100/80 hover:text-white"
+            >
+              {lang}
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-[1440px]">
-        <aside className="hidden h-[calc(100vh-57px)] w-80 overflow-y-auto border-r border-white/5 px-3 py-5 lg:block">
-          {navGroups.map((group) => (
-            <section key={group.sectionKey} className="mb-6">
-              <h2 className="mb-2 px-3 font-mono text-[11px] uppercase tracking-widest text-violet-100/45">
-                {getSectionLabel(group.sectionKey, lang)}
-              </h2>
-              <div className="space-y-1">
-                {group.items.map((entry) => (
-                  <NavLink
-                    key={entry.routePath}
-                    to={entry.routePath}
-                    className={({ isActive }) =>
-                      `block rounded-xl px-3 py-2 text-sm transition-colors ${
-                        isActive
-                          ? 'bg-vw-console-raised text-vw-console-gold'
-                          : 'text-violet-100/65 hover:bg-vw-console-raised/70 hover:text-white'
-                      }`
-                    }
-                    end={entry.routePath === '/'}
-                  >
-                    <NavItemLabel entry={entry} lang={lang} />
-                  </NavLink>
-                ))}
-              </div>
-            </section>
-          ))}
+      <div className="mx-auto flex min-h-[calc(100vh-57px)] w-full max-w-[1440px] items-stretch">
+        <aside className="hidden w-80 shrink-0 border-r border-white/5 bg-vw-console-bg lg:block">
+          <div className="sticky top-[57px] max-h-[calc(100vh-57px)] overflow-y-auto px-3 py-5">
+            {navGroups.map((group) => (
+              <section key={group.sectionKey} className="mb-6">
+                <h2 className="mb-2 px-3 font-mono text-[11px] uppercase tracking-widest text-violet-100/45">
+                  {getSectionLabel(group.sectionKey, lang)}
+                </h2>
+                <div className="space-y-1">
+                  {group.items.map((entry) => (
+                    <NavLink
+                      key={entry.routePath}
+                      to={entry.routePath}
+                      className={({ isActive }) =>
+                        `block rounded-xl px-3 py-2 text-sm transition-colors ${
+                          isActive
+                            ? 'bg-vw-console-raised text-vw-console-gold'
+                            : 'text-violet-100/65 hover:bg-vw-console-raised/70 hover:text-white'
+                        }`
+                      }
+                      end={entry.routePath === '/'}
+                    >
+                      <NavItemLabel entry={entry} lang={lang} />
+                    </NavLink>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
         </aside>
 
         <main className="min-w-0 flex-1 px-4 py-8 sm:px-6 lg:px-10">
@@ -225,11 +186,15 @@ function AppLayout() {
             {DOC_PAGE_ENTRIES.filter((entry) => entry.routePath !== '/').map((entry) => (
               <Route key={entry.routeKey} path={entry.routePath} element={<DocPage entry={entry} lang={lang} />} />
             ))}
-            {homeEntry ? <Route path="*" element={<Navigate to="/" replace />} /> : <Route path="*" element={<div>{ui.missingIndex}</div>} />}
+            {homeEntry ? (
+              <Route path="*" element={<Navigate to="/" replace />} />
+            ) : (
+              <Route path="*" element={<div>{ui.missingIndex}</div>} />
+            )}
           </Routes>
         </main>
       </div>
-    </div>
+    </Shell>
   )
 }
 
