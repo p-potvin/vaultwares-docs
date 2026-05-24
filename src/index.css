@@ -12,12 +12,6 @@
   --color-vw-console-elevated: var(--vault-console-elevated);
   --color-vw-console-gold: var(--vault-console-gold);
   --color-vw-console-violet: var(--vault-console-violet);
-  --color-vw-warm-bg: var(--vault-warm-bg);
-  --color-vw-warm-raised: var(--vault-warm-raised);
-  --color-vw-warm-muted: var(--vault-warm-muted);
-  --color-vw-ink: var(--vault-ink);
-  --color-vw-muted: var(--vault-muted);
-  --color-vw-gold: var(--vault-gold);
   --color-vw-signal-online: var(--vault-signal-online);
   --color-vw-signal-relay: var(--vault-signal-relay);
   --color-vw-signal-sync: var(--vault-signal-sync);
@@ -43,41 +37,6 @@ body {
 .vw-card {
   border: 1px solid var(--vault-console-border-subtle);
   background: color-mix(in srgb, var(--vault-console-raised) 88%, transparent);
-}
-
-.vw-warm-header {
-  border-color: var(--vault-warm-border-subtle);
-  background: color-mix(in srgb, var(--vault-warm-raised) 96%, transparent);
-  color: var(--vault-ink);
-}
-
-.vw-warm-sidebar {
-  border-color: var(--vault-warm-border-subtle);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--vault-warm-raised) 88%, transparent), var(--vault-warm-bg)),
-    var(--vault-warm-bg);
-  color: var(--vault-ink);
-}
-
-.vw-warm-toggle {
-  border: 1px solid var(--vault-warm-border-subtle);
-  background: var(--vault-paper-bright);
-  color: var(--vault-ink);
-}
-
-.vw-warm-toggle:hover {
-  border-color: color-mix(in srgb, var(--vault-gold) 45%, var(--vault-warm-border-subtle));
-  color: var(--vault-gold-muted);
-}
-
-.vw-warm-nav-link {
-  border-left: 2px solid transparent;
-}
-
-.vw-warm-nav-link-active {
-  border-left-color: var(--vault-gold);
-  background: var(--vault-paper-bright);
-  color: var(--vault-ink);
 }
 
 .prose-vw {

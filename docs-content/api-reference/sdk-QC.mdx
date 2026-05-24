@@ -1,30 +1,30 @@
 ---
-title: "SDKs & libraries"
-description: "Official VaultWares SDKs and client libraries"
+title: "SDK et bibliothèques"
+description: "SDK et bibliothèques clientes officielles de VaultWares"
 ---
 
-## Overview
+## Vue d'ensemble
 
-VaultWares provides official SDKs for the most popular languages. Each SDK wraps the REST API with idiomatic, type-safe methods and handles authentication, retries, and pagination for you.
+VaultWares fournit des SDK officiels pour les langages les plus populaires. Chaque SDK encapsule l'API REST avec des méthodes idiomatiques et à type sûr, et gère l'authentification, les tentatives et la pagination pour vous.
 
 <CardGroup cols={2}>
-  <Card title="Python SDK" icon="python" href="#python-sdk">
+  <Card title="SDK Python" icon="python" href="#python-sdk">
     `pip install vaultwares`
   </Card>
-  <Card title="Node.js SDK" icon="js" href="#nodejs-sdk">
+  <Card title="SDK Node.js" icon="js" href="#nodejs-sdk">
     `npm install @vaultwares/sdk`
   </Card>
-  <Card title="Java SDK" icon="java" href="#java-sdk">
+  <Card title="SDK Java" icon="java" href="#java-sdk">
     `com.vaultwares:vaultwares-sdk:3.2.0`
   </Card>
-  <Card title="Go SDK" icon="golang" href="#go-sdk">
+  <Card title="SDK Go" icon="golang" href="#go-sdk">
     `go get github.com/vaultwares/vaultwares-go`
   </Card>
 </CardGroup>
 
 ---
 
-## Python SDK
+## SDK Python
 
 ### Installation
 
@@ -36,7 +36,7 @@ pip install "vaultwares[async]"   # async/await support
 pip install "vaultwares[hsm]"     # PKCS#11 / HSM direct integration
 ```
 
-### Authentication
+### Authentification
 
 ```python
 from vaultwares import VaultWaresClient
@@ -55,7 +55,7 @@ client = VaultWaresClient(
 )
 ```
 
-### Device management
+### Gestion des appareils
 
 ```python
 from vaultwares import VaultWaresClient
@@ -84,7 +84,7 @@ client.devices.lock("dev_VD-ENT-00247", reason="Suspected loss")
 client.devices.apply_policy("dev_VD-ENT-00247", policy="high-security")
 ```
 
-### User management
+### Gestion des utilisateurs
 
 ```python
 from vaultwares.models import UserCreateRequest
@@ -106,7 +106,7 @@ client.users.disable(user.id, reason="Employment terminated")
 client.users.revoke_sessions(user.id)
 ```
 
-### Cryptographic operations (via VaultHSM)
+### Opérations cryptographiques (via VaultHSM)
 
 ```python
 from vaultwares.models import KeyType, KeyCurve, KeyUsage
@@ -141,7 +141,7 @@ verified = client.crypto.verify(
 print(f"Signature valid: {verified}")
 ```
 
-### Async support
+### Prise en charge asynchrone
 
 ```python
 import asyncio
@@ -158,7 +158,7 @@ asyncio.run(main())
 
 ---
 
-## Node.js SDK
+## SDK Node.js
 
 ### Installation
 
@@ -168,7 +168,7 @@ npm install @vaultwares/sdk
 # TypeScript types are included
 ```
 
-### Authentication
+### Authentification
 
 ```typescript
 import { VaultWaresClient } from "@vaultwares/sdk";
@@ -180,7 +180,7 @@ const client = new VaultWaresClient({
 });
 ```
 
-### Device management
+### Gestion des appareils
 
 ```typescript
 import { VaultWaresClient, DeviceType, DeviceStatus } from "@vaultwares/sdk";
@@ -208,7 +208,7 @@ await client.devices.cryptoErase("dev_VD-ENT-00247", {
 });
 ```
 
-### Webhook handling
+### Gestion des webhooks
 
 ```typescript
 import express from "express";
@@ -251,7 +251,7 @@ app.post(
 
 ---
 
-## Java SDK
+## SDK Java
 
 ### Installation
 
@@ -272,7 +272,7 @@ app.post(
   </Tab>
 </Tabs>
 
-### Basic usage
+### Utilisation de base
 
 ```java
 import com.vaultwares.VaultWaresClient;
@@ -314,7 +314,7 @@ public class Example {
 }
 ```
 
-### Spring Boot integration
+### Intégration Spring Boot
 
 ```java
 import com.vaultwares.spring.EnableVaultWares;
@@ -340,7 +340,7 @@ vaultwares.read-timeout-ms=30000
 
 ---
 
-## Go SDK
+## SDK Go
 
 ### Installation
 
@@ -348,7 +348,7 @@ vaultwares.read-timeout-ms=30000
 go get github.com/vaultwares/vaultwares-go@v3.2.0
 ```
 
-### Basic usage
+### Utilisation de base
 
 ```go
 package main
@@ -404,7 +404,7 @@ func main() {
 }
 ```
 
-### Webhook handler
+### Gestionnaire de webhooks
 
 ```go
 package main
@@ -449,29 +449,29 @@ func main() {
 
 ---
 
-## SDK versioning policy
+## Politique de versionnement des SDK
 
-| SDK version | API version | Support status |
+| Version du SDK | Version de l'API | Statut de support |
 |---|---|---|
-| 3.x | v1 | ✓ Active (current) |
-| 2.x | v1 | ⚠ Security patches only (until 2025-12-31) |
-| 1.x | v1 | ✗ End of life |
+| 3.x | v1 | ✓ Actif (actuel) |
+| 2.x | v1 | ⚠ Correctifs de sécurité seulement (jusqu'au 31-12-2025) |
+| 1.x | v1 | ✗ Fin de vie |
 
-Pin your SDK version in production and subscribe to [release notes](/support/updates) for security advisories.
+Verrouillez la version de votre SDK en production et abonnez-vous aux [notes de version](/support/updates) pour les avis de sécurité.
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Authentication" icon="key" href="/api-reference/authentication">
-    API keys and OAuth 2.0
+  <Card title="Authentification" icon="key" href="/api-reference/authentication">
+    Clés API et OAuth 2.0
   </Card>
-  <Card title="API endpoints" icon="code" href="/api-reference/endpoints">
-    Full REST API reference
+  <Card title="Points de terminaison API" icon="code" href="/api-reference/endpoints">
+    Référence complète de l'API REST
   </Card>
   <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
-    Real-time event handling
+    Gestion des événements en temps réel
   </Card>
   <Card title="Support" icon="headset" href="/support/contact">
-    SDK issues and feature requests
+    Problèmes et demandes de fonctionnalités du SDK
   </Card>
 </CardGroup>

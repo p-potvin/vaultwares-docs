@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { execSync } from 'child_process'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -9,6 +10,8 @@ const docsDir = path.join(__dirname, 'docs-content')
 const args = new Set(process.argv.slice(2))
 const confirmed = args.has('--yes')
 const dryRun = args.has('--dry-run')
+const onlyExactQc = args.has('--only-exact-qc')
+const onlyCleanQc = args.has('--only-clean-qc')
 const model = process.env.OLLAMA_MODEL || 'gemma4'
 const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434'
 const delayMs = Number.parseInt(process.env.TRANSLATE_DELAY_MS || '2000', 10)
@@ -38,39 +41,55 @@ function splitFrontmatter(content) {
   return { frontmatter: match[1], body: normalized.slice(match[0].length) }
 }
 
-function splitTranslatableBlocks(body) {
+function normalizeForCompare(content) {
+  return content.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+}
+
+function hasExactQcCopy(filePath) {
+  const qcPath = filePath.replace(/\.mdx$/, '-QC.mdx')
+  if (!fs.existsSync(qcPath)) return false
+  return normalizeForCompare(fs.readFileSync(filePath, 'utf8')) === normalizeForCompare(fs.readFileSync(qcPath, 'utf8'))
+}
+
+function getLocallyChangedFiles() {
+  const output = execSync('git diff --name-only -- docs-content', {
+    cwd: __dirname,
+    encoding: 'utf8',
+  })
+  return new Set(output.split(/\r?\n/).filter(Boolean).map((entry) => path.resolve(__dirname, entry)))
+}
+
+function protectCodeFences(content) {
   const blocks = []
-  let current = []
-  let inCodeFence = false
+  const protectedContent = content.replace(/^[ \t]*(`{3,}|~{3,})[^\n]*\n[\s\S]*?\n[ \t]*\1[ \t]*$/gm, (match) => {
+    const token = `%%VW_CODE_BLOCK_${blocks.length}%%`
+    blocks.push(match)
+    return token
+  })
+  return { protectedContent, blocks }
+}
 
-  for (const line of body.split('\n')) {
-    if (line.trim().startsWith('```')) {
-      if (current.length) blocks.push({ type: 'text', value: current.join('\n') })
-      current = []
-      inCodeFence = !inCodeFence
-      blocks.push({ type: 'raw', value: line })
-      continue
-    }
+function restoreCodeFences(content, blocks) {
+  return blocks.reduce((next, block, index) => next.replace(`%%VW_CODE_BLOCK_${index}%%`, block), content)
+}
 
-    if (inCodeFence || line.trim() === '' || line.trim().startsWith('import ') || line.trim().startsWith('export ')) {
-      if (current.length) blocks.push({ type: 'text', value: current.join('\n') })
-      current = []
-      blocks.push({ type: 'raw', value: line })
-      continue
-    }
-
-    current.push(line)
-  }
-
-  if (current.length) blocks.push({ type: 'text', value: current.join('\n') })
-  return blocks
+function stripModelWrapper(content) {
+  const trimmed = content.trim()
+  const fenced = trimmed.match(/^```(?:mdx|markdown|md)?\n([\s\S]*?)\n```$/i)
+  return fenced ? fenced[1].trim() : trimmed
 }
 
 async function translateWithOllama(text) {
   const prompt = [
-    'Translate this MDX documentation block to Quebec French.',
-    'Preserve Markdown, MDX tags, JSX attribute names, code spans, links, URLs, product names, and file paths.',
-    'Return only the translated block.',
+    'Translate this complete MDX documentation file from English to Quebec French for a public VaultWares documentation website.',
+    'Return the complete translated MDX file only.',
+    'Rules:',
+    '- Preserve Markdown structure, heading levels, tables, lists, admonitions, and MDX component tag names.',
+    '- Preserve JSX attribute names, URLs, routes, imports, exports, file paths, command names, environment variable names, and product names.',
+    '- Translate user-facing prose, frontmatter title and description values, headings, link text, list text, table prose, and user-visible JSX attribute values such as title, description, label, and children.',
+    '- Leave %%VW_CODE_BLOCK_N%% placeholders exactly unchanged.',
+    '- Use natural Quebec French, not literal France French.',
+    '- Do not add explanations. Do not wrap the answer in a code fence.',
     '',
     text,
   ].join('\n')
@@ -91,43 +110,79 @@ async function translateWithOllama(text) {
   }
 
   const payload = await response.json()
-  return String(payload.response || text).trim()
+  return stripModelWrapper(String(payload.response || text))
 }
 
 async function translateFile(filePath) {
   const qcPath = filePath.replace(/\.mdx$/, '-QC.mdx')
   const source = fs.readFileSync(filePath, 'utf8')
-  const { frontmatter, body } = splitFrontmatter(source)
-  const blocks = splitTranslatableBlocks(body)
-  const translatedBlocks = []
+  const { protectedContent, blocks } = protectCodeFences(source)
+  const translated = restoreCodeFences(await translateWithOllama(protectedContent), blocks)
+  const sourceFrontmatter = splitFrontmatter(source)
+  let normalized = `${translated.trim()}\n`
 
-  for (const block of blocks) {
-    if (block.type === 'raw' || !/[A-Za-z]/.test(block.value)) {
-      translatedBlocks.push(block.value)
-      continue
-    }
-    translatedBlocks.push(await translateWithOllama(block.value))
-    await sleep(delayMs)
+  if (sourceFrontmatter.frontmatter && !normalized.startsWith('---\n') && normalized.includes('\n---\n')) {
+    normalized = `---\n${normalized}`
   }
 
-  const output = frontmatter
-    ? `---\n${frontmatter}\n---\n\n${translatedBlocks.join('\n').trim()}\n`
-    : `${translatedBlocks.join('\n').trim()}\n`
+  let translatedFrontmatter = splitFrontmatter(normalized)
+
+  if (sourceFrontmatter.frontmatter && !translatedFrontmatter.frontmatter) {
+    const lines = normalized.split('\n')
+    const yamlLines = []
+    let bodyStart = 0
+
+    for (const line of lines) {
+      if (!line.trim()) {
+        bodyStart += 1
+        break
+      }
+      if (!/^[A-Za-z0-9_-]+:\s*/.test(line)) {
+        break
+      }
+      yamlLines.push(line)
+      bodyStart += 1
+    }
+
+    if (yamlLines.length > 0) {
+      normalized = `---\n${yamlLines.join('\n')}\n---\n\n${lines.slice(bodyStart).join('\n').trim()}\n`
+      translatedFrontmatter = splitFrontmatter(normalized)
+    }
+  }
+
+  if (sourceFrontmatter.frontmatter && !translatedFrontmatter.frontmatter) {
+    const failureDir = path.join(__dirname, '.omx', 'translation-failures')
+    fs.mkdirSync(failureDir, { recursive: true })
+    fs.writeFileSync(
+      path.join(failureDir, `${path.relative(docsDir, filePath).replace(/[\\/]/g, '__')}.txt`),
+      normalized,
+      'utf8'
+    )
+    throw new Error(`Translation dropped frontmatter: ${path.relative(docsDir, filePath)}`)
+  }
 
   if (!dryRun) {
-    fs.writeFileSync(qcPath, output, 'utf8')
+    fs.writeFileSync(qcPath, normalized, 'utf8')
   }
 }
 
 async function main() {
   const files = walkDir(docsDir)
-  const selected = limit > 0 ? files.slice(0, limit) : files
+  const changedFiles = onlyCleanQc ? getLocallyChangedFiles() : new Set()
+  const candidates = files.filter((file) => {
+    if (onlyExactQc && !hasExactQcCopy(file)) return false
+    if (onlyCleanQc && changedFiles.has(path.resolve(file.replace(/\.mdx$/, '-QC.mdx')))) return false
+    return true
+  })
+  const selected = limit > 0 ? candidates.slice(0, limit) : candidates
   const estimatedRequests = selected.length
 
   console.log(`Target: ${ollamaUrl}/api/generate`)
   console.log(`Model: ${model}`)
+  console.log(`Only exact QC copies: ${onlyExactQc}`)
+  console.log(`Only QC files without local changes: ${onlyCleanQc}`)
   console.log(`Files: ${selected.length}`)
-  console.log(`Estimated minimum requests: ${estimatedRequests}`)
+  console.log(`Estimated requests: ${estimatedRequests}`)
   console.log(`Delay: ${delayMs}ms`)
 
   if (!confirmed) {
@@ -139,6 +194,7 @@ async function main() {
   for (const [index, file] of selected.entries()) {
     console.log(`[${index + 1}/${selected.length}] ${path.relative(docsDir, file)}`)
     await translateFile(file)
+    await sleep(delayMs)
   }
 }
 

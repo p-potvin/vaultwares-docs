@@ -1,38 +1,38 @@
 ---
-title: "API endpoints"
-description: "Complete VaultWares REST API endpoint reference"
+title: "Points de terminaison de l'API"
+description: "Référence complète des points de terminaison de l'API REST de VaultWares"
 ---
 
-## Overview
+## Aperçu
 
-The VaultWares REST API provides programmatic access to all management functions. Use it to automate device management, enforce policies, manage users, query audit logs, and manage cryptographic keys and certificates.
+L'API REST de VaultWares fournit un accès programmatique à toutes les fonctions de gestion. Utilisez-la pour automatiser la gestion des appareils, appliquer des politiques, gérer les utilisateurs, interroger les journaux d'audit et gérer les clés cryptographiques et les certificats.
 
-**Base URL**: `https://api.vaultwares.com/v1`
+**URL de base**: `https://api.vaultwares.com/v1`
 
-All requests must be authenticated. See the [Authentication guide](/api-reference/authentication) for details.
+Toutes les requêtes doivent être authentifiées. Consultez le [guide d'authentification](/api-reference/authentication) pour plus de détails.
 
-## Common conventions
+## Conventions courantes
 
-- All request and response bodies are JSON (`Content-Type: application/json`)
-- Timestamps are ISO 8601 format (`2024-11-15T14:30:00Z`)
-- Pagination uses `limit` and `cursor` parameters
-- Errors follow a consistent `{"error": {"code": "...", "message": "...", "type": "..."}}` format
+- Tous les corps de requête et de réponse sont au format JSON (`Content-Type: application/json`)
+- Les horodatages sont au format ISO 8601 (`2024-11-15T14:30:00Z`)
+- La pagination utilise les paramètres `limit` et `cursor`
+- Les erreurs suivent un format cohérent de `{"error": {"code": "...", "message": "...", "type": "..."}}`
 
-## Devices
+## Appareils
 
-### List devices
+### Lister les appareils
 
 ```http
 GET /v1/devices
 ```
 
-| Parameter | Type | Description |
+| Paramètre | Type | Description |
 |-----------|------|-------------|
-| `type` | string | Filter by device type: `vaultdrive`, `vaulthsm`, `vaultscan`, `vaultgate` |
-| `status` | string | Filter by status: `online`, `offline`, `locked`, `error` |
-| `user_id` | string | Filter by assigned user |
-| `limit` | integer | Results per page (default: 20, max: 100) |
-| `cursor` | string | Pagination cursor from previous response |
+| `type` | string | Filtrer par type d'appareil : `vaultdrive`, `vaulthsm`, `vaultscan`, `vaultgate` |
+| `status` | string | Filtrer par statut : `online`, `offline`, `locked`, `error` |
+| `user_id` | string | Filtrer par utilisateur assigné |
+| `limit` | integer | Résultats par page (par défaut : 20, max : 100) |
+| `cursor` | string | Curseur de pagination de la réponse précédente |
 
 ```bash
 curl https://api.vaultwares.com/v1/devices \
@@ -68,13 +68,13 @@ curl https://api.vaultwares.com/v1/devices \
 }
 ```
 
-### Get a device
+### Récupérer un appareil
 
 ```http
 GET /v1/devices/{device_id}
 ```
 
-### Update a device
+### Mettre à jour un appareil
 
 ```http
 PATCH /v1/devices/{device_id}
@@ -91,7 +91,7 @@ curl -X PATCH https://api.vaultwares.com/v1/devices/dev_VD-ENT-00247 \
   }'
 ```
 
-### Lock / unlock a device
+### Verrouiller / déverrouiller un appareil
 
 ```bash
 # Lock device
@@ -104,7 +104,7 @@ curl -X POST https://api.vaultwares.com/v1/devices/dev_VD-ENT-00247/unlock \
   -H "X-API-Key: vw_live_1234567890abcdef"
 ```
 
-### Crypto-erase a device
+### Effacer cryptographiquement un appareil
 
 ```bash
 curl -X POST https://api.vaultwares.com/v1/devices/dev_VD-ENT-00247/crypto-erase \
@@ -117,18 +117,18 @@ curl -X POST https://api.vaultwares.com/v1/devices/dev_VD-ENT-00247/crypto-erase
 ```
 
 <Warning>
-  The `crypto-erase` endpoint is irreversible. All data on the device is permanently destroyed by wiping the encryption key.
+  Le point de terminaison `crypto-erase` est irréversible. Toutes les données sur l'appareil sont détruites de façon permanente en effaçant la clé de chiffrement.
 </Warning>
 
-## Policies
+## Politiques
 
-### List policies
+### Lister les politiques
 
 ```http
 GET /v1/policies
 ```
 
-### Create a policy
+### Créer une politique
 
 ```http
 POST /v1/policies
@@ -152,7 +152,7 @@ curl -X POST https://api.vaultwares.com/v1/policies \
   }'
 ```
 
-### Deploy policy to devices
+### Déployer une politique sur les appareils
 
 ```bash
 curl -X POST https://api.vaultwares.com/v1/policies/pol_abc123/deploy \
@@ -160,15 +160,15 @@ curl -X POST https://api.vaultwares.com/v1/policies/pol_abc123/deploy \
   -d '{"device_ids": ["dev_VD-ENT-00247", "dev_VD-ENT-00248"], "force": false}'
 ```
 
-## Users
+## Utilisateurs
 
-### List users
+### Lister les utilisateurs
 
 ```http
 GET /v1/users
 ```
 
-### Create a user
+### Créer un utilisateur
 
 ```http
 POST /v1/users
@@ -202,7 +202,7 @@ curl -X POST https://api.vaultwares.com/v1/users \
 }
 ```
 
-### Revoke all user sessions
+### Révoquer toutes les sessions utilisateur
 
 ```bash
 curl -X POST https://api.vaultwares.com/v1/users/user_charlie789/revoke-sessions \
@@ -210,22 +210,22 @@ curl -X POST https://api.vaultwares.com/v1/users/user_charlie789/revoke-sessions
   -d '{"reason": "Security incident"}'
 ```
 
-## Audit logs
+## Journaux d'audit
 
-### Query audit logs
+### Interroger les journaux d'audit
 
 ```http
 GET /v1/audit
 ```
 
-| Parameter | Type | Description |
+| Paramètre | Type | Description |
 |-----------|------|-------------|
-| `start` | ISO 8601 | Start of time range |
-| `end` | ISO 8601 | End of time range |
-| `user_id` | string | Filter by user |
-| `device_id` | string | Filter by device |
-| `event_type` | string | Filter by event type |
-| `limit` | integer | Results per page (max: 1000) |
+| `start` | ISO 8601 | Début de la plage de temps |
+| `end` | ISO 8601 | Fin de la plage de temps |
+| `user_id` | string | Filtrer par utilisateur |
+| `device_id` | string | Filtrer par appareil |
+| `event_type` | string | Filtrer par type d'événement |
+| `limit` | integer | Résultats par page (max : 1000) |
 
 ```bash
 curl https://api.vaultwares.com/v1/audit \
@@ -237,15 +237,15 @@ curl https://api.vaultwares.com/v1/audit \
   --data-urlencode "limit=100"
 ```
 
-## Keys
+## Clés
 
-### List keys
+### Lister les clés
 
 ```http
 GET /v1/keys
 ```
 
-### Generate a key
+### Générer une clé
 
 ```http
 POST /v1/keys
@@ -265,7 +265,7 @@ curl -X POST https://api.vaultwares.com/v1/keys \
   }'
 ```
 
-### Rotate a key
+### Rotationner une clé
 
 ```bash
 curl -X POST https://api.vaultwares.com/v1/keys/key_abc123/rotate \
@@ -273,15 +273,15 @@ curl -X POST https://api.vaultwares.com/v1/keys/key_abc123/rotate \
   -d '{"keep_old_version": true, "deprecate_old_after_days": 90}'
 ```
 
-## Certificates
+## Certificats
 
-### List certificates
+### Lister les certificats
 
 ```http
 GET /v1/certificates
 ```
 
-### Issue a certificate
+### Émettre un certificat
 
 ```http
 POST /v1/certificates
@@ -300,32 +300,32 @@ curl -X POST https://api.vaultwares.com/v1/certificates \
   }'
 ```
 
-## Error responses
+## Réponses d'erreur
 
 | HTTP Status | Error code | Description |
 |---|---|---|
-| 400 | `invalid_request` | Missing or malformed request parameter |
-| 401 | `invalid_api_key` | API key is invalid or revoked |
-| 403 | `insufficient_permissions` | API key lacks required permission |
-| 404 | `not_found` | Requested resource does not exist |
-| 409 | `conflict` | Resource already exists or state conflict |
-| 422 | `validation_error` | Request body failed validation |
-| 429 | `rate_limit_exceeded` | Too many requests |
-| 500 | `internal_error` | Server error — contact support |
+| 400 | `invalid_request` | Paramètre de requête manquant ou mal formé |
+| 401 | `invalid_api_key` | La clé API est invalide ou révoquée |
+| 403 | `insufficient_permissions` | La clé API ne possède pas la permission requise |
+| 404 | `not_found` | La ressource demandée n'existe pas |
+| 409 | `conflict` | La ressource existe déjà ou conflit d'état |
+| 422 | `validation_error` | Le corps de la requête a échoué à la validation |
+| 429 | `rate_limit_exceeded` | Trop de requêtes |
+| 500 | `internal_error` | Erreur serveur — contactez le support |
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Authentication" icon="key" href="/api-reference/authentication">
-    API keys, OAuth 2.0, and rate limits
+  <Card title="Authentification" icon="key" href="/api-reference/authentication">
+    Clés API, OAuth 2.0 et limites de taux
   </Card>
   <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
-    Real-time event notifications
+    Notifications d'événements en temps réel
   </Card>
-  <Card title="SDKs" icon="book-code" href="/api-reference/sdk">
-    Official client libraries
+  <Card title="SDK" icon="book-code" href="/api-reference/sdk">
+    Bibliothèques clientes officielles
   </Card>
-  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
-    Automate routine tasks with the API
+  <Card title="Opérations quotidiennes" icon="calendar" href="/guides/daily-operations">
+    Automatisez les tâches de routine avec l'API
   </Card>
 </CardGroup>

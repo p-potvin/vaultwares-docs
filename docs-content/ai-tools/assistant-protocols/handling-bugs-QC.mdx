@@ -1,24 +1,24 @@
 ---
-title: "Handling Bugs"
-description: "Assistant protocol summary: Handling Bugs"
+title: "Gestion des bogues"
+description: "Résumé du protocole de l'assistant : Gestion des bogues"
 ---
 
-# Handling Bugs
+# Gestion des bogues
 
-- Category ID: `HANDLING_BUGS`
-- Summary source: `instructions/summaries/HANDLING_BUGS.md`
-- Notes source: `instructions/notes/HANDLING_BUGS.md`
+- ID de catégorie : `HANDLING_BUGS`
+- Source du résumé : `instructions/summaries/HANDLING_BUGS.md`
+- Source des notes : `instructions/notes/HANDLING_BUGS.md`
 
-Applies when: a bug/defect is reported or discovered.
-Do:
-- Create a GitHub issue first (title, reproduction, expected vs actual, environment).
-- Decide fix-now vs assign using token budget: fix now only if the full loop (diagnose+patch+verify+reply) is expected to fit within <=6000 tokens.
-- If not fix-now: assign the issue to the user and link it in the reply.
-Do not:
-- Start large bugfix work without an issue link.
-Done when:
-- Issue exists and is linked; fix is either merged via PR or clearly deferred with ownership.
+S'applique quand : un bogue/défaut est signalé ou découvert.
+À faire :
+- Créer un problème GitHub d'abord (titre, reproduction, attendu vs réel, environnement).
+- Décider de corriger immédiatement ou d'assigner en utilisant le budget de jetons : corriger immédiatement seulement si le cycle complet (diagnostic+patch+vérification+réponse) est censé tenir dans <=6000 jetons.
+- Si ce n'est pas une correction immédiate : assigner le problème à l'utilisateur et y faire référence dans la réponse.
+À ne pas faire :
+- Commencer un travail de correction de bogue important sans lien de problème.
+Terminé quand :
+- Le problème existe et est lié ; la correction est soit fusionnée via une PR, soit clairement reportée avec un responsable.
 
 ## Notes
-Assistants read full notes only when explicitly prompted: `read full notes`.
-Notes path: `instructions/notes/HANDLING_BUGS.md`
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/HANDLING_BUGS.md`

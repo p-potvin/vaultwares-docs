@@ -1,29 +1,29 @@
 ---
-title: "Network Infrastructure"
-description: "Assistant protocol summary: Network Infrastructure"
+title: "Infrastructure réseau"
+description: "Résumé des protocoles de l'assistant : Infrastructure réseau"
 ---
 
-# Network Infrastructure
+# Infrastructure réseau
 
 - Category ID: `NETWORK_INFRASTRUCTURE`
 - Summary source: `instructions/summaries/NETWORK_INFRASTRUCTURE.md`
 - Notes source: `instructions/notes/NETWORK_INFRASTRUCTURE.md`
 
-Applies when: tailscale/tailnet, SSH, VPS, ports, nginx, firewalls, CI runners, any network access.
-Do:
-- Tailnet is the default control plane. Private services are tailnet-only.
-- SSH to servers is tailnet-only. Prefer SSH over Tailscale or tailnet IPs.
-- No outside contact for sensitive ops: do not open inbound ports for admin access; do not add public egress dependencies without explicit approval.
-- For loops or batches of TCP/UDP/HTTP/API requests, apply REQUEST_RATE_LIMITING before running commands.
-- CI: do not rely on outside GitHub-hosted runners for VaultWares infrastructure; use self-hosted runners only.
-- Consult these SoT pages before changes:
+S'applique quand : tailscale/tailnet, SSH, VPS, ports, nginx, pare-feu, exécuteurs CI, tout accès réseau.
+À faire :
+- Tailnet est le plan de contrôle par défaut. Les services privés sont uniquement tailnet.
+- Le SSH vers les serveurs est uniquement tailnet. Préférer SSH plutôt que les adresses IP Tailscale ou tailnet.
+- Pas de contact externe pour les opérations sensibles : ne pas ouvrir de ports entrants pour l'accès administratif ; ne pas ajouter de dépendances de sortie publiques sans approbation explicite.
+- Pour les boucles ou les lots de requêtes TCP/UDP/HTTP/API, appliquer REQUEST_RATE_LIMITING avant d'exécuter des commandes.
+- CI : ne pas dépendre des exécuteurs GitHub hébergés à l'extérieur pour l'infrastructure VaultWares ; utiliser uniquement des exécuteurs auto-hébergés.
+- Consulter ces pages SoT avant les changements :
   - vaultwares-docs/docs-content/operations/network-map.mdx
   - vaultwares-docs/docs-content/operations/tailscale.mdx
-Do not:
-- Add “quick temporary” public access paths.
-Done when:
-- Access paths are tailnet-first and documented; verification includes connectivity from the intended tailnet perspective.
+Ne pas :
+- Ajouter des chemins d'accès publics « rapides et temporaires ».
+Terminé quand :
+- Les chemins d'accès sont prioritaires tailnet et documentés ; la vérification comprend la connectivité depuis la perspective tailnet prévue.
 
 ## Notes
-Assistants read full notes only when explicitly prompted: `read full notes`.
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
 Notes path: `instructions/notes/NETWORK_INFRASTRUCTURE.md`

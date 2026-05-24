@@ -1,29 +1,29 @@
 ---
-title: "Long Running Tasks"
-description: "Assistant protocol summary: Long Running Tasks"
+title: "Tâches de longue durée"
+description: "Résumé du protocole de l'assistant : Tâches de longue durée"
 ---
 
-# Long Running Tasks
+# Tâches de longue durée
 
 - Category ID: `LONG_RUNNING_TASKS`
 - Summary source: `instructions/summaries/LONG_RUNNING_TASKS.md`
 - Notes source: `instructions/notes/LONG_RUNNING_TASKS.md`
 
-Applies when: overlay if estimated_output_tokens>=8000.
-Do:
-- Stop blind retries; if repeated failures yield no new signal, ask for instruction.
-- Interview gate: if your last reply asked no question and no interview occurred, ask exactly 1 question now and stop.
-- Include a VW_STATE block whenever this protocol applies.
-VW_STATE keys:
+S'applique quand : overlay if estimated_output_tokens>=8000.
+À faire :
+- Arrêter les tentatives aveugles ; si des échecs répétés ne donnent aucun nouveau signal, demander des instructions.
+- Porte d'entretien : si votre dernière réponse n'a posé aucune question et qu'aucun entretien n'a eu lieu, posez exactement 1 question maintenant et arrêtez.
+- Inclure un bloc VW_STATE chaque fois que ce protocole s'applique.
+Clés de VW_STATE :
 - routerCategories:[]
 - protocolsSelected:[]
 - overlaysApplied:[]
 - estimate:{estimatedOutputTokens:number,rationale:string}
 - interview:{askedQuestion:boolean,completed:boolean}
 - resume:{resumeMode:boolean,resumeId:string}
-Resume rule:
-- On resume, do not re-run estimate; use VW_STATE.estimate as-is; set interview.completed=true; do not re-trigger interview for the same resumeId.
+Règle de reprise :
+- Lors de la reprise, ne pas réexécuter l'estimation ; utiliser VW_STATE.estimate tel quel ; définir interview.completed=true ; ne pas déclencher à nouveau l'entretien pour le même resumeId.
 
 ## Notes
-Assistants read full notes only when explicitly prompted: `read full notes`.
-Notes path: `instructions/notes/LONG_RUNNING_TASKS.md`
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/LONG_RUNNING_TASKS.md`

@@ -1,24 +1,24 @@
 ---
-title: "Security Posture"
-description: "Assistant protocol summary: Security Posture"
+title: "Posture de sécurité"
+description: "Résumé du protocole de l'assistant : Posture de sécurité"
 ---
 
-# Security Posture
+# Posture de sécurité
 
-- Category ID: `SECURITY_POSTURE`
-- Summary source: `instructions/summaries/SECURITY_POSTURE.md`
-- Notes source: `instructions/notes/SECURITY_POSTURE.md`
+- ID de catégorie : `SECURITY_POSTURE`
+- Source du résumé : `instructions/summaries/SECURITY_POSTURE.md`
+- Source des notes : `instructions/notes/SECURITY_POSTURE.md`
 
-Applies when: auth, crypto, keys, tokens, access control, threat model, security UX.
-Do:
-- Privacy first. Security in service of privacy.
-- Use post-quantum cryptography with ML-KEM where security UX or protocols require PQC.
-- Ensure servers never read, persist, or reconstruct private keys or shared decryption keys.
-Do not:
-- Add features that imply impersonation, KYC bypass, or document forgery.
-Done when:
-- You can explain how the change preserves zero-knowledge/key-separation constraints.
+S'applique aux cas où : auth, crypto, keys, tokens, contrôle d'accès, modèle de menace, expérience utilisateur de sécurité (UX).
+À faire :
+- La confidentialité d'abord. La sécurité au service de la confidentialité.
+- Utiliser la cryptographie post-quantique avec ML-KEM lorsque l'UX de sécurité ou les protocoles exigent la PQC.
+- S'assurer que les serveurs ne lisent jamais, ne conservent jamais et ne reconstruisent jamais les clés privées ou les clés de déchiffrement partagées.
+À ne pas faire :
+- Ajouter des fonctionnalités qui impliquent l'usurpation d'identité, le contournement de KYC ou la falsification de documents.
+Fait lorsque :
+- Vous pouvez expliquer comment le changement préserve les contraintes de connaissance nulle/séparation des clés.
 
 ## Notes
-Assistants read full notes only when explicitly prompted: `read full notes`.
-Notes path: `instructions/notes/SECURITY_POSTURE.md`
+Les assistants lisent les notes complètes uniquement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/SECURITY_POSTURE.md`

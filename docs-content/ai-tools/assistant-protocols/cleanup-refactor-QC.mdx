@@ -1,24 +1,24 @@
 ---
-title: "Cleanup Refactor"
-description: "Assistant protocol summary: Cleanup Refactor"
+title: "Nettoyage et Refactorisation"
+description: "Résumé du protocole de l'assistant : Nettoyage et Refactorisation"
 ---
 
-# Refactorisation du nettoyage
+# Nettoyage et Refactorisation
 
-- ID de catégorie : `CLEANUP_REFACTOR`
-- Source du résumé : `instructions/summaries/CLEANUP_REFACTOR.md`
-- Source des notes : `instructions/notes/CLEANUP_REFACTOR.md`
+- ID de catégorie : `CLEANUP_REFACTOR`
+- Source du résumé : `instructions/summaries/CLEANUP_REFACTOR.md`
+- Source des notes : `instructions/notes/CLEANUP_REFACTOR.md`
 
-S'applique dans les cas suivants : refactorisation, désencombrement, réorganisation, modifications importantes sans nouvelle fonctionnalité destinée à l'utilisateur.
-Faire :
-- Rédigez un plan de nettoyage avant de le modifier.
-- Verrouillez d'abord le comportement avec des tests ou des étapes de vérification concrètes.
-- Préférer la suppression à l'ajout ; garder les différences petites et réversibles.
-Pas :
-- Combiner le refactor avec des travaux de fonctionnalités sans rapport.
-Fais quand :
-- Le comportement est inchangé (ou explicitement déclaré) et des preuves de vérification existent.
+S'applique quand : refactorisation, désencombrement, réorganisation, grandes modifications sans nouvelle fonctionnalité visible par l'utilisateur.
+À faire :
+- Écrire un plan de nettoyage avant de modifier.
+- Verrouiller le comportement avec des tests ou des étapes de vérification concrètes en premier.
+- Préférer la suppression plutôt que l'ajout; garder les différences (diffs) petites et réversibles.
+À ne pas faire :
+- Mélanger la refactorisation avec des fonctionnalités sans rapport.
+Terminé quand :
+- Le comportement n'a pas changé (ou est explicitement déclaré) et des preuves de vérification existent.
 
-## Remarques
-Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
-Chemin des notes : `instructions/notes/CLEANUP_REFACTOR.md`
+## Notes
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/CLEANUP_REFACTOR.md`

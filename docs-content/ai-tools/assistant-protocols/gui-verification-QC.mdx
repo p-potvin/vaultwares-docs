@@ -1,25 +1,25 @@
 ---
-title: "Gui Verification"
-description: "Assistant protocol summary: Gui Verification"
+title: "Vérification de l'interface graphique"
+description: "Résumé du protocole de l'assistant : Vérification de l'interface graphique"
 ---
 
-# Vérification Gui
+# Vérification de l'interface graphique
 
-- ID de catégorie : `GUI_VERIFICATION`
-- Source du résumé : `instructions/summaries/GUI_VERIFICATION.md`
-- Source des notes : `instructions/notes/GUI_VERIFICATION.md`
+- ID de catégorie : `GUI_VERIFICATION`
+- Source du résumé : `instructions/summaries/GUI_VERIFICATION.md`
+- Source des notes : `instructions/notes/GUI_VERIFICATION.md`
 
-S'applique lorsque : interface utilisateur Web, interface utilisateur du site de documentation, tableaux de bord, panneaux d'administration, SPA.
-Faire :
-- Naviguez sur au moins 2 liens en profondeur et en arrière.
-- Vérifiez la console DevTools et le réseau pour bloquer les erreurs.
-- Déclenchez un état de survol/mise au point et un état vide/erreur pertinent au changement.
-- Vérifiez par recoupement avec une deuxième modalité lorsque cela est possible (curl/Invoke-WebRequest ou Playwright).
-Pas :
-- Marquez « travail » à partir d'une seule capture d'écran ou 200 OK.
-Fais quand :
-- Vous pouvez énumérer les pages visitées et ce que vous avez inspecté.
+S'applique quand : interface web, site de documentation, tableaux de bord, panneaux d'administration, SPA.
+À faire :
+- Naviguer sur au moins 2 liens de profondeur et revenir en arrière.
+- Vérifier la console et le réseau des outils de développement pour les erreurs bloquantes.
+- Déclencher les états de survol/focus et un état vide/d'erreur pertinent au changement.
+- Vérifier avec une deuxième modalité si possible (curl/Invoke-WebRequest ou Playwright).
+À ne pas faire :
+- Marquer comme « fonctionnel » à partir d'une seule capture d'écran ou d'un 200 OK.
+Terminé quand :
+- Vous pouvez lister les pages visitées et ce que vous avez inspecté.
 
 ## Notes
-Assistants read full notes only when explicitly prompted: `read full notes`.
-Notes path: `instructions/notes/GUI_VERIFICATION.md`
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/GUI_VERIFICATION.md`

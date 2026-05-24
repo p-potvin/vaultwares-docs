@@ -1,23 +1,23 @@
 ---
-title: "Global Instruction Sync"
-description: "Assistant protocol summary: Global Instruction Sync"
+title: "Synchronisation globale des instructions"
+description: "Résumé du protocole de l'assistant : Synchronisation globale des instructions"
 ---
 
 # Synchronisation globale des instructions
 
-- ID de catégorie : `GLOBAL_INSTRUCTION_SYNC`
-- Source du résumé : `instructions/summaries/GLOBAL_INSTRUCTION_SYNC.md`
-- Source des notes : `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`
+- ID de catégorie : `GLOBAL_INSTRUCTION_SYNC`
+- Source de résumé : `instructions/summaries/GLOBAL_INSTRUCTION_SYNC.md`
+- Source de notes : `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`
 
-S'applique lorsque : modification de vaultwares-docs/AGENTS.md (instructions globales de niveau 1).
-Faire :
-- Après avoir modifié vaultwares-docs/AGENTS.md, exécutez : vaultwares-docs/scripts/sync-global-instructions.ps1
-- Synchronisez uniquement les préinstructions/pointeurs ; ne dupliquez pas la bibliothèque de protocoles complète dans les cibles hôtes.
-Pas :
-- Laissez les cibles hôtes obsolètes après les modifications d'AGENTS.md.
-Fais quand :
-- La synchronisation s'est déroulée avec succès (ou l'échec et la raison sont enregistrés).
+S'applique lorsque : on modifie `vaultwares-docs/AGENTS.md` (instructions globales de niveau 1).
+À faire :
+- Après avoir modifié `vaultwares-docs/AGENTS.md`, exécuter : `vaultwares-docs/scripts/sync-global-instructions.ps1`
+- Synchroniser uniquement les pré-instructions/pointeurs ; ne pas dupliquer la bibliothèque de protocole complète dans les cibles hôtes.
+À ne pas faire :
+- Laisser les cibles hôtes obsolètes après les changements dans `AGENTS.md`.
+Terminé lorsque :
+- La synchronisation a réussi (ou qu'un échec et la raison sont enregistrés).
 
-## Remarques
-Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
-Chemin des notes : `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`
+## Notes
+Les assistants lisent les notes complètes uniquement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/GLOBAL_INSTRUCTION_SYNC.md`

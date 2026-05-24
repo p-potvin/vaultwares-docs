@@ -1,61 +1,61 @@
 ---
-title: "Backups (Private)"
-description: "GreenCloud VPS hourly backups to Google Drive via rclone (encrypted)."
+title: "Sauvegardes (Privé)"
+description: "Sauvegardes horaires GreenCloud VPS vers Google Drive via rclone (chiffrées)."
 ---
 
-# Backups (Private)
+# Sauvegardes (Privé)
 
-Hourly backups run on `greencloud-vps` (`vaultwares-1`) using `rclone` to your Google Drive.
+Les sauvegardes horaires s'exécutent sur `greencloud-vps` (`vaultwares-1`) en utilisant `rclone` vers votre Google Drive.
 
-## What is backed up
+## Ce qui est sauvegardé
 
-The hourly job creates a `.tgz` containing (includes secrets):
+Le job horaire crée un fichier `.tgz` contenant (inclut des secrets) :
 
 - `/etc/nginx` (sites + nginx.conf)
-- `/etc/systemd/system` (custom units/timers)
-- `/etc/vw-secretsd` (VaultWarden config)
-- `/etc/vw-deployd` (webhook receiver config)
-- `/etc/letsencrypt` (TLS keys + renewal config)
-- `/opt/actions-runner` (self-hosted GitHub runner config)
+- `/etc/systemd/system` (unités/minuteries personnalisées)
+- `/etc/vw-secretsd` (Configuration VaultWarden)
+- `/etc/vw-deployd` (Configuration du récepteur de webhooks)
+- `/etc/letsencrypt` (Clés TLS + configuration de renouvellement)
+- `/opt/actions-runner` (Configuration du runner GitHub auto-hébergé)
 - `/opt/vw-jira-sync`
 - `/opt/vault-warden`
 - `/opt/vaultwares-webhooks`
 
-## Encryption
+## Chiffrement
 
-Backups are uploaded to a **crypt** remote (`vw_gdrive_crypt:`) so Google Drive only sees encrypted filenames + encrypted contents.
+Les sauvegardes sont téléchargées dans un dépôt **crypt** (`vw_gdrive_crypt:`) afin que Google Drive ne voie que des noms de fichiers et des contenus chiffrés.
 
-The crypt keys are stored in VaultWarden as:
+Les clés crypt sont stockées dans VaultWarden comme :
 
 - `vw_rclone_crypt_password`
 - `vw_rclone_crypt_password2`
 
-Do not paste these values into docs, issues, or chat.
+Ne collez jamais ces valeurs dans des documents, des problèmes ou des discussions.
 
-## Where it runs
+## Où ça s'exécute
 
-- Script: `/usr/local/bin/vw-backup.sh`
-- Systemd unit: `/etc/systemd/system/vw-backup.service`
-- Timer: `/etc/systemd/system/vw-backup.timer` (`OnCalendar=hourly`)
-- rclone config: `/etc/vw-backup/rclone.conf` (root-only)
-- Log: `/var/log/vaultwares/vw-backup.log`
+- Script : `/usr/local/bin/vw-backup.sh`
+- Unité systemd : `/etc/systemd/system/vw-backup.service`
+- Minuterie : `/etc/systemd/system/vw-backup.timer` (`OnCalendar=hourly`)
+- Configuration rclone : `/etc/vw-backup/rclone.conf` (root seulement)
+- Journal : `/var/log/vaultwares/vw-backup.log`
 
-## One-time Google Drive authorization
+## Autorisation unique Google Drive
 
-Google Drive OAuth needs to be completed once on the VPS (headless flow):
+L'OAuth Google Drive doit être complété une seule fois sur le VPS (flux sans tête) :
 
 ```bash
 sudo rclone --config /etc/vw-backup/rclone.conf config reconnect vw_gdrive:
 ```
 
-Then verify:
+Vérifiez ensuite :
 
 ```bash
 sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive:
 sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive_crypt:
 ```
 
-## Control / troubleshooting
+## Contrôle / Dépannage
 
 ```bash
 sudo systemctl status vw-backup.timer
@@ -64,10 +64,10 @@ sudo journalctl -u vw-backup.service -n 200 --no-pager
 tail -n 200 /var/log/vaultwares/vw-backup.log
 ```
 
-If OAuth is missing, `vw-backup.service` fails fast with an error telling you to run `config reconnect`.
+Si l'OAuth est manquant, `vw-backup.service` échoue rapidement avec une erreur vous indiquant de lancer `config reconnect`.
 
-## Restore (high-level)
+## Restauration (vue d'ensemble)
 
-1. Download the desired `.tgz` from `vw_gdrive_crypt:VaultWares/backups/vaultwares-1/` (host folder name depends on hostname).
-2. Extract it to a staging directory.
-3. Restore selected paths (nginx/systemd/letsencrypt) and then reload nginx/systemd.
+1. Téléchargez le fichier `.tgz` souhaité depuis `vw_gdrive_crypt:VaultWares/backups/vaultwares-1/` (le nom du dossier hôte dépend du nom d'hôte).
+2. Extrayez-le dans un répertoire de staging.
+3. Restaurez les chemins sélectionnés (nginx/systemd/letsencrypt) puis rechargez nginx/systemd.

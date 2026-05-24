@@ -1,20 +1,20 @@
 ---
-title: 'Markdown syntax'
-description: 'Text, title, and styling in standard markdown'
+title: 'Syntaxe Markdown'
+description: 'Texte, titres et stylisation en markdown standard'
 icon: 'text-size'
 ---
 
-## Titles
+## Titres
 
-Best used for section headers.
+Idéal pour les en-têtes de section.
 
 ```md
 ## Titles
 ```
 
-### Subtitles
+### Sous-titres
 
-Best used for subsection headers.
+Idéal pour les en-têtes de sous-section.
 
 ```md
 ### Subtitles
@@ -22,42 +22,42 @@ Best used for subsection headers.
 
 <Tip>
 
-Each **title** and **subtitle** creates an anchor and also shows up on the table of contents on the right.
+Chaque **titre** et **sous-titre** crée une ancre et apparaît aussi dans la table des matières à droite.
 
 </Tip>
 
-## Text formatting
+## Formatage de texte
 
-We support most markdown formatting. Simply add `**`, `_`, or `~` around text to format it.
+Nous prenons en charge la plupart des formats markdown. Il suffit d'ajouter `**`, `_`, ou `~` autour du texte pour le formater.
 
-| Style         | How to write it   | Result          |
-| ------------- | ----------------- | --------------- |
-| Bold          | `**bold**`        | **bold**        |
-| Italic        | `_italic_`        | _italic_        |
-| Strikethrough | `~strikethrough~` | ~strikethrough~ |
+| Style | Comment l'écrire | Résultat |
+| :--- | :--- | :--- |
+| Gras | `**gras**` | **gras** |
+| Italique | `_italique_` | _italique_ |
+| Barré | `~barré~` | ~barré~ |
 
-You can combine these. For example, write `**_bold and italic_**` to get **_bold and italic_** text.
+Vous pouvez les combiner. Par exemple, écrivez `**_gras et italique_**` pour obtenir du texte **_gras et italique_**.
 
-You need to use HTML to write superscript and subscript text. That is, add `<sup>` or `<sub>` around your text.
+Vous devez utiliser du HTML pour écrire du texte en exposant et en indice. C'est-à-dire, ajoutez `<sup` ou `<sub` autour de votre texte.
 
-| Text Size   | How to write it          | Result                 |
-| ----------- | ------------------------ | ---------------------- |
-| Superscript | `<sup>superscript</sup>` | <sup>superscript</sup> |
-| Subscript   | `<sub>subscript</sub>`   | <sub>subscript</sub>   |
+| Taille du texte | Comment l'écrire | Résultat |
+| :--- | :--- | :--- |
+| Exposant | `<sup>exposant</sup>` | <sup>exposant</sup> |
+| Indice | `<sub>indice</sub>` | <sub>indice</sub> |
 
-## Linking to pages
+## Créer des liens vers des pages
 
-You can add a link by wrapping text in `[]()`. You would write `[link to google](https://google.com)` to [link to google](https://google.com).
+Vous pouvez ajouter un lien en enveloppant le texte dans `[]()`. Vous écririez `[lien vers google](https://google.com)` pour obtenir un [lien vers google](https://google.com).
 
-Links to pages in your docs need to be root-relative. Basically, you should include the entire folder path. For example, `[link to text](/writing-content/text)` links to the page "Text" in our components section.
+Les liens vers des pages de votre documentation doivent être relatifs à la racine. En gros, vous devriez inclure le chemin complet du dossier. Par exemple, `[lien vers texte](/writing-content/text)` pointe vers la page « Text » dans notre section composants.
 
-Relative links like `[link to text](../text)` will open slower because we cannot optimize them as easily.
+Les liens relatifs comme `[lien vers texte](../text)` s'ouvriront plus lentement parce qu'on ne peut pas les optimiser aussi facilement.
 
-## Blockquotes
+## Citations
 
-### Singleline
+### Sur une seule ligne
 
-To create a blockquote, add a `>` in front of a paragraph.
+Pour créer une citation, ajoutez un `>` devant un paragraphe.
 
 > Dorothy followed her through many of the beautiful rooms in her castle.
 
@@ -65,7 +65,7 @@ To create a blockquote, add a `>` in front of a paragraph.
 > Dorothy followed her through many of the beautiful rooms in her castle.
 ```
 
-### Multiline
+### Multi-lignes
 
 > Dorothy followed her through many of the beautiful rooms in her castle.
 >
@@ -79,7 +79,7 @@ To create a blockquote, add a `>` in front of a paragraph.
 
 ### LaTeX
 
-Mintlify supports [LaTeX](https://www.latex-project.org) through the Latex component.
+Mintlify prend en charge [LaTeX](https://www.latex-project.org) grâce au composant Latex.
 
 <Latex>8 x (vk x H1 - H2) = (0,1)</Latex>
 

@@ -1,37 +1,37 @@
 ---
-title: "Access control"
-description: "Zero-trust access control and identity management"
+title: "Contrôle d'accès"
+description: "Contrôle d'accès et gestion d'identité zéro confiance"
 ---
 
-## Overview
+## Aperçu
 
-VaultAccess is VaultWares' zero-trust access control and identity management platform. It enforces least-privilege policies across your entire infrastructure — from endpoint authentication to privileged access management — and integrates natively with Active Directory, LDAP, SAML 2.0, and OAuth 2.0 providers.
+VaultAccess est la plateforme de contrôle d'accès et de gestion d'identité zéro confiance de VaultWares. Elle applique des politiques de moindre privilège sur l'ensemble de votre infrastructure — de l'authentification des points d'accès à la gestion des accès privilégiés — et s'intègre nativement avec Active Directory, LDAP, SAML 2.0 et les fournisseurs OAuth 2.0.
 
-## Product editions
+## Éditions du produit
 
 <CardGroup cols={3}>
   <Card title="VaultAccess Standard" icon="shield">
-    **Best for**: Small teams (up to 50 users)  
-    **Features**: RBAC, MFA, AD/LDAP integration  
-    **License**: Per-user annual subscription
+    **Idéal pour** : Petites équipes (jusqu'à 50 utilisateurs)
+    **Fonctionnalités** : RBAC, MFA, Intégration AD/LDAP
+    **Licence** : Abonnement annuel par utilisateur
   </Card>
   <Card title="VaultAccess Professional" icon="shield-halved">
-    **Best for**: Mid-size organizations (up to 500 users)  
-    **Features**: RBAC, ABAC, SSO, PAM, SIEM integration  
-    **License**: Per-user annual subscription
+    **Idéal pour** : Organisations de taille moyenne (jusqu'à 500 utilisateurs)
+    **Fonctionnalités** : RBAC, ABAC, SSO, PAM, Intégration SIEM
+    **Licence** : Abonnement annuel par utilisateur
   </Card>
   <Card title="VaultAccess Enterprise" icon="shield-check">
-    **Best for**: Large enterprises (unlimited users)  
-    **Features**: Full zero-trust, adaptive MFA, API access, custom policies  
-    **License**: Site license or per-user
+    **Idéal pour** : Grandes entreprises (utilisateurs illimités)
+    **Fonctionnalités** : Zéro confiance complet, MFA adaptatif, accès API, politiques personnalisées
+    **Licence** : Licence site ou par utilisateur
   </Card>
 </CardGroup>
 
-## Core features
+## Fonctionnalités principales
 
-### Role-based access control (RBAC)
+### Contrôle d'accès basé sur les rôles (RBAC)
 
-VaultAccess provides a hierarchical RBAC model with built-in roles and full support for custom role definitions.
+VaultAccess fournit un modèle RBAC hiérarchique avec des rôles intégrés et un support complet pour la définition de rôles personnalisés.
 
 ```json
 {
@@ -67,9 +67,9 @@ vw-admin user assign-role \
 vw-admin role list --format table
 ```
 
-### Attribute-based access control (ABAC)
+### Contrôle d'accès basé sur les attributs (ABAC)
 
-ABAC policies evaluate multiple contextual attributes at access time, enabling fine-grained control beyond simple role assignments.
+Les politiques ABAC évaluent plusieurs attributs contextuels au moment de l'accès, permettant un contrôle granulaire au-delà des simples attributions de rôles.
 
 ```json
 {
@@ -100,41 +100,41 @@ ABAC policies evaluate multiple contextual attributes at access time, enabling f
 }
 ```
 
-### Zero-trust architecture
+### Architecture zéro confiance
 
-VaultAccess implements zero-trust principles: every access request is verified regardless of network location.
+VaultAccess met en œuvre les principes zéro confiance : chaque demande d'accès est vérifiée, peu importe l'emplacement réseau.
 
 <Steps>
-  <Step title="Identity verification">
-    Every user and device must authenticate with at least two factors before any access is granted. Certificates, biometrics, and hardware tokens are supported.
+  <Step title="Vérification d'identité">
+    Chaque utilisateur et appareil doit s'authentifier avec au moins deux facteurs avant que tout accès ne soit accordé. Les certificats, la biométrie et les jetons matériels sont pris en charge.
   </Step>
-  <Step title="Device posture check">
-    Before granting access, VaultAccess checks that the requesting device meets your security baseline: OS patch level, disk encryption status, EDR agent presence, and certificate validity.
+  <Step title="Vérification de l'état de l'appareil">
+    Avant d'accorder l'accès, VaultAccess vérifie que l'appareil demandeur respecte votre niveau de base de sécurité : niveau de correctif du système d'exploitation, statut de chiffrement du disque, présence d'agent EDR et validité du certificat.
   </Step>
-  <Step title="Least-privilege enforcement">
-    Users receive only the permissions required for the specific task. Time-limited access tokens expire automatically; standing access is minimized.
+  <Step title="Application du moindre privilège">
+    Les utilisateurs ne reçoivent que les autorisations nécessaires pour la tâche spécifique. Les jetons d'accès à durée limitée expirent automatiquement; l'accès permanent est minimisé.
   </Step>
-  <Step title="Continuous monitoring">
-    Access sessions are monitored in real-time. Anomalous behavior (unusual hours, new location, excessive failed operations) triggers step-up authentication or automatic session termination.
+  <Step title="Surveillance continue">
+    Les sessions d'accès sont surveillées en temps réel. Un comportement anormal (heures inhabituelles, nouvel emplacement, opérations échouées excessives) déclenche une authentification renforcée ou une terminaison de session automatique.
   </Step>
 </Steps>
 
-### Multi-factor authentication (MFA)
+### Authentification multi-facteurs (MFA)
 
 <AccordionGroup>
-  <Accordion title="Supported MFA methods">
+  <Accordion title="Méthodes MFA prises en charge">
     - **TOTP** (Google Authenticator, Authy, Microsoft Authenticator)
-    - **FIDO2 / WebAuthn** hardware security keys (YubiKey, VaultScan biometric terminal)
-    - **Push notifications** via VaultWares Authenticator mobile app
-    - **SMS / Email OTP** (for legacy compatibility — not recommended for high-security environments)
-    - **Smart card / PIV** (X.509 certificate-based authentication)
-    - **Biometric** via VaultScan devices
+    - **FIDO2 / WebAuthn** clés de sécurité matérielles (YubiKey, terminal biométrique VaultScan)
+    - **Notifications push** via l'application mobile VaultWares Authenticator
+    - **OTP SMS / Courriel** (pour la compatibilité héritée — non recommandé pour les environnements de haute sécurité)
+    - **Carte à puce / PIV** (authentification basée sur certificat X.509)
+    - **Biométrique** via les appareils VaultScan
   </Accordion>
-  <Accordion title="Adaptive MFA">
-    Enterprise edition supports adaptive MFA, which escalates authentication requirements based on risk signals:
-    - First login from a new device or location → require hardware key
-    - Access from outside corporate network → push notification required
-    - Privileged operation (HSM key generation) → smart card required
+  <Accordion title="MFA adaptative">
+    L'édition Entreprise prend en charge le MFA adaptatif, qui augmente les exigences d'authentification en fonction des signaux de risque :
+    - Première connexion depuis un nouvel appareil ou un nouvel emplacement → clé matérielle requise
+    - Accès depuis l'extérieur du réseau d'entreprise → notification push requise
+    - Opération privilégiée (génération de clé HSM) → carte à puce requise
   </Accordion>
 </AccordionGroup>
 
@@ -152,7 +152,7 @@ vw-admin mfa enroll-fido2 \
   --device "YubiKey 5C"
 ```
 
-### Single sign-on (SSO)
+### Authentification unique (SSO)
 
 <Tabs>
   <Tab title="SAML 2.0">
@@ -210,9 +210,9 @@ vw-admin mfa enroll-fido2 \
   </Tab>
 </Tabs>
 
-### Privileged access management (PAM)
+### Gestion des accès privilégiés (PAM)
 
-PAM capabilities are available in Professional and Enterprise editions.
+Les capacités PAM sont disponibles dans les éditions Professionnelle et Entreprise.
 
 ```bash
 # Create a privileged session for HSM administration
@@ -234,7 +234,7 @@ vw-admin pam end-session --session psess_abc123
 vw-admin pam replay --session psess_abc123
 ```
 
-## API examples
+## Exemples d'API
 
 ```bash
 # Create user via API
@@ -259,7 +259,7 @@ curl -X POST https://api.vaultwares.com/v1/users/user_abc123/revoke-all-sessions
   -H "X-API-Key: vw_live_1234567890abcdef"
 ```
 
-## Policy configuration reference
+## Référence de configuration des politiques
 
 ```json
 {
@@ -292,33 +292,33 @@ curl -X POST https://api.vaultwares.com/v1/users/user_abc123/revoke-all-sessions
 }
 ```
 
-## Compliance and certifications
+## Conformité et certifications
 
 <AccordionGroup>
-  <Accordion title="NIST SP 800-207 Zero Trust Architecture">
-    VaultAccess implements all seven tenets of the NIST Zero Trust Architecture, including device trust, dynamic policy enforcement, and continuous monitoring.
+  <Accordion title="Architecture zéro confiance NIST SP 800-207">
+    VaultAccess met en œuvre les sept principes de l'Architecture zéro confiance NIST, y compris la confiance dans l'appareil, l'application dynamique des politiques et la surveillance continue.
   </Accordion>
   <Accordion title="ISO 27001 / ISO 27002">
-    Supports controls A.9 (Access Control) and A.6.1.2 (Segregation of Duties) from ISO 27001 Annex A.
+    Prend en charge les contrôles A.9 (Contrôle d'accès) et A.6.1.2 (Séparation des tâches) de l'Annexe A de l'ISO 27001.
   </Accordion>
   <Accordion title="SOC 2 Type II">
-    VaultAccess audit logs and access control mechanisms satisfy the CC6 (Logical and Physical Access Controls) criteria of the SOC 2 Trust Service Criteria.
+    Les journaux d'audit et les mécanismes de contrôle d'accès de VaultAccess satisfont aux critères CC6 (Contrôles d'accès logiques et physiques) des Critères de service de confiance SOC 2.
   </Accordion>
 </AccordionGroup>
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
-    Connect VaultAccess to AD, LDAP, and SAML providers
+  <Card title="Guides d'intégration" icon="plug" href="/installation/integration-guides">
+    Connecter VaultAccess aux fournisseurs AD, LDAP et SAML
   </Card>
-  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
-    Set up admin accounts and LDAP synchronization
+  <Card title="Configuration initiale" icon="sliders" href="/installation/initial-configuration">
+    Configurer les comptes administrateurs et la synchronisation LDAP
   </Card>
-  <Card title="API reference" icon="code" href="/api-reference/endpoints">
-    Manage users and policies via the REST API
+  <Card title="Référence API" icon="code" href="/api-reference/endpoints">
+    Gérer les utilisateurs et les politiques via l'API REST
   </Card>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    Zero-trust deployment recommendations
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Recommandations de déploiement zéro confiance
   </Card>
 </CardGroup>

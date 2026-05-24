@@ -1,49 +1,49 @@
 ---
-title: "GDPR compliance"
-description: "General Data Protection Regulation compliance guide"
+title: "Conformité au RGPD"
+description: "Guide de conformité au Règlement général sur la protection des données"
 ---
 
-## Overview
+## Vue d'ensemble
 
-The General Data Protection Regulation (GDPR) requires organizations processing personal data of EU/EEA residents to implement appropriate technical and organizational measures to protect that data. VaultWares products provide the technical controls needed to meet GDPR's security requirements.
+Le Règlement général sur la protection des données (RGPD) exige que les organisations qui traitent des données personnelles de résidents de l'UE/EEE mettent en œuvre des mesures techniques et organisationnelles appropriées pour protéger ces données. Les produits VaultWares fournissent les contrôles techniques nécessaires pour répondre aux exigences de sécurité du RGPD.
 
 <Note>
-  This guide provides technical guidance on how VaultWares products support GDPR compliance. It is not legal advice. Consult your Data Protection Officer (DPO) and legal counsel for a complete compliance assessment.
+  Ce guide fournit des conseils techniques sur la manière dont les produits VaultWares soutiennent la conformité au RGPD. Il ne constitue pas un avis juridique. Consultez votre Responsable de la protection des données (RPD) et un conseiller juridique pour une évaluation complète de la conformité.
 </Note>
 
-## Relevant GDPR articles
+## Articles pertinents du RGPD
 
 <AccordionGroup>
-  <Accordion title="Article 5 — Principles of data processing">
-    **Relevance**: Integrity and confidentiality principle (Art. 5(1)(f)) requires personal data to be processed "in a manner that ensures appropriate security of the personal data, including protection against unauthorised or unlawful processing and against accidental loss, destruction or damage."
+  <Accordion title="Article 5 — Principes de traitement des données">
+    **Pertinence** : Le principe d'intégrité et de confidentialité (Art. 5(1)(f)) exige que les données personnelles soient traitées « d'une manière qui assure la sécurité appropriée des données personnelles, y compris la protection contre le traitement non autorisé ou illicite et contre la perte, la destruction ou les dommages accidentels. »
 
-    **VaultWares controls**:
-    - VaultDrive and VaultCrypt ensure data-at-rest confidentiality
-    - VaultHSM provides key management to protect encryption keys
-    - VaultBackup ensures data availability and disaster recovery
+    **Contrôles VaultWares** :
+    - VaultDrive et VaultCrypt assurent la confidentialité des données au repos
+    - VaultHSM fournit la gestion des clés pour protéger les clés de chiffrement
+    - VaultBackup assure la disponibilité des données et la reprise après sinistre
   </Accordion>
-  <Accordion title="Article 25 — Data protection by design and by default">
-    **Relevance**: Requires implementing data protection measures from the ground up, not as an afterthought.
+  <Accordion title="Article 25 — Protection des données dès la conception et par défaut">
+    **Pertinence** : Exige la mise en œuvre de mesures de protection des données dès le départ, et non après coup.
 
-    **VaultWares controls**:
-    - Hardware encryption on VaultDrive is always-on; it cannot be disabled
-    - VaultAccess enforces least-privilege by default; access must be explicitly granted
-    - VaultCrypt can enforce always-encrypted volumes via GPO/MDM policy
+    **Contrôles VaultWares** :
+    - Le chiffrement matériel sur VaultDrive est toujours actif; il ne peut pas être désactivé
+    - VaultAccess applique par défaut le moindre privilège; l'accès doit être explicitement accordé
+    - VaultCrypt peut appliquer des volumes toujours chiffrés via une politique GPO/MDM
   </Accordion>
-  <Accordion title="Article 32 — Security of processing">
-    **Relevance**: Requires "appropriate technical and organisational measures" including encryption, pseudonymisation, ongoing confidentiality/integrity/availability assurance, and regular testing.
+  <Accordion title="Article 32 — Sécurité du traitement">
+    **Pertinence** : Exige des « mesures techniques et organisationnelles appropriées », y compris le chiffrement, la pseudonymisation, l'assurance continue de la confidentialité/intégrité/disponibilité, et des tests réguliers.
 
-    **VaultWares controls**:
-    - AES-256-XTS encryption for storage; TLS 1.3 for transmission
-    - VaultHSM FIPS 140-3 Level 3/4 certified key management
-    - VaultMonitor continuous security monitoring and anomaly detection
-    - VaultBackup automated recovery testing
+    **Contrôles VaultWares** :
+    - Chiffrement AES-256-XTS pour le stockage; TLS 1.3 pour la transmission
+    - Gestion des clés VaultHSM certifiée FIPS 140-3 Niveau 3/4
+    - VaultMonitor pour la surveillance continue de la sécurité et la détection d'anomalies
+    - VaultBackup pour les tests automatisés de récupération
   </Accordion>
-  <Accordion title="Article 17 — Right to erasure ('Right to be forgotten')">
-    **Relevance**: Data subjects can request deletion of their personal data.
+  <Accordion title="Article 17 — Droit à l'effacement ('Droit à l'oubli')">
+    **Pertinence** : Les personnes concernées peuvent demander la suppression de leurs données personnelles.
 
-    **VaultWares controls**:
-    VaultCrypt's cryptographic erasure capability makes data permanently inaccessible by destroying the encryption key, which is typically faster and more reliable than overwriting data (especially on SSDs).
+    **Contrôles VaultWares** :
+    La capacité d'effacement cryptographique de VaultCrypt rend les données définitivement inaccessibles en détruisant la clé de chiffrement, ce qui est généralement plus rapide et plus fiable que d'écraser les données (surtout sur les SSD).
 
     ```bash
     # Cryptographic erasure of a VaultCrypt volume
@@ -59,11 +59,11 @@ The General Data Protection Regulation (GDPR) requires organizations processing 
       --audit-log
     ```
   </Accordion>
-  <Accordion title="Article 20 — Right to data portability">
-    **Relevance**: Data subjects can request their data in a portable format.
+  <Accordion title="Article 20 — Droit à la portabilité des données">
+    **Pertinence** : Les personnes concernées peuvent demander leurs données dans un format portable.
 
-    **VaultWares controls**:
-    VaultAccess and VaultMonitor provide data export APIs that allow organizations to extract user-specific data in standard formats (JSON, CSV) for subject access requests.
+    **Contrôles VaultWares** :
+    VaultAccess et VaultMonitor fournissent des API d'exportation de données qui permettent aux organisations d'extraire des données spécifiques à l'utilisateur dans des formats standard (JSON, CSV) pour les demandes d'accès des personnes concernées.
 
     ```bash
     curl https://api.vaultwares.com/v1/users/user_abc123/data-export \
@@ -71,17 +71,17 @@ The General Data Protection Regulation (GDPR) requires organizations processing 
       -d '{"format": "json", "include": ["access_logs", "profile", "preferences"]}'
     ```
   </Accordion>
-  <Accordion title="Article 33 — Notification of a personal data breach">
-    **Relevance**: Organizations must notify the supervisory authority within 72 hours of becoming aware of a breach.
+  <Accordion title="Article 33 — Notification d'une violation de données personnelles">
+    **Pertinence** : Les organisations doivent notifier l'autorité de contrôle dans les 72 heures suivant la prise de connaissance d'une violation.
 
-    **VaultWares controls**:
-    VaultMonitor can detect and alert on suspected data breach indicators (unauthorized bulk data access, anomalous downloads, credential compromise) within minutes. Automated alerting and forensic log export support the 72-hour notification window.
+    **Contrôles VaultWares** :
+    VaultMonitor peut détecter et alerter sur des indicateurs de violation de données suspectés (accès non autorisé à des données en masse, téléchargements anormaux, compromission d'identifiants) en quelques minutes. L'alerte automatisée et l'exportation de journaux forensiques soutiennent la fenêtre de notification de 72 heures.
   </Accordion>
 </AccordionGroup>
 
-## Technical implementation
+## Implémentation technique
 
-### Encryption configuration for GDPR
+### Configuration de chiffrement pour le RGPD
 
 ```bash
 # VaultCrypt: Enable mandatory encryption for all drives in scope
@@ -102,9 +102,9 @@ vw-admin deploy-config \
   --geofencing eu-countries
 ```
 
-### Audit logging for GDPR
+### Journalisation d'audit pour le RGPD
 
-GDPR's accountability principle (Art. 5(2)) requires organizations to demonstrate compliance. VaultMonitor's tamper-evident audit logs support this:
+Le principe de responsabilité du RGPD (Art. 5(2)) exige que les organisations démontrent leur conformité. Les journaux d'audit inviolables de VaultMonitor soutiennent cela :
 
 ```bash
 # Enable comprehensive GDPR audit logging
@@ -126,9 +126,9 @@ vw-admin dsar-report \
   --output /reports/dsar-alice-$(date +%Y%m%d).pdf
 ```
 
-### Data residency controls
+### Contrôles de résidence des données
 
-For GDPR compliance regarding data transfers outside the EU/EEA:
+Pour la conformité au RGPD concernant les transferts de données en dehors de l'UE/EEE :
 
 ```bash
 # Restrict VaultHSM Cloud key storage to EU regions
@@ -145,52 +145,52 @@ vw-backup repo add \
   --restrict-to-region true
 ```
 
-## GDPR compliance checklist
+## Liste de contrôle de conformité au RGPD
 
 <AccordionGroup>
-  <Accordion title="Technical controls">
-    - [ ] All personal data encrypted at rest (VaultDrive or VaultCrypt)
-    - [ ] All personal data encrypted in transit (TLS 1.3)
-    - [ ] Encryption keys managed by VaultHSM (not software keystores)
-    - [ ] Cryptographic erasure capability tested and documented
-    - [ ] Audit logging enabled for all personal data access
-    - [ ] Audit logs tamper-protected (HSM-signed)
-    - [ ] Audit log retention ≥ 5 years (configurable in VaultMonitor)
+  <Accordion title="Contrôles techniques">
+    - [ ] Toutes les données personnelles chiffrées au repos (VaultDrive ou VaultCrypt)
+    - [ ] Toutes les données personnelles chiffrées en transit (TLS 1.3)
+    - [ ] Les clés de chiffrement gérées par VaultHSM (pas de coffres-forts logiciels)
+    - [ ] Capacité d'effacement cryptographique testée et documentée
+    - [ ] La journalisation d'audit est activée pour tout accès aux données personnelles
+    - [ ] Les journaux d'audit sont protégés contre la falsification (signés par HSM)
+    - [ ] Rétention des journaux d'audit ≥ 5 ans (configurable dans VaultMonitor)
   </Accordion>
-  <Accordion title="Access control">
-    - [ ] Least-privilege access enforced via VaultAccess RBAC
-    - [ ] MFA required for access to personal data systems
-    - [ ] PAM in place for privileged access to databases containing personal data
-    - [ ] Access reviews completed quarterly
-    - [ ] Automated offboarding revokes access within 24 hours
+  <Accordion title="Contrôle d'accès">
+    - [ ] Le moindre privilège est appliqué via VaultAccess RBAC
+    - [ ] L'authentification multifacteur (MFA) est requise pour l'accès aux systèmes de données personnelles
+    - [ ] Le PAM est en place pour l'accès privilégié aux bases de données contenant des données personnelles
+    - [ ] Les examens d'accès sont effectués trimestriellement
+    - [ ] Le départ automatisé révoque l'accès dans les 24 heures
   </Accordion>
-  <Accordion title="Data subject rights">
-    - [ ] DSAR export procedure documented and tested
-    - [ ] Cryptographic erasure procedure documented and tested
-    - [ ] Data portability export in machine-readable format available
-    - [ ] SLA for responding to DSARs defined (GDPR: 1 month)
+  <Accordion title="Droits des personnes concernées">
+    - [ ] Procédure d'exportation des demandes d'accès (DSAR) documentée et testée
+    - [ ] Procédure d'effacement cryptographique documentée et testée
+    - [ ] Exportation de portabilité des données dans un format lisible par machine disponible
+    - [ ] SLA pour répondre aux DSAR définis (RGPD : 1 mois)
   </Accordion>
-  <Accordion title="Breach notification readiness">
-    - [ ] VaultMonitor alert rules cover breach indicators
-    - [ ] 72-hour notification runbook documented and rehearsed
-    - [ ] Incident response contact list current
-    - [ ] Forensic log export procedure tested
+  <Accordion title="Préparation à la notification de violation">
+    - [ ] Les règles d'alerte de VaultMonitor couvrent les indicateurs de violation
+    - [ ] Le guide de réponse en 72 heures est documenté et répété
+    - [ ] La liste de contacts en cas d'incident est à jour
+    - [ ] La procédure d'exportation de journaux forensiques est testée
   </Accordion>
 </AccordionGroup>
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Data residency" icon="globe" href="/compliance/data-residency">
-    EU data sovereignty and regional storage requirements
+  <Card title="Résidence des données" icon="globe" href="/compliance/data-residency">
+    Souveraineté des données de l'UE et exigences de stockage régionales
   </Card>
-  <Card title="Encryption protocols" icon="lock" href="/security/encryption-protocols">
-    Technical details on encryption algorithms
+  <Card title="Protocoles de chiffrement" icon="lock" href="/security/encryption-protocols">
+    Détails techniques sur les algorithmes de chiffrement
   </Card>
-  <Card title="HIPAA compliance" icon="hospital" href="/compliance/hipaa">
-    Healthcare data protection requirements
+  <Card title="Conformité HIPAA" icon="hospital" href="/compliance/hipaa">
+    Exigences de protection des données de santé
   </Card>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    Security and key management recommendations
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Recommandations de sécurité et de gestion des clés
   </Card>
 </CardGroup>

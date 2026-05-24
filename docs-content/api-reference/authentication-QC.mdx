@@ -1,93 +1,93 @@
 ---
-title: Authentication
-description: Authenticate with the VaultWares API
+title: Authentification
+description: Authentifiez-vous avec l'API VaultWares
 ---
 
-## Overview
+## Aperçu
 
-The VaultWares API uses API keys for authentication. All API requests must include a valid API key in the request headers. API keys are associated with your organization and can be scoped to specific permissions.
+L'API VaultWares utilise des clés API pour l'authentification. Toutes les requêtes API doivent inclure une clé API valide dans les en-têtes de la requête. Les clés API sont associées à votre organisation et peuvent être limitées à des permissions spécifiques.
 
-## Getting an API key
+## Obtenir une clé API
 
 <Steps>
-  <Step title="Log in to the portal">
-    Navigate to [portal.vaultwares.com](https://portal.vaultwares.com) and log in with your credentials.
+  <Step title="Se connecter au portail">
+    Accédez à [portal.vaultwares.com](https://portal.vaultwares.com) et connectez-vous avec vos identifiants.
   </Step>
-  <Step title="Navigate to API settings">
-    Go to **Settings** > **API Keys** in the left sidebar.
+  <Step title="Accéder aux paramètres API">
+    Allez dans **Paramètres** > **Clés API** dans la barre latérale gauche.
   </Step>
-  <Step title="Create new API key">
-    Click **Create API Key** and provide:
-    - Key name (for identification)
-    - Permissions (read-only, read-write, admin)
-    - Expiration date (optional)
+  <Step title="Créer une nouvelle clé API">
+    Cliquez sur **Créer une clé API** et fournissez :
+    - Nom de la clé (pour identification)
+    - Permissions (lecture seule, lecture-écriture, administrateur)
+    - Date d'expiration (optionnel)
   </Step>
-  <Step title="Save your key">
-    Copy the API key immediately. It will only be shown once for security reasons.
+  <Step title="Sauvegarder votre clé">
+    Copiez la clé API immédiatement. Elle ne sera affichée qu'une seule fois pour des raisons de sécurité.
   </Step>
 </Steps>
 
 <Warning>
-  Store your API key securely. Never commit API keys to version control or share them publicly.
+  Stockez votre clé API en toute sécurité. Ne jamais committer de clés API dans un système de contrôle de version ni les partager publiquement.
 </Warning>
 
-## Authentication methods
+## Méthodes d'authentification
 
-### API key in header (recommended)
+### Clé API dans l'en-tête (recommandé)
 
-Include your API key in the `X-API-Key` header:
+Incluez votre clé API dans l'en-tête `X-API-Key`:
 
 ```bash
 curl https://api.vaultwares.com/v1/devices \
   -H "X-API-Key: vw_live_1234567890abcdef"
 ```
 
-### Bearer token
+### Jeton Bearer
 
-Alternatively, use the `Authorization` header with Bearer token:
+Alternativement, utilisez l'en-tête `Authorization` avec un jeton Bearer :
 
 ```bash
 curl https://api.vaultwares.com/v1/devices \
   -H "Authorization: Bearer vw_live_1234567890abcdef"
 ```
 
-## API key types
+## Types de clés API
 
 <Tabs>
-  <Tab title="Live keys">
-    **Prefix**: `vw_live_`
-    
-    - Used for production environments
-    - Access to real data and devices
-    - Rate limits apply
-    - All operations are permanent
-    
+  <Tab title="Clés actives">
+    **Préfixe**: `vw_live_`
+
+    - Utilisé pour les environnements de production
+    - Accès aux données et aux appareils réels
+    - Des limites de débit s'appliquent
+    - Toutes les opérations sont permanentes
+
     ```bash
     X-API-Key: vw_live_1234567890abcdef
     ```
   </Tab>
-  
-  <Tab title="Test keys">
-    **Prefix**: `vw_test_`
-    
-    - Used for development and testing
-    - Access to sandbox environment
-    - Higher rate limits
-    - Data is isolated from production
-    
+
+  <Tab title="Clés de test">
+    **Préfixe**: `vw_test_`
+
+    - Utilisé pour le développement et les tests
+    - Accès à l'environnement bac à sable
+    - Des limites de débit plus élevées
+    - Les données sont isolées de la production
+
     ```bash
     X-API-Key: vw_test_1234567890abcdef
     ```
   </Tab>
-  
-  <Tab title="Restricted keys">
-    **Prefix**: `vw_restricted_`
-    
-    - Limited to specific operations
-    - Read-only access
-    - Cannot modify or delete resources
-    - Useful for monitoring and reporting
-    
+
+  <Tab title="Clés restreintes">
+    **Préfixe**: `vw_restricted_`
+
+    - Limité à des opérations spécifiques
+    - Accès en lecture seule
+    - Ne peut pas modifier ou supprimer des ressources
+    - Utile pour la surveillance et les rapports
+
     ```bash
     X-API-Key: vw_restricted_1234567890abcdef
     ```
@@ -96,21 +96,21 @@ curl https://api.vaultwares.com/v1/devices \
 
 ## Permissions
 
-API keys can be scoped to specific permissions:
+Les clés API peuvent être limitées à des permissions spécifiques :
 
-| Permission | Description | Operations |
+| Permission | Description | Opérations |
 |------------|-------------|------------|
-| `devices:read` | View device information | GET /devices, GET /devices/:id |
-| `devices:write` | Manage devices | POST, PUT, PATCH /devices |
-| `devices:delete` | Delete devices | DELETE /devices/:id |
-| `policies:read` | View policies | GET /policies |
-| `policies:write` | Manage policies | POST, PUT, PATCH /policies |
-| `users:read` | View users | GET /users |
-| `users:write` | Manage users | POST, PUT, PATCH /users |
-| `audit:read` | View audit logs | GET /audit |
-| `admin` | Full access | All operations |
+| `devices:read` | Voir les informations sur les appareils | GET /devices, GET /devices/:id |
+| `devices:write` | Gérer les appareils | POST, PUT, PATCH /devices |
+| `devices:delete` | Supprimer les appareils | DELETE /devices/:id |
+| `policies:read` | Voir les politiques | GET /policies |
+| `policies:write` | Gérer les politiques | POST, PUT, PATCH /policies |
+| `users:read` | Voir les utilisateurs | GET /users |
+| `users:write` | Gérer les utilisateurs | POST, PUT, PATCH /users |
+| `audit:read` | Voir les journaux d'audit | GET /audit |
+| `admin` | Accès complet | Toutes les opérations |
 
-### Creating scoped API keys
+### Créer des clés API limitées
 
 ```bash
 curl https://api.vaultwares.com/v1/api-keys \
@@ -123,14 +123,14 @@ curl https://api.vaultwares.com/v1/api-keys \
   }'
 ```
 
-## OAuth 2.0 (Enterprise)
+## OAuth 2.0 (Entreprise)
 
-Enterprise customers can use OAuth 2.0 for user-delegated access.
+Les clients de niveau entreprise peuvent utiliser OAuth 2.0 pour l'accès délégué par l'utilisateur.
 
-### Authorization code flow
+### Flux de code d'autorisation
 
 <Steps>
-  <Step title="Redirect user to authorization URL">
+  <Step title="Rediriger l'utilisateur vers l'URL d'autorisation">
     ```
     https://auth.vaultwares.com/oauth/authorize?
       client_id=your_client_id&
@@ -139,16 +139,16 @@ Enterprise customers can use OAuth 2.0 for user-delegated access.
       scope=devices:read+devices:write
     ```
   </Step>
-  <Step title="User authorizes application">
-    User logs in and grants permissions to your application.
+  <Step title="L'utilisateur autorise l'application">
+    L'utilisateur se connecte et accorde les permissions à votre application.
   </Step>
-  <Step title="Receive authorization code">
-    VaultWares redirects to your callback URL with an authorization code:
+  <Step title="Recevoir le code d'autorisation">
+    VaultWares redirige vers votre URL de rappel avec un code d'autorisation :
     ```
     https://yourapp.com/callback?code=AUTH_CODE
     ```
   </Step>
-  <Step title="Exchange code for access token">
+  <Step title="Échanger le code contre un jeton d'accès">
     ```bash
     curl https://auth.vaultwares.com/oauth/token \
       -d grant_type=authorization_code \
@@ -158,7 +158,7 @@ Enterprise customers can use OAuth 2.0 for user-delegated access.
       -d redirect_uri=https://yourapp.com/callback
     ```
   </Step>
-  <Step title="Use access token">
+  <Step title="Utiliser le jeton d'accès">
     ```bash
     curl https://api.vaultwares.com/v1/devices \
       -H "Authorization: Bearer ACCESS_TOKEN"
@@ -166,9 +166,9 @@ Enterprise customers can use OAuth 2.0 for user-delegated access.
   </Step>
 </Steps>
 
-### Refresh tokens
+### Jetons de rafraîchissement
 
-Access tokens expire after 1 hour. Use refresh tokens to obtain new access tokens:
+Les jetons d'accès expirent après 1 heure. Utilisez des jetons de rafraîchissement pour obtenir de nouveaux jetons d'accès :
 
 ```bash
 curl https://auth.vaultwares.com/oauth/token \
@@ -178,22 +178,22 @@ curl https://auth.vaultwares.com/oauth/token \
   -d client_secret=your_client_secret
 ```
 
-## Rate limiting
+## Limitation de débit
 
-API requests are rate limited to ensure fair usage and system stability.
+Les requêtes API sont limitées pour assurer une utilisation équitable et la stabilité du système.
 
-### Rate limit tiers
+### Niveaux de limitation de débit
 
-| Tier | Requests per minute | Requests per hour |
-|------|---------------------|-------------------|
-| Free | 60 | 1,000 |
-| Professional | 300 | 10,000 |
-| Enterprise | 1,000 | 100,000 |
-| Custom | Negotiable | Negotiable |
+| Niveau | Requêtes par minute | Requêtes par heure |
+|------|------------------|--------------|
+| Gratuit | 60 | 1 000 |
+| Professionnel | 300 | 10 000 |
+| Entreprise | 1 000 | 100 000 |
+| Personnalisé | Négociable | Négociable |
 
-### Rate limit headers
+### En-têtes de limitation de débit
 
-Every API response includes rate limit information:
+Chaque réponse API inclut des informations sur la limitation de débit :
 
 ```http
 HTTP/1.1 200 OK
@@ -202,13 +202,13 @@ X-RateLimit-Remaining: 987
 X-RateLimit-Reset: 1640995200
 ```
 
-- `X-RateLimit-Limit`: Maximum requests allowed in the current window
-- `X-RateLimit-Remaining`: Requests remaining in the current window
-- `X-RateLimit-Reset`: Unix timestamp when the rate limit resets
+- `X-RateLimit-Limit`: Nombre maximum de requêtes autorisé dans la fenêtre actuelle
+- `X-RateLimit-Remaining`: Requêtes restantes dans la fenêtre actuelle
+- `X-RateLimit-Reset`: Horodatage Unix lorsque la limitation de débit est réinitialisée
 
-### Handling rate limits
+### Gérer les limitations de débit
 
-When you exceed the rate limit, you'll receive a `429 Too Many Requests` response:
+Lorsque vous dépassez la limite de débit, vous recevrez une réponse `429 Too Many Requests` :
 
 ```json
 {
@@ -220,7 +220,7 @@ When you exceed the rate limit, you'll receive a `429 Too Many Requests` respons
 }
 ```
 
-Implement exponential backoff in your application:
+Implémentez le *backoff* exponentiel dans votre application :
 
 ```python
 import time
@@ -229,20 +229,20 @@ import requests
 def make_request_with_retry(url, headers, max_retries=3):
     for attempt in range(max_retries):
         response = requests.get(url, headers=headers)
-        
+
         if response.status_code == 429:
             retry_after = int(response.headers.get('Retry-After', 60))
             time.sleep(retry_after)
             continue
-            
+
         return response
-    
+
     raise Exception("Max retries exceeded")
 ```
 
-## Security best practices
+## Bonnes pratiques de sécurité
 
-### Rotate API keys regularly
+### Rotation régulière des clés API
 
 ```bash
 # Create new API key
@@ -259,9 +259,9 @@ curl -X DELETE https://api.vaultwares.com/v1/api-keys/old_key_id \
   -H "X-API-Key: $NEW_KEY"
 ```
 
-### Use environment variables
+### Utiliser des variables d'environnement
 
-Never hardcode API keys in your application:
+Ne jamais coder en dur les clés API dans votre application :
 
 ```bash
 # .env file
@@ -276,9 +276,9 @@ api_key = os.environ.get('VAULTWARES_API_KEY')
 client = VaultWaresAPI(api_key=api_key)
 ```
 
-### Restrict by IP address
+### Restreindre par adresse IP
 
-Limit API key usage to specific IP addresses:
+Limitez l'utilisation de la clé API à des adresses IP spécifiques :
 
 ```bash
 curl https://api.vaultwares.com/v1/api-keys/key_id \
@@ -289,7 +289,7 @@ curl https://api.vaultwares.com/v1/api-keys/key_id \
   }'
 ```
 
-### Monitor API key usage
+### Surveiller l'utilisation des clés API
 
 ```bash
 # Get API key usage statistics
@@ -306,11 +306,11 @@ curl https://api.vaultwares.com/v1/api-keys/key_id/usage \
 }
 ```
 
-## Webhook signatures
+## Signatures de Webhook
 
-Verify webhook authenticity using HMAC signatures.
+Vérifiez l'authenticité des webhooks à l'aide de signatures HMAC.
 
-### Verify webhook signature
+### Vérifier la signature du webhook
 
 ```python
 import hmac
@@ -322,7 +322,7 @@ def verify_webhook(payload, signature, secret):
         payload.encode(),
         hashlib.sha256
     ).hexdigest()
-    
+
     return hmac.compare_digest(signature, expected_signature)
 
 # Usage
@@ -338,9 +338,9 @@ else:
     return 401
 ```
 
-## Testing authentication
+## Tester l'authentification
 
-### Test API key validity
+### Tester la validité de la clé API
 
 ```bash
 curl https://api.vaultwares.com/v1/auth/verify \
@@ -356,7 +356,7 @@ curl https://api.vaultwares.com/v1/auth/verify \
 }
 ```
 
-### Test OAuth token
+### Tester le jeton OAuth
 
 ```bash
 curl https://api.vaultwares.com/v1/auth/verify \
@@ -371,9 +371,9 @@ curl https://api.vaultwares.com/v1/auth/verify \
 }
 ```
 
-## Error responses
+## Réponses d'erreur
 
-### Authentication errors
+### Erreurs d'authentification
 
 ```json
 {
@@ -385,29 +385,29 @@ curl https://api.vaultwares.com/v1/auth/verify \
 }
 ```
 
-Common authentication error codes:
+Codes d'erreur d'authentification courants :
 
-| Code | HTTP Status | Description |
+| Code | Statut HTTP | Description |
 |------|-------------|-------------|
-| `invalid_api_key` | 401 | API key is invalid or revoked |
-| `expired_api_key` | 401 | API key has expired |
-| `insufficient_permissions` | 403 | API key lacks required permissions |
-| `ip_not_allowed` | 403 | Request from unauthorized IP address |
-| `rate_limit_exceeded` | 429 | Too many requests |
+| `invalid_api_key` | 401 | La clé API est invalide ou révoquée |
+| `expired_api_key` | 401 | La clé API a expiré |
+| `insufficient_permissions` | 403 | La clé API ne possède pas les permissions requises |
+| `ip_not_allowed` | 403 | Requête provenant d'une adresse IP non autorisée |
+| `rate_limit_exceeded` | 429 | Trop de requêtes |
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="API endpoints" icon="code" href="/api-reference/endpoints">
-    Explore available API endpoints
+  <Card title="Points de terminaison API" icon="code" href="/api-reference/endpoints">
+    Explorer les points de terminaison API disponibles
   </Card>
   <Card title="Webhooks" icon="webhook" href="/api-reference/webhooks">
-    Set up webhook notifications
+    Configurer les notifications de webhook
   </Card>
-  <Card title="SDKs" icon="book-code" href="/api-reference/sdk">
-    Use official SDKs
+  <Card title="SDK" icon="book-code" href="/api-reference/sdk">
+    Utiliser les SDK officiels
   </Card>
-  <Card title="Examples" icon="lightbulb" href="/api-reference/examples">
-    View code examples
+  <Card title="Exemples" icon="lightbulb" href="/api-reference/examples">
+    Voir des exemples de code
   </Card>
 </CardGroup>

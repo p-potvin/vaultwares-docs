@@ -1,23 +1,23 @@
 ---
-title: "Automation Policy"
-description: "Assistant protocol summary: Automation Policy"
+title: "Politique d'automatisation"
+description: "Résumé du protocole de l'assistant : Politique d'automatisation"
 ---
 
 # Politique d'automatisation
 
-- ID de catégorie : `AUTOMATION_POLICY`
-- Source du résumé : `instructions/summaries/AUTOMATION_POLICY.md`
-- Source des notes : `instructions/notes/AUTOMATION_POLICY.md`
+- Category ID: `AUTOMATION_POLICY`
+- Summary source: `instructions/summaries/AUTOMATION_POLICY.md`
+- Notes source: `instructions/notes/AUTOMATION_POLICY.md`
 
-S'applique lorsque : cron, moniteurs, automatisations récurrentes, tâches en arrière-plan, planificateurs.
-Faire :
-- Préférez les configurations explicites et inspectables ; éviter l'état caché.
-- Sauvegardez ce qui s'exécute où et comment arrêter/annuler.
-Pas :
-- Créez des automatisations qui s'exécutent en dehors de la politique tailnet.
-Fais quand :
+S'applique quand : cron, moniteurs, automatisations récurrentes, tâches en arrière-plan, planificateurs.
+Faire :
+- Préférer les configurations explicites et inspectables; éviter l'état caché.
+- Enregistrer ce qui s'exécute où, et comment arrêter/annuler.
+Ne pas :
+- Créer des automatisations qui s'exécutent en dehors de la politique tailnet.
+Terminé quand :
 - L'automatisation est documentée et vérifiable.
 
-## Remarques
-Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
-Chemin des notes : `instructions/notes/AUTOMATION_POLICY.md`
+## Notes
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/AUTOMATION_POLICY.md`

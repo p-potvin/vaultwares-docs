@@ -1,58 +1,58 @@
 ---
-title: "RMA process"
-description: "Return merchandise authorization process"
+title: "Processus de demande de retour de marchandise (RMA)"
+description: "Processus de demande d'autorisation de retour de marchandise"
 ---
 
-## Overview
+## Vue d'ensemble
 
-The Return Merchandise Authorization (RMA) process is used when you need to return a defective or damaged VaultWares hardware product for replacement or repair under warranty, or for end-of-life disposal. This guide walks through the complete RMA process.
+Le processus d'Autorisation de Retour de Marchandise (RMA) est utilisé lorsque vous devez retourner un produit matériel VaultWares défectueux ou endommagé pour le remplacement ou la réparation sous garantie, ou pour une élimination en fin de vie. Ce guide vous explique le processus complet de RMA.
 
-## When to file an RMA
+## Quand faire une demande de RMA
 
-File an RMA if:
+Faites une demande de RMA si :
 
-- A hardware product has a confirmed defect covered under warranty (see [Warranty information](/support/warranty))
-- A device arrived damaged (DOA — Dead on Arrival)
-- You need to return a device for secure disposal/destruction and receive a certificate of destruction
-- You are exchanging a device for a different model or capacity (contact sales for exchanges)
+- Un produit matériel présente un défaut confirmé couvert par la garantie (voir [Informations sur la garantie](/support/warranty))
+- Un appareil est arrivé endommagé (DOA — Dead on Arrival)
+- Vous devez retourner un appareil pour une élimination/destruction sécurisée et recevoir un certificat de destruction
+- Vous échangez un appareil contre un modèle ou une capacité différent (contactez les ventes pour les échanges)
 
 <Note>
-  Before filing an RMA, open a support ticket so our team can confirm the defect and issue an RMA number. Packages without a valid RMA number may be refused or returned at your expense.
+  Avant de faire une demande de RMA, ouvrez un ticket de support afin que notre équipe puisse confirmer le défaut et émettre un numéro de RMA. Les colis sans numéro de RMA valide peuvent être refusés ou retournés à vos frais.
 </Note>
 
-## Step-by-step RMA process
+## Processus de RMA étape par étape
 
 <Steps>
-  <Step title="Open a support ticket">
-    Contact VaultWares support to diagnose the issue and confirm warranty coverage:
+  <Step title="Ouvrir un ticket de support">
+    Contactez le support VaultWares pour diagnostiquer le problème et confirmer la couverture de la garantie :
 
-    - **Portal**: [portal.vaultwares.com/support](https://portal.vaultwares.com/support)
-    - **Email**: [support@vaultwares.com](mailto:support@vaultwares.com)
-    - **Phone**: Available to Gold and Platinum support plan customers
+    - **Portail** : [portal.vaultwares.com/support](https://portal.vaultwares.com/support)
+    - **Courriel** : [support@vaultwares.com](mailto:support@vaultwares.com)
+    - **Téléphone** : Disponible pour les clients des plans de support Gold et Platinum
 
-    Include in your ticket:
-    - Device serial number (printed on the device label)
-    - Date of purchase and proof of purchase (order number or invoice)
-    - Detailed description of the defect
-    - Diagnostic output: `vw-admin diag collect --output diag.tar.gz`
+    Incluez dans votre ticket :
+    - Numéro de série de l'appareil (imprimé sur l'étiquette de l'appareil)
+    - Date d'achat et preuve d'achat (numéro de commande ou facture)
+    - Description détaillée du défaut
+    - Sortie de diagnostic : `vw-admin diag collect --output diag.tar.gz`
   </Step>
 
-  <Step title="Receive RMA authorization">
-    Once the defect is confirmed and warranty coverage is verified, you will receive:
+  <Step title="Recevoir l'autorisation de RMA">
+    Une fois que le défaut est confirmé et que la couverture de la garantie est vérifiée, vous recevrez :
 
-    - **RMA number** (format: `RMA-YYYYMMDD-NNNN`)
-    - **RMA instructions** including the return shipping address
-    - **Prepaid return shipping label** (for warranty repairs — standard warranty service)
-    - **Expected resolution timeline**
+    - **Numéro de RMA** (format : `RMA-YYYYMMDD-NNNN`)
+    - **Instructions de RMA** incluant l'adresse d'expédition de retour
+    - **Étiquette d'expédition de retour prépayée** (pour les réparations sous garantie — service de garantie standard)
+    - **Délai de résolution prévu**
 
-    RMA numbers are valid for 30 days from issuance. Contact support to extend if needed.
+    Les numéros de RMA sont valides pendant 30 jours à compter de leur émission. Contactez le support pour prolonger si nécessaire.
   </Step>
 
-  <Step title="Perform crypto-erase before returning (REQUIRED)">
-    Before returning any VaultWares hardware, you **must** perform a cryptographic erasure to destroy all key material and data on the device. This protects your organization and is required to maintain your security posture.
+  <Step title="Effectuer une effacement cryptographique avant de retourner (OBLIGATOIRE)">
+    Avant de retourner tout matériel VaultWares, vous **devez** effectuer un effacement cryptographique pour détruire tout le matériel de clé et les données de l'appareil. Cela protège votre organisation et est requis pour maintenir votre posture de sécurité.
 
     <Warning>
-      Returning a device without performing crypto-erase may expose sensitive data. VaultWares will not be responsible for data remaining on returned devices.
+      Retourner un appareil sans effectuer d'effacement cryptographique peut exposer des données sensibles. VaultWares ne sera pas responsable des données qui resteraient sur les appareils retournés.
     </Warning>
 
     ```bash
@@ -75,36 +75,36 @@ File an RMA if:
       --audit-log "RMA return - RMA-20241115-0043"
     ```
 
-    If the device cannot be powered on or is physically damaged:
-    - VaultWares can perform physical destruction and provide a **Certificate of Destruction**
-    - Note in your RMA request that the device cannot be erased prior to return
+    Si l'appareil ne peut pas être mis sous tension ou est physiquement endommagé :
+    - VaultWares peut effectuer une destruction physique et fournir un **Certificat de destruction**
+    - Mentionnez dans votre demande de RMA que l'appareil ne peut pas être effacé avant le retour
   </Step>
 
-  <Step title="Package the device">
-    Proper packaging prevents shipping damage and protects the tamper-evident features of VaultWares hardware.
+  <Step title="Emballer l'appareil">
+    Un emballage adéquat prévient les dommages pendant le transport et protège les fonctionnalités anti-manipulation du matériel VaultWares.
 
-    **Packaging requirements**:
-    - Use the **original VaultWares packaging** if available. If not, use a similarly sized sturdy box with at least 5 cm of foam or bubble wrap on all sides.
-    - **Do not** wrap devices directly in loose packing peanuts — they can damage the device and interfere with tamper-detection features.
-    - For VaultHSM appliances: rack rails and accessories do not need to be returned unless specifically requested.
-    - Include a **printed copy of the RMA number** inside the box.
-    - Write the **RMA number** on the outside of the box.
+    **Exigences d'emballage** :
+    - Utilisez l'**emballage d'origine VaultWares** si disponible. Sinon, utilisez une boîte solide de taille similaire avec au moins 5 cm de mousse ou de papier bulle sur tous les côtés.
+    - **Ne pas** emballer les appareils directement dans des copeaux de rembourrage — ils peuvent endommager l'appareil et interférer avec les fonctionnalités de détection de manipulation.
+    - Pour les appareils VaultHSM : les rails de rack et les accessoires n'ont pas besoin d'être retournés sauf si spécifiquement demandé.
+    - Incluez une **copie imprimée du numéro de RMA** à l'intérieur de la boîte.
+    - Écrivez le **numéro de RMA** à l'extérieur de la boîte.
 
     <Warning>
-      Attach the prepaid shipping label to the outside of the box, not the original manufacturer's box. Do not obscure any labels on the inner box.
+      Collez l'étiquette d'expédition prépayée à l'extérieur de la boîte, et non à la boîte originale du fabricant. Ne masquez aucune étiquette sur la boîte intérieure.
     </Warning>
   </Step>
 
-  <Step title="Ship the package">
-    Use the **prepaid shipping label** provided with your RMA authorization. Drop off the package at the designated carrier location.
+  <Step title="Expédier le colis">
+    Utilisez l'**étiquette d'expédition prépayée** fournie avec votre autorisation de RMA. Déposez le colis au point de transport désigné.
 
-    For packages not using the prepaid label (e.g., non-warranty returns), ship to the address provided in your RMA authorization. VaultWares recommends using a trackable shipping service with insurance for high-value items.
+    Pour les colis qui n'utilisent pas l'étiquette prépayée (par exemple, retours non garantis), expédiez à l'adresse fournie dans votre autorisation de RMA. VaultWares recommande d'utiliser un service d'expédition traçable avec assurance pour les articles de grande valeur.
 
-    After shipping, update your support ticket with the **tracking number**.
+    Après l'expédition, mettez à jour votre ticket de support avec le **numéro de suivi**.
   </Step>
 
-  <Step title="Track your RMA">
-    Monitor the status of your RMA at [portal.vaultwares.com/support/rma](https://portal.vaultwares.com/support/rma) or via the CLI:
+  <Step title="Suivre votre RMA">
+    Surveillez le statut de votre RMA à [portal.vaultwares.com/support/rma](https://portal.vaultwares.com/support/rma) ou via le CLI :
 
     ```bash
     # Check RMA status
@@ -121,57 +121,57 @@ File an RMA if:
   </Step>
 </Steps>
 
-## RMA resolution types
+## Types de résolution de RMA
 
-| Resolution | Description | Timeline |
+| Résolution | Description | Délai |
 |---|---|---|
-| **Advanced replacement** | Replacement device ships before return is received (requires credit card hold) | Next business day |
-| **Standard replacement** | Replacement ships after defective unit is received and inspected | 5–10 business days after receipt |
-| **Repair** | Device is repaired and returned | 10–15 business days after receipt |
-| **Refund** | Available within 30 days of purchase for DOA units | 5–10 business days after receipt |
-| **Certificate of Destruction** | Physical destruction with written certification | 5 business days after receipt |
+| **Remplacement avancé** | L'appareil de remplacement est expédié avant la réception du retour (nécessite une retenue de carte de crédit) | Jour ouvrable suivant |
+| **Remplacement standard** | L'appareil de remplacement est expédié après réception et inspection de l'unité défectueuse | 5 à 10 jours ouvrables après réception |
+| **Réparation** | L'appareil est réparé et retourné | 10 à 15 jours ouvrables après réception |
+| **Remboursement** | Disponible dans les 30 jours suivant l'achat pour les unités DOA | 5 à 10 jours ouvrables après réception |
+| **Certificat de destruction** | Destruction physique avec certification écrite | 5 jours ouvrables après réception |
 
-## Advanced replacement
+## Remplacement avancé
 
-Advanced replacement ships a new device immediately while you return the defective unit.
+Le remplacement avancé expédie un nouvel appareil immédiatement pendant que vous retournez l'unité défectueuse.
 
-- Requires a **valid credit card** on file (charged only if the defective unit is not returned within 30 days)
-- Available for VaultDrive Pro/Enterprise, VaultHSM PCIe/Network, and VaultScan
-- Request advanced replacement when opening your support ticket
+- Nécessite une **carte de crédit valide** enregistrée (facturée uniquement si l'unité défectueuse n'est pas retournée dans les 30 jours)
+- Disponible pour VaultDrive Pro/Enterprise, VaultHSM PCIe/Network et VaultScan
+- Demandez un remplacement avancé lors de l'ouverture de votre ticket de support
 
-## Shipping and logistics
+## Expédition et logistique
 
-| Situation | Shipping cost |
+| Situation | Coût d'expédition |
 |---|---|
-| Warranty defect (within warranty period) | VaultWares pays return shipping |
-| DOA within 30 days of purchase | VaultWares pays return shipping |
-| Non-warranty return or exchange | Customer pays return shipping |
-| Advanced replacement outbound | VaultWares pays outbound shipping |
+| Défaut sous garantie (dans la période de garantie) | VaultWares paie l'expédition de retour |
+| DOA dans les 30 jours suivant l'achat | VaultWares paie l'expédition de retour |
+| Retour ou échange non garanti | Le client paie l'expédition de retour |
+| Expédition de remplacement avancé | VaultWares paie l'expédition de sortie |
 
-VaultWares ships replacements via FedEx Priority, UPS Next Day Air, or equivalent carrier depending on region. Signature required on delivery for HSM products.
+VaultWares expédie les remplacements via FedEx Priority, UPS Next Day Air ou transporteur équivalent selon la région. Une signature est requise à la livraison pour les produits HSM.
 
-## International RMAs
+## RMA internationaux
 
-For customers outside the continental US:
+Pour les clients en dehors des États-Unis continentaux :
 
-- International return shipping labels are provided for warranty claims
-- Customs documentation is handled by VaultWares — do not declare a commercial value on the customs form beyond what VaultWares provides
-- Allow additional 5–10 business days for international RMAs
-- Contact [support@vaultwares.com](mailto:support@vaultwares.com) to confirm regional availability for advanced replacement
+- Des étiquettes d'expédition de retour internationales sont fournies pour les réclamations sous garantie
+- La documentation douanière est gérée par VaultWares — ne déclarez pas de valeur commerciale sur le formulaire de douane au-delà de ce que VaultWares fournit
+- Prévoyez 5 à 10 jours ouvrables supplémentaires pour les RMA internationaux
+- Contactez [support@vaultwares.com](mailto:support@vaultwares.com) pour confirmer la disponibilité régionale du remplacement avancé
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Warranty information" icon="file-certificate" href="/support/warranty">
-    Warranty terms and coverage details
+  <Card title="Informations sur la garantie" icon="file-certificate" href="/support/warranty">
+    Termes et détails de couverture de la garantie
   </Card>
-  <Card title="Contact support" icon="headset" href="/support/contact">
-    Open a support ticket
+  <Card title="Contacter le support" icon="headset" href="/support/contact">
+    Ouvrir un ticket de support
   </Card>
-  <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
-    Try to resolve the issue before filing an RMA
+  <Card title="Dépannage" icon="wrench" href="/guides/troubleshooting">
+    Essayez de résoudre le problème avant de faire une demande de RMA
   </Card>
   <Card title="FAQ" icon="circle-question" href="/support/faq">
-    Frequently asked questions
+    Questions fréquemment posées
   </Card>
 </CardGroup>

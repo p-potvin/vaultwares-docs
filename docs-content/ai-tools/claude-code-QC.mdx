@@ -1,36 +1,36 @@
 ---
-title: "Claude Code setup"
-description: "Configure Claude Code for your documentation workflow"
+title: "Configuration de Claude Code"
+description: "Configurez Claude Code pour votre flux de travail de documentation"
 icon: "asterisk"
 ---
 
-## Assistant protocols (VaultWares)
+## Protocoles d'assistant (VaultWares)
 
-Before doing any VaultWares work, route your prompt using:
-- Docs: `/ai-tools/assistant-protocols`
-- File: `C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\instructions\ROUTER.md`
+Avant de faire tout travail avec VaultWares, dirigez votre invite en utilisant :
+- Docs : `/ai-tools/assistant-protocols`
+- Fichier : `C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\instructions\ROUTER.md`
 
-Claude Code is Anthropic's official CLI tool. This guide will help you set up Claude Code to help you write and maintain your documentation.
+Claude Code est l'outil CLI officiel d'Anthropic. Ce guide va vous aider à configurer Claude Code pour vous aider à écrire et à maintenir votre documentation.
 
-## Prerequisites
+## Prérequis
 
-- Active Claude subscription (Pro, Max, or API access)
+- Abonnement Claude actif (Pro, Max ou accès API)
 
-## Setup
+## Configuration
 
-1. Install Claude Code globally:
+1. Installez Claude Code globalement :
 
   ```bash
   npm install -g @anthropic-ai/claude-code
 ```
 
-2. Navigate to your docs directory.
-3. (Optional) Add the `CLAUDE.md` file below to your project.
-4. Run `claude` to start.
+2. Naviguez jusqu'au répertoire de votre documentation.
+3. (Optionnel) Ajoutez le fichier `CLAUDE.md` ci-dessous à votre projet.
+4. Exécutez `claude` pour démarrer.
 
-## Create `CLAUDE.md`
+## Créer `CLAUDE.md`
 
-Create a `CLAUDE.md` file at the root of your documentation repository to train Claude Code on your specific documentation standards:
+Créez un fichier `CLAUDE.md` à la racine de votre dépôt de documentation pour entraîner Claude Code sur vos normes de documentation spécifiques :
 
 ````markdown
 # Mintlify documentation

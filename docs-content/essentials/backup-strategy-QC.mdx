@@ -1,39 +1,39 @@
 ---
-title: 'Backup Strategy'
-description: 'The A.N.S.W.E.R.S. protocol for multi-location, encrypted backups'
+title: 'Stratégie de sauvegarde'
+description: 'Le protocole A.N.S.W.E.R.S. pour les sauvegardes chiffrées multi-sites'
 icon: 'shield-check'
 ---
 
-VaultWares employs the **A.N.S.W.E.R.S.** (Alternating, Non Sequential, With Encryption, Restoring System) protocol to ensure maximum data durability.
+VaultWares utilise le protocole **A.N.S.W.E.R.S.** (Alternating, Non Sequential, With Encryption, Restoring System) pour assurer une durabilité maximale des données.
 
-## 1. Targets
+## 1. Cibles
 
-Backups are synchronized across the following targets:
-- Local Machine
+Les sauvegardes sont synchronisées sur les cibles suivantes :
+- Machine locale
 - Greencloud VPS
-- Old VPS
+- Ancien VPS
 - Google Drive
-- Self-hosted Vaultwarden
+- Vaultwarden auto-hébergé
 - Proton Drive
 - iCloud
 - Mega
 
-## 2. Encryption Mandate
+## 2. Obligation de chiffrement
 
 > [!CAUTION]
-> **No data may leave the local environment without being encrypted.** 
-> All multi-location backups must be encrypted in-transit to VPS or cloud targets.
+> **Aucune donnée ne doit quitter l'environnement local sans être chiffrée.**
+> Toutes les sauvegardes multi-sites doivent être chiffrées en transit vers un VPS ou des cibles cloud.
 
-## 3. Rotation Logic (A.N.S.W.E.R.S.)
+## 3. Logique de rotation (A.N.S.W.E.R.S.)
 
-To extend the coverage period while maintaining recent backups, use the following mathematical rotation logic ($N=20$):
+Pour prolonger la période de couverture tout en conservant les sauvegardes récentes, utilisez la logique de rotation mathématique suivante ($N=20$) :
 
-1. **Calculate Skip Value**: `skip_value = today_count + skip_modifier` (where `skip_modifier` defaults to 1).
-2. **Select Target for Deletion**:
-   - If `today_count` is **odd**: Remove record at index `N - skip_value`.
-   - If `today_count` is **even**: Remove record at index `0 + skip_value`.
-3. **Update State**: Increment `skip_modifier`. Reset to 1 once `skip_value >= (N/2) - 1`.
+1. **Calculer la valeur de saut** : `skip_value = today_count + skip_modifier` (où `skip_modifier` est par défaut de 1).
+2. **Sélectionner la cible à supprimer** :
+   - Si `today_count` est **impair** : Supprimer l'enregistrement à l'index `N - skip_value`.
+   - Si `today_count` est **pair** : Supprimer l'enregistrement à l'index `0 + skip_value`.
+3. **Mettre à jour l'état** : Incrémenter `skip_modifier`. Réinitialiser à 1 une fois que `skip_value >= (N/2) - 1`.
 
-## 4. Automation Rule
+## 4. Règle d'automatisation
 
-The `sync-global-instructions.ps1` script and the backup sync routine must **never** be executed automatically. They require an active conversation and explicit user confirmation.
+Le script `sync-global-instructions.ps1` et la routine de synchronisation de sauvegarde ne doivent **jamais** être exécutés automatiquement. Ils exigent une conversation active et une confirmation explicite de l'utilisateur.

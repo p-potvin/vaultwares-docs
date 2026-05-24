@@ -1,30 +1,28 @@
 ---
-title: "Zero-knowledge encryption standard"
-description: "VaultWares-wide normative standard for client-side, post-quantum, zero-knowledge encryption."
+title: "Norme de chiffrement à connaissance zéro"
+description: "Norme normative de VaultWares pour le chiffrement à connaissance zéro, post-quantique et côté client."
 ---
 
 <Note>
-**Tier 1 source of truth.** This document is normative for all VaultWares projects.
-A project that cannot satisfy these requirements MUST add `NOTE.encryption.md`
-to its repository root explaining the technical reason and the chosen fallback.
+**Source de vérité de niveau 1.** Ce document est normatif pour tous les projets VaultWares.
+Un projet qui ne peut pas satisfaire ces exigences DOIT ajouter `NOTE.encryption.md`
+à la racine de son dépôt pour expliquer la raison technique et le mécanisme de repli choisi.
 </Note>
 
-## Scope
+## Portée
 
-This standard governs every place where a VaultWares project encrypts user data
-client-side under user-controlled secrets — local vaults, encrypted backups,
-device-to-device sync payloads, end-to-end messaging, and any flow where the
-server must not be able to read user content.
+Cette norme régit chaque endroit où un projet VaultWares chiffre les données utilisateur
+côté client à l'aide de secrets contrôlés par l'utilisateur — les coffres-forts locaux, les sauvegardes chiffrées,
+les charges utiles de synchronisation appareil-à-appareil, la messagerie de bout en bout, et tout flux où le
+serveur ne doit pas être en mesure de lire le contenu utilisateur.
 
-It does **not** govern transport encryption (TLS) or storage encryption performed
-by VaultWares hardware products under enterprise key custody — those are covered
-by [Encryption protocols](./encryption-protocols).
+Elle ne régit **pas** le chiffrement de transport (TLS) ou le chiffrement de stockage effectué
+par les produits matériels VaultWares sous garde de clés d'entreprise — ceux-ci sont couverts
+par [Protocoles de chiffrement](./encryption-protocols).
 
-## Mandatory architecture
+## Architecture obligatoire
 
-Client-side encryption MUST use **ML-KEM (FIPS 203)** as the key encapsulation
-mechanism, layered with **AES-256-GCM** as the symmetric data cipher, in the
-envelope-encryption pattern below.
+Le chiffrement côté client DOIT utiliser **ML-KEM (FIPS 203)** comme mécanisme d'encapsulation de clé, superposé à **AES-256-GCM** comme chiffre de données symétrique, selon le modèle de chiffrement par enveloppe ci-dessous.
 
 ```
 PIN / passphrase
@@ -46,69 +44,63 @@ For each blob (preview, message, backup chunk):
    5. Persist: ML-KEM ciphertext ‖ wrapped DEK ‖ blob ciphertext
 ```
 
-## Parameter selection
+## Sélection des paramètres
 
-| Tier | Parameter set | When to use |
+| Niveau | Ensemble de paramètres | Quand l'utiliser |
 |------|---------------|-------------|
-| **Default** | **ML-KEM-1024** | All long-term confidential data. NIST security level 5. |
-| **Allowed minimum** | **ML-KEM-512** | Only when decapsulation latency directly degrades user-perceived performance (e.g. real-time preview decoding on hot paths). NIST security level 1. Document the latency budget that justified the choice in `NOTE.encryption.md`. |
-| **Fallback (with note)** | **AES-256-GCM only**, no PQ layer | Only when ML-KEM cannot be implemented in the project's runtime (e.g. hard SDK constraints, no audited PQ library available). Requires `NOTE.encryption.md` at repo root. |
+| **Par défaut** | **ML-KEM-1024** | Toutes les données confidentielles à long terme. Niveau de sécurité NIST 5. |
+| **Minimum autorisé** | **ML-KEM-512** | Seulement lorsque la latence de décapsulation dégrade directement la performance perçue par l'utilisateur (ex. décodage de prévisualisation en temps réel sur des chemins chauds). Niveau de sécurité NIST 1. Documentez le budget de latence qui justifie ce choix dans `NOTE.encryption.md`. |
+| **Repli (avec note)** | **AES-256-GCM seulement**, pas de couche PQ | Seulement lorsque ML-KEM ne peut pas être implémenté dans l'environnement d'exécution du projet (ex. contraintes SDK strictes, pas de bibliothèque PQ auditée disponible). Nécessite `NOTE.encryption.md` à la racine du dépôt. |
 
-ML-KEM-768 is intentionally not listed — projects either need quantum-grade margin
-(use 1024) or are latency-bound (use 512). Picking the middle is rarely the right
-answer; if you think it is, write the trade-off down in `NOTE.encryption.md` and
-escalate.
+ML-KEM-768 n'est pas intentionnellement listé — les projets ont soit besoin d'une marge de grade quantique
+(utiliser 1024) soit sont limités par la latence (utiliser 512). Choisir le milieu est rarement la bonne
+réponse; si vous pensez que c'est le cas, écrivez le compromis dans `NOTE.encryption.md` et
+escaladez.
 
-## Required properties
+## Propriétés requises
 
-A compliant implementation MUST guarantee all of the following.
+Une implémentation conforme DOIT garantir tout ce qui suit.
 
-### Zero-knowledge
+### Connaissance zéro
 
-- The server MUST NOT receive the PIN, the master KEK, the private key, the DEK,
-  or plaintext blobs.
-- Backups uploaded for cross-device sync MUST be encrypted with the public key
-  before leaving the device.
-- Telemetry, logs, and crash reports MUST NOT contain key material or plaintext.
+- Le serveur NE DOIT PAS recevoir le code PIN, la KEK maître, la clé privée, la DEK,
+  ou les blocs en texte clair.
+- Les sauvegardes téléchargées pour la synchronisation inter-appareils DOIVENT être chiffrées avec la clé publique
+  avant de quitter l'appareil.
+- Les télémétries, journaux et rapports de plantage NE DOIVENT PAS contenir de matériel de clé ou de texte clair.
 
-### Key handling
+### Gestion des clés
 
-- PINs are NEVER stored in any reversible form. Store only the Argon2id-derived
-  hash for verification, with a per-user random salt.
-- The Argon2id salt MUST be stored alongside the verification hash.
-- Symmetric keys MUST NOT be derived directly from a PIN without a slow KDF.
-- Direct use of a PIN as an AES key is prohibited.
-- Private keys MUST be wrapped under the master KEK whenever persisted.
-- DEKs MUST be ephemeral (regenerated per blob) — never reuse a DEK across blobs.
+- Les codes PIN ne DOIVENT JAMAIS être stockés sous une forme réversible. Stocker uniquement le hachage dérivé d'Argon2id
+  pour la vérification, avec un sel aléatoire par utilisateur.
+- Le sel Argon2id DOIT être stocké avec le hachage de vérification.
+- Les clés symétriques NE DOIVENT PAS être dérivées directement d'un code PIN sans une KDF lente.
+- L'utilisation directe d'un code PIN comme clé AES est interdite.
+- Les clés privées DOIVENT être enveloppées sous la KEK maître chaque fois qu'elles sont persistées.
+- Les DEK DOIVENT être éphémères (régénérés par bloc) — ne jamais réutiliser une DEK entre les blocs.
 
-### Cryptographic agility
+### Agilité cryptographique
 
-- The on-disk format MUST include an algorithm identifier and version field so
-  the parameter set can change in a future release without breaking existing
-  vaults.
-- A documented migration path MUST exist for upgrading older vaults to the
-  current parameter set.
+- Le format sur disque DOIT inclure un identifiant d'algorithme et un champ de version afin que l'ensemble de paramètres puisse changer dans une future version sans casser les coffres-forts existants.
+- Un chemin de migration documenté DOIT exister pour mettre à niveau les anciens coffres-forts vers l'ensemble de paramètres actuel.
 
-## Implementation guidance
+## Guide d'implémentation
 
-### Recommended libraries
+### Bibliothèques recommandées
 
-| Runtime | Library | Notes |
+| Environnement d'exécution | Bibliothèque | Notes |
 |---------|---------|-------|
-| Browser / Node (TypeScript) | [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum) | Audited, zero-dependency, MIT |
-| Browser / Node (TypeScript) | [`liboqs-js`](https://github.com/open-quantum-safe/liboqs) | NIST reference algorithms, larger payload |
-| Native (Rust) | [`pqcrypto`](https://github.com/rustpq/pqcrypto) | Wraps PQClean reference implementations |
-| Python | [`pyoqs`](https://github.com/open-quantum-safe/liboqs-python) | OQS bindings |
+| Navigateur / Node (TypeScript) | [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum) | Audité, zéro dépendance, MIT |
+| Navigateur / Node (TypeScript) | [`liboqs-js`](https://github.com/open-quantum-safe/liboqs) | Algorithmes de référence NIST, charge utile plus grande |
+| Natif (Rust) | [`pqcrypto`](https://github.com/rustpq/pqcrypto) | Enveloppe des implémentations de référence PQClean |
+| Python | [`pyoqs`](https://github.com/open-quantum-safe/liboqs-python) | Liens OQS |
 
-Pick a library that has a third-party security audit on the ML-KEM
-implementation. If none is available for your runtime, document the gap in
-`NOTE.encryption.md` and prefer the AES-256-GCM fallback over an unaudited PQ
-implementation.
+Choisissez une bibliothèque qui possède un audit de sécurité tiers sur l'implémentation ML-KEM. Si aucune n'est disponible pour votre environnement d'exécution, documentez l'écart dans `NOTE.encryption.md` et préférez le repli AES-256-GCM à une implémentation PQ non auditée.
 
-### `NOTE.encryption.md` template
+### Modèle `NOTE.encryption.md`
 
-When a fallback or a deviation from this standard is unavoidable, add the
-following file to the repository root:
+Lorsqu'un repli ou un écart par rapport à cette norme est inévitable, ajoutez le
+fichier suivant à la racine du dépôt :
 
 ```markdown
 # Encryption Note
@@ -125,28 +117,22 @@ following file to the repository root:
 **Reviewed:** <YYYY-MM-DD>
 ```
 
-## Forbidden patterns
+## Schémas interdits
 
-The following patterns are non-compliant and MUST be removed when discovered:
+Les schémas suivants ne sont pas conformes et DOIVENT être supprimés lorsqu'ils sont découverts :
 
-- Storing the user's PIN, password, or recovery phrase in plaintext or in any
-  reversible form
-- Using a PIN, password, or low-entropy secret directly as an AES key
-- Using a fast hash (SHA-1, SHA-256 single round, MD5) as a password hash
-- Reusing a DEK across multiple blobs
-- Sending unencrypted user data to any server, even temporarily, even "for
-  diagnostics"
-- Hardcoded encryption keys in source, build artifacts, or environment files
-- "Encrypted" data whose key is shipped alongside it (so-called encryption
-  theatre)
+- Le stockage du code PIN, du mot de passe ou de la phrase de récupération de l'utilisateur en texte clair ou sous toute forme réversible
+- L'utilisation d'un code PIN, d'un mot de passe ou d'un secret de faible entropie directement comme clé AES
+- L'utilisation d'un hachage rapide (SHA-1, SHA-256 en un seul passage, MD5) comme hachage de mot de passe
+- La réutilisation d'une DEK entre plusieurs blocs
+- L'envoi de données utilisateur non chiffrées à n'importe quel serveur, même temporairement, même « pour diagnostic »
+- Les clés de chiffrement codées en dur dans le code source, les artefacts de construction ou les fichiers d'environnement
+- Les données « chiffrées » dont la clé est expédiée avec elles (le soi-disant théâtre du chiffrement)
 
-## Audit & review
+## Audit et révision
 
-- Every project subject to this standard MUST be reviewed annually against the
-  current version of this document. The review date and reviewer go in
-  `NOTE.encryption.md` even when the project is fully compliant.
-- New implementations MUST have their cryptographic flow reviewed by at least
-  one engineer who did not write the implementation.
-- The wire format and on-disk format MUST be documented in the project's own
-  README or security-notes file so the format can be parsed by recovery tooling
-  in the future.
+- Chaque projet soumis à cette norme DOIT être révisé annuellement par rapport à la version actuelle de ce document. La date de révision et le réviseur doivent être inscrits dans `NOTE.encryption.md` même si le projet est entièrement conforme.
+- Les nouvelles implémentations DOIVENT faire réviser leur flux cryptographique par au moins un ingénieur qui n'a pas écrit l'implémentation.
+- Le format de transmission (wire format) et le format sur disque DOIVENT être documentés dans le propre
+  README ou fichier de notes de sécurité du projet afin que le format puisse être analysé par des outils de récupération
+  à l'avenir.

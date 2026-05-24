@@ -1,23 +1,23 @@
 ---
-title: "Incident Response"
-description: "Assistant protocol summary: Incident Response"
+title: "Réponse aux incidents"
+description: "Résumé des protocoles d'assistance : Réponse aux incidents"
 ---
 
-# Incident Response
+# Réponse aux incidents
 
-- Category ID: `INCIDENT_RESPONSE`
-- Summary source: `instructions/summaries/INCIDENT_RESPONSE.md`
-- Notes source: `instructions/notes/INCIDENT_RESPONSE.md`
+- ID de catégorie : `INCIDENT_RESPONSE`
+- Source du résumé : `instructions/summaries/INCIDENT_RESPONSE.md`
+- Source des notes : `instructions/notes/INCIDENT_RESPONSE.md`
 
-Applies when: outage, production breakage, security incident, urgent regression.
-Do:
-- Stabilize first (stop bleed), then diagnose, then fix.
-- Keep an incident timeline and note what was verified.
-Do not:
-- Make irreversible changes without a rollback plan.
-Done when:
-- Service is stable and incident notes exist.
+S'applique quand : panne, rupture en production, incident de sécurité, régression urgente.
+À faire :
+- Stabiliser d'abord (arrêter l'hémorragie), puis diagnostiquer, puis corriger.
+- Tenir une chronologie de l'incident et noter ce qui a été vérifié.
+À ne pas faire :
+- Effectuer des changements irréversibles sans un plan de restauration.
+Terminé quand :
+- Le service est stable et que des notes d'incident existent.
 
 ## Notes
-Assistants read full notes only when explicitly prompted: `read full notes`.
-Notes path: `instructions/notes/INCIDENT_RESPONSE.md`
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/INCIDENT_RESPONSE.md`

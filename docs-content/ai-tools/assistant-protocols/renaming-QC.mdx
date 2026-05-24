@@ -1,33 +1,33 @@
 ---
-title: "Renaming"
-description: "Assistant protocol summary: Renaming"
+title: "Renommage"
+description: "Résumé du protocole de l'assistant : Renommage"
 ---
 
-# Renaming
+# Renommage
 
-- Category ID: `RENAMING`
-- Summary source: `instructions/summaries/RENAMING.md`
-- Notes source: `instructions/notes/RENAMING.md`
+- ID de catégorie : `RENAMING`
+- Source du résumé : `instructions/summaries/RENAMING.md`
+- Source des notes : `instructions/notes/RENAMING.md`
 
-Applies when: renaming a GitHub repo, Jira project, or any tracked identifier that other systems reference.
-Do:
-- Before renaming anything on GitHub, check `vw-jira-sync/config.yaml` — every repo has a Jira project key and a mapping file.
-- Follow the full 6-step GitHub repo rename procedure (see notes or `operations/jira-sync.mdx`):
-  1. Rename on GitHub.
-  2. Update `repo_project_keys` and `repos` in `vw-jira-sync/config.yaml`.
-  3. `Copy-Item mapping\old-name.json mapping\new-name.json` then `Remove-Item mapping\old-name.json`.
-  4. `python scripts/backfill.py --repo new-name` (mapping file prevents duplicates).
-  5. `python scripts/deploy_caller_workflows.py --repo new-name --strategy main`.
-  6. Commit and push `vw-jira-sync` to main.
-- Rename the mapping file *before* re-running backfill — order matters.
-Do not:
-- Run backfill with the new name before renaming the mapping file — it will create duplicate Jira issues.
-- Delete the old mapping file without copying it first.
-- Assume GitHub's automatic redirect covers Jira labels — labels embed the repo name and must be kept consistent via backfill.
-Done when:
-- `config.yaml` uses the new name, mapping file is renamed, backfill completed with no errors, caller workflow re-deployed, vw-jira-sync pushed.
-- Full runbook: `vaultwares-docs/docs-content/operations/jira-sync.mdx`
+S'applique quand : on renomme un dépôt GitHub, un projet Jira, ou tout identifiant suivi auquel d'autres systèmes font référence.
+À faire :
+- Avant de renommer quoi que ce soit sur GitHub, vérifier `vw-jira-sync/config.yaml` — chaque dépôt a une clé de projet Jira et un fichier de mappage.
+- Suivre la procédure complète de 6 étapes pour renommer un dépôt GitHub (voir les notes ou `operations/jira-sync.mdx`) :
+  1. Renommer sur GitHub.
+  2. Mettre à jour `repo_project_keys` et `repos` dans `vw-jira-sync/config.yaml`.
+  3. `Copy-Item mapping\ancien-nom.json mapping\nouveau-nom.json` puis `Remove-Item mapping\ancien-nom.json`.
+  4. `python scripts/backfill.py --repo nouveau-nom` (le fichier de mappage empêche les doublons).
+  5. `python scripts/deploy_caller_workflows.py --repo nouveau-nom --strategy main`.
+  6. Commiter et pousser `vw-jira-sync` vers main.
+- Renommer le fichier de mappage *avant* de relancer le backfill — l'ordre est important.
+À ne pas faire :
+- Exécuter le backfill avec le nouveau nom avant d'avoir renommé le fichier de mappage — cela créera des problèmes Jira en double.
+- Supprimer l'ancien fichier de mappage sans l'avoir copié au préalable.
+- Supposer que la redirection automatique de GitHub couvre les étiquettes Jira — les étiquettes intègrent le nom du dépôt et doivent être maintenues cohérentes via le backfill.
+Terminé quand :
+- `config.yaml` utilise le nouveau nom, le fichier de mappage est renommé, le backfill est complété sans erreur, le workflow appelant est redéployé, vw-jira-sync est poussé.
+- Guide complet : `vaultwares-docs/docs-content/operations/jira-sync.mdx`
 
 ## Notes
-Assistants read full notes only when explicitly prompted: `read full notes`.
-Notes path: `instructions/notes/RENAMING.md`
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/RENAMING.md`

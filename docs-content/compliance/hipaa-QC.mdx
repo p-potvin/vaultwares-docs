@@ -1,30 +1,30 @@
 ---
-title: "HIPAA compliance"
-description: "Health Insurance Portability and Accountability Act compliance"
+title: "Conformité HIPAA"
+description: "Conformité à la Loi sur la portabilité et la responsabilité des assurances maladie"
 ---
 
-## Overview
+## Vue d'ensemble
 
-The HIPAA Security Rule (45 CFR Part 164) requires covered entities and business associates to implement administrative, physical, and technical safeguards to protect electronic protected health information (ePHI). VaultWares products address the technical safeguard requirements directly.
+La règle de sécurité HIPAA (45 CFR Part 164) exige des entités couvertes et des associés commerciaux qu'elles mettent en œuvre des sauvegardes administratives, physiques et techniques pour protéger les informations de santé protégées électroniques (ISPE). Les produits VaultWares répondent directement aux exigences de sauvegarde techniques.
 
 <Note>
-  This guide provides technical guidance on how VaultWares products support HIPAA compliance. Consult your compliance officer and legal counsel for a complete HIPAA risk analysis.
+  Ce guide fournit des conseils techniques sur la manière dont les produits VaultWares soutiennent la conformité HIPAA. Consultez votre responsable de la conformité et votre conseiller juridique pour une analyse des risques HIPAA complète.
 </Note>
 
-## Technical safeguard requirements
+## Exigences de sauvegarde techniques
 
-The HIPAA Security Rule defines technical safeguards at 45 CFR § 164.312.
+La règle de sécurité HIPAA définit les sauvegardes techniques à 45 CFR § 164.312.
 
 <Tabs>
-  <Tab title="Access Control (§164.312(a))">
-    **Required**: Unique user identification, emergency access procedure, automatic logoff, encryption/decryption
+  <Tab title="Contrôle d'accès (§164.312(a))">
+    **Requis** : Identification unique de l'utilisateur, procédure d'accès d'urgence, déconnexion automatique, chiffrement/déchiffrement
 
-    | Specification | Status | VaultWares Control |
+    | Spécification | Statut | Contrôle VaultWares |
     |---|---|---|
-    | Unique user IDs | Required | VaultAccess unique user accounts; no shared credentials |
-    | Emergency access | Required | VaultAccess PAM break-glass procedure |
-    | Automatic logoff | Addressable | VaultAccess idle session timeout; VaultDrive auto-lock |
-    | Encryption/decryption | Addressable | VaultCrypt ePHI volume encryption; VaultHSM key management |
+    | Identifiants d'utilisateur uniques | Requis | Comptes utilisateurs uniques VaultAccess; pas de mots de passe partagés |
+    | Accès d'urgence | Requis | Procédure de rupture de verre (break-glass) VaultAccess PAM |
+    | Déconnexion automatique | Adressable | Délai de session inactive VaultAccess; Verrouillage automatique VaultDrive |
+    | Chiffrement/déchiffrement | Adressable | Chiffrement de volume ISPE VaultCrypt; Gestion des clés VaultHSM |
 
     ```bash
     # Configure automatic session timeout for ePHI systems
@@ -42,8 +42,8 @@ The HIPAA Security Rule defines technical safeguards at 45 CFR § 164.312.
       --require-reauthentication true
     ```
   </Tab>
-  <Tab title="Audit Controls (§164.312(b))">
-    **Required**: Hardware, software, and procedural mechanisms to record and examine activity in information systems containing ePHI
+  <Tab title="Contrôles d'audit (§164.312(b))">
+    **Requis** : Mécanismes matériels, logiciels et procéduraux pour enregistrer et examiner l'activité dans les systèmes d'information contenant des ISPE
 
     ```bash
     # Enable comprehensive ePHI audit logging
@@ -69,19 +69,19 @@ The HIPAA Security Rule defines technical safeguards at 45 CFR § 164.312.
       --output /reports/hipaa-audit-oct-2024.pdf
     ```
 
-    Audit events captured by VaultMonitor for HIPAA:
+    Événements d'audit capturés par VaultMonitor pour HIPAA :
 
-    | Event | Detail level |
+    | Événement | Niveau de détail |
     |---|---|
-    | ePHI file access (read) | User, timestamp, resource, source IP |
-    | ePHI file modification | User, timestamp, resource, change summary |
-    | ePHI file deletion / crypto-erasure | User, timestamp, resource, reason |
-    | Authentication attempts | User, timestamp, result, source IP, MFA method |
-    | Privileged access sessions | Full session recording (PAM) |
-    | Key management operations | HSM audit log — key ID, operation, user |
+    | Accès à un fichier ISPE (lecture) | Utilisateur, horodatage, ressource, IP source |
+    | Modification d'un fichier ISPE | Utilisateur, horodatage, ressource, résumé des changements |
+    | Suppression / effacement crypto d'un fichier ISPE | Utilisateur, horodatage, ressource, raison |
+    | Tentatives d'authentification | Utilisateur, horodatage, résultat, IP source, méthode MFA |
+    | Sessions d'accès privilégié | Enregistrement complet de la session (PAM) |
+    | Opérations de gestion des clés | Journal d'audit HSM — ID de clé, opération, utilisateur |
   </Tab>
-  <Tab title="Integrity (§164.312(c))">
-    **Required**: Mechanisms to authenticate ePHI; electronic mechanisms to corroborate that ePHI has not been altered or destroyed
+  <Tab title="Intégrité (§164.312(c))">
+    **Requis** : Mécanismes pour authentifier les ISPE; mécanismes électroniques pour corroborer que les ISPE n'ont pas été altérées ou détruites
 
     ```bash
     # Enable file integrity monitoring on ePHI directories
@@ -100,8 +100,8 @@ The HIPAA Security Rule defines technical safeguards at 45 CFR § 164.312.
       --output /reports/phi-backup-integrity-$(date +%Y%m%d).json
     ```
   </Tab>
-  <Tab title="Transmission Security (§164.312(e))">
-    **Required**: Guard against unauthorized access to ePHI transmitted over electronic networks
+  <Tab title="Sécurité de transmission (§164.312(e))">
+    **Requis** : Protection contre l'accès non autorisé aux ISPE transmises sur des réseaux électroniques
 
     ```bash
     # Enforce TLS 1.2+ for all ePHI transmission
@@ -116,9 +116,9 @@ The HIPAA Security Rule defines technical safeguards at 45 CFR § 164.312.
   </Tab>
 </Tabs>
 
-## ePHI protection configuration
+## Configuration de protection des ISPE
 
-### Encrypting ePHI at rest
+### Chiffrer les ISPE au repos
 
 ```bash
 # Create dedicated encrypted volume for ePHI
@@ -141,7 +141,7 @@ vaultcrypt policy set \
   --enforce-no-plaintext true
 ```
 
-### VaultDrive deployment for clinical staff
+### Déploiement de VaultDrive pour le personnel clinique
 
 ```bash
 # Deploy HIPAA-compliant policy to clinical staff VaultDrives
@@ -159,63 +159,63 @@ vw-admin deploy-config \
   }'
 ```
 
-## Business Associate Agreement (BAA)
+## Accord d'associé commercial (AAC)
 
-VaultWares executes Business Associate Agreements with covered entities. A BAA confirms that VaultWares:
+VaultWares exécute des Accords d'associé commercial avec les entités couvertes. Un AAC confirme que VaultWares :
 
-- Protects the security and confidentiality of ePHI
-- Reports security incidents and breaches to the covered entity
-- Returns or destroys ePHI upon contract termination
-- Ensures subcontractors (including cloud providers) execute BAAs
+- Protège la sécurité et la confidentialité des ISPE
+- Signale les incidents de sécurité et les violations à l'entité couverte
+- Retourne ou détruit les ISPE à la fin du contrat
+- S'assure que les sous-traitants (y compris les fournisseurs de services cloud) exécutent des AAC
 
-Contact [compliance@vaultwares.com](mailto:compliance@vaultwares.com) to request a BAA.
+Contactez [compliance@vaultwares.com](mailto:compliance@vaultwares.com) pour demander un AAC.
 
-## HIPAA compliance checklist
+## Liste de vérification de conformité HIPAA
 
 <AccordionGroup>
-  <Accordion title="Access control">
-    - [ ] Unique user IDs enforced for all ePHI access (no shared accounts)
-    - [ ] MFA required for all ePHI systems
-    - [ ] Automatic session timeout ≤ 15 minutes configured
-    - [ ] Emergency access (break-glass) procedure documented and tested
-    - [ ] Access reviews completed quarterly
-    - [ ] Terminated employee access removed within 24 hours
+  <Accordion title="Contrôle d'accès">
+    - [ ] Identifiants d'utilisateur uniques appliqués pour tout accès ISPE (pas de comptes partagés)
+    - [ ] MFA requis pour tous les systèmes ISPE
+    - [ ] Délai de session automatique ≤ 15 minutes configuré
+    - [ ] Procédure d'accès d'urgence (rupture de verre) documentée et testée
+    - [ ] Revues d'accès complétées trimestriellement
+    - [ ] Accès des employés licenciés retiré dans les 24 heures
   </Accordion>
-  <Accordion title="Encryption">
-    - [ ] All ePHI encrypted at rest (AES-256)
-    - [ ] All ePHI encrypted in transit (TLS 1.2+)
-    - [ ] Encryption keys managed by FIPS 140-2+ validated HSM
-    - [ ] Key rotation schedule documented
-    - [ ] Encrypted backup of ePHI tested monthly
+  <Accordion title="Chiffrement">
+    - [ ] Toutes les ISPE chiffrées au repos (AES-256)
+    - [ ] Toutes les ISPE chiffrées en transit (TLS 1.2+)
+    - [ ] Les clés de chiffrement gérées par un HSM validé FIPS 140-2+
+    - [ ] Calendrier de rotation des clés documenté
+    - [ ] Sauvegarde chiffrée des ISPE testée mensuellement
   </Accordion>
-  <Accordion title="Audit controls">
-    - [ ] Audit logging enabled for all ePHI access (read, write, delete)
-    - [ ] Audit logs retained for minimum 6 years
-    - [ ] Audit log integrity protection enabled (HSM signing)
-    - [ ] Audit logs reviewed regularly (weekly minimum)
-    - [ ] Automated alerting on suspicious access patterns
+  <Accordion title="Contrôles d'audit">
+    - [ ] Journalisation d'audit activée pour tout accès ISPE (lecture, écriture, suppression)
+    - [ ] Journaux d'audit conservés pendant un minimum de 6 ans
+    - [ ] Protection de l'intégrité des journaux d'audit activée (signature HSM)
+    - [ ] Journaux d'audit examinés régulièrement (minimum hebdomadaire)
+    - [ ] Alertes automatisées sur les modèles d'accès suspects
   </Accordion>
-  <Accordion title="Breach response">
-    - [ ] VaultMonitor alerts configured for ePHI breach indicators
-    - [ ] 60-day breach notification runbook documented (HIPAA Breach Notification Rule)
-    - [ ] Forensic log export procedure tested
-    - [ ] Incident response team trained on HIPAA breach response
+  <Accordion title="Réponse aux violations">
+    - [ ] Alertes VaultMonitor configurées pour les indicateurs de violation ISPE
+    - [ ] Guide de gestion des violations de 60 jours documenté (Règle de notification de violation HIPAA)
+    - [ ] Procédure de transfert des journaux forensiques testée
+    - [ ] Équipe de réponse aux incidents formée sur la réponse aux violations HIPAA
   </Accordion>
 </AccordionGroup>
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Encryption protocols" icon="lock" href="/security/encryption-protocols">
-    Technical details on HIPAA-compliant encryption algorithms
+  <Card title="Protocoles de chiffrement" icon="lock" href="/security/encryption-protocols">
+    Détails techniques sur les algorithmes de chiffrement conformes à HIPAA
   </Card>
-  <Card title="Access control" icon="shield-halved" href="/software/access-control">
-    Configure VaultAccess for HIPAA compliance
+  <Card title="Contrôle d'accès" icon="shield-halved" href="/software/access-control">
+    Configurer VaultAccess pour la conformité HIPAA
   </Card>
-  <Card title="GDPR compliance" icon="flag" href="/compliance/gdpr">
-    EU data protection requirements
+  <Card title="Conformité RGPD" icon="flag" href="/compliance/gdpr">
+    Exigences de protection des données de l'UE
   </Card>
-  <Card title="PCI DSS compliance" icon="credit-card" href="/compliance/pci-dss">
-    Payment card data security requirements
+  <Card title="Conformité PCI DSS" icon="credit-card" href="/compliance/pci-dss">
+    Exigences de sécurité des données de cartes de paiement
   </Card>
 </CardGroup>

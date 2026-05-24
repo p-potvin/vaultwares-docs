@@ -1,101 +1,102 @@
 ---
-title: Encryption software
-description: Full-disk and file-level encryption solutions
+title: Logiciels de chiffrement
+description: Solutions de chiffrement de disque entier et de fichiers
 ---
 
-## Overview
 
-VaultWares encryption software provides comprehensive data protection through full-disk encryption (FDE), file-level encryption, and folder encryption. Protect data at rest on workstations, servers, and removable media with military-grade AES-256 encryption.
+## Aperçu
 
-## Product editions
+Le logiciel de chiffrement VaultWares offre une protection complète des données grâce au chiffrement de disque entier (CDE), au chiffrement au niveau des fichiers et au chiffrement des dossiers. Protégez les données au repos sur les postes de travail, les serveurs et les médias amovibles avec le chiffrement AES-256 de qualité militaire.
+
+## Éditions du produit
 
 <CardGroup cols={2}>
   <Card title="VaultCrypt Standard" icon="lock">
-    **Use case**: Individual workstations  
-    **Encryption**: Full-disk, file, folder  
-    **Management**: Local only
+    **Cas d'utilisation** : Postes de travail individuels
+    **Chiffrement** : Disque entier, fichier, dossier
+    **Gestion** : Local uniquement
   </Card>
   <Card title="VaultCrypt Professional" icon="shield">
-    **Use case**: Small business  
-    **Encryption**: Full-disk, file, folder, removable media  
-    **Management**: Centralized console
+    **Cas d'utilisation** : Petites entreprises
+    **Chiffrement** : Disque entier, fichier, dossier, médias amovibles
+    **Gestion** : Console centralisée
   </Card>
   <Card title="VaultCrypt Enterprise" icon="building">
-    **Use case**: Large organizations  
-    **Encryption**: All types + cloud storage  
-    **Management**: Enterprise console + API
+    **Cas d'utilisation** : Grandes organisations
+    **Chiffrement** : Tous types + stockage cloud
+    **Gestion** : Console d'entreprise + API
   </Card>
   <Card title="VaultCrypt Server" icon="server">
-    **Use case**: Server environments  
-    **Encryption**: Boot volumes, data volumes  
-    **Management**: Headless operation
+    **Cas d'utilisation** : Environnements serveurs
+    **Chiffrement** : Volumes de démarrage, volumes de données
+    **Gestion** : Opération sans interface graphique
   </Card>
 </CardGroup>
 
-## Key features
+## Fonctionnalités clés
 
-### Encryption capabilities
-- **Full-disk encryption**: Encrypt entire system drives including boot sectors
-- **File-level encryption**: Selective encryption of individual files
-- **Folder encryption**: Automatic encryption of designated folders
-- **Removable media**: Encrypt USB drives and external storage
-- **Cloud storage**: Encrypt files before uploading to cloud services
-- **Email encryption**: Integrate with email clients for encrypted messages
+### Capacités de chiffrement
+- **Chiffrement de disque entier** : Chiffre les disques système entiers, y compris les secteurs de démarrage
+- **Chiffrement au niveau des fichiers** : Chiffrement sélectif de fichiers individuels
+- **Chiffrement des dossiers** : Chiffrement automatique des dossiers désignés
+- **Médias amovibles** : Chiffre les clés USB et les supports de stockage externes
+- **Stockage cloud** : Chiffre les fichiers avant de les téléverser vers des services cloud
+- **Chiffrement des courriels** : Intégration avec les clients de messagerie pour des messages chiffrés
 
-### Security features
-- **AES-256-XTS encryption**: Military-grade encryption standard
-- **Pre-boot authentication**: Secure boot process before OS loads
-- **Multi-factor authentication**: Password + TPM + biometric + smart card
-- **Self-encrypting drive (SED) support**: Hardware-accelerated encryption
-- **Secure key management**: TPM-based key storage
-- **Emergency recovery**: Secure key escrow and recovery procedures
+### Fonctionnalités de sécurité
+- **Chiffrement AES-256-XTS** : Norme de chiffrement de qualité militaire
+- **Authentification pré-démarrage** : Processus de démarrage sécurisé avant le chargement du système d'exploitation
+- **Authentification multi-facteurs** : Mot de passe + TPM + biométrique + carte à puce
+- **Support de disque à chiffrement intégré (SED)** : Chiffrement accéléré par le matériel
+- **Gestion sécurisée des clés** : Stockage des clés basé sur le TPM
+- **Récupération d'urgence** : Procédures de séquestre et de récupération des clés sécurisées
 
-### Management features
-- **Centralized console**: Manage encryption across entire organization
-- **Policy enforcement**: Automated encryption policies
-- **Compliance reporting**: Detailed encryption status reports
-- **Remote management**: Deploy, configure, and monitor remotely
-- **Active Directory integration**: User and group policy management
-- **Audit logging**: Complete encryption operation logs
+### Fonctionnalités de gestion
+- **Console centralisée** : Gérez le chiffrement dans toute l'organisation
+- **Application des politiques** : Politiques de chiffrement automatisées
+- **Rapports de conformité** : Rapports détaillés sur l'état du chiffrement
+- **Gestion à distance** : Déployer, configurer et surveiller à distance
+- **Intégration Active Directory** : Gestion des utilisateurs et des groupes
+- **Journalisation d'audit** : Journaux complets des opérations de chiffrement
 
-## System requirements
+## Exigences système
 
-### Minimum requirements
-- **OS**: Windows 10/11, Windows Server 2016+, macOS 11+, Linux (Ubuntu 20.04+, RHEL 8+)
-- **CPU**: 2 GHz dual-core processor
-- **RAM**: 4GB (8GB recommended)
-- **Disk space**: 500MB for software, additional space for encrypted containers
-- **TPM**: TPM 1.2 or 2.0 (recommended for full-disk encryption)
+### Exigences minimales
+- **OS** : Windows 10/11, Windows Server 2016+, macOS 11+, Linux (Ubuntu 20.04+, RHEL 8+)
+- **CPU** : Processeur dual-cœur de 2 GHz
+- **RAM** : 4 Go (8 Go recommandé)
+- **Espace disque** : 500 Mo pour le logiciel, espace supplémentaire pour les conteneurs chiffrés
+- **TPM** : TPM 1.2 ou 2.0 (recommandé pour le chiffrement de disque entier)
 
-### Supported platforms
-- Physical machines
-- Virtual machines (VMware, Hyper-V, KVM)
-- Cloud instances (AWS, Azure, GCP)
-- Containers (encryption of persistent volumes)
+### Plateformes prises en charge
+- Machines physiques
+- Machines virtuelles (VMware, Hyper-V, KVM)
+- Instances cloud (AWS, Azure, GCP)
+- Conteneurs (chiffrement des volumes persistants)
 
 ## Installation
 
-### Windows installation
+### Installation Windows
 
 <Steps>
-  <Step title="Download installer">
-    Download VaultCrypt from the [customer portal](https://portal.vaultwares.com).
+  <Step title="Télécharger l'installateur">
+    Téléchargez VaultCrypt depuis le [portail client](https://portal.vaultwares.com).
   </Step>
-  <Step title="Run installer">
+  <Step title="Exécuter l'installateur">
     ```powershell
     # Silent installation
     VaultCrypt-Setup.exe /S /LICENSE=your-license-key
     ```
   </Step>
-  <Step title="Reboot system">
-    Restart your computer to complete installation.
+  <Step title="Redémarrer le système">
+    Redémarrez votre ordinateur pour terminer l'installation.
   </Step>
-  <Step title="Configure encryption">
-    Launch VaultCrypt and follow the encryption wizard.
+  <Step title="Configurer le chiffrement">
+    Lancez VaultCrypt et suivez l'assistant de chiffrement.
   </Step>
 </Steps>
 
-### macOS installation
+### Installation macOS
 
 ```bash
 # Install via Homebrew
@@ -107,7 +108,7 @@ curl -O https://downloads.vaultwares.com/vaultcrypt-latest.dmg
 open vaultcrypt-latest.dmg
 ```
 
-### Linux installation
+### Installation Linux
 
 <Tabs>
   <Tab title="Debian/Ubuntu">
@@ -116,34 +117,34 @@ open vaultcrypt-latest.dmg
     wget -qO - https://repo.vaultwares.com/gpg.key | sudo apt-key add -
     echo "deb https://repo.vaultwares.com/apt stable main" | \
       sudo tee /etc/apt/sources.list.d/vaultwares.list
-    
+
     # Install
     sudo apt update
     sudo apt install vaultcrypt
-    
+
     # Activate license
     sudo vaultcrypt-cli activate --license your-license-key
     ```
   </Tab>
-  
+
   <Tab title="RHEL/CentOS">
     ```bash
     # Add repository
     sudo wget https://repo.vaultwares.com/rpm/vaultwares.repo \
       -O /etc/yum.repos.d/vaultwares.repo
-    
+
     # Install
     sudo yum install vaultcrypt
-    
+
     # Activate license
     sudo vaultcrypt-cli activate --license your-license-key
     ```
   </Tab>
 </Tabs>
 
-## Usage
+## Utilisation
 
-### Full-disk encryption
+### Chiffrement de disque entier
 
 <CodeGroup>
 ```powershell Windows
@@ -183,7 +184,7 @@ sudo vaultcrypt status /dev/sda1
 ```
 </CodeGroup>
 
-### File and folder encryption
+### Chiffrement de fichiers et de dossiers
 
 ```bash
 # Encrypt a file
@@ -211,7 +212,7 @@ vaultcrypt mount ~/SecureDocuments
 vaultcrypt unmount ~/SecureDocuments
 ```
 
-### Removable media encryption
+### Chiffrement des médias amovibles
 
 ```bash
 # Encrypt USB drive
@@ -225,9 +226,9 @@ vaultcrypt encrypt-removable \
 # without VaultCrypt installed (includes portable app)
 ```
 
-## Enterprise management
+## Gestion d'entreprise
 
-### Deploy via Group Policy (Windows)
+### Déploiement via Stratégie de groupe (Windows)
 
 ```powershell
 # Create GPO for VaultCrypt deployment
@@ -247,7 +248,7 @@ Set-GPRegistryValue -Name "VaultCrypt Deployment" `
   -ValueName "RequireTPM" -Type DWord -Value 1
 ```
 
-### Centralized management console
+### Console de gestion centralisée
 
 ```bash
 # Connect to management server
@@ -272,7 +273,7 @@ vaultcrypt-admin report generate \
   --output compliance-report-$(date +%Y%m%d).pdf
 ```
 
-### API integration
+### Intégration API
 
 ```python
 from vaultwares import VaultCryptAPI
@@ -301,9 +302,9 @@ policy = api.policies.create(
 api.policies.apply(policy.id, group='new-hires')
 ```
 
-## Recovery procedures
+## Procédures de récupération
 
-### User-initiated recovery
+### Récupération initiée par l'utilisateur
 
 ```bash
 # Generate recovery key during encryption
@@ -316,7 +317,7 @@ vaultcrypt encrypt-disk \
 # Enter recovery key when prompted
 ```
 
-### Administrator recovery
+### Récupération administrateur
 
 ```bash
 # Connect to management console
@@ -336,7 +337,7 @@ vaultcrypt-admin recovery reset-password \
   --new-password "temporary-password"
 ```
 
-### Emergency access
+### Accès d'urgence
 
 ```bash
 # Create emergency access disk
@@ -348,9 +349,9 @@ vaultcrypt-admin emergency-disk create \
 # Boot from emergency disk to access encrypted system
 ```
 
-## Performance optimization
+## Optimisation des performances
 
-### Hardware acceleration
+### Accélération matérielle
 
 ```bash
 # Enable AES-NI acceleration (Intel/AMD CPUs)
@@ -367,7 +368,7 @@ vaultcrypt benchmark
 # CPU overhead: 3%
 ```
 
-### Optimization settings
+### Paramètres d'optimisation
 
 ```bash
 # Optimize for performance
@@ -383,9 +384,9 @@ vaultcrypt config set \
   --background-conversion true
 ```
 
-## Compliance and auditing
+## Conformité et audit
 
-### Generate compliance reports
+### Générer des rapports de conformité
 
 ```bash
 # Encryption compliance report
@@ -401,71 +402,71 @@ vaultcrypt-admin audit export \
   --output audit-log.json
 ```
 
-### Compliance standards supported
+### Normes de conformité prises en charge
 
 <AccordionGroup>
   <Accordion title="PCI DSS">
-    Meets PCI DSS Requirement 3.4 for rendering PAN unreadable through encryption.
+    Satisfait l'exigence 3.4 de PCI DSS pour rendre le PAN illisible par chiffrement.
   </Accordion>
-  
+
   <Accordion title="HIPAA">
-    Satisfies HIPAA Security Rule addressable implementation specification for encryption of ePHI.
+    Satisfait la spécification d'implémentation applicable de la règle de sécurité HIPAA pour le chiffrement de l'ePHI.
   </Accordion>
-  
+
   <Accordion title="GDPR">
-    Provides technical measures for data protection as required by GDPR Article 32.
+    Fournit des mesures techniques pour la protection des données comme l'exige l'article 32 du RGPD.
   </Accordion>
-  
+
   <Accordion title="FIPS 140-2">
-    Uses FIPS 140-2 validated cryptographic modules for encryption operations.
+    Utilise des modules cryptographiques validés FIPS 140-2 pour les opérations de chiffrement.
   </Accordion>
 </AccordionGroup>
 
-## Troubleshooting
+## Dépannage
 
 <AccordionGroup>
-  <Accordion title="Encryption is slow">
-    - Enable hardware acceleration: `vaultcrypt config set --hardware-acceleration enable`
-    - Check CPU usage during encryption
-    - Consider using SED drives for better performance
-    - Schedule encryption during off-hours
+  <Accordion title="Le chiffrement est lent">
+    - Activer l'accélération matérielle : `vaultcrypt config set --hardware-acceleration enable`
+    - Vérifier l'utilisation du CPU pendant le chiffrement
+    - Envisager d'utiliser des disques SED pour de meilleures performances
+    - Planifier le chiffrement pendant les heures creuses
   </Accordion>
-  
-  <Accordion title="Cannot boot after encryption">
-    - Boot from recovery media
-    - Enter recovery key at pre-boot screen
-    - Check BIOS/UEFI settings (Secure Boot, TPM)
-    - Contact support with error code
+
+  <Accordion title="Impossible de démarrer après le chiffrement">
+    - Démarrer à partir d'un média de récupération
+    - Entrer la clé de récupération à l'écran pré-démarrage
+    - Vérifier les paramètres du BIOS/UEFI (Secure Boot, TPM)
+    - Contacter le support avec le code d'erreur
   </Accordion>
-  
-  <Accordion title="TPM errors">
-    - Clear TPM in BIOS/UEFI
-    - Reinitialize TPM: `vaultcrypt tpm-init`
-    - Update TPM firmware
-    - Use password-only authentication as fallback
+
+  <Accordion title="Erreurs TPM">
+    - Effacer le TPM dans le BIOS/UEFI
+    - Réinitialiser le TPM : `vaultcrypt tpm-init`
+    - Mettre à jour le micrologiciel TPM
+    - Utiliser l'authentification par mot de passe uniquement en dernier recours
   </Accordion>
-  
-  <Accordion title="Performance degradation">
-    - Check disk health: `vaultcrypt disk-health`
-    - Verify sufficient free space (20% minimum)
-    - Disable real-time antivirus scanning of encrypted volumes
-    - Update VaultCrypt to latest version
+
+  <Accordion title="Dégradation des performances">
+    - Vérifier l'état du disque : `vaultcrypt disk-health`
+    - Vérifier l'espace libre suffisant (minimum 20 %)
+    - Désactiver l'analyse antivirus en temps réel des volumes chiffrés
+    - Mettre à jour VaultCrypt vers la dernière version
   </Accordion>
 </AccordionGroup>
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    Encryption best practices
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Meilleures pratiques de chiffrement
   </Card>
-  <Card title="API reference" icon="code" href="/api-reference/endpoints">
-    Programmatic management
+  <Card title="Référence API" icon="code" href="/api-reference/endpoints">
+    Gestion par programmation
   </Card>
-  <Card title="Compliance" icon="shield-check" href="/compliance/gdpr">
-    Compliance guides
+  <Card title="Conformité" icon="shield-check" href="/compliance/gdpr">
+    Guides de conformité
   </Card>
   <Card title="Support" icon="headset" href="/support/contact">
-    Get technical assistance
+    Obtenir de l'aide technique
   </Card>
 </CardGroup>

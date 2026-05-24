@@ -1,24 +1,24 @@
 ---
-title: "Software deployment"
-description: "Enterprise software deployment strategies"
+title: "Déploiement de logiciels"
+description: "Stratégies de déploiement de logiciels d'entreprise"
 ---
 
-## Overview
+## Vue d'ensemble
 
-VaultWares software products (VaultCrypt, VaultAccess, VaultBackup, VaultMonitor) support a range of enterprise deployment strategies, from manual installation to fully automated pipelines. This guide covers silent installation, MDM/endpoint management, Group Policy (GPO), Docker, and Kubernetes deployments.
+Les produits logiciels VaultWares (VaultCrypt, VaultAccess, VaultBackup, VaultMonitor) prennent en charge une gamme de stratégies de déploiement d'entreprise, allant de l'installation manuelle aux pipelines entièrement automatisés. Ce guide couvre l'installation silencieuse, la gestion des terminaux (MDM/endpoint), les stratégies de groupe (GPO), Docker et les déploiements Kubernetes.
 
-## Supported platforms
+## Plateformes prises en charge
 
-| Product | Windows | macOS | Linux | Docker | Kubernetes |
+| Produit | Windows | macOS | Linux | Docker | Kubernetes |
 |---------|---------|-------|-------|--------|------------|
 | VaultCrypt | ✓ | ✓ | ✓ | ✓ | - |
 | VaultAccess | ✓ | ✓ | ✓ | ✓ | ✓ |
 | VaultBackup | ✓ | ✓ | ✓ | ✓ | ✓ |
 | VaultMonitor | ✓ | - | ✓ | ✓ | ✓ |
 
-## Silent installation
+## Installation silencieuse
 
-Silent (unattended) installation is the recommended method for large-scale endpoint deployments.
+L'installation silencieuse (non assistée) est la méthode recommandée pour les déploiements de terminaux à grande échelle.
 
 <Tabs>
   <Tab title="Windows MSI">
@@ -92,30 +92,30 @@ Silent (unattended) installation is the recommended method for large-scale endpo
   </Tab>
 </Tabs>
 
-## MDM deployment
+## Déploiement MDM
 
 ### Microsoft Intune
 
 <Steps>
-  <Step title="Upload the installer">
-    1. Navigate to **Intune admin center** → **Apps** → **All apps** → **Add**
-    2. Select **Windows app (Win32)** for MSI deployments, or **macOS LOB app** for PKG files
-    3. Upload the VaultCrypt installer package
+  <Step title="Télécharger l'installeur">
+    1. Naviguez vers le **Centre d'administration Intune** → **Applications** → **Toutes les applications** → **Ajouter**
+    2. Sélectionnez **Application Windows (Win32)** pour les déploiements MSI, ou **Application LOB macOS** pour les fichiers PKG
+    3. Téléchargez le paquet d'installation VaultCrypt
   </Step>
-  <Step title="Configure detection rules">
-    Set a detection rule to confirm successful installation:
-    - **Rule type**: File
-    - **Path**: `C:\Program Files\VaultWares\VaultCrypt`
-    - **File or folder**: `vaultcrypt.exe`
-    - **Detection method**: File or folder exists
+  <Step title="Configurer les règles de détection">
+    Définissez une règle de détection pour confirmer une installation réussie :
+    - **Type de règle** : Fichier
+    - **Chemin** : `C:\Program Files\VaultWares\VaultCrypt`
+    - **Fichier ou dossier** : `vaultcrypt.exe`
+    - **Méthode de détection** : Fichier ou dossier existe
   </Step>
-  <Step title="Set install command">
+  <Step title="Définir la commande d'installation">
     ```cmd
     msiexec /i VaultCrypt-Enterprise-3.2.0-x64.msi /quiet /norestart LICENSEKEY="VWCR-XXXX-XXXX-XXXX-XXXX" CONSOLEURL="https://console.corp.example.com" ORGKEY="ORG-KEY-XXXX"
     ```
   </Step>
-  <Step title="Assign to device group">
-    Assign the app to the target device group and set deployment type to **Required**.
+  <Step title="Attribuer au groupe d'appareils">
+    Attribuez l'application au groupe d'appareils cible et définissez le type de déploiement sur **Requis**.
   </Step>
 </Steps>
 
@@ -144,30 +144,30 @@ ORG_KEY="ORG-KEY-XXXX"
 exit $?
 ```
 
-## Group Policy (GPO) deployment
+## Déploiement par Stratégie de groupe (GPO)
 
-### Software installation via GPO
+### Installation de logiciels via GPO
 
 <Steps>
-  <Step title="Copy installer to network share">
+  <Step title="Copier l'installeur sur un partage réseau">
     ```powershell
     # Copy MSI to software deployment share
     Copy-Item "VaultCrypt-Enterprise-3.2.0-x64.msi" `
       -Destination "\\ad.corp.example.com\NETLOGON\VaultWares\"
     ```
   </Step>
-  <Step title="Create a GPO">
-    1. Open **Group Policy Management Console** (gpmc.msc)
-    2. Create a new GPO: `VaultWares - VaultCrypt Deployment`
-    3. Link to the target OU (e.g., `OU=Workstations,DC=corp,DC=example,DC=com`)
+  <Step title="Créer une GPO">
+    1. Ouvrez la **Console de gestion des stratégies de groupe** (gpmc.msc)
+    2. Créez une nouvelle GPO : `VaultWares - Déploiement VaultCrypt`
+    3. Liez-la à l'OU cible (ex. : `OU=Workstations,DC=corp,DC=example,DC=com`)
   </Step>
-  <Step title="Configure software installation">
-    Navigate to: **Computer Configuration** → **Policies** → **Software Settings** → **Software installation**
+  <Step title="Configurer l'installation du logiciel">
+    Naviguez vers : **Configuration ordinateur** → **Stratégies** → **Paramètres logiciels** → **Installation de logiciels**
 
-    Add the MSI package from the network share using the UNC path.
+    Ajoutez le paquet MSI à partir du partage réseau en utilisant le chemin UNC.
   </Step>
-  <Step title="Configure VaultCrypt settings via Registry GPO">
-    Create an **Administrative Template** (.admx) from the VaultCrypt GPO template package:
+  <Step title="Configurer les paramètres VaultCrypt via GPO de Registre">
+    Créez un **Modèle administratif** (.admx) à partir du paquet de modèle GPO VaultCrypt :
 
     ```xml
     <!-- VaultCrypt.admx excerpt -->
@@ -187,19 +187,19 @@ exit $?
   </Step>
 </Steps>
 
-### VaultCrypt ADMX template registry settings
+### Paramètres de modèle ADMX de registre VaultCrypt
 
-| Registry key | Value name | Type | Description |
+| Clé de registre | Nom de la valeur | Type | Description |
 |---|---|---|---|
-| `SOFTWARE\VaultWares\VaultCrypt\Config` | `ConsoleURL` | REG_SZ | Management console URL |
-| `SOFTWARE\VaultWares\VaultCrypt\Config` | `OrgKey` | REG_SZ | Organization enrollment key |
-| `SOFTWARE\VaultWares\VaultCrypt\Config` | `RequireHSM` | REG_DWORD | 1 = require HSM for key storage |
-| `SOFTWARE\VaultWares\VaultCrypt\Policy` | `AutoLockMinutes` | REG_DWORD | Idle auto-lock timeout |
-| `SOFTWARE\VaultWares\VaultCrypt\Policy` | `AllowUserKeyChange` | REG_DWORD | 0 = prevent users from changing keys |
+| `SOFTWARE\VaultWares\VaultCrypt\Config` | `ConsoleURL` | REG_SZ | URL de la console de gestion |
+| `SOFTWARE\VaultWares\VaultCrypt\Config` | `OrgKey` | REG_SZ | Clé d'inscription de l'organisation |
+| `SOFTWARE\VaultWares\VaultCrypt\Config` | `RequireHSM` | REG_DWORD | 1 = exiger un HSM pour le stockage des clés |
+| `SOFTWARE\VaultWares\VaultCrypt\Policy` | `AutoLockMinutes` | REG_DWORD | Délai de verrouillage automatique en cas d'inactivité |
+| `SOFTWARE\VaultWares\VaultCrypt\Policy` | `AllowUserKeyChange` | REG_DWORD | 0 = empêcher les utilisateurs de changer les clés |
 
-## Docker deployment
+## Déploiement Docker
 
-VaultAccess, VaultBackup, and VaultMonitor are available as Docker images from the VaultWares container registry.
+VaultAccess, VaultBackup et VaultMonitor sont disponibles sous forme d'images Docker dans le registre de conteneurs VaultWares.
 
 ```bash
 # Authenticate to VaultWares container registry
@@ -300,9 +300,9 @@ docker compose ps
 docker compose logs -f vaultaccess
 ```
 
-## Kubernetes deployment
+## Déploiement Kubernetes
 
-### Helm chart installation
+### Installation du graphique Helm
 
 ```bash
 # Add the VaultWares Helm repository
@@ -332,7 +332,7 @@ helm install vaultaccess vaultwares/vaultaccess \
   --values /etc/vaultwares/helm/vaultaccess-values.yaml
 ```
 
-### Kubernetes values file
+### Fichier de valeurs Kubernetes
 
 ```yaml
 # vaultaccess-values.yaml
@@ -390,19 +390,19 @@ ldap:
   bindDN: CN=svc_vaultaccess,OU=Services,DC=corp,DC=example,DC=com
 ```
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
-    Post-deployment configuration steps
+  <Card title="Configuration initiale" icon="sliders" href="/installation/initial-configuration">
+    Étapes de configuration post-déploiement
   </Card>
-  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
-    Connect to AD, LDAP, SAML, and SIEM
+  <Card title="Guides d'intégration" icon="plug" href="/installation/integration-guides">
+    Se connecter à AD, LDAP, SAML et SIEM
   </Card>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    Hardening and security recommendations
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Durcissement et recommandations de sécurité
   </Card>
-  <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
-    Diagnose deployment issues
+  <Card title="Dépannage" icon="wrench" href="/guides/troubleshooting">
+    Diagnostiquer les problèmes de déploiement
   </Card>
 </CardGroup>

@@ -1,24 +1,24 @@
 ---
-title: "Git Branch Policy"
-description: "Assistant protocol summary: Git Branch Policy"
+title: "Politique des branches Git"
+description: "Résumé du protocole de l'assistant : Politique des branches Git"
 ---
 
-# Politique de branche Git
+# Politique des branches Git
 
-- ID de catégorie : `GIT_BRANCH_POLICY`
-- Source du résumé : `instructions/summaries/GIT_BRANCH_POLICY.md`
-- Source des notes : `instructions/notes/GIT_BRANCH_POLICY.md`
+- ID de catégorie : `GIT_BRANCH_POLICY`
+- Source du résumé : `instructions/summaries/GIT_BRANCH_POLICY.md`
+- Source des notes : `instructions/notes/GIT_BRANCH_POLICY.md`
 
-S'applique lorsque : toute action de workflow git, validations, branches, push.
-Faire :
-- Si sur la branche principale : ne validez pas à moins que l'utilisateur n'ait explicitement demandé une validation dans l'invite actuelle.
-- Préférer une branche de fonctionnalité (préfixe par défaut : vw-codex-).
-- Gardez les changements non reliés hors de la branche.
-Pas :
-- Engager/pousser sur main sans instruction explicite.
-Fais quand :
-- L'état de la branche est propre, isolé et prêt à être examiné.
+S'applique quand : toute action de flux de travail Git, les commits, les branches, les pushes.
+À faire :
+- Si sur la branche `main` : ne pas commiter à moins que l'utilisateur n'ait explicitement demandé des commits dans l'invite actuelle.
+- Préférer une branche de fonctionnalité (préfixe par défaut : vw-codex-).
+- Garder les changements non liés hors de la branche.
+À ne pas faire :
+- Commiter/pousser sur `main` sans instruction explicite.
+Terminé quand :
+- L'état de la branche est propre, isolé et prêt pour examen.
 
-## Remarques
-Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
-Chemin des notes : `instructions/notes/GIT_BRANCH_POLICY.md`
+## Notes
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/GIT_BRANCH_POLICY.md`

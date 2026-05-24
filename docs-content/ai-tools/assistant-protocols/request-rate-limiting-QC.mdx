@@ -1,29 +1,29 @@
 ---
-title: "Limitation du rythme des requetes"
-description: "Resume du protocole assistant : limitation du rythme des requetes"
+title: "Limitation du débit de requêtes"
+description: "Résumé du protocole de l'assistant : Limitation du débit de requêtes"
 ---
 
-# Limitation du rythme des requetes
+# Limitation du débit de requêtes
 
 - Category ID: `REQUEST_RATE_LIMITING`
 - Summary source: `instructions/summaries/REQUEST_RATE_LIMITING.md`
 - Notes source: `instructions/notes/REQUEST_RATE_LIMITING.md`
 
-S'applique quand : toute boucle ou tout lot de requetes externes ou internes; traduction, crawler, interrogation d'API, interrogation de webhook, sondes TCP/UDP, verifications de sante, appels de modele, ou requetes vers un service local.
-Faire :
-- Mettre en pause et demander avant d'executer toute boucle ou tout lot de requetes TCP, UDP, HTTP, API, traduction, crawler, polling, ou modele.
-- Indiquer la cible, le nombre de requetes, le rythme prevu, la condition d'arret, et pourquoi le lot est necessaire.
-- Preferer Gemma4 local via Ollama a `http://localhost:11434` pour la traduction ou les travaux d'aide a volume eleve lorsque c'est applicable.
-- Espacer les requetes et utiliser de petits lots pour ne pas surcharger les services externes, les services internes, les modeles locaux, ni le PC de l'utilisateur.
-- Ajouter des limites explicites, des modes dry-run, ou des portes de confirmation aux scripts qui peuvent generer plusieurs requetes.
-Ne pas faire :
-- Spammer des services externes ou internes depuis l'adresse IP de l'utilisateur.
-- Executer des boucles non bornees, de larges crawls, des traductions massives, des balayages de ports, des boucles de polling, ou des lots de modele local sans approbation.
-- Utiliser des services publics de traduction/recherche/API pour du travail en lot lorsqu'un modele local peut raisonnablement le faire.
-Termine quand :
-- L'utilisateur a approuve le volume et le rythme des requetes, ou la tache a ete terminee avec une methode locale/hors ligne bornee.
-- La verification enregistre la cible et le volume de requetes sans journaliser de secrets.
+S'applique lorsque : tout cycle ou lot de requêtes externes ou internes ; traduction, crawl, sondage d'API, sondage de webhooks, sondes TCP/UDP, vérifications de santé, appels de modèle ou requêtes de services locaux.
+À faire :
+- Mettre en pause et demander avant d'exécuter tout cycle ou lot de requêtes TCP, UDP, HTTP, API, de traduction, de crawl, de sondage ou de modèle.
+- Indiquer la cible, le nombre de requêtes, le débit attendu, la condition d'arrêt et pourquoi le lot est nécessaire.
+- Préférer le Gemma4 local via Ollama à `http://localhost:11434` pour la traduction ou le travail d'aide à grand volume, le cas échéant.
+- Échelonner les requêtes et utiliser de petits lots afin que les services externes, les services internes, les modèles locaux et l'ordinateur de l'utilisateur ne soient pas surchargés.
+- Ajouter des limites explicites, des modes de simulation (dry-run) ou des portes de confirmation aux scripts qui peuvent générer de nombreuses requêtes.
+À ne pas faire :
+- Spammer les services externes ou les services internes à partir de l'adresse IP de l'utilisateur.
+- Exécuter des boucles non bornées, des crawls étendus, des traductions de masse, des balayages de ports, des boucles de sondage ou des lots de modèles locaux sans approbation.
+- Utiliser des services publics de traduction/recherche/API pour un travail en vrac lorsqu'un modèle local peut raisonnablement s'en charger.
+Terminé lorsque :
+- L'utilisateur a approuvé le volume/débit de requêtes ou la tâche a été complétée avec une méthode locale/hors ligne limitée.
+- La vérification enregistre la cible et le volume de requêtes sans journaliser de secrets.
 
 ## Notes
-Les assistants lisent les notes completes seulement quand c'est explicitement demande : `read full notes`.
-Chemin des notes : `instructions/notes/REQUEST_RATE_LIMITING.md`
+Les assistants lisent les notes complètes uniquement lorsqu'on le leur demande explicitement : `read full notes`.
+Notes path: `instructions/notes/REQUEST_RATE_LIMITING.md`

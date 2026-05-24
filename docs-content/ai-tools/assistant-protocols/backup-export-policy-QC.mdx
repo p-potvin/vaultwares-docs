@@ -1,23 +1,23 @@
 ---
-title: "Backup Export Policy"
-description: "Assistant protocol summary: Backup Export Policy"
+title: "Politique de sauvegarde et d'exportation"
+description: "Résumé du protocole de l'assistant : Politique de sauvegarde et d'exportation"
 ---
 
-# Politique d'exportation de sauvegarde
+# Politique de sauvegarde et d'exportation
 
-- ID de catégorie : `BACKUP_EXPORT_POLICY`
-- Source du résumé : `instructions/summaries/BACKUP_EXPORT_POLICY.md`
-- Source des notes : `instructions/notes/BACKUP_EXPORT_POLICY.md`
+- ID de catégorie : `BACKUP_EXPORT_POLICY`
+- Source du résumé : `instructions/summaries/BACKUP_EXPORT_POLICY.md`
+- Source des notes : `instructions/notes/BACKUP_EXPORT_POLICY.md`
 
-S'applique lorsque : sauvegardes, exportations, migrations, création d'archives, planification de restauration.
-Faire :
-- Définir ce qui est inclus (données + métadonnées + blocage) et comment restaurer.
-- Préférez un test de restauration aux affirmations « sauvegarde réussie ».
-Pas :
-- Produisez des sauvegardes partielles sans indiquer d'exclusions.
-Fais quand :
+S'applique lorsque : sauvegardes, exportations, migrations, création d'archives, planification de restauration.
+À faire :
+- Définir ce qui est inclus (données + métadonnées + blobs) et comment restaurer.
+- Préférer un test de restauration plutôt que les affirmations de « sauvegarde réussie ».
+À ne pas faire :
+- Produire des sauvegardes partielles sans indiquer les exclusions.
+Terminé lorsque :
 - La sauvegarde est restaurable et le chemin de restauration est documenté.
 
-## Remarques
-Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
-Chemin des notes : `instructions/notes/BACKUP_EXPORT_POLICY.md`
+## Notes
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/BACKUP_EXPORT_POLICY.md`

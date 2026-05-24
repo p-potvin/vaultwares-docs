@@ -1,23 +1,23 @@
 ---
-title: "Submodule Boundaries"
-description: "Assistant protocol summary: Submodule Boundaries"
+title: "Limites de sous-modules"
+description: "Résumé du protocole de l'assistant : Limites de sous-modules"
 ---
 
-# Submodule Boundaries
+# Limites de sous-modules
 
 - Category ID: `SUBMODULE_BOUNDARIES`
 - Summary source: `instructions/summaries/SUBMODULE_BOUNDARIES.md`
 - Notes source: `instructions/notes/SUBMODULE_BOUNDARIES.md`
 
-Applies when: the path you are editing is a git submodule or a mirrored vendor copy.
-Do:
-- If the change targets vaultwares-themes, vaultwares-adk, or agent-ledger, prefer editing the standalone repo under C:\\Users\\Administrator\\Desktop\\Github Repos\\<repo> (not a submodule checkout).
-- If you must read a submodule copy to understand behavior, treat it as read-only.
-Do not:
-- Patch Tier-2 repos inside another repo's submodule directory.
-Done when:
-- The final patch is applied in the standalone repo checkout.
+S'applique lorsque : le chemin que vous modifiez est un sous-module git ou une copie de fournisseur miroir.
+À faire :
+- Si le changement cible `vaultwares-themes`, `vaultwares-adk`, ou `agent-ledger`, préférez modifier le dépôt autonome sous C:\\Users\\Administrator\\Desktop\\Github Repos\\<repo> (pas un *checkout* de sous-module).
+- Si vous devez lire une copie de sous-module pour comprendre le comportement, traitez-la comme étant en lecture seule.
+À ne pas faire :
+- Appliquer de correctifs aux dépôts de Niveau 2 à l'intérieur du répertoire de sous-module d'un autre dépôt.
+Terminé lorsque :
+- Le correctif final est appliqué dans le *checkout* du dépôt autonome.
 
 ## Notes
-Assistants read full notes only when explicitly prompted: `read full notes`.
+Les assistants lisent les notes complètes seulement lorsqu'on leur demande explicitement : `read full notes`.
 Notes path: `instructions/notes/SUBMODULE_BOUNDARIES.md`

@@ -1,30 +1,30 @@
 ---
-title: "Initial configuration"
-description: "Configure VaultWares after installation"
+title: "Configuration initiale"
+description: "Configurer VaultWares après l'installation"
 ---
 
-## Overview
+## Aperçu
 
-This guide walks through the initial configuration steps that should be completed after installing any VaultWares product. Follow these steps in order for a smooth deployment.
+Ce guide vous présente les étapes de configuration initiales qui doivent être complétées après l'installation de tout produit VaultWares. Suivez ces étapes dans l'ordre pour un déploiement fluide.
 
 <Tip>
-  Run through these steps in your staging environment first. Many settings (particularly directory integration and HSM initialization) are difficult to change after production data has been associated with them.
+  Exécutez ces étapes d'abord dans votre environnement de *staging*. De nombreux paramètres (en particulier l'intégration de répertoire et l'initialisation du HSM) sont difficiles à modifier après que des données de production y aient été associées.
 </Tip>
 
-## Step 1: Admin account setup
+## Étape 1 : Configuration du compte administrateur
 
 <Steps>
-  <Step title="Log in with the default credentials">
-    After installation, the VaultWares Management Console is accessible at `https://<server>:8443`. Log in with the initial administrator credentials:
+  <Step title="Se connecter avec les identifiants par défaut">
+    Après l'installation, la console de gestion VaultWares est accessible à `https://<server>:8443`. Connectez-vous avec les identifiants administrateur initiaux :
 
-    - **Username**: `admin`
-    - **Password**: Printed on the product's Quick Start card, or displayed at the end of the installer
+    - **Nom d'utilisateur** : `admin`
+    - **Mot de passe** : Imprimé sur la carte de démarrage rapide du produit, ou affiché à la fin de l'installateur
 
     <Warning>
-      Change the default password immediately. Default credentials are the same for all VaultWares deployments and are publicly documented.
+      Changez immédiatement le mot de passe par défaut. Les identifiants par défaut sont les mêmes pour tous les déploiements VaultWares et sont publiquement documentés.
     </Warning>
   </Step>
-  <Step title="Change the default admin password">
+  <Step title="Changer le mot de passe administrateur par défaut">
     ```bash
     vw-admin password change \
       --user admin \
@@ -32,8 +32,8 @@ This guide walks through the initial configuration steps that should be complete
       --new-password <strong-new-password>
     ```
   </Step>
-  <Step title="Create named administrator accounts">
-    Avoid using the generic `admin` account for day-to-day operations. Create named accounts for each administrator:
+  <Step title="Créer des comptes administrateurs nommés">
+    Évitez d'utiliser le compte générique `admin` pour les opérations quotidiennes. Créez des comptes nommés pour chaque administrateur :
 
     ```bash
     # Create an administrator account
@@ -53,7 +53,7 @@ This guide walks through the initial configuration steps that should be complete
       --require-hardware-key true
     ```
   </Step>
-  <Step title="Disable or restrict the default admin account">
+  <Step title="Désactiver ou restreindre le compte administrateur par défaut">
     ```bash
     # Lock the default admin account after named accounts are configured
     vw-admin user disable --username admin
@@ -67,7 +67,7 @@ This guide walks through the initial configuration steps that should be complete
   </Step>
 </Steps>
 
-## Step 2: License activation
+## Étape 2 : Activation de la licence
 
 ```bash
 # Activate license online
@@ -92,9 +92,9 @@ vw-admin license request-offline-token --key VWXX-XXXX-XXXX-XXXX-XXXX
 vw-admin license apply-offline-response --file activation-response.json
 ```
 
-## Step 3: TLS certificate configuration
+## Étape 3 : Configuration du certificat TLS
 
-Replace the self-signed certificate installed by default with a CA-signed certificate.
+Remplacez le certificat auto-signé installé par défaut par un certificat signé par une Autorité de Certification (AC).
 
 ```bash
 # Generate a CSR
@@ -114,7 +114,7 @@ vw-admin tls install \
 vw-admin service restart --all
 ```
 
-## Step 4: Active Directory / LDAP integration
+## Étape 4 : Intégration Active Directory / LDAP
 
 <Tabs>
   <Tab title="Active Directory">
@@ -166,7 +166,7 @@ vw-admin service restart --all
   </Tab>
 </Tabs>
 
-## Step 5: Email notification setup
+## Étape 5 : Configuration des notifications par courriel
 
 ```bash
 # Configure SMTP for email notifications
@@ -190,9 +190,9 @@ vw-admin notifications configure \
   --backup-reports backup@example.com
 ```
 
-## Step 6: Initial backup configuration
+## Étape 6 : Configuration de la sauvegarde initiale
 
-Configure at least one backup destination before the system goes into production.
+Configurez au moins une destination de sauvegarde avant que le système ne soit mis en production.
 
 ```bash
 # Add a local backup repository
@@ -223,9 +223,9 @@ vw-backup schedule create \
   --retention-days 90
 ```
 
-## Step 7: HSM integration
+## Étape 7 : Intégration HSM
 
-If you have a VaultHSM, integrate it before creating any production keys.
+Si vous disposez d'un VaultHSM, intégrez-le avant de créer des clés de production.
 
 ```bash
 # Add HSM to the key management configuration
@@ -247,7 +247,7 @@ vw-admin hsm generate-master-key \
   --algorithm AES-256
 ```
 
-## Step 8: Verify the installation
+## Étape 8 : Vérifier l'installation
 
 ```bash
 # Run the built-in configuration health check
@@ -268,7 +268,7 @@ vw-admin health-check --full
 vw-admin user enforce-mfa --user bob@example.com
 ```
 
-## Configuration reference
+## Référence de configuration
 
 ```json
 {
@@ -300,19 +300,19 @@ vw-admin user enforce-mfa --user bob@example.com
 }
 ```
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
-    Connect to SSO, SIEM, PKI, and cloud providers
+  <Card title="Guides d'intégration" icon="plug" href="/installation/integration-guides">
+    Se connecter à SSO, SIEM, PKI et fournisseurs de cloud
   </Card>
-  <Card title="Access control" icon="shield-halved" href="/software/access-control">
-    Configure RBAC policies and user groups
+  <Card title="Contrôle d'accès" icon="shield-halved" href="/software/access-control">
+    Configurer les politiques RBAC et les groupes d'utilisateurs
   </Card>
-  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
-    Day-to-day management tasks
+  <Card title="Opérations quotidiennes" icon="calendar" href="/guides/daily-operations">
+    Tâches de gestion quotidiennes
   </Card>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    Security hardening recommendations
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Recommandations de durcissement de la sécurité
   </Card>
 </CardGroup>

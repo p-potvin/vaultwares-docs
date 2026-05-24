@@ -1,52 +1,51 @@
 ---
-title: "Tailscale (Private)"
-description: "How Tailnet is used for access control, SSH, and internal services."
+title: "Tailscale (Privé)"
+description: "Comment Tailnet est utilisé pour le contrôle d'accès, SSH et les services internes."
 ---
 
-# Tailscale (Private)
+# Tailscale (Privé)
 
-## Policy goals
+## Objectifs de politique
+- Tailnet est le **plan de contrôle par défaut**.
+- Le SSH VPS est **uniquement sur le tailnet**.
+- Les services sont explicitement autorisés par la politique (refus par défaut).
 
-- Tailnet is the **default control plane**.
-- VPS SSH is **tailnet-only**.
-- Services are explicitly allowed by policy (deny-by-default).
+## Règles clés (actuelles)
+- Le Propriétaire peut atteindre `tag:server` sur les ports `22`, `80`, `443`.
+- Si nous utilisons un DNS divisé avec `greencloud-vps` comme serveur de noms, autoriser également `tag:server` sur le **DNS** (`53` TCP+UDP).
+- Le Propriétaire peut atteindre `100.71.101.21` sur `3389` (RDP) et `9001` (API de pipelines).
+- `tag:server` peut atteindre `100.71.101.21:9001` (reverse-proxy VPS vers PC).
 
-## Key rules (current)
+## Exposer les services web internes au tailnet (DNS divisé)
 
-- Owner can reach `tag:server` on `22`, `80`, `443`.
-- If we use split DNS with `greencloud-vps` as the nameserver, also allow `tag:server` on **DNS** (`53` TCP+UDP).
-- Owner can reach `100.71.101.21` on `3389` (RDP) and `9001` (pipelines API).
-- `tag:server` can reach `100.71.101.21:9001` (VPS reverse-proxy to PC).
+Certains sous-domaines (ex. `stats.vaultwares.ca`) sont des services **uniquement sur le tailnet**. L'enregistrement DNS public renvoie l'IP publique du VPS, qui sert un 403 à tous les clients non-tailnet. Les nœuds Tailnet résolvent le même nom d'hôte vers l'**IP Tailscale** de `greencloud-vps` via une substitution DNS Tailscale, contournant entièrement le vhost nginx public et atteignant un bloc de serveur nginx séparé et interne uniquement.
 
-## Exposer des services web internes au tailnet (Split DNS)
-
-Certains sous-domaines (p. ex. `stats.vaultwares.ca`) sont des services **réservés au tailnet**. Le DNS public renvoie l'IP publique du VPS, qui retourne un 403 à tous les clients externes (intentionnel). Les nœuds du tailnet résolvent le même nom d'hôte vers l'**IP Tailscale** de `greencloud-vps` via une règle DNS Tailscale, contournant ainsi le vhost nginx public et atterrissant sur un bloc serveur nginx interne dédié.
-
-### Fonctionnement
+### Comment ça fonctionne
 
 ```
-Client public  →  stats.vaultwares.ca  →  <IP publique>  →  nginx (403, intentionnel)
-Nœud tailnet   →  stats.vaultwares.ca  →  100.x.x.x      →  nginx (vhost interne, 200)
+Public client  →  stats.vaultwares.ca  →  <public IP>  →  nginx (403, intentional)
+Tailnet node   →  stats.vaultwares.ca  →  100.x.x.x    →  nginx (internal vhost, 200)
 ```
 
-### Étape 1 — Règle DNS Tailscale (Split DNS)
+### Étape 1 — Substitution DNS Tailscale
 
 Dans la [console d'administration Tailscale](https://login.tailscale.com/admin/dns) → **Nameservers** :
 
-- Ajouter une entrée **Split DNS** pour le domaine `vaultwares.ca` pointant vers l'IP Tailscale de `greencloud-vps` (p. ex. `100.x.x.x`).
-- Cela fait résoudre `*.vaultwares.ca` vers l'IP Tailscale **uniquement pour les nœuds du tailnet**. Le DNS public n'est pas affecté.
+- Ajouter une entrée de **DNS divisé** pour le domaine `vaultwares.ca` pointant vers l'IP Tailscale de `greencloud-vps` (ex. `100.x.x.x`).
+- Cela fait que `*.vaultwares.ca` se résout vers l'IP Tailscale **uniquement pour les nœuds tailnet**. Le DNS public n'est pas affecté.
 
-> L'ACL doit autoriser `tag:server` sur le port **53** (TCP+UDP) si `greencloud-vps` est le serveur DNS autoritaire. Voir les règles clés ci-dessus.
+> L'ACL doit autoriser `tag:server` sur le port **53** (TCP+UDP) si `greencloud-vps` est le serveur de noms faisant autorité. Voir Règles clés ci-dessus.
 
-### Étape 2 — Vhost nginx interne sur l'interface Tailscale
+### Étape 2 — vhost interne nginx sur l'interface Tailscale
 
-Ajouter un second bloc `server` qui écoute uniquement sur l'IP Tailscale :
+Ajouter un deuxième bloc `server` qui écoute uniquement sur l'IP Tailscale :
 
 ```nginx
 server {
     listen 100.x.x.x:443 ssl;
     server_name stats.vaultwares.ca;
 
+    # Tailscale-issued cert (or Let's Encrypt if using tailscale cert)
     ssl_certificate     /etc/nginx/certs/stats.vaultwares.ca.crt;
     ssl_certificate_key /etc/nginx/certs/stats.vaultwares.ca.key;
 
@@ -67,17 +66,17 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ### Certificat TLS pour le vhost interne
 
-Deux options :
+Vous avez deux options :
 
-- **`tailscale cert`** — génère un certificat Let's Encrypt valide pour le nom MagicDNS.
-- **Certificat Let's Encrypt existant** — si vous avez déjà un certificat wildcard ou SAN pour `*.vaultwares.ca`, réutilisez-le.
+- **`tailscale cert`** — génère un certificat Let's Encrypt valide pour le FQDN MagicDNS. Fonctionne si le `server_name` du vhost correspond au nom MagicDNS.
+- **Certificat Let's Encrypt existant** — si vous avez déjà un certificat wildcard ou SAN pour `*.vaultwares.ca`, réutilisez-le ici.
 
-### Note sur les ACL
+### Note sur l'ACL
 
-Aucune modification d'ACL n'est nécessaire — la règle existante `owner → tag:server : [80, 443]` suffit. La règle Split DNS est le seul point de contrôle d'accès.
+Aucun changement d'ACL n'est nécessaire pour le trafic web lui-même — la règle existante `owner → tag:server : [80, 443]` couvre déjà cela. L'entrée DNS divisé est le seul portier.
 
 ## Notes opérationnelles
 
-- Évitez de taguer les appareils personnels sauf si vous souhaitez qu'ils se comportent comme des « comptes de service ».
-- Préférez des tags dédiés pour l'infrastructure : `tag:server`, `tag:vps-old`, `tag:vps-greencloud`.
-- Brume2 gère le réseau domestique ; mettez à jour Tailscale avec précaution pour ne pas perturber le routage.
+- Éviter d'attribuer des étiquettes à des appareils personnels à moins que vous ne souhaitiez qu'ils se comportent comme des « comptes de service ».
+- Préférer des étiquettes dédiées pour l'infrastructure : `tag:server`, `tag:vps-old`, `tag:vps-greencloud`.
+- Brume2 gère le réseau domestique; mettre à jour Tailscale avec soin pour éviter de perturber le routage.

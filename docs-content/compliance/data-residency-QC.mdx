@@ -1,26 +1,26 @@
 ---
-title: "Data residency"
-description: "Data sovereignty and residency requirements"
+title: "Résidence des données"
+description: "Exigences de souveraineté et de résidence des données"
 ---
 
-## Overview
+## Vue d'ensemble
 
-Data residency requirements mandate that certain categories of data be stored and processed only within specific geographic boundaries. VaultWares products provide the technical controls to enforce data residency, support sovereignty requirements, and enable audit evidence of compliance.
+Les exigences de résidence des données imposent que certaines catégories de données soient stockées et traitées uniquement au sein de frontières géographiques spécifiques. Les produits VaultWares fournissent les contrôles techniques pour faire respecter la résidence des données, soutenir les exigences de souveraineté et permettre la preuve d'audit de la conformité.
 
-## Data residency controls
+## Contrôles de résidence des données
 
-### On-premises enforcement
+### Application sur site (On-premises)
 
-For organizations with strict sovereignty requirements, VaultWares' on-premises deployment ensures data never leaves your controlled environment:
+Pour les organisations ayant des exigences de souveraineté strictes, le déploiement sur site de VaultWares garantit que les données ne quittent jamais votre environnement contrôlé :
 
-- **VaultHSM** (PCIe and Network): All key material remains on-premises. HSM keys are never transmitted to VaultWares or cloud providers.
-- **VaultCrypt**: Encryption operations occur locally on the endpoint. No data is transmitted to cloud services without explicit configuration.
-- **VaultBackup**: Backup repositories can be restricted to on-premises NAS and co-location facilities.
-- **VaultAccess**: Deployable fully on-premises with no cloud dependencies. AD/LDAP integration via local domain controllers.
+- **VaultHSM** (PCIe et Réseau) : Tout le matériel de clé reste sur site. Les clés HSM ne sont jamais transmises à VaultWares ou aux fournisseurs de cloud.
+- **VaultCrypt** : Les opérations de chiffrement se déroulent localement sur le point d'accès. Aucune donnée n'est transmise aux services cloud sans configuration explicite.
+- **VaultBackup** : Les référentiels de sauvegarde peuvent être limités aux NAS sur site et aux installations de co-localisation.
+- **VaultAccess** : Déployable entièrement sur site sans dépendances cloud. Intégration AD/LDAP via des contrôleurs de domaine locaux.
 
-### Cloud region selection
+### Sélection de région dans le cloud
 
-For organizations using VaultWares cloud features, region selection ensures data stays within required boundaries:
+Pour les organisations utilisant les fonctionnalités cloud de VaultWares, la sélection de région garantit que les données restent dans les limites requises :
 
 <Tabs>
   <Tab title="VaultHSM Cloud">
@@ -76,17 +76,17 @@ For organizations using VaultWares cloud features, region selection ensures data
   </Tab>
 </Tabs>
 
-## Regional compliance frameworks
+## Cadres de conformité régionaux
 
 <AccordionGroup>
-  <Accordion title="European Union (GDPR, EU Data Boundary)">
-    **Requirements**: Personal data of EU residents must not be transferred outside the EU/EEA without adequate safeguards (GDPR Chapter V).
+  <Accordion title="Union européenne (RGPD, Frontière de données UE)">
+    **Exigences** : Les données personnelles des résidents de l'UE ne doivent pas être transférées en dehors de l'UE/EEE sans garanties adéquates (Chapitre V du RGPD).
 
-    **VaultWares controls**:
-    - VaultHSM Cloud supports EU-only key storage (Dublin, Frankfurt, Paris regions)
-    - VaultBackup supports EU-only S3 and Azure Blob regions with hard locks
-    - All audit logs can be restricted to EU storage
-    - Standard Contractual Clauses (SCCs) available for VaultWares Cloud services
+    **Contrôles VaultWares** :
+    - VaultHSM Cloud prend en charge le stockage de clés uniquement dans l'UE (régions de Dublin, Francfort, Paris)
+    - VaultBackup prend en charge les régions S3 et Azure Blob uniquement dans l'UE avec des verrous stricts
+    - Tous les journaux d'audit peuvent être limités au stockage de l'UE
+    - Les Clauses Contractuelles Types (CCT) sont disponibles pour les services VaultWares Cloud
 
     ```bash
     # Enable EU data boundary enforcement
@@ -99,8 +99,8 @@ For organizations using VaultWares cloud features, region selection ensures data
     ```
   </Accordion>
 
-  <Accordion title="United Kingdom (UK GDPR, Data Protection Act 2018)">
-    **Requirements**: Similar to EU GDPR following Brexit. Data transfers to non-adequate countries require safeguards. VaultWares maintains UK-specific data residency options.
+  <Accordion title="Royaume-Uni (UK GDPR, Data Protection Act 2018)">
+    **Exigences** : Similaire au RGPD de l'UE après le Brexit. Les transferts de données vers des pays non adéquats nécessitent des garanties. VaultWares maintient des options de résidence des données spécifiques au Royaume-Uni.
 
     ```bash
     vw-admin data-residency enable \
@@ -111,17 +111,17 @@ For organizations using VaultWares cloud features, region selection ensures data
     ```
   </Accordion>
 
-  <Accordion title="Germany (C5, BDSG, Cloud Computing Compliance)">
-    **Requirements**: German BSI C5 attestation and Federal Data Protection Act requirements for public sector and financial institutions.
+  <Accordion title="Allemagne (C5, BDSG, Cloud Computing Compliance)">
+    **Exigences** : Attestation BSI C5 et exigences de la Loi fédérale sur la protection des données pour le secteur public et les institutions financières.
 
-    VaultWares supports:
-    - Deployment in German sovereign cloud regions (Azure Germany North/West Central, Deutsche Telekom T-Systems)
-    - All data and keys processed exclusively on German infrastructure when configured
-    - BSI C5 audit evidence from VaultMonitor reports
+    VaultWares prend en charge :
+    - Le déploiement dans des régions cloud souveraines allemandes (Azure Germany North/West Central, Deutsche Telekom T-Systems)
+    - Toutes les données et clés traitées exclusivement sur l'infrastructure allemande lorsqu'elles sont configurées
+    - Preuve d'audit BSI C5 à partir des rapports VaultMonitor
   </Accordion>
 
-  <Accordion title="United States (FedRAMP, StateRAMP, ITAR)">
-    **Requirements**: FedRAMP requires cloud services used by federal agencies to be hosted in US regions. ITAR restricts certain technical data to US persons and facilities.
+  <Accordion title="États-Unis (FedRAMP, StateRAMP, ITAR)">
+    **Exigences** : FedRAMP exige que les services cloud utilisés par les agences fédérales soient hébergés dans des régions américaines. ITAR restreint certaines données techniques aux personnes et installations américaines.
 
     ```bash
     # Restrict to US GovCloud regions (FedRAMP)
@@ -133,8 +133,8 @@ For organizations using VaultWares cloud features, region selection ensures data
     ```
   </Accordion>
 
-  <Accordion title="Australia (Privacy Act, CDR, APRA CPS 234)">
-    **Requirements**: APRA-regulated entities (banks, insurers, super funds) must ensure data is not transferred offshore without appropriate controls.
+  <Accordion title="Australie (Privacy Act, CDR, APRA CPS 234)">
+    **Exigences** : Les entités réglementées par l'APRA (banques, assureurs, fonds de retraite) doivent s'assurer que les données ne sont pas transférées à l'étranger sans contrôles appropriés.
 
     ```bash
     vw-admin data-residency enable \
@@ -145,23 +145,23 @@ For organizations using VaultWares cloud features, region selection ensures data
     ```
   </Accordion>
 
-  <Accordion title="China (PIPL, MLPS, DSL)">
-    **Requirements**: China's Personal Information Protection Law requires personal data of Chinese residents to be stored in China, with strict controls on cross-border transfers.
+  <Accordion title="Chine (PIPL, MLPS, DSL)">
+    **Exigences** : La Loi chinoise sur la protection des informations personnelles exige que les données personnelles des résidents chinois soient stockées en Chine, avec des contrôles stricts sur les transferts transfrontaliers.
 
-    VaultWares supports fully air-gapped on-premises deployment for Chinese data sovereignty requirements. Cloud features are not available for data governed by PIPL without additional assessment.
+    VaultWares prend en charge un déploiement sur site entièrement isolé pour les exigences de souveraineté des données chinoises. Les fonctionnalités cloud ne sont pas disponibles pour les données régies par la PIPL sans évaluation supplémentaire.
   </Accordion>
 </AccordionGroup>
 
-## GDPR international data transfers
+## Transferts internationaux de données RGPD
 
-When data must transfer outside the EU/EEA, GDPR Chapter V requires one of:
+Lorsque les données doivent être transférées en dehors de l'UE/EEE, le Chapitre V du RGPD exige l'un des éléments suivants :
 
-| Transfer mechanism | VaultWares support |
+| Mécanisme de transfert | Support VaultWares |
 |---|---|
-| Adequacy decision (e.g., UK, Japan, Israel) | Automatically permitted; VaultWares applies no additional restrictions |
-| Standard Contractual Clauses (SCCs) | VaultWares executes SCCs for cloud services data processing |
-| Binding Corporate Rules (BCRs) | Supported for enterprise customers with BCR programmes |
-| Explicit consent | Configurable per data category in VaultAccess ABAC policies |
+| Décision d'adéquation (ex. : Royaume-Uni, Japon, Israël) | Automatiquement autorisé ; VaultWares n'applique aucune restriction supplémentaire |
+| Clauses Contractuelles Types (CCT) | VaultWares exécute les CCT pour le traitement des données des services cloud |
+| Règles d'entreprise contraignantes (REC) | Pris en charge pour les clients d'entreprise avec des programmes REC |
+| Consentement explicite | Configurables par catégorie de données dans les politiques ABAC de VaultAccess |
 
 ```bash
 # Tag data categories for transfer restriction
@@ -180,9 +180,9 @@ vaultgate data-transfer-policy create \
   --alert-on-violation true
 ```
 
-## Audit evidence
+## Preuve d'audit
 
-VaultWares provides comprehensive audit evidence for data residency compliance:
+VaultWares fournit une preuve d'audit complète pour la conformité de résidence des données :
 
 ```bash
 # Generate data residency compliance report
@@ -203,19 +203,19 @@ vw-admin data-residency audit \
   --report-violations
 ```
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="GDPR compliance" icon="flag" href="/compliance/gdpr">
-    Full GDPR implementation guide
+  <Card title="Conformité RGPD" icon="flag" href="/compliance/gdpr">
+    Guide complet de mise en œuvre du RGPD
   </Card>
-  <Card title="Encryption protocols" icon="lock" href="/security/encryption-protocols">
-    Technical details on data protection methods
+  <Card title="Protocoles de chiffrement" icon="lock" href="/security/encryption-protocols">
+    Détails techniques sur les méthodes de protection des données
   </Card>
-  <Card title="Integration guides" icon="cloud" href="/installation/integration-guides">
-    AWS, Azure, and GCP cloud integration
+  <Card title="Guides d'intégration" icon="cloud" href="/installation/integration-guides">
+    Intégration cloud AWS, Azure et GCP
   </Card>
-  <Card title="Support contact" icon="headset" href="/support/contact">
-    Data residency compliance consulting
+  <Card title="Contact support" icon="headset" href="/support/contact">
+    Consultation en conformité de résidence des données
   </Card>
 </CardGroup>

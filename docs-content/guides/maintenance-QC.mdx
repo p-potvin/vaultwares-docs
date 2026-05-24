@@ -1,19 +1,20 @@
 ---
-title: "Maintenance guide"
-description: "Keep VaultWares products running optimally"
+title: "Guide de maintenance"
+description: "Maintenir les produits VaultWares en parfait état de fonctionnement"
 ---
 
-## Overview
 
-Regular maintenance keeps your VaultWares deployment secure, performant, and compliant. This guide covers firmware updates, software updates, key rotation, hardware maintenance tasks, and backup verification.
+## Vue d'ensemble
+
+Une maintenance régulière maintient votre déploiement VaultWares sécurisé, performant et conforme. Ce guide couvre les mises à jour de micrologiciel, les mises à jour logicielles, la rotation des clés, les tâches de maintenance matérielle et la vérification des sauvegardes.
 
 <Note>
-  Schedule maintenance activities during approved change windows. For high-availability deployments, many tasks can be performed with zero downtime using rolling update procedures.
+  Planifiez les activités de maintenance pendant les fenêtres de changement approuvées. Pour les déploiements à haute disponibilité, de nombreuses tâches peuvent être effectuées sans temps d'arrêt en utilisant des procédures de mise à jour progressive (rolling update).
 </Note>
 
-## Firmware updates
+## Mises à jour de micrologiciel
 
-### Check for available updates
+### Vérifier les mises à jour disponibles
 
 ```bash
 # Check all managed hardware for available firmware updates
@@ -30,7 +31,7 @@ vw-admin updates check \
 # VaultGate-01         4.2.3       4.3.0       Stable    Security
 ```
 
-### VaultDrive firmware update
+### Mise à jour du micrologiciel VaultDrive
 
 ```bash
 # Update a single device
@@ -51,14 +52,14 @@ vw-admin fleet-update firmware \
 vw-admin fleet-update status --job job_abc123
 ```
 
-### VaultHSM firmware update
+### Mise à jour du micrologiciel VaultHSM
 
 <Warning>
-  HSM firmware updates are critical operations. Always back up all keys before updating. For network HSMs in a cluster, update one node at a time.
+  Les mises à jour du micrologiciel HSM sont des opérations critiques. Sauvegardez toujours toutes les clés avant de mettre à jour. Pour les HSM réseau dans un cluster, mettez à jour un nœud à la fois.
 </Warning>
 
 <Steps>
-  <Step title="Backup all keys">
+  <Step title="Sauvegarder toutes les clés">
     ```bash
     vw-hsm backup create \
       --all-keys \
@@ -67,14 +68,14 @@ vw-admin fleet-update status --job job_abc123
       --custodians alice,bob,charlie,diana,erin
     ```
   </Step>
-  <Step title="Verify backup">
+  <Step title="Vérifier la sauvegarde">
     ```bash
     vw-hsm backup verify \
       --input /secure/backup/hsm-backup-$(date +%Y%m%d).enc \
       --custodian-keys alice.key,bob.key,charlie.key
     ```
   </Step>
-  <Step title="Download and verify firmware package">
+  <Step title="Télécharger et vérifier le paquet de micrologiciel">
     ```bash
     # Download firmware
     curl -O https://updates.vaultwares.com/hsm/firmware/vaulthsm-5.5.0.pkg
@@ -86,7 +87,7 @@ vw-admin fleet-update status --job job_abc123
       --public-key /etc/vaultwares/firmware-signing.pub
     ```
   </Step>
-  <Step title="Update (cluster: one node at a time)">
+  <Step title="Mettre à jour (cluster : un nœud à la fois)">
     ```bash
     # Remove node from cluster before update
     vw-hsm cluster drain --node hsm01 --graceful
@@ -108,7 +109,7 @@ vw-admin fleet-update status --job job_abc123
   </Step>
 </Steps>
 
-### VaultGate firmware update
+### Mise à jour du micrologiciel VaultGate
 
 ```bash
 # VaultGate supports hot-swap upgrade with zero downtime (HA pairs)
@@ -125,15 +126,15 @@ vaultgate firmware-update \
 vaultgate ha failback --graceful
 ```
 
-## Software updates
+## Mises à jour logicielles
 
-### Update channels
+### Canaux de mise à jour
 
-| Channel | Description | Recommended for |
+| Canal | Description | Recommandé pour |
 |---------|-------------|-----------------|
-| **Stable** | Thoroughly tested releases | All production environments |
-| **LTS** | Long-term support with extended security patches | Regulated environments, minimal change windows |
-| **Beta** | Pre-release testing | Non-production environments only |
+| **Stable** | Versions rigoureusement testées | Tous les environnements de production |
+| **LTS** | Support à long terme avec correctifs de sécurité étendus | Environnements réglementés, fenêtres de changement minimales |
+| **Beta** | Tests de pré-publication | Environnements non de production uniquement |
 
 ```bash
 # Configure update channel
@@ -147,7 +148,7 @@ vw-admin updates set-channel \
 vw-admin updates check --scope software --format table
 ```
 
-### VaultCrypt update
+### Mise à jour de VaultCrypt
 
 ```bash
 # Linux (systemd)
@@ -162,7 +163,7 @@ Start-Process msiexec -ArgumentList "/i vaultcrypt-update.msi /quiet /norestart"
 vaultcrypt --version
 ```
 
-### VaultAccess update (Docker)
+### Mise à jour de VaultAccess (Docker)
 
 ```bash
 # Pull new image
@@ -180,9 +181,9 @@ kubectl set image deployment/vaultaccess \
 kubectl rollout status deployment/vaultaccess -n vaultwares
 ```
 
-## Key rotation schedule
+## Calendrier de rotation des clés
 
-### Automated key rotation
+### Rotation automatique des clés
 
 ```bash
 # Configure automated rotation for TLS keys
@@ -202,7 +203,7 @@ vw-admin key-rotation schedule \
   --require-approval-from security-officer@example.com
 ```
 
-### Manual key rotation procedure
+### Procédure de rotation manuelle des clés
 
 ```bash
 # 1. Generate new key version
@@ -232,21 +233,21 @@ vw-hsm key deprecate \
   --deprecation-date "2025-11-01"
 ```
 
-## Hardware maintenance
+## Maintenance matérielle
 
-### Regular inspection checklist
+### Liste de contrôle d'inspection régulière
 
 <AccordionGroup>
-  <Accordion title="Monthly hardware inspection">
-    - [ ] Check status LEDs on all VaultHSM appliances (all should be green)
-    - [ ] Verify UPS or dual-PSU health via management console
-    - [ ] Inspect cable connections — check for loose or damaged cables
-    - [ ] Clean rack equipment with compressed air (avoid liquids near electronics)
-    - [ ] Check server room temperature and humidity logs
-    - [ ] Verify tamper-evident seals on all VaultHSM units are intact
+  <Accordion title="Inspection matérielle mensuelle">
+    - [ ] Vérifier les LED de statut sur tous les appareils VaultHSM (toutes devraient être vertes)
+    - [ ] Vérifier l'état de l'UPS ou de l'alimentation double (PSU) via la console de gestion
+    - [ ] Inspecter les connexions des câbles — vérifier les câbles desserrés ou endommagés
+    - [ ] Nettoyer l'équipement de rack avec de l'air comprimé (éviter les liquides près de l'électronique)
+    - [ ] Vérifier les journaux de température et d'humidité de la salle de serveurs
+    - [ ] Vérifier que les scellés anti-effraction sur toutes les unités VaultHSM sont intacts
   </Accordion>
-  <Accordion title="VaultHSM battery / capacitor maintenance">
-    VaultHSM units use a supercapacitor to preserve RAM-resident keys during brief power interruptions. The capacitor should be tested annually.
+  <Accordion title="Maintenance de la batterie / du condensateur VaultHSM">
+    Les unités VaultHSM utilisent un supercondensateur pour préserver les clés résidentes en RAM pendant de brèves interruptions de courant. Le condensateur doit être testé annuellement.
 
     ```bash
     # Test supercapacitor health
@@ -258,7 +259,7 @@ vw-hsm key deprecate \
     # Last test: 2024-06-01
     ```
   </Accordion>
-  <Accordion title="Fan and temperature">
+  <Accordion title="Ventilateur et température">
     ```bash
     # Check HSM appliance temperature and fan speed
     vw-hsm hardware-status --node hsm01 --component thermal
@@ -272,7 +273,7 @@ vw-hsm key deprecate \
   </Accordion>
 </AccordionGroup>
 
-## Backup verification
+## Vérification des sauvegardes
 
 ```bash
 # Monthly backup verification
@@ -297,9 +298,9 @@ vw-backup verify-restore \
   --output /reports/restore-test-$(date +%Y%m).html
 ```
 
-## Maintenance window procedures
+## Procédures de fenêtre de maintenance
 
-### Pre-maintenance checklist
+### Liste de contrôle avant la maintenance
 
 ```bash
 # Pre-maintenance health snapshot
@@ -315,7 +316,7 @@ vw-monitor maintenance-mode enable \
 vw-backup jobs list --status success --since 24h
 ```
 
-### Post-maintenance validation
+### Validation après la maintenance
 
 ```bash
 # Post-maintenance health check
@@ -333,19 +334,19 @@ vw-monitor maintenance-mode disable
 vw-admin service status --all
 ```
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Updates and releases" icon="circle-arrow-up" href="/support/updates">
-    Release notes and update history
+  <Card title="Mises à jour et versions" icon="circle-arrow-up" href="/support/updates">
+    Notes de version et historique des mises à jour
   </Card>
-  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
-    Routine operational tasks
+  <Card title="Opérations quotidiennes" icon="calendar" href="/guides/daily-operations">
+    Tâches opérationnelles de routine
   </Card>
-  <Card title="Troubleshooting" icon="wrench" href="/guides/troubleshooting">
-    Diagnose common issues
+  <Card title="Dépannage" icon="wrench" href="/guides/troubleshooting">
+    Diagnostiquer les problèmes courants
   </Card>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    Security and operational recommendations
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Recommandations de sécurité et opérationnelles
   </Card>
 </CardGroup>

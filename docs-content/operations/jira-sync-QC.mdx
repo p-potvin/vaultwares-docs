@@ -1,14 +1,14 @@
 ---
-title: "GitHub → Jira Sync (Private)"
-description: "Runbook for the vw-jira-sync one-way integration: project structure, repo onboarding, rename procedure, and secret management."
+title: "GitHub → Jira Sync (Privé)"
+description: "Guide de démarrage rapide pour l'intégration unidirectionnelle vw-jira-sync : structure du projet, intégration du dépôt, procédure de renommage, et gestion des secrets."
 ---
 
-# GitHub → Jira Sync
+# Sync GitHub → Jira
 
-One-way sync from GitHub to Jira Cloud. Lives in `p-potvin/vw-jira-sync`.
+Synchronisation unidirectionnelle de GitHub vers Jira Cloud. Réside dans `p-potvin/vw-jira-sync`.
 
-**Preferred trigger model:** GitHub Webhooks → `https://hooks.vaultwares.ca/github` → `vw-deployd`
-→ run `vw-jira-sync/scripts/live_sync.py` on `vaultwares-1` (inside the tailnet).
+**Modèle de déclenchement préféré :** Webhooks GitHub → `https://hooks.vaultwares.ca/github` → `vw-deployd`
+→ exécution de `vw-jira-sync/scripts/live_sync.py` sur `vaultwares-1` (à l'intérieur du tailnet).
 
 ## Architecture
 
@@ -33,66 +33,66 @@ vw-jira-sync/scripts/live_sync.py
               └─ direct commit          → create individual Task
 ```
 
-Every GitHub repo maps to exactly one Jira project. Tasks are created directly in the
-project — no Epics, no parent hierarchy.
+Chaque dépôt GitHub est lié à exactement un projet Jira. Les tâches sont créées directement dans le
+projet — pas d'Épopées (Epics), pas de hiérarchie parentale.
 
-## Project map
+## Carte des projets
 
-41 active projects (37 VaultWares + 4 Prom-King). Full reference in `config.yaml`
-→ `repo_project_keys`. Key prefixes:
+41 projets actifs (37 VaultWares + 4 Prom-King). Référence complète dans `config.yaml`
+→ `repo_project_keys`. Préfixes de clés :
 
-| Prefix | Org | Examples |
+| Préfixe | Org | Exemples |
 |--------|-----|---------|
-| `VW`, `AGMK`, `VLRT`, … | `p-potvin` | Most VaultWares repos |
+| `VW`, `AGMK`, `VLRT`, … | `p-potvin` | La plupart des dépôts VaultWares |
 | `PK*` | `Prom-King` | `PKLS`, `PKPRE`, `PKQA`, `PKTS` |
 
-## Jira issue types
+## Types d'incidents Jira
 
-| GitHub event | Jira issue type | Label pattern |
+| Événement GitHub | Type d'incident Jira | Motif d'étiquette (Label pattern) |
 |---|---|---|
-| Pull request | Task | `gh-pr-{owner}-{repo}-{number}` |
-| Direct commit (push, not in a PR) | Task | `gh-commit-{owner}-{repo}-{sha12}` |
+| Pull request | Tâche (Task) | `gh-pr-{owner}-{repo}-{number}` |
+| Commit direct (push, pas dans une PR) | Tâche (Task) | `gh-commit-{owner}-{repo}-{sha12}` |
 
-Labels make every operation idempotent: the sync scripts JQL-search by label before creating.
+Les étiquettes rendent chaque opération idempotente : les scripts de synchronisation recherchent par étiquette JQL avant de créer.
 
-## PR status mapping
+## Cartographie du statut des PR
 
-| GitHub state | Jira status |
+| État GitHub | Statut Jira |
 |---|---|
-| `open` | In Progress |
-| `draft` | To Do |
-| `merged` | Done |
-| `closed` | Done |
+| `open` | En cours (In Progress) |
+| `draft` | À faire (To Do) |
+| `merged` | Terminé (Done) |
+| `closed` | Terminé (Done) |
 
 ## Secrets
 
-For the webhook-triggered VPS model, secrets live on the VPS (not in every repo):
+Pour le modèle VPS déclenché par webhook, les secrets résident sur le VPS (et non dans chaque dépôt) :
 
-- `VW_GITHUB_WEBHOOK_SECRET` (used by `vw-deployd` to verify webhook signatures)
-- Jira token for `vw-jira-sync` (`JIRA_TOKEN` or `JIRA_TOKEN_FILE`)
-- GitHub API token for `vw-jira-sync` (`GITHUB_TOKEN` preferred, or `GH_TOKEN`)
+- `VW_GITHUB_WEBHOOK_SECRET` (utilisé par `vw-deployd` pour vérifier les signatures des webhooks)
+- Jeton Jira pour `vw-jira-sync` (`JIRA_TOKEN` ou `JIRA_TOKEN_FILE`)
+- Jeton API GitHub pour `vw-jira-sync` (`GITHUB_TOKEN` préféré, ou `GH_TOKEN`)
 
-Do not commit these. Store the values in VaultWarden (`https://warden.vaultwares.ca`, tailnet-only)
-and provision them to the VPS via `/etc/*` environment files.
+Ne jamais committer ces secrets. Stockez les valeurs dans VaultWarden (`https://warden.vaultwares.ca`, uniquement sur le tailnet)
+et provisionnez-les au VPS via les fichiers d'environnement `/etc/*`.
 
-## GitHub configuration (per repository)
+## Configuration GitHub (par dépôt)
 
-Repo → Settings → Webhooks → Add webhook:
+Dépôt → Settings → Webhooks → Ajouter un webhook :
 
-- Payload URL: `https://hooks.vaultwares.ca/github`
-- Content type: `application/json`
-- Secret: same value as `VW_GITHUB_WEBHOOK_SECRET` on the VPS
-- Events: select
+- URL de la charge utile (Payload URL) : `https://hooks.vaultwares.ca/github`
+- Type de contenu (Content type) : `application/json`
+- Secret : même valeur que `VW_GITHUB_WEBHOOK_SECRET` sur le VPS
+- Événements (Events) : sélectionner
   - `push`
   - `pull_request`
   - `pull_request_review`
   - `pull_request_review_comment`
   - `issue_comment`
 
-## Adding a new repo
+## Ajout d'un nouveau dépôt
 
-1. Create a Jira project (team-managed, Kanban) with an uppercase 2–10 char key.
-2. Add the mapping to `config.yaml`:
+1. Créez un projet Jira (géré par l'équipe, Kanban) avec une clé de 2 à 10 caractères en majuscules.
+2. Ajoutez la cartographie dans `config.yaml` :
 
 ```yaml
 repo_project_keys:
@@ -102,52 +102,52 @@ repos:
   - my-new-repo       # ← new entry
 ```
 
-3. If the repo belongs to a different GitHub org, also add to `repo_owners`:
+3. Si le dépôt appartient à une autre organisation GitHub, ajoutez-le également à `repo_owners` :
 
 ```yaml
 repo_owners:
   my-new-repo: OtherOrg
 ```
 
-4. Add the GitHub webhook (preferred model):
+4. Ajoutez le webhook GitHub (modèle préféré) :
 
-- Repo → Settings → Webhooks → Add webhook (see “GitHub configuration” below).
+- Dépôt → Settings → Webhooks → Ajouter un webhook (voir « Configuration GitHub » ci-dessous).
 
-5. Run the initial backfill:
+5. Exécutez le remplissage initial (backfill) :
 
 ```bash
 python scripts/backfill.py --repo my-new-repo
 ```
 
-6. Optional (legacy): deploy the caller workflow to the new repo:
+6. Optionnel (légacy) : déployez le workflow d'appel vers le nouveau dépôt :
 
 ```bash
 python scripts/deploy_caller_workflows.py --repo my-new-repo --strategy main
 ```
 
-## Adding a new GitHub org
+## Ajout d'une nouvelle organisation GitHub
 
-1. Add the org repos to `repo_owners` in `config.yaml`:
+1. Ajoutez les dépôts de l'organisation à `repo_owners` dans `config.yaml` :
 
 ```yaml
 repo_owners:
   repo-name: NewOrg
 ```
 
-2. Add each repo to `repo_project_keys` and `repos` as normal.
-3. Ensure the `gh` CLI is authenticated for the new org
-   (`gh auth status` — must show the org as accessible).
+2. Ajoutez chaque dépôt à `repo_project_keys` et `repos` normalement.
+3. Assurez-vous que l'outil de ligne de commande `gh` est authentifié pour la nouvelle organisation
+   (`gh auth status` — doit montrer l'organisation comme accessible).
 
-## Repo rename procedure
+## Procédure de renommage de dépôt
 
-When a GitHub repo is renamed, the Jira project key and all existing issues stay unchanged.
-Only labels (which embed the repo name) and the mapping file need updating.
+Lorsqu'un dépôt GitHub est renommé, la clé de projet Jira et tous les incidents existants restent inchangés.
+Seules les étiquettes (qui contiennent le nom du dépôt) et le fichier de cartographie doivent être mis à jour.
 
-**Step-by-step:**
+**Étape par étape :**
 
-1. Rename the repo on GitHub (Settings → Rename).
+1. Renommez le dépôt sur GitHub (Settings → Rename).
 
-2. Update `config.yaml` in `vw-jira-sync`:
+2. Mettez à jour `config.yaml` dans `vw-jira-sync` :
 
 ```yaml
 repo_project_keys:
@@ -158,36 +158,36 @@ repos:
   - new-repo-name         # ← update (was old-repo-name)
 ```
 
-3. Rename the mapping file so existing issues are not re-created:
+3. Renommez le fichier de cartographie pour que les incidents existants ne soient pas recréés :
 
 ```powershell
 Copy-Item "mapping\old-repo-name.json" "mapping\new-repo-name.json"
 Remove-Item "mapping\old-repo-name.json"
 ```
 
-4. Re-run backfill with the new name to tag any new issues with the current label
-   (existing issues keep their old labels and won't be duplicated — the mapping file
-   prevents that):
+4. Réexécutez le remplissage (backfill) avec le nouveau nom pour étiqueter tout nouvel incident avec l'étiquette actuelle
+   (les incidents existants conservent leurs anciennes étiquettes et ne seront pas dupliqués — le fichier de cartographie
+   empêche cela) :
 
 ```bash
 python scripts/backfill.py --repo new-repo-name
 ```
 
-5. Commit and push to `vw-jira-sync` main.
+5. Commit et push vers `vw-jira-sync` main.
 
-6. Deploy the caller workflow to the renamed repo (GitHub renames the repo but
-   the workflow file path stays the same — if it was already present, a re-deploy
-   ensures the file is current):
+6. Déployez le workflow d'appel vers le dépôt renommé (GitHub renomme le dépôt, mais
+   le chemin du fichier de workflow reste le même — si il était déjà présent, un nouveau déploiement
+   assure que le fichier est à jour) :
 
 ```bash
 python scripts/deploy_caller_workflows.py --repo new-repo-name --strategy main
 ```
 
-**Tested on:** `i-dub-thee` → `vaultwares-asttro` (IDUB project, 2026-05-19).
-Mapping file renamed, backfill re-run, 6 duplicate issues cleaned up from partial
-re-backfill before mapping fix.
+**Testé sur :** `i-dub-thee` → `vaultwares-asttro` (projet IDUB, 2026-05-19).
+Fichier de cartographie renommé, backfill réexécuté, 6 incidents dupliqués nettoyés suite à un remplissage partiel
+avant la correction de la cartographie.
 
-## Backfill script reference
+## Référence du script de remplissage (Backfill)
 
 ```bash
 # All repos
@@ -200,10 +200,10 @@ python scripts/backfill.py --repo vault-flows
 python scripts/backfill.py --repo vault-flows --dry-run
 ```
 
-Backfill is idempotent. Progress is checkpointed in `mapping/{repo}.json`
-(format: `{"prs": {"42": "PROJ-7"}, "commits": {"abc123def456": "PROJ-8"}}`).
+Le remplissage est idempotent. La progression est mise à jour dans `mapping/{repo}.json`
+(format : `{"prs": {"42": "PROJ-7"}, "commits": {"abc123def456": "PROJ-8"}}`).
 
-## Deploying caller workflows (Legacy: GitHub Actions)
+## Déploiement des workflows d'appel (Legacy : GitHub Actions)
 
 ```bash
 # Single repo, push directly to main
@@ -216,7 +216,7 @@ python scripts/deploy_caller_workflows.py --strategy pr
 python scripts/deploy_caller_workflows.py --strategy main
 ```
 
-## Creating Jira projects in bulk
+## Création de projets Jira en masse
 
 ```bash
 # Dry run — prints what would be created
@@ -229,47 +229,47 @@ python scripts/create_projects.py --repo my-new-repo
 python scripts/create_projects.py
 ```
 
-## Troubleshooting
+## Dépannage
 
-### `startup_failure` in GitHub Actions (Legacy)
+### `startup_failure` dans GitHub Actions (Legacy)
 
-**Cause:** The legacy caller workflow has a `permissions:` block that conflicts with
-reusable workflow dispatch on personal accounts.
+**Cause :** Le workflow d'appel legacy possède un bloc `permissions:` qui entre en conflit avec
+le déclenchement de workflow réutilisable sur les comptes personnels.
 
-**Fix:** Remove the `permissions:` block from `.github/workflows/jira-sync.yml`
-in the affected repo, or re-deploy with the current template (which has no
-`permissions:` block).
+**Correction :** Supprimez le bloc `permissions:` de `.github/workflows/jira-sync.yml`
+dans le dépôt concerné, ou redéployez avec le modèle actuel (qui ne contient pas de
+bloc `permissions:`).
 
-### Webhook-driven sync not running (Preferred model)
+### Synchronisation non exécutée par webhook (Modèle préféré)
 
-- Confirm `https://hooks.vaultwares.ca/health` returns 200.
-- Confirm `https://hooks.vaultwares.ca/github` is receiving deliveries (check `/var/log/vw-deployd.log`).
-- Ensure `/etc/vw-deployd/config.yml` has `jira_sync.enabled: true`.
-- Ensure `vw-jira-sync` exists on `vaultwares-1` (default path: `/opt/vw-jira-sync`).
-- Ensure `vw-jira-sync` has secrets available:
-  - `JIRA_TOKEN` or `JIRA_TOKEN_FILE`
-  - `GITHUB_TOKEN` (preferred) or `GH_TOKEN`
+- Confirmez que `https://hooks.vaultwares.ca/health` retourne 200.
+- Confirmez que `https://hooks.vaultwares.ca/github` reçoit des livraisons (vérifiez `/var/log/vw-deployd.log`).
+- Assurez-vous que `/etc/vw-deployd/config.yml` contient `jira_sync.enabled: true`.
+- Assurez-vous que `vw-jira-sync` existe sur `vaultwares-1` (chemin par défaut : `/opt/vw-jira-sync`).
+- Assurez-vous que `vw-jira-sync` dispose des secrets suivants :
+  - `JIRA_TOKEN` ou `JIRA_TOKEN_FILE`
+  - `GITHUB_TOKEN` (préféré) ou `GH_TOKEN`
 
-### Jira 401 / "You do not have permission to create issues"
+### Jira 401 / "Vous n'avez pas la permission de créer des incidents"
 
-**Cause:** Jira token is corrupted or expired (`JIRA_TOKEN` or `JIRA_TOKEN_FILE`).
+**Cause :** Le jeton Jira est corrompu ou expiré (`JIRA_TOKEN` ou `JIRA_TOKEN_FILE`).
 
-**Fix:** Re-provision the token on the VPS (preferred), or re-distribute secrets if
-you are still using the legacy GitHub Actions model.
+**Correction :** Reprovisionnez le jeton sur le VPS (préféré), ou redistribuez les secrets si
+vous utilisez encore le modèle GitHub Actions legacy.
 
-### Duplicate Jira issues after a rename
+### Incidents Jira dupliqués après un renommage
 
-**Cause:** Mapping file was not renamed before re-running backfill, so the script
-didn't recognize already-synced issues.
+**Cause :** Le fichier de cartographie n'a pas été renommé avant de réexécuter le remplissage, de sorte que le script
+n'a pas reconnu les incidents déjà synchronisés.
 
-**Fix:**
-1. Delete the duplicates in Jira (REST DELETE or UI).
-2. Restore the mapping file from git, rename it correctly, then re-run backfill.
+**Correction :**
+1. Supprimez les doublons dans Jira (REST DELETE ou UI).
+2. Restaurez le fichier de cartographie depuis git, renommez-le correctement, puis réexécutez le remplissage.
 
-### Backfill error on a specific PR
+### Erreur de remplissage sur un PR spécifique
 
-**Cause:** Deleted/restricted GitHub issue or network failure during comment fetch.
+**Cause :** Incident GitHub supprimé/restreint ou échec réseau lors de la récupération des commentaires.
 
-**Behavior:** Logged as `WARN` and skipped — does not abort the run. Re-run
-backfill for the repo; checkpointing means already-created issues won't be
-duplicated.
+**Comportement :** Journalisé comme `WARN` et ignoré — cela n'arrête pas l'exécution. Réexécutez
+le remplissage pour le dépôt ; le mécanisme de point de contrôle (checkpointing) signifie que les incidents déjà créés ne seront pas
+dupliqués.

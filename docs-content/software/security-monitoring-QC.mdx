@@ -1,34 +1,35 @@
 ---
-title: "Security monitoring"
-description: "Real-time threat detection and security analytics"
+title: "Surveillance de la sécurité"
+description: "Détection des menaces en temps réel et analyse de la sécurité"
 ---
 
-## Overview
 
-VaultMonitor is VaultWares' unified security monitoring platform. It collects telemetry from all VaultWares hardware and software products, correlates events across your environment, and surfaces actionable alerts in real-time. VaultMonitor ships with out-of-the-box SIEM integrations for Splunk, IBM QRadar, Microsoft Sentinel, and others, as well as a built-in dashboard for organizations without an existing SIEM.
+## Vue d'ensemble
 
-## Product editions
+VaultMonitor est la plateforme unifiée de surveillance de la sécurité de VaultWares. Elle collecte la télémétrie de tous les produits matériels et logiciels VaultWares, corrèle les événements dans votre environnement, et affiche des alertes exploitables en temps réel. VaultMonitor est livré avec des intégrations SIEM prêtes à l'emploi pour Splunk, IBM QRadar, Microsoft Sentinel, et d'autres, ainsi qu'un tableau de bord intégré pour les organisations qui n'ont pas de SIEM existant.
+
+## Éditions du produit
 
 <CardGroup cols={2}>
-  <Card title="VaultMonitor Professional" icon="chart-line">
-    **Best for**: Single-site deployments  
-    **Retention**: 90 days  
-    **Features**: Real-time alerts, built-in dashboard, email/SMS notifications, Splunk integration  
-    **Ingestion**: Up to 5,000 events/second
+  <Card title="VaultMonitor Professionnel" icon="chart-line">
+    **Idéal pour** : Déploiements sur un seul site
+    **Rétention** : 90 jours
+    **Fonctionnalités** : Alertes en temps réel, tableau de bord intégré, notifications par courriel/SMS, intégration Splunk
+    **Ingestion** : Jusqu'à 5 000 événements/seconde
   </Card>
-  <Card title="VaultMonitor Enterprise" icon="tower-broadcast">
-    **Best for**: Multi-site and MSSP deployments  
-    **Retention**: Up to 7 years (configurable)  
-    **Features**: + Anomaly detection ML, threat intelligence feeds, SOAR integration, multi-tenant  
-    **Ingestion**: Unlimited (horizontal scaling)
+  <Card title="VaultMonitor Entreprise" icon="tower-broadcast">
+    **Idéal pour** : Déploiements multi-sites et MSSP
+    **Rétention** : Jusqu'à 7 ans (configurable)
+    **Fonctionnalités** : + ML de détection d'anomalies, flux de renseignements sur les menaces, intégration SOAR, multi-locataire
+    **Ingestion** : Illimitée (mise à l'échelle horizontale)
   </Card>
 </CardGroup>
 
-## Key features
+## Fonctionnalités clés
 
-### Real-time event collection
+### Collecte d'événements en temps réel
 
-VaultMonitor collects events from all VaultWares products and external sources:
+VaultMonitor collecte les événements de tous les produits VaultWares et de sources externes :
 
 ```bash
 # View current ingestion status
@@ -47,9 +48,9 @@ vw-monitor status --ingestion
 # Total                        11,060       Healthy
 ```
 
-### Threat detection rules
+### Règles de détection des menaces
 
-VaultMonitor ships with over 500 pre-built detection rules tuned for VaultWares environments. Custom rules use a simple YAML-based rule language:
+VaultMonitor est livré avec plus de 500 règles de détection pré-construites, adaptées aux environnements VaultWares. Les règles personnalisées utilisent un langage de règles simple basé sur YAML :
 
 ```yaml
 # Custom detection rule: Brute-force attack on VaultDrive fleet
@@ -100,13 +101,13 @@ vw-monitor rules test \
   --dry-run
 ```
 
-### Anomaly detection
+### Détection d'anomalies
 
-Enterprise edition includes machine learning-based anomaly detection:
+L'édition Entreprise comprend la détection d'anomalies basée sur l'apprentissage automatique :
 
 <AccordionGroup>
-  <Accordion title="User behavior analytics (UBA)">
-    Builds a behavioral baseline for each user and alerts when activity deviates significantly. Detects credential theft, insider threats, and account compromise.
+  <Accordion title="Analyse du comportement utilisateur (ACU)">
+    Établit une ligne de base comportementale pour chaque utilisateur et alerte lorsque l'activité s'en écarte de manière significative. Détecte le vol d'identifiants, les menaces internes et le compromis de compte.
 
     ```bash
     # View anomaly scores for users
@@ -121,15 +122,15 @@ Enterprise edition includes machine learning-based anomaly detection:
     # dave@example.com     78     Bulk file exports from VaultDrive
     ```
   </Accordion>
-  <Accordion title="Device behavior analytics">
-    Monitors device telemetry for unusual patterns: abnormal data volumes, unexpected geographic locations, unusual operation sequences.
+  <Accordion title="Analyse du comportement des appareils">
+    Surveille la télémétrie des appareils à la recherche de modèles inhabituels : volumes de données anormaux, emplacements géographiques inattendus, séquences d'opérations inhabituelles.
   </Accordion>
-  <Accordion title="Network traffic analysis">
-    Integrates with VaultGate to detect anomalous network flows, command-and-control beaconing, and data exfiltration patterns.
+  <Accordion title="Analyse du trafic réseau">
+    S'intègre à VaultGate pour détecter les flux réseau anormaux, le signalement de type commande et contrôle (C2), et les schémas d'exfiltration de données.
   </Accordion>
 </AccordionGroup>
 
-### Alert configuration
+### Configuration des alertes
 
 ```json
 {
@@ -176,7 +177,7 @@ vw-monitor alerts acknowledge --id alert_abc123 --comment "Investigating"
 vw-monitor alerts escalate --id alert_abc123 --to soc-lead@example.com
 ```
 
-## SIEM integration
+## Intégration SIEM
 
 ### Splunk
 
@@ -196,7 +197,7 @@ vw-monitor alerts escalate --id alert_abc123 --to soc-lead@example.com
     vw-monitor siem test --integration splunk
     ```
   </Tab>
-  <Tab title="Splunk forwarder">
+  <Tab title="Forwarder Splunk">
     ```bash
     # Forward events via Syslog to Splunk Universal Forwarder
     vw-monitor siem configure syslog \
@@ -232,7 +233,7 @@ vw-monitor siem configure sentinel \
   --batch-size 500
 ```
 
-### Generic syslog / CEF
+### Syslog / CEF générique
 
 ```bash
 # Configure CEF output for any SIEM
@@ -245,7 +246,7 @@ vw-monitor siem configure cef \
   --version 3.0
 ```
 
-## Dashboards and reporting
+## Tableaux de bord et rapports
 
 ```bash
 # Generate compliance report (HIPAA)
@@ -268,7 +269,7 @@ vw-monitor report generate \
 vw-monitor dashboard list-templates
 ```
 
-## Log management
+## Gestion des journaux
 
 ```bash
 # Query events with filters
@@ -292,22 +293,22 @@ vw-monitor export \
 ```
 
 <Note>
-  Exported logs are digitally signed by default when a VaultHSM signing key is configured, providing cryptographic proof of log integrity for forensic and compliance purposes.
+  Les journaux exportés sont signés numériquement par défaut lorsqu'une clé de signature VaultHSM est configurée, fournissant une preuve cryptographique de l'intégrité des journaux à des fins forensiques et de conformité.
 </Note>
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Integration guides" icon="plug" href="/installation/integration-guides">
-    Integrate VaultMonitor with your SIEM and ticketing systems
+  <Card title="Guides d'intégration" icon="plug" href="/installation/integration-guides">
+    Intégrer VaultMonitor avec votre SIEM et vos systèmes de billetterie
   </Card>
-  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
-    Daily log review and alert management workflows
+  <Card title="Opérations quotidiennes" icon="calendar" href="/guides/daily-operations">
+    Flux de travail de révision quotidienne des journaux et de gestion des alertes
   </Card>
-  <Card title="Troubleshooting guide" icon="wrench" href="/guides/troubleshooting">
-    Diagnose VaultMonitor collection and alerting issues
+  <Card title="Guide de dépannage" icon="wrench" href="/guides/troubleshooting">
+    Diagnostiquer les problèmes de collecte et d'alertes de VaultMonitor
   </Card>
-  <Card title="API reference" icon="code" href="/api-reference/endpoints">
-    Query events and manage alerts via the REST API
+  <Card title="Référence API" icon="code" href="/api-reference/endpoints">
+    Interroger les événements et gérer les alertes via l'API REST
   </Card>
 </CardGroup>

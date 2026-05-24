@@ -1,31 +1,31 @@
 ---
-title: "Cursor setup"
-description: "Configure Cursor for your documentation workflow"
+title: "Configuration de Cursor"
+description: "Configurer Cursor pour votre flux de travail de documentation"
 icon: "arrow-pointer"
 ---
 
-## Assistant protocols (VaultWares)
+## Protocoles d'assistant (VaultWares)
 
-Before doing any VaultWares work, route your prompt using:
+Avant de faire tout travail VaultWares, dirigez votre invite en utilisant :
 - Docs: `/ai-tools/assistant-protocols`
 - File: `C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\instructions\ROUTER.md`
 
-Use Cursor to help write and maintain your documentation. This guide shows how to configure Cursor for better results on technical writing tasks and using Mintlify components.
+Utilisez Cursor pour vous aider à écrire et à maintenir votre documentation. Ce guide montre comment configurer Cursor pour de meilleurs résultats dans les tâches de rédaction technique et l'utilisation des composants Mintlify.
 
-## Prerequisites
+## Prérequis
 
-- Cursor editor installed
-- Access to your documentation repository
+- Éditeur Cursor installé
+- Accès à votre dépôt de documentation
 
-## Project rules
+## Règles de projet
 
-Create project rules that all team members can use. In your documentation repository root:
+Créez des règles de projet que tous les membres de l'équipe peuvent utiliser. À la racine de votre dépôt de documentation :
 
 ```bash
 mkdir -p .cursor
 ```
 
-Create `.cursor/rules.md`:
+Créez `.cursor/rules.md`:
 
 ````markdown
 # Mintlify technical writing rule
@@ -126,7 +126,7 @@ const response = await fetch('/api/endpoint', {
 
 ```python Python
 import requests
-response = requests.get('/api/endpoint', 
+response = requests.get('/api/endpoint',
   headers={'Authorization': f'Bearer {api_key}'})
 ```
 
@@ -152,7 +152,7 @@ curl -X POST 'https://api.example.com/users' \
 ```json Success
 {
   "id": "user_123",
-  "name": "John Doe", 
+  "name": "John Doe",
   "email": "john@example.com",
   "created_at": "2024-01-15T10:30:00Z"
 }
@@ -168,7 +168,7 @@ Example of step-by-step instructions:
 <Steps>
 <Step title="Install dependencies">
   Run `npm install` to install required packages.
-  
+
   <Check>
   Verify installation by running `npm list`.
   </Check>
@@ -176,11 +176,11 @@ Example of step-by-step instructions:
 
 <Step title="Configure environment">
   Create a `.env` file with your API credentials.
-  
+
   ```bash
   API_KEY=your_api_key_here
   ```
-  
+
   <Warning>
   Never commit API keys to version control.
   </Warning>
@@ -301,12 +301,12 @@ Complete user object with all associated data.
 <Expandable title="User properties">
   <ResponseField name="profile" type="object">
   User profile information including personal details.
-  
+
   <Expandable title="Profile details">
     <ResponseField name="first_name" type="string">
     User's first name as entered during registration.
     </ResponseField>
-    
+
     <ResponseField name="avatar_url" type="string | null">
     URL to user's profile picture. Returns null if no avatar is set.
     </ResponseField>

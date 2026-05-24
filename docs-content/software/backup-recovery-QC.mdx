@@ -1,50 +1,51 @@
 ---
-title: "Backup & recovery"
-description: "Automated encrypted backup and disaster recovery"
+title: "Sauvegarde et récupération"
+description: "Sauvegarde chiffrée automatisée et reprise après sinistre"
 ---
 
-## Overview
 
-VaultBackup provides automated, hardware-encrypted backup and disaster recovery for organizations that cannot afford data loss. All backup data is encrypted at the source using AES-256 before transmission, and VaultBackup integrates natively with VaultHSM for enterprise key management. Built-in ransomware protection and immutable backup storage ensure your recovery data remains safe even when your primary environment is compromised.
+## Aperçu
 
-## Product editions
+VaultBackup offre une sauvegarde et une reprise après sinistre automatisées et chiffrées par matériel pour les organisations qui ne peuvent pas se permettre de perdre des données. Toutes les données de sauvegarde sont chiffrées à la source à l'aide d'AES-256 avant la transmission, et VaultBackup s'intègre nativement à VaultHSM pour la gestion des clés d'entreprise. La protection intégrée contre les rançongiciels et le stockage de sauvegarde immuable garantissent que vos données de récupération restent sécurisées même lorsque votre environnement principal est compromis.
+
+## Éditions du produit
 
 <CardGroup cols={3}>
   <Card title="VaultBackup Standard" icon="floppy-disk">
-    **Targets**: Up to 5 servers or 25 workstations  
-    **Retention**: Up to 90 days  
-    **Features**: Full, incremental, scheduled backups  
-    **Storage**: Local and NAS targets
+    **Cibles**: Jusqu'à 5 serveurs ou 25 postes de travail
+    **Rétention**: Jusqu'à 90 jours
+    **Fonctionnalités**: Sauvegardes complètes, incrémentielles et planifiées
+    **Stockage**: Cibles locales et NAS
   </Card>
-  <Card title="VaultBackup Professional" icon="cloud-arrow-up">
-    **Targets**: Up to 50 servers  
-    **Retention**: Up to 1 year  
-    **Features**: + Off-site replication, deduplication  
-    **Storage**: Local, NAS, S3-compatible cloud
+  <Card title="VaultBackup Professionnel" icon="cloud-arrow-up">
+    **Cibles**: Jusqu'à 50 serveurs
+    **Rétention**: Jusqu'à 1 an
+    **Fonctionnalités**: + Réplication hors site, déduplication
+    **Stockage**: Local, NAS, cloud compatible S3
   </Card>
-  <Card title="VaultBackup Enterprise" icon="shield-halved">
-    **Targets**: Unlimited  
-    **Retention**: Configurable (up to 7 years)  
-    **Features**: + Ransomware protection, immutable storage, DR orchestration  
-    **Storage**: All targets + VaultWares Cloud Vault
+  <Card title="VaultBackup Entreprise" icon="shield-halved">
+    **Cibles**: Illimitées
+    **Rétention**: Configurable (jusqu'à 7 ans)
+    **Fonctionnalités**: + Protection contre les rançongiciels, stockage immuable, orchestration de RS
+    **Stockage**: Toutes les cibles + VaultWares Cloud Vault
   </Card>
 </CardGroup>
 
-## Key features
+## Fonctionnalités clés
 
-### Encryption at every stage
+### Chiffrement à chaque étape
 
-- **Source encryption**: Data is encrypted on the backup agent before leaving the source system
-- **In-transit encryption**: All backup streams use TLS 1.3
-- **At-rest encryption**: Backup repositories use AES-256-XTS
-- **Key management**: Integrate with VaultHSM for hardware-protected backup keys
-- **Key escrow**: Encrypted key copies held in secure escrow for disaster scenarios
+- **Chiffrement à la source**: Les données sont chiffrées sur l'agent de sauvegarde avant de quitter le système source
+- **Chiffrement en transit**: Tous les flux de sauvegarde utilisent TLS 1.3
+- **Chiffrement au repos**: Les référentiels de sauvegarde utilisent AES-256-XTS
+- **Gestion des clés**: Intégration avec VaultHSM pour les clés de sauvegarde protégées par matériel
+- **Séquestre de clés**: Copies de clés chiffrées détenues en séquestre sécurisé pour les scénarios de sinistre
 
-### Backup types
+### Types de sauvegarde
 
 <Tabs>
-  <Tab title="Full backup">
-    A complete copy of all selected data. Used as the baseline for incremental and differential chains.
+  <Tab title="Sauvegarde complète">
+    Une copie complète de toutes les données sélectionnées. Utilisée comme base pour les chaînes incrémentielles et différentielles.
 
     ```bash
     # Run a full backup immediately
@@ -56,8 +57,8 @@ VaultBackup provides automated, hardware-encrypted backup and disaster recovery 
       --compress lz4
     ```
   </Tab>
-  <Tab title="Incremental backup">
-    Backs up only data changed since the last backup of any type. Minimizes backup window and storage consumption.
+  <Tab title="Sauvegarde incrémentielle">
+    Sauvegarde uniquement des données modifiées depuis la dernière sauvegarde de tout type. Minimise la fenêtre de sauvegarde et la consommation de stockage.
 
     ```bash
     # Run an incremental backup
@@ -69,8 +70,8 @@ VaultBackup provides automated, hardware-encrypted backup and disaster recovery 
       --encrypt-key hsm:DB-Backup-Key
     ```
   </Tab>
-  <Tab title="Differential backup">
-    Backs up all data changed since the last **full** backup. Faster restores than incremental at the cost of more storage.
+  <Tab title="Sauvegarde différentielle">
+    Sauvegarde toutes les données modifiées depuis la dernière sauvegarde **complète**. Restauration plus rapide que l'incrémentielle au prix d'un plus grand stockage.
 
     ```bash
     # Run a differential backup
@@ -84,7 +85,7 @@ VaultBackup provides automated, hardware-encrypted backup and disaster recovery 
   </Tab>
 </Tabs>
 
-### Schedule configuration
+### Configuration des horaires
 
 ```json
 {
@@ -142,7 +143,7 @@ vw-backup schedule list
 vw-backup schedule run-now --job "Daily incremental"
 ```
 
-### Off-site replication
+### Réplication hors site
 
 ```bash
 # Configure off-site replication to AWS S3
@@ -168,13 +169,13 @@ vw-backup replication configure \
 vw-backup replication status --all
 ```
 
-### Ransomware protection
+### Protection contre les rançongiciels
 
-VaultBackup Enterprise includes multi-layered ransomware protection:
+VaultBackup Entreprise comprend une protection multi-couches contre les rançongiciels :
 
 <AccordionGroup>
-  <Accordion title="Immutable backup storage">
-    Backup data written to immutable storage cannot be modified or deleted for the configured retention period, even by administrators with full credentials. Supported on VaultWares Cloud Vault and S3-compatible storage with Object Lock.
+  <Accordion title="Stockage de sauvegarde immuable">
+    Les données de sauvegarde écrites sur un stockage immuable ne peuvent être modifiées ou supprimées pendant la période de rétention configurée, même par des administrateurs disposant de pleins privilèges. Pris en charge sur VaultWares Cloud Vault et le stockage compatible S3 avec Object Lock.
 
     ```bash
     # Enable immutability on a backup repository
@@ -184,8 +185,8 @@ VaultBackup Enterprise includes multi-layered ransomware protection:
       --compliance-mode governance
     ```
   </Accordion>
-  <Accordion title="Honeypot file monitoring">
-    VaultBackup plants hidden sentinel files in monitored directories. Any modification to these files triggers an immediate alert and optionally pauses new backups to prevent encrypting already-ransomed data.
+  <Accordion title="Surveillance des fichiers leurres (Honeypot)">
+    VaultBackup place des fichiers sentinelles cachés dans les répertoires surveillés. Toute modification de ces fichiers déclenche une alerte immédiate et met optionnellement en pause les nouvelles sauvegardes pour empêcher le chiffrement des données déjà rançonnées.
 
     ```bash
     # Enable honeypot monitoring
@@ -195,17 +196,17 @@ VaultBackup Enterprise includes multi-layered ransomware protection:
       --pause-backup-on-trigger true
     ```
   </Accordion>
-  <Accordion title="Entropy analysis">
-    Backup streams are analyzed for abnormally high entropy, which is characteristic of ransomware-encrypted data. Suspicious backups are flagged for review before overwriting previous clean backups.
+  <Accordion title="Analyse d'entropie">
+    Les flux de sauvegarde sont analysés pour une entropie anormalement élevée, ce qui est caractéristique des données chiffrées par rançongiciel. Les sauvegardes suspectes sont signalées pour examen avant d'écraser les sauvegardes propres précédentes.
   </Accordion>
 </AccordionGroup>
 
-## Recovery procedures
+## Procédures de récupération
 
-### Restore from backup
+### Restaurer à partir d'une sauvegarde
 
 <Steps>
-  <Step title="List available recovery points">
+  <Step title="Lister les points de récupération disponibles">
     ```bash
     # List all recovery points for a source
     vw-backup restore list \
@@ -219,7 +220,7 @@ VaultBackup Enterprise includes multi-layered ransomware protection:
     # 2024-11-10T01:00:05Z     Full          312 GB   Yes        Yes
     ```
   </Step>
-  <Step title="Verify backup integrity">
+  <Step title="Vérifier l'intégrité de la sauvegarde">
     ```bash
     # Verify a specific recovery point
     vw-backup verify \
@@ -228,7 +229,7 @@ VaultBackup Enterprise includes multi-layered ransomware protection:
       --decrypt-key hsm:DB-Backup-Key
     ```
   </Step>
-  <Step title="Perform the restore">
+  <Step title="Effectuer la restauration">
     ```bash
     # Restore to original location
     vw-backup restore \
@@ -246,7 +247,7 @@ VaultBackup Enterprise includes multi-layered ransomware protection:
       --decrypt-key hsm:DB-Backup-Key
     ```
   </Step>
-  <Step title="Verify restored data">
+  <Step title="Vérifier les données restaurées">
     ```bash
     # Generate a checksum report of restored files
     vw-backup verify-restore \
@@ -257,7 +258,7 @@ VaultBackup Enterprise includes multi-layered ransomware protection:
   </Step>
 </Steps>
 
-### Disaster recovery
+### Reprise après sinistre
 
 ```bash
 # Initiate a full DR failover
@@ -278,9 +279,9 @@ vw-backup dr test \
   --snapshot-only
 ```
 
-## Backup verification
+## Vérification de la sauvegarde
 
-Regular verification is critical. VaultBackup supports both on-demand and scheduled verification:
+Une vérification régulière est essentielle. VaultBackup prend en charge la vérification à la demande et planifiée :
 
 ```bash
 # Verify all backups in a repository
@@ -297,19 +298,19 @@ vw-backup schedule add-verification \
   --alert-email security@example.com
 ```
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
-    Configure backup destinations and schedules during initial setup
+  <Card title="Configuration initiale" icon="sliders" href="/installation/initial-configuration">
+    Configurer les destinations et les horaires de sauvegarde lors de l'installation initiale
   </Card>
-  <Card title="HSM integration" icon="microchip" href="/hardware/hsm">
-    Use VaultHSM to protect backup encryption keys
+  <Card title="Intégration HSM" icon="microchip" href="/hardware/hsm">
+    Utiliser VaultHSM pour protéger les clés de chiffrement de sauvegarde
   </Card>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    Backup strategy and retention recommendations
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Recommandations de stratégie de sauvegarde et de rétention
   </Card>
-  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
-    Monitoring and managing backup jobs day to day
+  <Card title="Opérations quotidiennes" icon="calendar" href="/guides/daily-operations">
+    Surveillance et gestion des tâches de sauvegarde jour après jour
   </Card>
 </CardGroup>

@@ -1,67 +1,67 @@
 ---
 title: "Webhooks"
-description: "Receive real-time notifications via webhooks"
+description: "Recevez des notifications en temps réel via des webhooks"
 ---
 
-## Overview
+## Vue d'ensemble
 
-VaultWares webhooks deliver real-time notifications to your application when events occur in your environment. Use webhooks to trigger automated workflows, update your SIEM, or integrate with ticketing systems.
+Les webhooks de VaultWares envoient des notifications en temps réel à votre application lorsqu'il se produisent des événements dans votre environnement. Utilisez les webhooks pour déclencher des flux de travail automatisés, mettre à jour votre SIEM ou vous intégrer à des systèmes de billetterie.
 
-## Event types
+## Types d'événements
 
 <Tabs>
-  <Tab title="Device events">
-    | Event type | Description |
+  <Tab title="Événements d'appareils">
+    | Type d'événement | Description |
     |---|---|
-    | `device.connected` | A device connected to a host |
-    | `device.disconnected` | A device was safely ejected or disconnected |
-    | `device.locked` | A device was locked (remote or automatic) |
-    | `device.unlocked` | A device was unlocked |
-    | `device.auth_failed` | Authentication attempt failed |
-    | `device.auth_lockout` | Device entered lockout state after failed attempts |
-    | `device.crypto_erase` | Cryptographic erasure was initiated |
-    | `device.firmware_updated` | Firmware update completed |
-    | `device.policy_applied` | A new policy was applied to the device |
-    | `device.tamper_detected` | Physical tamper event detected |
+    | `device.connected` | Un appareil est connecté à un hôte |
+    | `device.disconnected` | Un appareil a été éjecté ou déconnecté en toute sécurité |
+    | `device.locked` | Un appareil a été verrouillé (à distance ou automatiquement) |
+    | `device.unlocked` | Un appareil a été déverrouillé |
+    | `device.auth_failed` | Tentative d'authentification échouée |
+    | `device.auth_lockout` | L'appareil est entré dans un état de verrouillage après des tentatives échouées |
+    | `device.crypto_erase` | L'effacement cryptographique a été initié |
+    | `device.firmware_updated` | La mise à jour du micrologiciel est terminée |
+    | `device.policy_applied` | Une nouvelle politique a été appliquée à l'appareil |
+    | `device.tamper_detected` | Détection d'altération physique |
   </Tab>
-  <Tab title="User events">
-    | Event type | Description |
+  <Tab title="Événements utilisateurs">
+    | Type d'événement | Description |
     |---|---|
-    | `user.created` | A new user was created |
-    | `user.updated` | User attributes were modified |
-    | `user.disabled` | User account was disabled |
-    | `user.deleted` | User account was deleted |
-    | `user.login_success` | User logged in successfully |
-    | `user.login_failed` | User login attempt failed |
-    | `user.mfa_enrolled` | User enrolled an MFA device |
-    | `user.password_changed` | User password was changed |
-    | `user.sessions_revoked` | All user sessions were revoked |
+    | `user.created` | Un nouvel utilisateur a été créé |
+    | `user.updated` | Les attributs de l'utilisateur ont été modifiés |
+    | `user.disabled` | Le compte utilisateur a été désactivé |
+    | `user.deleted` | Le compte utilisateur a été supprimé |
+    | `user.login_success` | L'utilisateur s'est connecté avec succès |
+    | `user.login_failed` | Tentative de connexion de l'utilisateur échouée |
+    | `user.mfa_enrolled` | L'utilisateur a enregistré un appareil MFA |
+    | `user.password_changed` | Le mot de passe de l'utilisateur a été changé |
+    | `user.sessions_revoked` | Toutes les sessions de l'utilisateur ont été révoquées |
   </Tab>
-  <Tab title="Key events">
-    | Event type | Description |
+  <Tab title="Événements clés">
+    | Type d'événement | Description |
     |---|---|
-    | `key.generated` | A new cryptographic key was generated |
-    | `key.rotated` | A key was rotated |
-    | `key.deprecated` | A key was marked as deprecated |
-    | `key.destroyed` | A key was permanently destroyed |
-    | `key.expiring_soon` | A key is expiring within the configured threshold |
-    | `key.exported` | A key was exported (if allowed by policy) |
-    | `key.backup_created` | A key backup was created |
+    | `key.generated` | Une nouvelle clé cryptographique a été générée |
+    | `key.rotated` | Une clé a été pivotée (rotée) |
+    | `key.deprecated` | Une clé a été marquée comme obsolète |
+    | `key.destroyed` | Une clé a été détruite de façon permanente |
+    | `key.expiring_soon` | Une clé expire dans le seuil configuré |
+    | `key.exported` | Une clé a été exportée (si autorisé par la politique) |
+    | `key.backup_created` | Une sauvegarde de clé a été créée |
   </Tab>
-  <Tab title="Security events">
-    | Event type | Description |
+  <Tab title="Événements de sécurité">
+    | Type d'événement | Description |
     |---|---|
-    | `security.alert_triggered` | A VaultMonitor detection rule fired |
-    | `security.anomaly_detected` | ML anomaly detection flagged activity |
-    | `security.policy_violation` | A security policy was violated |
-    | `security.compliance_change` | Compliance status changed |
-    | `security.incident_opened` | An incident was automatically opened |
+    | `security.alert_triggered` | Une règle de détection VaultMonitor a été déclenchée |
+    | `security.anomaly_detected` | La détection d'anomalie ML a signalé une activité |
+    | `security.policy_violation` | Une politique de sécurité a été violée |
+    | `security.compliance_change` | Le statut de conformité a changé |
+    | `security.incident_opened` | Un incident a été ouvert automatiquement |
   </Tab>
 </Tabs>
 
-## Payload format
+## Format de la charge utile (Payload)
 
-All webhook payloads follow this structure:
+Toutes les charges utiles de webhooks suivent cette structure :
 
 ```json
 {
@@ -88,9 +88,9 @@ All webhook payloads follow this structure:
 }
 ```
 
-## Configure webhooks
+## Configurer les webhooks
 
-### Create a webhook endpoint
+### Créer un point de terminaison de webhook
 
 ```bash
 curl -X POST https://api.vaultwares.com/v1/webhooks \
@@ -111,7 +111,7 @@ curl -X POST https://api.vaultwares.com/v1/webhooks \
   }'
 ```
 
-### Update a webhook
+### Mettre à jour un webhook
 
 ```bash
 curl -X PATCH https://api.vaultwares.com/v1/webhooks/wh_abc123 \
@@ -122,7 +122,7 @@ curl -X PATCH https://api.vaultwares.com/v1/webhooks/wh_abc123 \
   }'
 ```
 
-### Test a webhook
+### Tester un webhook
 
 ```bash
 curl -X POST https://api.vaultwares.com/v1/webhooks/wh_abc123/test \
@@ -130,11 +130,11 @@ curl -X POST https://api.vaultwares.com/v1/webhooks/wh_abc123/test \
   -d '{"event_type": "device.auth_lockout"}'
 ```
 
-## Signature verification
+## Vérification de la signature
 
-VaultWares signs every webhook payload with an HMAC-SHA256 signature. Always verify the signature before processing the payload.
+VaultWares signe chaque charge utile de webhook avec une signature HMAC-SHA256. Vérifiez toujours la signature avant de traiter la charge utile.
 
-The signature is in the `X-VaultWares-Signature` header, in the format:
+La signature se trouve dans l'en-tête `X-VaultWares-Signature`, au format :
 `t=<timestamp>,v1=<signature>`
 
 <CodeGroup>
@@ -146,7 +146,7 @@ import time
 def verify_webhook_signature(payload: bytes, header: str, secret: str, tolerance: int = 300) -> bool:
     """
     Verify a VaultWares webhook signature.
-    
+
     Args:
         payload: Raw request body bytes
         header: X-VaultWares-Signature header value
@@ -184,17 +184,17 @@ WEBHOOK_SECRET = os.environ["VAULTWARES_WEBHOOK_SECRET"]
 @app.route("/webhooks/vaultwares", methods=["POST"])
 def handle_webhook():
     sig_header = request.headers.get("X-VaultWares-Signature", "")
-    
+
     if not verify_webhook_signature(request.data, sig_header, WEBHOOK_SECRET):
         abort(400, "Invalid signature")
-    
+
     event = request.json
-    
+
     if event["type"] == "device.auth_lockout":
         handle_lockout(event["data"]["object"])
     elif event["type"] == "device.tamper_detected":
         handle_tamper(event["data"]["object"])
-    
+
     return "", 200
 
 def handle_lockout(device):
@@ -270,21 +270,21 @@ app.listen(3000);
 ```
 </CodeGroup>
 
-## Retry logic
+## Logique de nouvelle tentative (Retry logic)
 
-If your endpoint returns a non-2xx status code or does not respond within 30 seconds, VaultWares retries the delivery with exponential backoff:
+Si votre point de terminaison renvoie un code de statut autre que 2xx ou ne répond pas dans les 30 secondes, VaultWares tente de livrer à nouveau avec un délai exponentiel :
 
-| Attempt | Delay |
+| Tentative | Délai |
 |---------|-------|
-| 1 | Immediate |
-| 2 | 5 seconds |
-| 3 | 30 seconds |
+| 1 | Immédiat |
+| 2 | 5 secondes |
+| 3 | 30 secondes |
 | 4 | 2 minutes |
 | 5 | 10 minutes |
-| 6 | 1 hour |
-| 7 | 6 hours |
+| 6 | 1 heure |
+| 7 | 6 heures |
 
-After 7 failed attempts, the event is marked as failed and you can replay it manually from the portal.
+Après 7 tentatives échouées, l'événement est marqué comme échoué et vous pouvez le rejouer manuellement depuis le portail.
 
 ```bash
 # Replay a failed webhook event
@@ -297,41 +297,41 @@ curl https://api.vaultwares.com/v1/webhooks/wh_abc123/events?status=failed \
   -H "X-API-Key: vw_live_1234567890abcdef"
 ```
 
-## Best practices
+## Bonnes pratiques
 
 <AccordionGroup>
-  <Accordion title="Use HTTPS endpoints only">
-    VaultWares only delivers webhooks to HTTPS endpoints with valid TLS certificates. HTTP endpoints are not supported.
+  <Accordion title="Utiliser uniquement des points de terminaison HTTPS">
+    VaultWares ne livre les webhooks qu'à des points de terminaison HTTPS avec des certificats TLS valides. Les points de terminaison HTTP ne sont pas pris en charge.
   </Accordion>
-  <Accordion title="Respond quickly">
-    Return a 200 response as quickly as possible (before doing any processing). Process events asynchronously to avoid timeouts triggering retries. Use a queue (e.g., Redis, SQS) to decouple receipt from processing.
+  <Accordion title="Répondre rapidement">
+    Retournez une réponse 200 aussi rapidement que possible (avant d'effectuer tout traitement). Traitez les événements de manière asynchrone pour éviter que les délais d'attente ne déclenchent des nouvelles tentatives. Utilisez une file d'attente (ex. : Redis, SQS) pour découpler la réception du traitement.
   </Accordion>
-  <Accordion title="Handle duplicate deliveries">
-    Store processed event IDs and check for duplicates before processing. Webhook deliveries are at-least-once; in rare cases the same event may be delivered more than once.
+  <Accordion title="Gérer les livraisons en double">
+    Stockez les identifiants d'événements traités et vérifiez les doublons avant de traiter. Les livraisons de webhooks sont au moins une fois (at-least-once) ; dans de rares cas, le même événement peut être livré plus d'une fois.
   </Accordion>
-  <Accordion title="Rotate webhook secrets regularly">
+  <Accordion title="Rotation régulière des secrets de webhook">
     ```bash
     # Rotate webhook secret
     curl -X POST https://api.vaultwares.com/v1/webhooks/wh_abc123/rotate-secret \
       -H "X-API-Key: vw_live_1234567890abcdef"
     ```
-    Update your application with the new secret before the old one expires (a 24-hour overlap is provided).
+    Mettez à jour votre application avec le nouveau secret avant l'expiration de l'ancien (un chevauchement de 24 heures est fourni).
   </Accordion>
 </AccordionGroup>
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Authentication" icon="key" href="/api-reference/authentication">
-    API keys and security best practices
+  <Card title="Authentification" icon="key" href="/api-reference/authentication">
+    Clés API et meilleures pratiques de sécurité
   </Card>
-  <Card title="API endpoints" icon="code" href="/api-reference/endpoints">
-    Full REST API reference
+  <Card title="Points de terminaison API" icon="code" href="/api-reference/endpoints">
+    Référence complète de l'API REST
   </Card>
-  <Card title="SDKs" icon="book-code" href="/api-reference/sdk">
-    Webhook handling in official SDKs
+  <Card title="SDK" icon="book-code" href="/api-reference/sdk">
+    Gestion des webhooks dans les SDK officiels
   </Card>
-  <Card title="Security monitoring" icon="chart-line" href="/software/security-monitoring">
-    Route webhook events to VaultMonitor
+  <Card title="Surveillance de la sécurité" icon="chart-line" href="/software/security-monitoring">
+    Diriger les événements de webhook vers VaultMonitor
   </Card>
 </CardGroup>

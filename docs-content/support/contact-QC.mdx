@@ -1,106 +1,106 @@
 ---
-title: Contact support
-description: Get help from the VaultWares support team
+title: Contacter le support
+description: Obtenez de l'aide de l'équipe de support de VaultWares
 ---
 
-## Support channels
+## Canaux de support
 
 <CardGroup cols={2}>
-  <Card title="Email support" icon="envelope">
-    **support@vaultwares.com**  
-    Available 24/7  
-    Response time: Based on support tier
+  <Card title="Support par courriel" icon="envelope">
+    **support@vaultwares.com**
+    Disponible 24/7
+    Délai de réponse : Selon le niveau de support
   </Card>
-  <Card title="Phone support" icon="phone">
-    **+1-800-VAULT-WARE**  
-    Professional & Enterprise customers  
-    Mon-Fri 8AM-8PM EST
+  <Card title="Support téléphonique" icon="phone">
+    **+1-800-VAULT-WARE**
+    Clients professionnels et entreprises
+    Lun-Ven 8h-20h HAE
   </Card>
-  <Card title="Support portal" icon="ticket">
-    **portal.vaultwares.com/support**  
-    Submit and track tickets  
-    Access knowledge base
+  <Card title="Portail de support" icon="ticket">
+    **portal.vaultwares.com/support**
+    Soumettre et suivre les tickets
+    Accéder à la base de connaissances
   </Card>
-  <Card title="Live chat" icon="message">
-    **Available on website**  
-    Mon-Fri 9AM-6PM EST  
-    Instant assistance
+  <Card title="Chat en direct" icon="message">
+    **Disponible sur le site web**
+    Lun-Ven 9h-18h HAE
+    Assistance instantanée
   </Card>
 </CardGroup>
 
-## Support tiers
+## Niveaux de support
 
 <Tabs>
   <Tab title="Standard">
-    **Included with all purchases**
-    
-    - Email support
-    - 24-hour response time (business days)
-    - Access to knowledge base and documentation
-    - Community forum access
-    - Software updates and patches
-    
-    **Best for**: Individual users and small teams
+    **Inclus avec tous les achats**
+
+    - Support par courriel
+    - Délai de réponse de 24 heures (jours ouvrables)
+    - Accès à la base de connaissances et à la documentation
+    - Accès au forum communautaire
+    - Mises à jour et correctifs logiciels
+
+    **Idéal pour** : Utilisateurs individuels et petites équipes
   </Tab>
-  
-  <Tab title="Professional">
-    **$499/year per organization**
-    
-    - Email and phone support
-    - 4-hour response time (24/7)
-    - Priority ticket handling
-    - Remote assistance
-    - Quarterly product training webinars
-    - Early access to new features
-    
-    **Best for**: Growing businesses
+
+  <Tab title="Professionnel">
+    **$499/an par organisation**
+
+    - Support par courriel et téléphone
+    - Délai de réponse de 4 heures (24/7)
+    - Gestion prioritaire des tickets
+    - Assistance à distance
+    - Webinaires trimestriels de formation sur les produits
+    - Accès anticipé aux nouvelles fonctionnalités
+
+    **Idéal pour** : Entreprises en croissance
   </Tab>
-  
-  <Tab title="Enterprise">
-    **$2,499/year per organization**
-    
-    - 24/7 phone and email support
-    - 1-hour response time for critical issues
-    - Dedicated account manager
-    - On-site support available
-    - Custom training sessions
-    - Architecture and design consultation
-    - Direct access to engineering team
-    - Annual security review
-    
-    **Best for**: Large organizations with mission-critical deployments
+
+  <Tab title="Entreprise">
+    **$2,499/an par organisation**
+
+    - Support téléphonique et par courriel 24/7
+    - Délai de réponse d'1 heure pour les problèmes critiques
+    - Gestionnaire de compte dédié
+    - Support sur site disponible
+    - Sessions de formation personnalisées
+    - Consultation en architecture et conception
+    - Accès direct à l'équipe d'ingénierie
+    - Examen de sécurité annuel
+
+    **Idéal pour** : Grandes organisations avec des déploiements critiques pour la mission
   </Tab>
 </Tabs>
 
-## Before contacting support
+## Avant de contacter le support
 
-To help us assist you quickly, please have the following information ready:
+Pour nous aider à vous assister rapidement, veuillez avoir les informations suivantes prêtes :
 
 <Steps>
-  <Step title="Product information">
-    - Product name and model
-    - Software version or firmware version
-    - License key or serial number
+  <Step title="Informations sur le produit">
+    - Nom et modèle du produit
+    - Version du logiciel ou du micrologiciel
+    - Clé de licence ou numéro de série
   </Step>
-  <Step title="System information">
-    - Operating system and version
-    - Hardware specifications
-    - Network configuration (if applicable)
+  <Step title="Informations sur le système">
+    - Système d'exploitation et version
+    - Spécifications matérielles
+    - Configuration réseau (le cas échéant)
   </Step>
-  <Step title="Issue details">
-    - Detailed description of the problem
-    - Steps to reproduce the issue
-    - Error messages or codes
-    - Screenshots or logs (if available)
+  <Step title="Détails du problème">
+    - Description détaillée du problème
+    - Étapes pour reproduire le problème
+    - Messages ou codes d'erreur
+    - Captures d'écran ou journaux (si disponibles)
   </Step>
-  <Step title="Impact assessment">
-    - How many users are affected?
-    - Is this blocking critical operations?
-    - When did the issue start?
+  <Step title="Évaluation de l'impact">
+    - Combien d'utilisateurs sont affectés ?
+    - Est-ce que cela bloque des opérations critiques ?
+    - Quand le problème a-t-il commencé ?
   </Step>
 </Steps>
 
-## Collect diagnostic information
+## Collecter les informations de diagnostic
 
 ### Windows
 
@@ -109,7 +109,7 @@ To help us assist you quickly, please have the following information ready:
 vw-diagnostic --full-report --output C:\vw-diagnostic.zip
 
 # Collect system logs
-Get-EventLog -LogName Application -Source VaultWares* | 
+Get-EventLog -LogName Application -Source VaultWares* |
   Export-Csv C:\vw-logs.csv
 
 # Check service status
@@ -142,174 +142,174 @@ sudo journalctl -u vaultwares* --since "24 hours ago" > /tmp/vw-logs.txt
 sudo systemctl status vaultwares*
 ```
 
-## Submit a support ticket
+## Soumettre un ticket de support
 
 <Steps>
-  <Step title="Log in to support portal">
-    Visit [portal.vaultwares.com/support](https://portal.vaultwares.com/support) and log in with your account credentials.
+  <Step title="Se connecter au portail de support">
+    Visitez [portal.vaultwares.com/support](https://portal.vaultwares.com/support) et connectez-vous avec vos identifiants de compte.
   </Step>
-  <Step title="Create new ticket">
-    Click "New Ticket" and select the appropriate category:
-    - Technical issue
-    - License or billing
-    - Feature request
-    - General inquiry
+  <Step title="Créer un nouveau ticket">
+    Cliquez sur « Nouveau ticket » et sélectionnez la catégorie appropriée :
+    - Problème technique
+    - Licence ou facturation
+    - Demande de fonctionnalité
+    - Demande générale
   </Step>
-  <Step title="Provide details">
-    Fill in all required fields and attach diagnostic files if available.
+  <Step title="Fournir des détails">
+    Remplissez tous les champs obligatoires et joignez des fichiers de diagnostic si disponibles.
   </Step>
-  <Step title="Set priority">
-    - **Critical**: System down, data loss, security breach
-    - **High**: Major functionality impaired
-    - **Medium**: Minor functionality issue
-    - **Low**: General question or enhancement request
+  <Step title="Définir la priorité">
+    - **Critique** : Arrêt du système, perte de données, violation de sécurité
+    - **Élevée** : Fonctionnalité majeure altérée
+    - **Moyenne** : Problème de fonctionnalité mineur
+    - **Faible** : Question générale ou demande d'amélioration
   </Step>
-  <Step title="Submit and track">
-    Submit your ticket and track progress via email notifications or the support portal.
+  <Step title="Soumettre et suivre">
+    Soumettez votre ticket et suivez les progrès via les notifications par courriel ou le portail de support.
   </Step>
 </Steps>
 
-## Emergency support
+## Support d'urgence
 
-For **critical security incidents** or **system outages** affecting production environments:
+Pour les **incidents de sécurité critiques** ou les **pannes de système** affectant les environnements de production :
 
 <Warning>
-  **Emergency Hotline**: +1-800-VAULT-911  
-  Available 24/7 for Enterprise customers only
+  **Ligne d'urgence** : +1-800-VAULT-911
+  Disponible 24/7 pour les clients Entreprise uniquement
 </Warning>
 
-Emergency support is for:
-- Active security breaches
-- Complete system failures
-- Data loss incidents
-- Compliance violations
+Le support d'urgence est destiné à :
+- Violations de sécurité actives
+- Pannes système complètes
+- Incidents de perte de données
+- Violations de conformité
 
-## Regional support offices
+## Bureaux de support régionaux
 
-### North America
-**VaultWares Inc.**  
-123 Security Boulevard  
-San Francisco, CA 94105  
-Phone: +1-800-VAULT-WARE  
-Email: support-na@vaultwares.com
+### Amérique du Nord
+**VaultWares Inc.**
+123 Security Boulevard
+San Francisco, CA 94105
+Téléphone : +1-800-VAULT-WARE
+Courriel : support-na@vaultwares.com
 
 ### Europe
-**VaultWares Europe Ltd.**  
-45 Encryption Street  
-London, UK EC2A 4BX  
-Phone: +44-20-VAULT-WARE  
-Email: support-eu@vaultwares.com
+**VaultWares Europe Ltd.**
+45 Encryption Street
+London, UK EC2A 4BX
+Téléphone : +44-20-VAULT-WARE
+Courriel : support-eu@vaultwares.com
 
-### Asia Pacific
-**VaultWares Asia Pacific Pte Ltd.**  
-88 Cyber Security Road  
-Singapore 018956  
-Phone: +65-VAULT-WARE  
-Email: support-apac@vaultwares.com
+### Asie-Pacifique
+**VaultWares Asia Pacific Pte Ltd.**
+88 Cyber Security Road
+Singapore 018956
+Téléphone : +65-VAULT-WARE
+Courriel : support-apac@vaultwares.com
 
-## Community resources
+## Ressources communautaires
 
 <CardGroup cols={2}>
-  <Card title="Community forum" icon="users" href="https://community.vaultwares.com">
-    Ask questions and share knowledge with other users
+  <Card title="Forum communautaire" icon="users" href="https://community.vaultwares.com">
+    Posez des questions et partagez des connaissances avec d'autres utilisateurs
   </Card>
-  <Card title="Knowledge base" icon="book" href="https://kb.vaultwares.com">
-    Search articles, guides, and troubleshooting tips
+  <Card title="Base de connaissances" icon="book" href="https://kb.vaultwares.com">
+    Recherchez des articles, des guides et des astuces de dépannage
   </Card>
-  <Card title="Video tutorials" icon="video" href="https://youtube.com/vaultwares">
-    Watch step-by-step video guides
+  <Card title="Tutoriels vidéo" icon="video" href="https://youtube.com/vaultwares">
+    Regardez des guides vidéo étape par étape
   </Card>
-  <Card title="Developer docs" icon="code" href="/api-reference/authentication">
-    API documentation and integration guides
+  <Card title="Docs développeur" icon="code" href="/api-reference/authentication">
+    Documentation API et guides d'intégration
   </Card>
 </CardGroup>
 
-## Professional services
+## Services professionnels
 
-Need help with implementation, migration, or custom development?
+Vous avez besoin d'aide pour l'implémentation, la migration ou le développement personnalisé ?
 
 <CardGroup cols={2}>
-  <Card title="Implementation services" icon="rocket">
-    Expert deployment and configuration assistance
+  <Card title="Services d'implémentation" icon="rocket">
+    Assistance d'experts pour le déploiement et la configuration
   </Card>
-  <Card title="Security consulting" icon="shield-check">
-    Architecture review and security best practices
+  <Card title="Consultation en sécurité" icon="shield-check">
+    Examen de l'architecture et meilleures pratiques de sécurité
   </Card>
-  <Card title="Training programs" icon="graduation-cap">
-    On-site or virtual training for your team
+  <Card title="Programmes de formation" icon="graduation-cap">
+    Formation sur site ou virtuelle pour votre équipe
   </Card>
-  <Card title="Custom development" icon="code">
-    Custom integrations and feature development
+  <Card title="Développement personnalisé" icon="code">
+    Intégrations et développement de fonctionnalités personnalisés
   </Card>
 </CardGroup>
 
-**Contact**: services@vaultwares.com
+**Contact** : services@vaultwares.com
 
-## Feedback and suggestions
+## Commentaires et suggestions
 
-We value your feedback! Help us improve VaultWares products and services:
+Votre avis nous est précieux ! Aidez-nous à améliorer les produits et services de VaultWares :
 
-- **Feature requests**: Submit via support portal or email feedback@vaultwares.com
-- **Bug reports**: Use support portal with detailed reproduction steps
-- **Documentation feedback**: Click "Edit this page" at the bottom of any doc page
-- **Product reviews**: Share your experience on G2, Capterra, or Gartner Peer Insights
+- **Demandes de fonctionnalités** : Soumettre via le portail de support ou par courriel à feedback@vaultwares.com
+- **Rapports de bogues** : Utiliser le portail de support avec des étapes de reproduction détaillées
+- **Commentaires sur la documentation** : Cliquez sur « Modifier cette page » en bas de n'importe quelle page de documentation
+- **Avis sur les produits** : Partagez votre expérience sur G2, Capterra ou Gartner Peer Insights
 
-## Service level agreements (SLA)
+## Accords de niveau de service (SLA)
 
-### Response times
+### Délais de réponse
 
-| Priority | Standard | Professional | Enterprise |
+| Priorité | Standard | Professionnel | Entreprise |
 |----------|----------|--------------|------------|
-| Critical | 24 hours | 4 hours | 1 hour |
-| High | 48 hours | 8 hours | 4 hours |
-| Medium | 5 business days | 24 hours | 8 hours |
-| Low | 10 business days | 48 hours | 24 hours |
+| Critique | 24 heures | 4 heures | 1 heure |
+| Élevée | 48 heures | 8 heures | 4 heures |
+| Moyenne | 5 jours ouvrables | 24 heures | 8 heures |
+| Faible | 10 jours ouvrables | 48 heures | 24 heures |
 
-### Resolution targets
+### Délai de résolution cible
 
-| Priority | Target Resolution Time |
+| Priorité | Délai de résolution cible |
 |----------|----------------------|
-| Critical | 4 business hours (Enterprise: 2 hours) |
-| High | 2 business days (Enterprise: 1 day) |
-| Medium | 5 business days (Enterprise: 3 days) |
-| Low | 10 business days (Enterprise: 5 days) |
+| Critique | 4 heures ouvrables (Entreprise : 2 heures) |
+| Élevée | 2 jours ouvrables (Entreprise : 1 jour) |
+| Moyenne | 5 jours ouvrables (Entreprise : 3 jours) |
+| Faible | 10 jours ouvrables (Entreprise : 5 jours) |
 
 <Info>
-  Resolution times are targets, not guarantees. Complex issues may require additional time. We'll keep you informed throughout the process.
+  Les délais de résolution sont des objectifs, pas des garanties. Les problèmes complexes peuvent nécessiter plus de temps. Nous vous tiendrons informé tout au long du processus.
 </Info>
 
-## Escalation process
+## Processus d'escalade
 
-If you're not satisfied with the support you're receiving:
+Si vous n'êtes pas satisfait du support que vous recevez :
 
 <Steps>
-  <Step title="Contact your support engineer">
-    Discuss your concerns with the assigned support engineer.
+  <Step title="Contacter votre ingénieur de support">
+    Discutez de vos préoccupations avec l'ingénieur de support assigné.
   </Step>
-  <Step title="Request escalation">
-    Ask for your ticket to be escalated to a senior engineer or team lead.
+  <Step title="Demander une escalade">
+    Demandez que votre ticket soit escaladé à un ingénieur senior ou un chef d'équipe.
   </Step>
-  <Step title="Contact support manager">
-    Email support-manager@vaultwares.com with your ticket number.
+  <Step title="Contacter le gestionnaire de support">
+    Envoyez un courriel à support-manager@vaultwares.com avec votre numéro de ticket.
   </Step>
-  <Step title="Executive escalation">
-    For unresolved critical issues, contact: escalations@vaultwares.com
+  <Step title="Escalade exécutive">
+    Pour les problèmes critiques non résolus, contactez : escalations@vaultwares.com
   </Step>
 </Steps>
 
-## Additional resources
+## Ressources supplémentaires
 
 <CardGroup cols={2}>
-  <Card title="System status" icon="signal" href="https://status.vaultwares.com">
-    Check service availability and planned maintenance
+  <Card title="Statut du système" icon="signal" href="https://status.vaultwares.com">
+    Vérifier la disponibilité du service et la maintenance planifiée
   </Card>
-  <Card title="Security advisories" icon="shield-alert" href="https://security.vaultwares.com">
-    Latest security updates and advisories
+  <Card title="Avis de sécurité" icon="shield-alert" href="https://security.vaultwares.com">
+    Dernières mises à jour et avis de sécurité
   </Card>
-  <Card title="Release notes" icon="file-text" href="https://releases.vaultwares.com">
-    Product updates and changelogs
+  <Card title="Notes de version" icon="file-text" href="https://releases.vaultwares.com">
+    Mises à jour du produit et journaux de modifications
   </Card>
-  <Card title="API status" icon="activity" href="https://api-status.vaultwares.com">
-    API uptime and performance metrics
+  <Card title="Statut de l'API" icon="activity" href="https://api-status.vaultwares.com">
+    Temps de disponibilité et métriques de performance de l'API
   </Card>
 </CardGroup>

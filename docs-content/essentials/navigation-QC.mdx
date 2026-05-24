@@ -1,16 +1,16 @@
 ---
 title: 'Navigation'
-description: 'The navigation field in docs.json defines the pages that go in the navigation menu'
+description: 'Le champ de navigation dans docs.json définit les pages qui apparaissent dans le menu de navigation'
 icon: 'map'
 ---
 
-The navigation menu is the list of links on every website.
+Le menu de navigation est la liste de liens présente sur chaque site web.
 
-You will likely update `docs.json` every time you add a new page. Pages do not show up automatically.
+Vous devrez probablement mettre à jour `docs.json` chaque fois que vous ajoutez une nouvelle page. Les pages n'apparaissent pas automatiquement.
 
-## Navigation syntax
+## Syntaxe de navigation
 
-Our navigation syntax is recursive which means you can make nested navigation groups. You don't need to include `.mdx` in page names.
+Notre syntaxe de navigation est récursive, ce qui signifie que vous pouvez créer des groupes de navigation imbriqués. Vous n'avez pas besoin d'inclure `.mdx` dans les noms de pages.
 
 <CodeGroup>
 
@@ -54,15 +54,15 @@ Our navigation syntax is recursive which means you can make nested navigation gr
 
 </CodeGroup>
 
-## Folders
+## Dossiers
 
-Simply put your MDX files in folders and update the paths in `docs.json`.
+Il suffit de placer vos fichiers MDX dans des dossiers et de mettre à jour les chemins dans `docs.json`.
 
-For example, to have a page at `https://yoursite.com/your-folder/your-page` you would make a folder called `your-folder` containing an MDX file called `your-page.mdx`.
+Par exemple, pour avoir une page à l'adresse `https://yoursite.com/your-folder/your-page`, vous feriez un dossier nommé `your-folder` contenant un fichier MDX appelé `your-page.mdx`.
 
 <Warning>
 
-You cannot use `api` for the name of a folder unless you nest it inside another folder. Mintlify uses Next.js which reserves the top-level `api` folder for internal server calls. A folder name such as `api-reference` would be accepted.
+Vous ne pouvez pas utiliser `api` comme nom de dossier, à moins de l'imbriquer dans un autre dossier. Mintlify utilise Next.js, qui réserve le dossier `api` de niveau supérieur pour les appels de serveur internes. Un nom de dossier comme `api-reference` serait accepté.
 
 </Warning>
 
@@ -82,6 +82,6 @@ You cannot use `api` for the name of a folder unless you nest it inside another 
 }
 ```
 
-## Hidden pages
+## Pages cachées
 
-MDX files not included in `docs.json` will not show up in the sidebar but are accessible through the search bar and by linking directly to them.
+Les fichiers MDX qui ne sont pas inclus dans `docs.json` n'apparaîtront pas dans la barre latérale, mais ils sont accessibles via la barre de recherche et en y faisant un lien direct.

@@ -1,126 +1,126 @@
 ---
-title: Hardware security modules
-description: Enterprise-grade cryptographic key management and processing
+title: Modules de sécurité matériels
+description: Gestion et traitement cryptographique des clés de niveau entreprise
 ---
 
-## Overview
+## Vue d'ensemble
 
-VaultWares Hardware Security Modules (HSMs) provide dedicated, tamper-resistant hardware for cryptographic operations and key management. HSMs protect your most sensitive cryptographic keys and perform encryption, decryption, signing, and authentication operations at high speed.
+Les Modules de sécurité matériels (HSM) VaultWares fournissent un matériel dédié et résistant aux manipulations pour les opérations cryptographiques et la gestion des clés. Les HSM protègent vos clés cryptographiques les plus sensibles et effectuent les opérations de chiffrement, déchiffrement, de signature et d'authentification à haute vitesse.
 
-## Product lineup
+## Gamme de produits
 
 <CardGroup cols={2}>
   <Card title="VaultHSM PCIe" icon="microchip">
-    **Form factor**: PCIe x4 card  
-    **Performance**: 10,000 RSA ops/sec  
-    **Certification**: FIPS 140-2 Level 3
+    **Facteur de forme** : Carte PCIe x4
+    **Performance** : 10 000 opérations RSA/sec
+    **Certification** : FIPS 140-2 Niveau 3
   </Card>
   <Card title="VaultHSM Network" icon="network-wired">
-    **Form factor**: 1U rack-mount appliance  
-    **Performance**: 25,000 RSA ops/sec  
-    **Certification**: FIPS 140-2 Level 3
+    **Facteur de forme** : Appareil de type rack 1U
+    **Performance** : 25 000 opérations RSA/sec
+    **Certification** : FIPS 140-2 Niveau 3
   </Card>
   <Card title="VaultHSM Enterprise" icon="server">
-    **Form factor**: 2U rack-mount appliance  
-    **Performance**: 100,000 RSA ops/sec  
-    **Certification**: FIPS 140-3 Level 4
+    **Facteur de forme** : Appareil de type rack 2U
+    **Performance** : 100 000 opérations RSA/sec
+    **Certification** : FIPS 140-3 Niveau 4
   </Card>
   <Card title="VaultHSM Cloud" icon="cloud">
-    **Deployment**: Cloud-based HSM service  
-    **Performance**: Scalable on-demand  
-    **Certification**: FIPS 140-2 Level 3
+    **Déploiement** : Service HSM basé sur le cloud
+    **Performance** : Évolutif sur demande
+    **Certification** : FIPS 140-2 Niveau 3
   </Card>
 </CardGroup>
 
-## Key features
+## Fonctionnalités clés
 
-### Cryptographic operations
-- **Key generation**: RSA, ECC, AES, DES/3DES
-- **Digital signatures**: RSA, ECDSA, EdDSA
-- **Encryption/decryption**: Symmetric and asymmetric algorithms
-- **Hashing**: SHA-2, SHA-3 family
-- **Key derivation**: PBKDF2, HKDF, X9.63
-- **Random number generation**: True hardware RNG (TRNG)
+### Opérations cryptographiques
+- **Génération de clés** : RSA, ECC, AES, DES/3DES
+- **Signatures numériques** : RSA, ECDSA, EdDSA
+- **Chiffrement/déchiffrement** : Algorithmes symétriques et asymétriques
+- **Hachage** : Famille SHA-2, SHA-3
+- **Dérivation de clés** : PBKDF2, HKDF, X9.63
+- **Génération de nombres aléatoires** : RNG matériel véritable (TRNG)
 
-### Security features
-- **Tamper detection**: Physical intrusion triggers automatic key zeroization
-- **Secure key storage**: Keys never leave the HSM in plaintext
-- **Role-based access**: Separation of duties with multiple administrator roles
-- **Audit logging**: Comprehensive cryptographic operation logs
-- **Backup and recovery**: Secure key backup with M-of-N key splitting
-- **FIPS compliance**: Certified cryptographic modules
+### Fonctionnalités de sécurité
+- **Détection de sabotage** : L'intrusion physique déclenche la désactivation automatique des clés (zeroization)
+- **Stockage sécurisé des clés** : Les clés ne quittent jamais l'HSM en texte clair
+- **Accès basé sur les rôles** : Séparation des tâches avec plusieurs rôles d'administrateur
+- **Journalisation d'audit** : Journaux d'opérations cryptographiques complets
+- **Sauvegarde et récupération** : Sauvegarde sécurisée des clés avec division de clés M-sur-N
+- **Conformité FIPS** : Modules cryptographiques certifiés
 
-### High availability
-- **Clustering**: Active-active or active-passive configurations
-- **Load balancing**: Distribute operations across multiple HSMs
-- **Automatic failover**: Seamless operation during hardware failures
-- **Hot-swappable**: Replace failed units without downtime (network models)
+### Haute disponibilité
+- **Clustering** : Configurations actif-actif ou actif-passif
+- **Équilibrage de charge** : Distribution des opérations sur plusieurs HSM
+- **Basculement automatique** : Fonctionnement continu en cas de défaillance matérielle
+- **Remplacement à chaud** : Remplacer les unités défaillantes sans temps d'arrêt (modèles réseau)
 
-## Technical specifications
+## Spécifications techniques
 
 <Tabs>
   <Tab title="VaultHSM PCIe">
-    | Specification | Details |
+    | Spécification | Détails |
     |--------------|---------|
-    | Form factor | PCIe x4 low-profile card |
-    | Performance | 10,000 RSA-2048 ops/sec, 50,000 AES ops/sec |
-    | Algorithms | RSA, ECC, AES, 3DES, SHA-2/3 |
-    | Key storage | 10,000 keys |
-    | Power | 25W maximum |
-    | Operating temp | 0°C to 50°C |
-    | Dimensions | 167mm x 69mm (half-height) |
-    | Certification | FIPS 140-2 Level 3, Common Criteria EAL4+ |
-    | Warranty | 3 years |
+    | Facteur de forme | Carte à profil bas PCIe x4 |
+    | Performance | 10 000 opérations RSA-2048/sec, 50 000 opérations AES/sec |
+    | Algorithmes | RSA, ECC, AES, 3DES, SHA-2/3 |
+    | Stockage des clés | 10 000 clés |
+    | Alimentation | 25W maximum |
+    | Temp. de fonctionnement | 0°C à 50°C |
+    | Dimensions | 167mm x 69mm (demi-hauteur) |
+    | Certification | FIPS 140-2 Niveau 3, Common Criteria EAL4+ |
+    | Garantie | 3 ans |
   </Tab>
-  
+
   <Tab title="VaultHSM Network">
-    | Specification | Details |
+    | Spécification | Détails |
     |--------------|---------|
-    | Form factor | 1U rack-mount appliance |
-    | Performance | 25,000 RSA-2048 ops/sec, 100,000 AES ops/sec |
-    | Algorithms | RSA, ECC, AES, 3DES, SHA-2/3 |
-    | Key storage | 50,000 keys |
-    | Network | Dual Gigabit Ethernet |
-    | Power | Dual redundant PSU, 100-240V AC |
-    | Operating temp | 0°C to 40°C |
+    | Facteur de forme | Appareil de type rack 1U |
+    | Performance | 25 000 opérations RSA-2048/sec, 100 000 opérations AES/sec |
+    | Algorithmes | RSA, ECC, AES, 3DES, SHA-2/3 |
+    | Stockage des clés | 50 000 clés |
+    | Réseau | Double Gigabit Ethernet |
+    | Alimentation | Bloc d'alimentation redondant double, 100-240V AC |
+    | Temp. de fonctionnement | 0°C à 40°C |
     | Dimensions | 1U (44mm x 430mm x 550mm) |
-    | Certification | FIPS 140-2 Level 3, Common Criteria EAL4+ |
-    | Warranty | 5 years |
+    | Certification | FIPS 140-2 Niveau 3, Common Criteria EAL4+ |
+    | Garantie | 5 ans |
   </Tab>
-  
+
   <Tab title="VaultHSM Enterprise">
-    | Specification | Details |
+    | Spécification | Détails |
     |--------------|---------|
-    | Form factor | 2U rack-mount appliance |
-    | Performance | 100,000 RSA-2048 ops/sec, 500,000 AES ops/sec |
-    | Algorithms | RSA, ECC, AES, 3DES, SHA-2/3, post-quantum ready |
-    | Key storage | 500,000 keys |
-    | Network | Dual 10GbE, optional 25GbE |
-    | Power | Dual redundant PSU, 100-240V AC |
-    | Operating temp | 0°C to 40°C |
+    | Facteur de forme | Appareil de type rack 2U |
+    | Performance | 100 000 opérations RSA-2048/sec, 500 000 opérations AES/sec |
+    | Algorithmes | RSA, ECC, AES, 3DES, SHA-2/3, prêt pour post-quantique |
+    | Stockage des clés | 500 000 clés |
+    | Réseau | Double 10GbE, 25GbE optionnel |
+    | Alimentation | Bloc d'alimentation redondant double, 100-240V AC |
+    | Temp. de fonctionnement | 0°C à 40°C |
     | Dimensions | 2U (88mm x 430mm x 650mm) |
-    | Certification | FIPS 140-3 Level 4, Common Criteria EAL5+ |
-    | Warranty | 7 years |
+    | Certification | FIPS 140-3 Niveau 4, Common Criteria EAL5+ |
+    | Garantie | 7 ans |
   </Tab>
-  
+
   <Tab title="VaultHSM Cloud">
-    | Specification | Details |
+    | Spécification | Détails |
     |--------------|---------|
-    | Deployment | AWS, Azure, GCP, private cloud |
-    | Performance | Scalable, auto-scaling available |
-    | Algorithms | RSA, ECC, AES, 3DES, SHA-2/3 |
-    | Key storage | Unlimited (cloud-based) |
-    | Network | Cloud provider network |
-    | Availability | 99.99% SLA |
-    | Regions | Global availability |
-    | Certification | FIPS 140-2 Level 3 |
-    | Billing | Pay-per-use or reserved capacity |
+    | Déploiement | AWS, Azure, GCP, cloud privé |
+    | Performance | Évolutif, auto-scaling disponible |
+    | Algorithmes | RSA, ECC, AES, 3DES, SHA-2/3 |
+    | Stockage des clés | Illimité (basé sur le cloud) |
+    | Réseau | Réseau du fournisseur de cloud |
+    | Disponibilité | SLA de 99,99 % |
+    | Régions | Disponibilité mondiale |
+    | Certification | FIPS 140-2 Niveau 3 |
+    | Facturation | Paiement à l'usage ou capacité réservée |
   </Tab>
 </Tabs>
 
-## Use cases
+## Cas d'utilisation
 
-### PKI and certificate management
+### PKI et gestion des certificats
 ```bash
 # Generate CA root key
 vw-hsm generate-key \
@@ -137,7 +137,7 @@ vw-hsm sign \
   --algorithm sha256-rsa
 ```
 
-### Code signing
+### Signature de code
 ```bash
 # Sign application binary
 vw-hsm code-sign \
@@ -147,7 +147,7 @@ vw-hsm code-sign \
   --timestamp https://timestamp.vaultwares.com
 ```
 
-### Database encryption
+### Chiffrement de bases de données
 ```bash
 # Generate database master key
 vw-hsm generate-key \
@@ -163,7 +163,7 @@ vw-hsm encrypt \
   --output dek-encrypted.bin
 ```
 
-### SSL/TLS offloading
+### Déchargement SSL/TLS
 ```nginx
 # Nginx configuration with HSM
 ssl_engine vaulthsm;
@@ -172,22 +172,22 @@ ssl_certificate_key "pkcs11:token=VaultHSM;object=WebServer-Key";
 ssl_protocols TLSv1.2 TLSv1.3;
 ```
 
-## Setup and configuration
+## Installation et configuration
 
-### Initial setup
+### Installation initiale
 
 <Steps>
-  <Step title="Install hardware">
-    For PCIe models, install the card in an available PCIe slot. For network models, rack mount and connect power and network cables.
+  <Step title="Installer le matériel">
+    Pour les modèles PCIe, installez la carte dans un emplacement PCIe disponible. Pour les modèles réseau, montez-le dans un rack et connectez les câbles d'alimentation et de réseau.
   </Step>
-  <Step title="Initialize HSM">
+  <Step title="Initialiser l'HSM">
     ```bash
     vw-hsm init \
       --admin-pin <secure-pin> \
       --label "Production-HSM-01"
     ```
   </Step>
-  <Step title="Create security officer">
+  <Step title="Créer l'agent de sécurité">
     ```bash
     vw-hsm create-user \
       --role security-officer \
@@ -195,7 +195,7 @@ ssl_protocols TLSv1.2 TLSv1.3;
       --pin <so-pin>
     ```
   </Step>
-  <Step title="Configure network (network models)">
+  <Step title="Configurer le réseau (modèles réseau)">
     ```bash
     vw-hsm network-config \
       --ip 192.168.1.100 \
@@ -205,7 +205,7 @@ ssl_protocols TLSv1.2 TLSv1.3;
   </Step>
 </Steps>
 
-### High availability setup
+### Configuration de haute disponibilité
 
 ```bash
 # Configure HSM cluster
@@ -225,9 +225,9 @@ vw-hsm cluster sync \
   --all-keys
 ```
 
-## Key management
+## Gestion des clés
 
-### Key generation
+### Génération de clés
 
 <CodeGroup>
 ```bash RSA key pair
@@ -258,7 +258,7 @@ vw-hsm generate-key \
 ```
 </CodeGroup>
 
-### Key backup and recovery
+### Sauvegarde et récupération des clés
 
 ```bash
 # Create key backup with M-of-N key splitting
@@ -273,7 +273,7 @@ vw-hsm backup restore \
   --custodian-keys alice.key,bob.key,charlie.key
 ```
 
-### Key rotation
+### Rotation des clés
 
 ```bash
 # Rotate encryption key
@@ -283,9 +283,9 @@ vw-hsm key-rotate \
   --re-encrypt-data /data/encrypted/*
 ```
 
-## Integration examples
+## Exemples d'intégration
 
-### PKCS#11 integration
+### Intégration PKCS#11
 
 ```c
 // C/C++ application using PKCS#11
@@ -300,7 +300,7 @@ functions->C_Initialize(NULL);
 
 // Open session
 CK_SLOT_ID slot = 0;
-functions->C_OpenSession(slot, CKF_SERIAL_SESSION | CKF_RW_SESSION, 
+functions->C_OpenSession(slot, CKF_SERIAL_SESSION | CKF_RW_SESSION,
                          NULL, NULL, &session);
 
 // Login
@@ -314,7 +314,7 @@ functions->C_Logout(session);
 functions->C_CloseSession(session);
 ```
 
-### Java integration
+### Intégration Java
 
 ```java
 import java.security.*;
@@ -337,7 +337,7 @@ sig.update(data);
 byte[] signature = sig.sign();
 ```
 
-### OpenSSL integration
+### Intégration OpenSSL
 
 ```bash
 # OpenSSL configuration for VaultHSM
@@ -358,9 +358,9 @@ openssl dgst -sha256 -sign "pkcs11:token=VaultHSM;object=MyKey" \
   -out signature.bin data.txt
 ```
 
-## Monitoring and audit
+## Surveillance et audit
 
-### Enable audit logging
+### Activer la journalisation d'audit
 
 ```bash
 # Configure comprehensive audit logging
@@ -372,7 +372,7 @@ vw-hsm audit-config \
   --include-failed-attempts
 ```
 
-### View audit logs
+### Afficher les journaux d'audit
 
 ```bash
 # Query audit logs
@@ -384,7 +384,7 @@ vw-hsm audit-query \
   --format json > audit-report.json
 ```
 
-### Performance monitoring
+### Surveillance des performances
 
 ```bash
 # Real-time performance metrics
@@ -398,75 +398,75 @@ vw-hsm monitor \
 # Queue depth: 12
 ```
 
-## Compliance and certifications
+## Conformité et certifications
 
 <AccordionGroup>
   <Accordion title="FIPS 140-2/140-3">
-    VaultHSM products are certified to FIPS 140-2 Level 3 or FIPS 140-3 Level 4, providing:
-    - Cryptographic module validation
-    - Physical security mechanisms
-    - Role-based authentication
-    - Secure key management
+    Les produits VaultHSM sont certifiés FIPS 140-2 Niveau 3 ou FIPS 140-3 Niveau 4, offrant :
+    - Validation du module cryptographique
+    - Mécanismes de sécurité physique
+    - Authentification basée sur les rôles
+    - Gestion sécurisée des clés
   </Accordion>
-  
+
   <Accordion title="Common Criteria">
-    Evaluated and certified to Common Criteria EAL4+ or EAL5+ for security functionality.
+    Évalué et certifié Common Criteria EAL4+ ou EAL5+ pour la fonctionnalité de sécurité.
   </Accordion>
-  
+
   <Accordion title="PCI DSS">
-    Meets PCI DSS requirements for cryptographic key management and protection of cardholder data.
+    Respecte les exigences PCI DSS pour la gestion des clés cryptographiques et la protection des données des titulaires de cartes.
   </Accordion>
-  
+
   <Accordion title="eIDAS">
-    Qualified for use in eIDAS-compliant digital signature solutions (EU).
+    Qualifié pour être utilisé dans des solutions de signature numérique conformes à eIDAS (UE).
   </Accordion>
 </AccordionGroup>
 
-## Troubleshooting
+## Dépannage
 
 <AccordionGroup>
-  <Accordion title="HSM not detected">
-    - Verify power connections (network models)
-    - Check PCIe slot compatibility (PCIe models)
-    - Ensure drivers are installed: `vw-hsm-driver --version`
-    - Check system logs: `journalctl -u vaulthsm`
+  <Accordion title="HSM non détecté">
+    - Vérifier les connexions d'alimentation (modèles réseau)
+    - Vérifier la compatibilité du slot PCIe (modèles PCIe)
+    - S'assurer que les pilotes sont installés : `vw-hsm-driver --version`
+    - Vérifier les journaux système : `journalctl -u vaulthsm`
   </Accordion>
-  
-  <Accordion title="Performance degradation">
-    - Check CPU and memory usage on host
-    - Verify network latency (network models)
-    - Review queue depth: `vw-hsm status --verbose`
-    - Consider adding HSMs to cluster for load distribution
+
+  <Accordion title="Dégradation des performances">
+    - Vérifier l'utilisation du CPU et de la mémoire sur l'hôte
+    - Vérifier la latence réseau (modèles réseau)
+    - Examiner la profondeur de la file d'attente : `vw-hsm status --verbose`
+    - Envisager d'ajouter des HSM au cluster pour la distribution de charge
   </Accordion>
-  
-  <Accordion title="Authentication failures">
-    - Verify PIN/password is correct
-    - Check if account is locked: `vw-hsm user-status`
-    - Review audit logs for failed attempts
-    - Reset user PIN if necessary (requires SO privileges)
+
+  <Accordion title="Échecs d'authentification">
+    - Vérifier que le PIN/mot de passe est correct
+    - Vérifier si le compte est verrouillé : `vw-hsm user-status`
+    - Examiner les journaux d'audit pour les tentatives échouées
+    - Réinitialiser le PIN de l'utilisateur si nécessaire (nécessite des privilèges d'agent de sécurité)
   </Accordion>
-  
-  <Accordion title="Cluster synchronization issues">
-    - Verify network connectivity between cluster members
-    - Check time synchronization (NTP)
-    - Review cluster status: `vw-hsm cluster status`
-    - Force resync: `vw-hsm cluster sync --force`
+
+  <Accordion title="Problèmes de synchronisation du cluster">
+    - Vérifier la connectivité réseau entre les membres du cluster
+    - Vérifier la synchronisation temporelle (NTP)
+    - Examiner l'état du cluster : `vw-hsm cluster status`
+    - Forcer la resynchronisation : `vw-hsm cluster sync --force`
   </Accordion>
 </AccordionGroup>
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Installation guide" icon="download" href="/installation/hardware-installation">
-    Detailed HSM installation
+  <Card title="Guide d'installation" icon="download" href="/installation/hardware-installation">
+    Installation détaillée de l'HSM
   </Card>
-  <Card title="API reference" icon="code" href="/api-reference/endpoints">
-    Programmatic HSM management
+  <Card title="Référence API" icon="code" href="/api-reference/endpoints">
+    Gestion programmatique de l'HSM
   </Card>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    HSM security recommendations
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Recommandations de sécurité pour les HSM
   </Card>
   <Card title="Support" icon="headset" href="/support/contact">
-    Get technical assistance
+    Obtenir de l'assistance technique
   </Card>
 </CardGroup>

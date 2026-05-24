@@ -1,24 +1,24 @@
 ---
-title: "Dependency Policy"
-description: "Assistant protocol summary: Dependency Policy"
+title: "Politique de dépendances"
+description: "Résumé du protocole de l'assistant : Politique de dépendances"
 ---
 
-# Politique de dépendance
+# Politique de dépendances
 
-- ID de catégorie : `DEPENDENCY_POLICY`
-- Source du résumé : `instructions/summaries/DEPENDENCY_POLICY.md`
-- Source des notes : `instructions/notes/DEPENDENCY_POLICY.md`
+- ID de catégorie : `DEPENDENCY_POLICY`
+- Source de résumé : `instructions/summaries/DEPENDENCY_POLICY.md`
+- Source de notes : `instructions/notes/DEPENDENCY_POLICY.md`
 
-S'applique lorsque : l'ajout/la mise à jour de dépendances, de chaînes d'outils, de fichiers de verrouillage, de gestionnaires de packages.
-Faire :
-- N'ajoutez pas de nouvelles dépendances à moins que cela ne soit explicitement demandé ou clairement nécessaire et justifié.
+S'applique lors de : l'ajout ou la mise à jour de dépendances, de chaînes d'outils (toolchains), de fichiers de verrouillage (lockfiles), de gestionnaires de paquets.
+À faire :
+- Ne pas ajouter de nouvelles dépendances sauf si explicitement demandé ou clairement nécessaire et justifié.
 - Préférer les bibliothèques/utilitaires existants déjà utilisés dans le dépôt.
-- Enregistrez les changements de dépendance et pourquoi.
-Pas :
+- Enregistrer les changements de dépendances et pourquoi.
+À ne pas faire :
 - Introduire de nouveaux outils « juste parce que ».
-Fais quand :
-- Le changement de dépendance est minime, justifié et vérifié (build/tests).
+Terminé lorsque :
+- Le changement de dépendance est minimal, justifié et vérifié (build/tests).
 
-## Remarques
-Les assistants ne lisent les notes complètes que lorsqu'ils y sont explicitement invités : « lire les notes complètes ».
-Chemin des notes : `instructions/notes/DEPENDENCY_POLICY.md`
+## Notes
+Les assistants lisent les notes complètes seulement lorsqu'on le leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/DEPENDENCY_POLICY.md`

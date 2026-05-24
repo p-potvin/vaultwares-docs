@@ -1,17 +1,17 @@
 ---
-title: "Daily operations"
-description: "Routine tasks for managing VaultWares products"
+title: "Opérations quotidiennes"
+description: "Tâches de routine pour gérer les produits VaultWares"
 ---
 
-## Overview
+## Aperçu
 
-This guide covers the routine tasks that security and IT administrators should perform on a daily, weekly, and monthly basis to keep VaultWares deployments healthy and secure.
+Ce guide couvre les tâches de routine que les administrateurs de sécurité et de TI devraient effectuer quotidiennement, hebdomadairement et mensuellement pour maintenir les déploiements VaultWares en bonne santé et sécurisés.
 
-## Daily tasks
+## Tâches quotidiennes
 
-### Check device status
+### Vérifier l'état des appareils
 
-Start each day by verifying all managed hardware is online and healthy:
+Commencez chaque jour par vérifier que tout le matériel géré est en ligne et fonctionnel :
 
 ```bash
 # Check status of all managed devices
@@ -29,7 +29,7 @@ vw-admin status --all
 vw-admin alerts list --device VaultGate-01 --status open
 ```
 
-### Review security alerts
+### Examiner les alertes de sécurité
 
 ```bash
 # Review all open alerts from the last 24 hours
@@ -49,7 +49,7 @@ vw-monitor alerts acknowledge \
 vw-monitor alerts get --id alert_abc123 --verbose
 ```
 
-### Review audit logs
+### Examiner les journaux d'audit
 
 ```bash
 # Review privileged operations from the last 24 hours
@@ -72,7 +72,7 @@ vw-admin audit export \
   --output /var/log/vaultwares/audit-$(date +%Y%m%d).json
 ```
 
-### Check backup jobs
+### Vérifier les tâches de sauvegarde
 
 ```bash
 # Review backup job status from the last 24 hours
@@ -90,9 +90,9 @@ vw-backup jobs list \
 vw-backup jobs list --status failed --since 24h
 ```
 
-## User management
+## Gestion des utilisateurs
 
-### Onboard a new user
+### Intégrer un nouvel utilisateur
 
 ```bash
 # Create a new user account
@@ -118,26 +118,26 @@ vw-storage assign \
   --policy corporate-standard
 ```
 
-### Offboard a user
+### Retirer un utilisateur
 
 <Steps>
-  <Step title="Disable the account immediately">
+  <Step title="Désactiver le compte immédiatement">
     ```bash
     vw-admin user disable --user charlie@example.com --reason "Employment terminated"
     ```
   </Step>
-  <Step title="Revoke all active sessions">
+  <Step title="Révoquer toutes les sessions actives">
     ```bash
     vw-admin user revoke-sessions --user charlie@example.com
     ```
   </Step>
-  <Step title="Revoke API keys and certificates">
+  <Step title="Révoquer les clés API et les certificats">
     ```bash
     vw-admin user revoke-api-keys --user charlie@example.com
     vw-admin user revoke-certificates --user charlie@example.com
     ```
   </Step>
-  <Step title="Reclaim assigned hardware">
+  <Step title="Récupérer le matériel assigné">
     ```bash
     # Remotely lock the user's assigned VaultDrive
     vw-storage remote-lock --device VD-ENT-00247
@@ -146,7 +146,7 @@ vw-storage assign \
     vw-storage unassign --device VD-ENT-00247
     ```
   </Step>
-  <Step title="Archive audit records">
+  <Step title="Archiver les enregistrements d'audit">
     ```bash
     # Export user activity history for records retention
     vw-admin audit export \
@@ -157,7 +157,7 @@ vw-storage assign \
   </Step>
 </Steps>
 
-### Reset user MFA
+### Réinitialiser le MFA de l'utilisateur
 
 ```bash
 # Generate a temporary bypass code for a user who has lost their MFA device
@@ -171,9 +171,9 @@ vw-admin mfa generate-bypass \
 vw-admin mfa reset --user alice@example.com
 ```
 
-## Key management tasks
+## Tâches de gestion des clés
 
-### Check key expiration
+### Vérifier l'expiration des clés
 
 ```bash
 # List all keys expiring in the next 30 days
@@ -187,7 +187,7 @@ vw-hsm key list \
 # Code-Signing-Key-v2    ECC-P256   2022-06-01   2025-06-01   OK
 ```
 
-### Rotate a key
+### Rotation d'une clé
 
 ```bash
 # Generate a new key version
@@ -213,7 +213,7 @@ vw-admin tls install \
 vw-hsm key deprecate --label "TLS-WebServer-Key-v3"
 ```
 
-### Verify HSM cluster health
+### Vérifier la santé du cluster HSM
 
 ```bash
 # Check HSM cluster status
@@ -229,7 +229,7 @@ vw-hsm cluster status --verbose
 # Keys synchronized: Yes (last sync: 10 seconds ago)
 ```
 
-## Weekly tasks
+## Tâches hebdomadaires
 
 ```bash
 # Generate weekly security summary report
@@ -255,7 +255,7 @@ vw-admin access-review generate \
 vw-admin updates check --all
 ```
 
-## Monthly tasks
+## Tâches mensuelles
 
 ```bash
 # Generate compliance report
@@ -284,19 +284,19 @@ vw-admin audit archive \
   --encrypt-key hsm:AuditLog-Signing-Key
 ```
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Maintenance guide" icon="wrench" href="/guides/maintenance">
-    Firmware updates and scheduled maintenance
+  <Card title="Guide de maintenance" icon="wrench" href="/guides/maintenance">
+    Mises à jour du micrologiciel et maintenance planifiée
   </Card>
-  <Card title="Troubleshooting" icon="magnifying-glass" href="/guides/troubleshooting">
-    Diagnose and resolve common issues
+  <Card title="Dépannage" icon="magnifying-glass" href="/guides/troubleshooting">
+    Diagnostiquer et résoudre les problèmes courants
   </Card>
-  <Card title="Best practices" icon="star" href="/guides/best-practices">
-    Security recommendations and policies
+  <Card title="Meilleures pratiques" icon="star" href="/guides/best-practices">
+    Recommandations et politiques de sécurité
   </Card>
-  <Card title="API reference" icon="code" href="/api-reference/endpoints">
-    Automate operational tasks via API
+  <Card title="Référence API" icon="code" href="/api-reference/endpoints">
+    Automatiser les tâches opérationnelles via l'API
   </Card>
 </CardGroup>

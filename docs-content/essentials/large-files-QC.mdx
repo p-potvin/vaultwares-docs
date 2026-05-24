@@ -1,32 +1,32 @@
 ---
-title: 'Large Files & Heavy Assets'
-description: 'Guidelines for handling heavy files, AI models, and large datasets across VaultWares projects'
+title: 'Fichiers volumineux et actifs lourds'
+description: 'Lignes directrices pour la gestion des fichiers lourds, des modèles d\'IA et des grands ensembles de données dans les projets VaultWares'
 icon: 'file-import'
 ---
 
-To ensure system stability and predictable performance, all VaultWares projects handling large files (AI models, datasets, video blobs, etc.) must adhere to these guidelines.
+Pour assurer la stabilité du système et une performance prévisible, tous les projets VaultWares qui gèrent des fichiers volumineux (modèles d\'IA, ensembles de données, blobs vidéo, etc.) doivent adhérer à ces lignes directrices.
 
-## 1. Resource Management
+## 1. Gestion des ressources
 
-### Warm Loading
-Any project that loads heavy assets into memory must implement a "Warm Loading" phase. This establishes the necessary hardware context (e.g., CUDA) and ensures that memory is correctly allocated before high-throughput processing begins.
+### Chargement progressif (Warm Loading)
+Tout projet qui charge des actifs lourds en mémoire doit implémenter une phase de « Chargement progressif ». Cela établit le contexte matériel nécessaire (ex. : CUDA) et garantit que la mémoire est correctement allouée avant que le traitement à haut débit ne commence.
 
-### Cache Flushing
-Explicitly clear hardware and software caches between intensive tasks. 
-- **Python**: Use `torch.cuda.empty_cache()` and `gc.collect()`.
-- **Rust/Node**: Ensure explicit drops or manual memory clearing where applicable.
+### Vidage du cache (Cache Flushing)
+Videz explicitement les caches matériels et logiciels entre les tâches intensives.
+- **Python**: Utilisez `torch.cuda.empty_cache()` et `gc.collect()`.
+- **Rust/Node**: Assurez-vous de décharger explicitement ou de vider manuellement la mémoire lorsque cela est applicable.
 
-## 2. Safety Thresholds
+## 2. Seuils de sécurité
 
-### Download Approval
-No agent or automated process may download a file larger than **500MB** without explicit user approval in the current conversation. 
+### Approbation de téléchargement
+Aucun agent ou processus automatisé ne peut télécharger un fichier de plus de **500 Mo** sans l'approbation explicite de l'utilisateur dans la conversation actuelle.
 
 > [!IMPORTANT]
-> If a task requires a large download, the agent must pause and present the file size and source to the user.
+> Si une tâche nécessite un téléchargement volumineux, l'agent doit faire une pause et présenter la taille du fichier et la source à l'utilisateur.
 
-## 3. Visual Feedback
+## 3. Rétroaction visuelle
 
-Every long-running operation involving large files must provide a robust, real-time visual cue to the user. 
+Toute opération de longue durée impliquant des fichiers volumineux doit fournir un indicateur visuel robuste et en temps réel à l'utilisateur.
 
-- **CLI Implementation**: Use `tqdm` (Python), `indicatif` (Rust), or equivalent high-fidelity progress bars.
-- **GUI Implementation**: Follow the [Visual Cues](/vault-themes/visual-cues) guidelines in the Vault Themes system.
+- **Implémentation CLI**: Utilisez `tqdm` (Python), `indicatif` (Rust), ou des barres de progression équivalentes de haute fidélité.
+- **Implémentation GUI**: Suivez les directives des [Indices visuels](/vault-themes/visual-cues) dans le système Vault Themes.

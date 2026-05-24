@@ -1,140 +1,140 @@
 ---
-title: System requirements
-description: Hardware and software requirements for VaultWares products
+title: Exigences système
+description: Exigences matérielles et logicielles pour les produits VaultWares
 ---
 
-## Hardware requirements
+## Exigences matérielles
 
-### Minimum specifications
+### Spécifications minimales
 
 <AccordionGroup>
-  <Accordion title="Encrypted storage devices">
-    - **Interface**: USB 3.0 or higher
-    - **Power**: USB-powered (no external power required)
-    - **Operating temperature**: 0°C to 45°C
-    - **Storage temperature**: -20°C to 85°C
+  <Accordion title="Périphériques de stockage chiffré">
+    - **Interface**: USB 3.0 ou supérieur
+    - **Alimentation**: Alimenté par USB (aucune alimentation externe requise)
+    - **Température de fonctionnement**: 0°C à 45°C
+    - **Température de stockage**: -20°C à 85°C
   </Accordion>
 
-  <Accordion title="Hardware security modules (HSM)">
-    - **Form factor**: PCIe x4 or network-attached
-    - **Power**: 25W maximum
-    - **Cooling**: Active cooling required for rack-mounted units
-    - **Network**: Gigabit Ethernet (for network HSMs)
+  <Accordion title="Modules de sécurité matériels (HSM)">
+    - **Format**: PCIe x4 ou connecté au réseau
+    - **Alimentation**: 25W maximum
+    - **Refroidissement**: Refroidissement actif requis pour les unités montées en rack
+    - **Réseau**: Gigabit Ethernet (pour les HSM réseau)
   </Accordion>
 
-  <Accordion title="Biometric devices">
-    - **Interface**: USB 2.0 or higher
-    - **Power**: USB-powered
-    - **Sensor resolution**: 500 DPI minimum
-    - **Operating temperature**: 10°C to 35°C
+  <Accordion title="Périphériques biométriques">
+    - **Interface**: USB 2.0 ou supérieur
+    - **Alimentation**: Alimenté par USB
+    - **Résolution du capteur**: 500 DPI minimum
+    - **Température de fonctionnement**: 10°C à 35°C
   </Accordion>
 
-  <Accordion title="Network security appliances">
-    - **Rack space**: 1U or 2U rack-mountable
-    - **Power**: Dual redundant PSU (100-240V AC)
-    - **Network**: Dual Gigabit Ethernet minimum
-    - **Storage**: 256GB SSD minimum
+  <Accordion title="Appareils de sécurité réseau">
+    - **Espace en rack**: 1U ou 2U montable en rack
+    - **Alimentation**: Bloc d'alimentation redondant double (100-240V CA)
+    - **Réseau**: Double Gigabit Ethernet minimum
+    - **Stockage**: 256GB SSD minimum
   </Accordion>
 </AccordionGroup>
 
-## Software requirements
+## Exigences logicielles
 
-### Operating system compatibility
+### Compatibilité du système d'exploitation
 
 <Tabs>
   <Tab title="Windows">
-    - Windows 10 (64-bit) or later
-    - Windows Server 2016 or later
-    - .NET Framework 4.8 or later
-    - 4GB RAM minimum (8GB recommended)
-    - 500MB available disk space
+    - Windows 10 (64 bits) ou ultérieur
+    - Windows Server 2016 ou ultérieur
+    - .NET Framework 4.8 ou ultérieur
+    - 4 Go de RAM minimum (8 Go recommandé)
+    - 500 Mo d'espace disque disponible
   </Tab>
 
   <Tab title="macOS">
-    - macOS 11 (Big Sur) or later
-    - 4GB RAM minimum (8GB recommended)
-    - 500MB available disk space
-    - Administrator privileges for installation
+    - macOS 11 (Big Sur) ou ultérieur
+    - 4 Go de RAM minimum (8 Go recommandé)
+    - 500 Mo d'espace disque disponible
+    - Privilèges d'administrateur pour l'installation
   </Tab>
 
   <Tab title="Linux">
-    - Ubuntu 20.04 LTS or later
-    - Red Hat Enterprise Linux 8 or later
-    - CentOS 8 or later
-    - Debian 11 or later
-    - 4GB RAM minimum (8GB recommended)
-    - 500MB available disk space
-    - Root access for installation
+    - Ubuntu 20.04 LTS ou ultérieur
+    - Red Hat Enterprise Linux 8 ou ultérieur
+    - CentOS 8 ou ultérieur
+    - Debian 11 ou ultérieur
+    - 4 Go de RAM minimum (8 Go recommandé)
+    - 500 Mo d'espace disque disponible
+    - Accès root pour l'installation
   </Tab>
 </Tabs>
 
-### Network requirements
+### Exigences réseau
 
-- **Bandwidth**: 10 Mbps minimum (100 Mbps recommended)
-- **Ports**: HTTPS (443), SSH (22), custom ports for API access
-- **Firewall**: Outbound HTTPS access for license validation and updates
-- **DNS**: Functional DNS resolution required
+- **Bande passante**: 10 Mbps minimum (100 Mbps recommandé)
+- **Ports**: HTTPS (443), SSH (22), ports personnalisés pour l'accès API
+- **Pare-feu**: Accès HTTPS sortant pour la validation des licences et les mises à jour
+- **DNS**: Résolution DNS fonctionnelle requise
 
-### Browser compatibility
+### Compatibilité du navigateur
 
-For web-based management interfaces:
+Pour les interfaces de gestion basées sur le web :
 
-- Google Chrome 90 or later
-- Mozilla Firefox 88 or later
-- Microsoft Edge 90 or later
-- Safari 14 or later
+- Google Chrome 90 ou ultérieur
+- Mozilla Firefox 88 ou ultérieur
+- Microsoft Edge 90 ou ultérieur
+- Safari 14 ou ultérieur
 
-## Database requirements
+## Exigences de base de données
 
-For enterprise deployments with centralized management:
+Pour les déploiements d'entreprise avec gestion centralisée :
 
-- **PostgreSQL**: 12 or later
-- **MySQL**: 8.0 or later
-- **Microsoft SQL Server**: 2017 or later
-- **Oracle Database**: 19c or later
+- **PostgreSQL**: 12 ou ultérieur
+- **MySQL**: 8.0 ou ultérieur
+- **Microsoft SQL Server**: 2017 ou ultérieur
+- **Oracle Database**: 19c ou ultérieur
 
-## Virtualization support
+## Prise en charge de la virtualisation
 
-VaultWares software is compatible with:
+Le logiciel VaultWares est compatible avec :
 
-- VMware vSphere 7.0 or later
-- Microsoft Hyper-V (Windows Server 2016 or later)
-- KVM (kernel 4.15 or later)
-- Docker containers (for microservices deployment)
+- VMware vSphere 7.0 ou ultérieur
+- Microsoft Hyper-V (Windows Server 2016 ou ultérieur)
+- KVM (noyau 4.15 ou ultérieur)
+- Conteneurs Docker (pour le déploiement de microservices)
 
 <Warning>
-  Hardware security modules (HSMs) require direct hardware access and cannot be virtualized. Use PCIe passthrough or network-attached HSMs for virtualized environments.
+  Les modules de sécurité matériels (HSM) nécessitent un accès matériel direct et ne peuvent pas être virtualisés. Utilisez le passage PCIe ou des HSM connectés au réseau pour les environnements virtualisés.
 </Warning>
 
-## Cloud platform support
+## Prise en charge des plateformes cloud
 
 - Amazon Web Services (AWS)
 - Microsoft Azure
 - Google Cloud Platform (GCP)
-- Private cloud environments
+- Environnements cloud privés
 
-## Additional requirements
+## Exigences supplémentaires
 
-### For API integration
+### Pour l'intégration API
 
-- TLS 1.2 or later
-- Valid SSL/TLS certificates
-- API key management system
-- JSON parsing capabilities
+- TLS 1.2 ou ultérieur
+- Certificats SSL/TLS valides
+- Système de gestion des clés API
+- Capacités d'analyse JSON
 
-### For compliance features
+### Pour les fonctionnalités de conformité
 
-- Network Time Protocol (NTP) for accurate timestamping
-- Syslog server for centralized logging
-- SIEM integration capabilities
+- Protocole de temps réseau (NTP) pour l'horodatage précis
+- Serveur Syslog pour la journalisation centralisée
+- Capacités d'intégration SIEM
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Quick installation" icon="download" href="/getting-started/quick-installation">
-    Install VaultWares products
+  <Card title="Installation rapide" icon="download" href="/getting-started/quick-installation">
+    Installer les produits VaultWares
   </Card>
-  <Card title="Hardware products" icon="microchip" href="/hardware/encrypted-storage">
-    Explore hardware solutions
+  <Card title="Produits matériels" icon="microchip" href="/hardware/encrypted-storage">
+    Explorer les solutions matérielles
   </Card>
 </CardGroup>

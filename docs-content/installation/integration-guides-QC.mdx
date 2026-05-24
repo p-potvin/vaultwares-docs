@@ -1,30 +1,30 @@
 ---
-title: "Integration guides"
-description: "Integrate VaultWares with your existing infrastructure"
+title: "Guides d'intégration"
+description: "Intégrer VaultWares à votre infrastructure existante"
 ---
 
-## Overview
+## Aperçu
 
-VaultWares products are designed to integrate with the identity, security, and cloud infrastructure you already have. This guide covers the most common integration scenarios.
+Les produits VaultWares sont conçus pour s'intégrer à l'identité, à la sécurité et à l'infrastructure cloud que vous possédez déjà. Ce guide couvre les scénarios d'intégration les plus courants.
 
 <CardGroup cols={3}>
   <Card title="Active Directory" icon="sitemap" href="#active-directory">
-    Sync users and groups from AD
+    Synchroniser les utilisateurs et groupes depuis AD
   </Card>
   <Card title="LDAP" icon="server" href="#ldap">
-    Generic LDAP directory integration
+    Intégration générique de répertoire LDAP
   </Card>
   <Card title="SAML / SSO" icon="key" href="#saml--sso">
-    Federated authentication
+    Authentification fédérée
   </Card>
   <Card title="SIEM" icon="chart-line" href="#siem-integration">
-    Security event forwarding
+    Transfert d'événements de sécurité
   </Card>
   <Card title="PKI" icon="certificate" href="#pki-integration">
-    Certificate authority integration
+    Intégration d'autorité de certification
   </Card>
   <Card title="Cloud" icon="cloud" href="#cloud-integration">
-    AWS, Azure, and GCP
+    AWS, Azure et GCP
   </Card>
 </CardGroup>
 
@@ -32,15 +32,15 @@ VaultWares products are designed to integrate with the identity, security, and c
 
 ## Active Directory
 
-### Service account requirements
+### Exigences du compte de service
 
-Create a dedicated service account for VaultWares with the following minimum permissions:
+Créez un compte de service dédié pour VaultWares avec les permissions minimales suivantes :
 
 | Permission | Scope | Purpose |
 |-----------|-------|---------|
-| `Read` | All user objects in target OU | User enumeration and sync |
-| `Read` | All group objects in target OU | Group membership sync |
-| `Read` | Domain password policy | Password policy enforcement |
+| `Read` | Tous les objets utilisateur dans l'OU cible | Énumération et synchronisation des utilisateurs |
+| `Read` | Tous les objets groupe dans l'OU cible | Synchronisation des appartenances aux groupes |
+| `Read` | Politique de mot de passe du domaine | Application de la politique de mot de passe |
 
 ```powershell
 # Create the VaultWares service account
@@ -93,7 +93,7 @@ vw-admin ad map-group \
 
 ## LDAP
 
-### OpenLDAP configuration
+### Configuration OpenLDAP
 
 ```bash
 # Configure OpenLDAP integration
@@ -120,14 +120,14 @@ vw-admin ldap test-user --username alice
 ### Okta
 
 <Steps>
-  <Step title="Create a SAML app in Okta">
-    1. Log into your Okta admin console
-    2. Navigate to **Applications** → **Create App Integration** → **SAML 2.0**
-    3. Set the **Single sign-on URL** to `https://vaultaccess.corp.example.com/saml/acs`
-    4. Set the **Audience URI (SP Entity ID)** to `https://vaultaccess.corp.example.com/saml/sp`
-    5. Configure attribute mappings:
+  <Step title="Créer une application SAML dans Okta">
+    1. Connectez-vous à votre console d'administration Okta
+    2. Naviguez vers **Applications** → **Créer une intégration d'application** → **SAML 2.0**
+    3. Définissez l'**URL de connexion unique** sur `https://vaultaccess.corp.example.com/saml/acs`
+    4. Définissez l'**URI de l'audience (ID d'entité SP)** sur `https://vaultaccess.corp.example.com/saml/sp`
+    5. Configurez les mappages d'attributs :
 
-    | Okta Attribute | VaultWares Attribute |
+    | Attribut Okta | Attribut VaultWares |
     |---|---|
     | `user.login` | `username` |
     | `user.email` | `email` |
@@ -135,10 +135,10 @@ vw-admin ldap test-user --username alice
     | `user.lastName` | `lastName` |
     | `user.groups` | `groups` |
   </Step>
-  <Step title="Download IdP metadata">
-    Download the IdP metadata XML from Okta and save it to `/etc/vaultwares/saml/okta-metadata.xml`.
+  <Step title="Télécharger les métadonnées IdP">
+    Téléchargez le XML des métadonnées IdP d'Okta et enregistrez-le dans `/etc/vaultwares/saml/okta-metadata.xml`.
   </Step>
-  <Step title="Configure VaultAccess SAML">
+  <Step title="Configurer VaultAccess SAML">
     ```bash
     vw-admin sso configure-saml \
       --idp-metadata /etc/vaultwares/saml/okta-metadata.xml \
@@ -149,7 +149,7 @@ vw-admin ldap test-user --username alice
       --name-id-format emailAddress
     ```
   </Step>
-  <Step title="Map SAML groups to VaultAccess roles">
+  <Step title="Mapper les groupes SAML aux rôles VaultAccess">
     ```bash
     vw-admin sso map-group \
       --saml-group "VaultWares-Admins" \
@@ -259,7 +259,7 @@ vw-admin pki configure \
   --ttl 8760h
 ```
 
-### ACME (Let's Encrypt / internal CA)
+### ACME (Let's Encrypt / CA interne)
 
 ```bash
 # Configure ACME for automatic TLS certificate renewal
@@ -318,19 +318,19 @@ vw-admin cloud configure gcp \
   --kms-key-id backup-encryption-key
 ```
 
-## Next steps
+## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Initial configuration" icon="sliders" href="/installation/initial-configuration">
-    Complete post-installation setup
+  <Card title="Configuration initiale" icon="sliders" href="/installation/initial-configuration">
+    Compléter la configuration post-installation
   </Card>
-  <Card title="Access control" icon="shield-halved" href="/software/access-control">
-    Configure RBAC, ABAC, and SSO policies
+  <Card title="Contrôle d'accès" icon="shield-halved" href="/software/access-control">
+    Configurer les politiques RBAC, ABAC et SSO
   </Card>
-  <Card title="Security monitoring" icon="chart-line" href="/software/security-monitoring">
-    Configure VaultMonitor SIEM forwarding
+  <Card title="Surveillance de la sécurité" icon="chart-line" href="/software/security-monitoring">
+    Configurer le transfert SIEM VaultMonitor
   </Card>
-  <Card title="Daily operations" icon="calendar" href="/guides/daily-operations">
-    Operational tasks and maintenance
+  <Card title="Opérations quotidiennes" icon="calendar" href="/guides/daily-operations">
+    Tâches opérationnelles et maintenance
   </Card>
 </CardGroup>
