@@ -3,7 +3,7 @@ This file is the single entrypoint for VaultWares company protocols.
 Default read target: summaries. Notes are human reference and are read only when the user explicitly says: read full notes.
 Protocol categories are executed only when relevant.
 ## ROUTER routine (always, first)
-1) Resume shortcut: if the prior assistant reply contains a VW_STATE block with resume.resumeMode=true, resume from that state:
+1) Resume shortcut: if the prior assistant reply contains a `VW_STATE_REF` (resumeId + ledger event path/hash), load VW_STATE from the referenced ledger record and resume from that state:
 - Do not re-run routing, routines, or estimates; use the stored routerCategories/protocolsSelected/overlaysApplied/estimate as-is.
 - Set VW_STATE.interview.completed=true and continue execution.
 - Do not re-trigger the interview gate again for the same resumeId.
@@ -17,7 +17,7 @@ Protocol categories are executed only when relevant.
 - If estimated_output_tokens >= 8000: add overlay LONG_RUNNING_TASKS (even if other protocols already match).
 ## Other routines (run only when relevant)
 - Tools/routines (optional): if an MCP routine exists (credit optimization, batching, etc.), decide whether to run it. This does not change which protocols apply.
-- Ledger (always, last step before replying): record completed work in agent-ledger. If you cannot access agent-ledger, state that in the reply and include a compact ledger block for later capture.
+- Ledger (always, last step before replying): record completed work in agent-ledger. If you cannot access agent-ledger, state that in the reply and include only a compact ledger summary plus a VW_STATE_REF-style pointer; do not paste VW_STATE into chat unless the user explicitly asks.
 ## Protocol categories (scan all; select relevant; read summaries in this order)
 | Category | Applies when | Summary | Notes | Keywords (non-exclusive) |
 |---|---|---|---|---|

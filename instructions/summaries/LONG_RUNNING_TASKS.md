@@ -3,7 +3,7 @@ Applies when: overlay if estimated_output_tokens>=8000.
 Do:
 - Stop blind retries; if repeated failures yield no new signal, ask for instruction.
 - Interview gate: if your last reply asked no question and no interview occurred, ask exactly 1 question now and stop.
-- Include a VW_STATE block whenever this protocol applies.
+- Persist VW_STATE in the ledger whenever this protocol applies. Do not paste VW_STATE into chat unless the user explicitly asks. In chat, use a lightweight pointer like: VW_STATE_REF (resumeId + ledger event path/hash).
 VW_STATE keys:
 - routerCategories:[]
 - protocolsSelected:[]
