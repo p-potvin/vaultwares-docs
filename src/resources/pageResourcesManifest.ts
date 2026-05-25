@@ -466,6 +466,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "operations__backups"
   },
   {
+    "routePath": "/operations/deployment-flow",
+    "routeKey": "operations/deployment-flow",
+    "sectionKey": "operations",
+    "resourceKey": "operations__deployment-flow"
+  },
+  {
     "routePath": "/operations/jira-sync",
     "routeKey": "operations/jira-sync",
     "sectionKey": "operations",

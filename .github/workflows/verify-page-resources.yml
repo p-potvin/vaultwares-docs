@@ -1,15 +1,6 @@
 name: Verify Page Resources
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - docs-content/**
-      - scripts/generate-doc-page-resources.mjs
-      - src/resources/**
-      - package.json
-      - package-lock.json
-      - .github/workflows/verify-page-resources.yml
   pull_request:
     paths:
       - docs-content/**
@@ -18,6 +9,7 @@ on:
       - package.json
       - package-lock.json
       - .github/workflows/verify-page-resources.yml
+  workflow_dispatch:
 
 jobs:
   generated-page-resources:

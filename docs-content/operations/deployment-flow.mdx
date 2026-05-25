@@ -1,0 +1,49 @@
+---
+title: "Deployment flow (Private)"
+description: "Canonical CI/CD model: GitHub webhooks → vw-webhookd → tailnet-only runner on greencloud-vps. No GitHub Actions deploys."
+---
+
+# Deployment flow (Private)
+
+This page is the **source of truth** for how deployments happen for VaultWares + Prom‑King sites.
+
+## Principles (mandatory)
+
+- **No GitHub Actions deployments.** A `git push` to `main` must not run build/deploy jobs inside GitHub.
+- **GitHub is only an event source.** The only GitHub-side behavior on `main` pushes is a **signed webhook delivery**.
+- **Deploy executes inside the tailnet** on `greencloud-vps` (the deployment authority).
+
+## Machines / endpoints
+
+- **Deployment authority:** `greencloud-vps` (Public `173.249.194.15`, Tailnet `100.73.93.84`)
+- **GitHub webhook receiver (public, required by GitHub):** `https://hooks.vaultwares.ca/github`
+  - nginx → `vw-webhookd` on `127.0.0.1:9033`
+- **Tailscale webhook handler (tailnet-local):** `vaultwares-hooks` on `127.0.0.1:8787`
+
+## End-to-end flow
+
+```text
+Developer pushes to GitHub (main)
+  → GitHub delivers signed webhook event (push)
+  → https://hooks.vaultwares.ca/github (public)
+  → nginx reverse proxy
+  → vw-webhookd (127.0.0.1:9033) verifies signature + writes event payload
+  → vw-webhookd triggers the deployment runner inside the tailnet
+       (via vaultwares-hooks / internal job trigger)
+  → runner pulls repo + deploys on greencloud-vps
+```
+
+## Repository requirements
+
+- Repos **must not** auto-deploy via `.github/workflows/*` on `push` to `main`.
+- PR-only checks are allowed, but any **deployment** must be webhook-driven.
+- Each repo must have a GitHub webhook configured to `https://hooks.vaultwares.ca/github`
+  (see `operations/project-bootstrap`).
+
+## Secrets / verification
+
+- `VW_GITHUB_WEBHOOK_SECRET` lives in VaultWarden (`https://warden.vaultwares.ca`, tailnet-only) and is provisioned on `greencloud-vps`.
+- Verify delivery + processing by checking:
+  - `https://hooks.vaultwares.ca/health` returns `200`
+  - `vw-webhookd` logs on `greencloud-vps` (and the downstream runner logs)
+
