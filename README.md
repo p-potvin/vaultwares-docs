@@ -73,7 +73,7 @@ npm run preview
 Production deploys are designed to keep the server in control:
 
 - GitHub sends a **signed push webhook**.
-- `vw-deployd` on the VPS verifies signature + allowlist and deploys by commit SHA.
+- `vw-webhookd` on the VPS verifies signature + allowlist and triggers deploys by commit SHA.
 
 Webhook endpoint:
 - `https://hooks.vaultwares.ca/github`

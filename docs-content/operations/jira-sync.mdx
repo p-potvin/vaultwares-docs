@@ -7,8 +7,8 @@ description: "Runbook for the vw-jira-sync one-way integration: project structur
 
 One-way sync from GitHub to Jira Cloud. Lives in `p-potvin/vw-jira-sync`.
 
-**Preferred trigger model:** GitHub Webhooks → `https://hooks.vaultwares.ca/github` → `vw-deployd`
-→ run `vw-jira-sync/scripts/live_sync.py` on `vaultwares-1` (inside the tailnet).
+**Preferred trigger model:** GitHub Webhooks → `https://hooks.vaultwares.ca/github` → `vw-webhookd`
+→ run `vw-jira-sync/scripts/live_sync.py` on `greencloud-vps` (inside the tailnet).
 
 ## Architecture
 
@@ -19,7 +19,7 @@ GitHub event (push / pull_request / review / comment)
 hooks.vaultwares.ca/github  (nginx)
         │  proxy
         ▼
-vw-deployd (webhook receiver)
+vw-webhookd (webhook receiver)
         │  writes event JSON to disk
         │  sets: GITHUB_EVENT_NAME + GITHUB_EVENT_PATH
         ▼
@@ -68,7 +68,7 @@ Labels make every operation idempotent: the sync scripts JQL-search by label bef
 
 For the webhook-triggered VPS model, secrets live on the VPS (not in every repo):
 
-- `VW_GITHUB_WEBHOOK_SECRET` (used by `vw-deployd` to verify webhook signatures)
+- `VW_GITHUB_WEBHOOK_SECRET` (used by `vw-webhookd` to verify webhook signatures)
 - Jira token for `vw-jira-sync` (`JIRA_TOKEN` or `JIRA_TOKEN_FILE`)
 - GitHub API token for `vw-jira-sync` (`GITHUB_TOKEN` preferred, or `GH_TOKEN`)
 
@@ -243,9 +243,9 @@ in the affected repo, or re-deploy with the current template (which has no
 ### Webhook-driven sync not running (Preferred model)
 
 - Confirm `https://hooks.vaultwares.ca/health` returns 200.
-- Confirm `https://hooks.vaultwares.ca/github` is receiving deliveries (check `/var/log/vw-deployd.log`).
-- Ensure `/etc/vw-deployd/config.yml` has `jira_sync.enabled: true`.
-- Ensure `vw-jira-sync` exists on `vaultwares-1` (default path: `/opt/vw-jira-sync`).
+- Confirm `https://hooks.vaultwares.ca/github` is receiving deliveries (check `/var/log/vw-webhookd.log`).
+- Ensure `/etc/vw-webhookd/config.yml` has `jira_sync.enabled: true`.
+- Ensure `vw-jira-sync` exists on `greencloud-vps` (default path: `/opt/vw-jira-sync`).
 - Ensure `vw-jira-sync` has secrets available:
   - `JIRA_TOKEN` or `JIRA_TOKEN_FILE`
   - `GITHUB_TOKEN` (preferred) or `GH_TOKEN`

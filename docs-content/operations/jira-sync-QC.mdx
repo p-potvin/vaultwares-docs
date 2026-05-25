@@ -7,8 +7,8 @@ description: "Guide de démarrage rapide pour l'intégration unidirectionnelle v
 
 Synchronisation unidirectionnelle de GitHub vers Jira Cloud. Réside dans `p-potvin/vw-jira-sync`.
 
-**Modèle de déclenchement préféré :** Webhooks GitHub → `https://hooks.vaultwares.ca/github` → `vw-deployd`
-→ exécution de `vw-jira-sync/scripts/live_sync.py` sur `vaultwares-1` (à l'intérieur du tailnet).
+**Modèle de déclenchement préféré :** Webhooks GitHub → `https://hooks.vaultwares.ca/github` → `vw-webhookd`
+→ exécution de `vw-jira-sync/scripts/live_sync.py` sur `greencloud-vps` (à l'intérieur du tailnet).
 
 ## Architecture
 
@@ -19,7 +19,7 @@ GitHub event (push / pull_request / review / comment)
 hooks.vaultwares.ca/github  (nginx)
         │  proxy
         ▼
-vw-deployd (webhook receiver)
+vw-webhookd (webhook receiver)
         │  writes event JSON to disk
         │  sets: GITHUB_EVENT_NAME + GITHUB_EVENT_PATH
         ▼
@@ -68,7 +68,7 @@ Les étiquettes rendent chaque opération idempotente : les scripts de synchroni
 
 Pour le modèle VPS déclenché par webhook, les secrets résident sur le VPS (et non dans chaque dépôt) :
 
-- `VW_GITHUB_WEBHOOK_SECRET` (utilisé par `vw-deployd` pour vérifier les signatures des webhooks)
+- `VW_GITHUB_WEBHOOK_SECRET` (utilisé par `vw-webhookd` pour vérifier les signatures des webhooks)
 - Jeton Jira pour `vw-jira-sync` (`JIRA_TOKEN` ou `JIRA_TOKEN_FILE`)
 - Jeton API GitHub pour `vw-jira-sync` (`GITHUB_TOKEN` préféré, ou `GH_TOKEN`)
 
@@ -243,9 +243,9 @@ bloc `permissions:`).
 ### Synchronisation non exécutée par webhook (Modèle préféré)
 
 - Confirmez que `https://hooks.vaultwares.ca/health` retourne 200.
-- Confirmez que `https://hooks.vaultwares.ca/github` reçoit des livraisons (vérifiez `/var/log/vw-deployd.log`).
-- Assurez-vous que `/etc/vw-deployd/config.yml` contient `jira_sync.enabled: true`.
-- Assurez-vous que `vw-jira-sync` existe sur `vaultwares-1` (chemin par défaut : `/opt/vw-jira-sync`).
+- Confirmez que `https://hooks.vaultwares.ca/github` reçoit des livraisons (vérifiez `/var/log/vw-webhookd.log`).
+- Assurez-vous que `/etc/vw-webhookd/config.yml` contient `jira_sync.enabled: true`.
+- Assurez-vous que `vw-jira-sync` existe sur `greencloud-vps` (chemin par défaut : `/opt/vw-jira-sync`).
 - Assurez-vous que `vw-jira-sync` dispose des secrets suivants :
   - `JIRA_TOKEN` ou `JIRA_TOKEN_FILE`
   - `GITHUB_TOKEN` (préféré) ou `GH_TOKEN`

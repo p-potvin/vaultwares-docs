@@ -95,6 +95,9 @@ Pour chaque repo :
     - `pull_request_review_comment`
     - `issue_comment`
 
+> Ce webhook est aussi le **déclencheur canonique des déploiements**. N’ajoutez pas de workflows de déploiement via GitHub Actions.
+> Voir : `operations/deployment-flow`.
+
 ## 6) Placement des bots / automatisation
 
 - Les projets de bots/agents doivent être sous `vaultwares-adk` (et non `automation-suite`).
