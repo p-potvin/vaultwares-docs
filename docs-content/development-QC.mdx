@@ -5,61 +5,57 @@ description: 'Aperçu des changements localement pour mettre à jour votre docum
 
 <Info>
   **Prérequis** :
-  - Node.js version 19 ou supérieure
-  - Un dépôt de documentation avec un fichier `docs.json`
+  - Node.js 20+ (Node 22 recommandé)
+  - Pages sources `docs-content/` avec frontmatter YAML
 </Info>
 
 Suivez ces étapes pour installer et exécuter VaultWares Docs sur votre système d'exploitation.
 
 <Steps>
-<Step title="Installer l'interface de ligne de commande (CLI) VaultWares Docs">
+<Step title="Installer les dépendances">
 
 ```bash
-npm i -g mint
+npm ci
 ```
 </Step>
 
-<Step title="Aperçu local">
+<Step title="Générer les ressources de pages">
 
-Naviguez jusqu'au répertoire de votre documentation où se trouve votre fichier `docs.json`, puis exécutez la commande suivante :
+L'interface consomme des ressources de langue générées sous `src/resources/`. Régénérez-les après avoir modifié `docs-content/` :
 
 ```bash
-mint dev
+npm run generate:page-resources
 ```
-
-Un aperçu local de votre documentation sera disponible à `http://localhost:3000`.
 
 </Step>
 </Steps>
 
-## Ports personnalisés
+## Aperçu local
 
-Par défaut, VaultWares Docs utilise le port 3000. Vous pouvez personnaliser le port sur lequel VaultWares Docs s'exécute en utilisant le drapeau `--port`. Par exemple, pour exécuter VaultWares Docs sur le port 3333, utilisez cette commande :
-
-```bash
-mint dev --port 3333
-```
-
-Si vous tentez d'exécuter VaultWares Docs sur un port déjà utilisé, il utilisera le prochain port disponible :
-
-```md
-Port 3000 is already in use. Trying 3001 instead.
-```
-
-## Versions de VaultWares Docs
-
-Veuillez noter que chaque version de l'interface de ligne de commande (CLI) est associée à une version spécifique de VaultWares Docs. Si votre aperçu local ne correspond pas à la version de production, veuillez mettre à jour l'interface de ligne de commande (CLI) :
+Démarrez le serveur de développement :
 
 ```bash
-npm mint update
+npm run dev
 ```
 
-## Validation des liens
-
-L'interface de ligne de commande (CLI) peut aider à valider les liens de votre documentation. Pour identifier tout lien brisé, utilisez la commande suivante :
+Vite utilise le port 5173 par défaut et choisit le prochain port disponible s'il est occupé. Vous pouvez forcer un port :
 
 ```bash
-mint broken-links
+npm run dev -- --port 3333
+```
+
+## Build et aperçu
+
+Build :
+
+```bash
+npm run build
+```
+
+Prévisualiser le build de production localement :
+
+```bash
+npm run preview
 ```
 
 ## Déploiement
@@ -77,19 +73,18 @@ Nous suggérons d'utiliser des extensions dans votre IDE pour reconnaître et fo
 ## Dépannage
 
 <AccordionGroup>
-  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'>
+  <Accordion title='Problème : version de Node incompatible'>
 
-    Ceci peut être dû à une version obsolète de Node. Essayez ce qui suit :
-    1. Supprimer la version actuelle de l'interface de ligne de commande (CLI) : `npm remove -g mint`
-    2. Mettre à niveau vers Node v19 ou supérieur.
-    3. Réinstaller l'interface de ligne de commande (CLI) : `npm i -g mint`
+    Il s'agit généralement d'une version de Node incompatible. Utilisez Node 20+ (Node 22 recommandé) et réinstallez :
+    1. Supprimez `node_modules/` et le lockfile seulement si nécessaire
+    2. Exécutez `npm ci`
   </Accordion>
 
-  <Accordion title="Issue: Encountering an unknown error">
+  <Accordion title="Problème : le contenu semble périmé après modification de docs-content/">
 
-    Solution : Allez à la racine de votre appareil et supprimez le dossier `~/.VaultWares Docs`. Ensuite, exécutez à nouveau `mint dev`.
+    Solution : régénérez les ressources et redémarrez le serveur :
+    1. `npm run generate:page-resources`
+    2. Redémarrez `npm run dev`
   </Accordion>
 </AccordionGroup>
-
-Curieux de savoir ce qui a changé dans la dernière version de l'interface de ligne de commande (CLI) ? Consultez le [journal des modifications de l'interface de ligne de commande (CLI)](https://www.npmjs.com/package/VaultWares Docs?activeTab=versions).
 

@@ -68,7 +68,11 @@ function Card(props: CardProps) {
   )
 
   if (href.startsWith('/')) {
-    return <Link to={href}>{shell}</Link>
+    return (
+      <Link to={href} className="vw-no-underline">
+        {shell}
+      </Link>
+    )
   }
   return shell
 }

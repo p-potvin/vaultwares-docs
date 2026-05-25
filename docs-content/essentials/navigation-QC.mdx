@@ -1,88 +1,40 @@
 ---
 title: 'Navigation'
-description: 'Le champ de navigation dans docs.json définit les pages qui apparaissent dans le menu de navigation'
+description: 'Comment les routes et la barre latérale sont générées à partir de docs-content'
 icon: 'map'
 ---
 
-Le menu de navigation est la liste de liens présente sur chaque site web.
+VaultWares Docs n'utilise pas de fichier de navigation `docs.json`. La barre latérale est générée à partir des pages `docs-content/`.
 
-Vous devrez probablement mettre à jour `docs.json` chaque fois que vous ajoutez une nouvelle page. Les pages n'apparaissent pas automatiquement.
+## D'où vient la barre latérale
 
-## Syntaxe de navigation
+1. Les pages sources vivent sous `docs-content/**/*.mdx` (EN), et peuvent être jumelées à `*-QC.mdx` (QC).
+2. Exécutez `npm run generate:page-resources` pour générer :
+   - `src/resources/pages/*.json` (corps EN/QC)
+   - `src/resources/pageResourcesManifest.ts` (index des routes)
+3. L'application utilise le manifeste généré pour construire la barre latérale et les routes.
 
-Notre syntaxe de navigation est récursive, ce qui signifie que vous pouvez créer des groupes de navigation imbriqués. Vous n'avez pas besoin d'inclure `.mdx` dans les noms de pages.
+## Règles de routes
 
-<CodeGroup>
-
-```json Regular Navigation
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Getting Started",
-          "pages": ["quickstart"]
-        }
-      ]
-    }
-  ]
-}
-```
-
-```json Nested Navigation
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Getting Started",
-          "pages": [
-            "quickstart",
-            {
-              "group": "Nested Reference Pages",
-              "pages": ["nested-reference-page"]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-</CodeGroup>
-
-## Dossiers
-
-Il suffit de placer vos fichiers MDX dans des dossiers et de mettre à jour les chemins dans `docs.json`.
-
-Par exemple, pour avoir une page à l'adresse `https://yoursite.com/your-folder/your-page`, vous feriez un dossier nommé `your-folder` contenant un fichier MDX appelé `your-page.mdx`.
+- `docs-content/index.mdx` → `/`
+- `docs-content/getting-started/overview.mdx` → `/getting-started/overview`
+- `docs-content/hardware/index.mdx` → `/hardware`
+- `*-QC.mdx` est la version QC pour la même route (le bouton bascule la langue ; QC revient à EN si la version QC est absente).
 
 <Warning>
-
-Vous ne pouvez pas utiliser `api` comme nom de dossier, à moins de l'imbriquer dans un autre dossier. VaultWares Docs utilise Next.js, qui réserve le dossier `api` de niveau supérieur pour les appels de serveur internes. Un nom de dossier comme `api-reference` serait accepté.
-
+Évitez de créer des pages dont la route de premier niveau entre en conflit avec des assets statiques dans `public/` (par exemple `/images`) ou d'autres chemins réservés. Préférez des dossiers de premier niveau descriptifs comme `api-reference`, `getting-started`, `operations`, etc.
 </Warning>
 
-```json Navigation With Folder
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Group Name",
-          "pages": ["your-folder/your-page"]
-        }
-      ]
-    }
-  ]
-}
-```
+## Ordre et libellés
 
-## Pages cachées
+- Les **sections** sont dérivées du premier segment de route (`/hardware/...` se regroupe sous `hardware`).
+- L'ordre des sections est contrôlé par `SECTION_ORDER` dans `src/resources/uiResources.ts`.
+- Les libellés viennent du frontmatter `title` (sinon, repli sur le slug).
+- À l'intérieur d'une section, les routes sont actuellement triées par `routePath`.
 
-Les fichiers MDX qui ne sont pas inclus dans `docs.json` n'apparaîtront pas dans la barre latérale, mais ils sont accessibles via la barre de recherche et en y faisant un lien direct.
+## Ajouter une nouvelle page
+
+1. Créez `docs-content/<section>/<page>.mdx` et optionnellement `<page>-QC.mdx`.
+2. Assurez-vous que le frontmatter inclut `title` et `description`.
+3. Exécutez `npm run generate:page-resources` et redémarrez le serveur de dev si nécessaire.
 

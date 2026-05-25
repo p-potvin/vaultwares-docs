@@ -1,314 +1,45 @@
 ---
 title: 'Paramètres globaux'
-description: 'VaultWares Docs vous donne un contrôle complet sur l\'apparence de votre documentation grâce au fichier docs.json'
+description: 'Où configurer VaultWares Docs (sans docs.json)'
 icon: 'gear'
 ---
 
-Chaque site VaultWares Docs a besoin d'un fichier `docs.json` avec les paramètres de configuration de base. Apprenez-en plus sur les [propriétés](#properties) ci-dessous.
+VaultWares Docs est une application React + Vite personnalisée. Elle n'utilise pas de fichier de configuration `docs.json`.
 
-## Propriétés
+Cette page indique où configurer le contenu, la navigation et le branding.
 
-<ResponseField name="name" type="string" required>
-Nom de votre projet. Utilisé pour le titre global.
+## Contenu et langues
 
-Exemple : `VaultWares Docs`
+- Les pages sources vivent dans `docs-content/**/*.mdx` (EN).
+- Les pages QC sont optionnelles et se trouvent à côté des pages EN sous la forme `*-QC.mdx`.
+- Les pages doivent inclure un frontmatter YAML (`title`, `description`).
 
-</ResponseField>
+Après avoir modifié `docs-content/`, régénérez les ressources de langue consommées par l'interface :
 
-<ResponseField name="navigation" type="Navigation[]" required>
-  Un tableau de groupes contenant toutes les pages de ce groupe
-  <Expandable title="Navigation">
-    <ResponseField name="group" type="string">
-    Le nom du groupe.
+```bash
+npm run generate:page-resources
+```
 
-    Exemple : `Paramètres`
+## Navigation et libellés de sections
 
-    </ResponseField>
-    <ResponseField name="pages" type="string[]">
-    Les chemins relatifs vers les fichiers markdown qui serviront de pages.
+La navigation est générée à partir de `docs-content/` et du manifeste généré sous `src/resources/`.
 
-    Exemple : `["customization", "page"]`
+- Le regroupement (sections de la barre latérale) vient du premier segment de route (`/hardware/...` → `hardware`).
+- L'ordre des sections et les libellés bilingues vivent dans `src/resources/uiResources.ts` (`SECTION_ORDER` + `SECTION_LABELS`).
+- Les libellés des pages viennent du frontmatter `title` (chargé par langue).
 
-    </ResponseField>
+## Thème et jetons de marque
 
-  </Expandable>
-</ResponseField>
+L'interface utilise les jetons VaultWares depuis `vaultwares-themes` :
 
-<ResponseField name="logo" type="string or object">
-  Chemin vers l'image du logo ou objet avec le chemin des images de logo pour les modes « clair » et « sombre »
-  <Expandable title="Logo">
-    <ResponseField name="light" type="string">
-      Chemin vers le logo en mode clair
-    </ResponseField>
-    <ResponseField name="dark" type="string">
-      Chemin vers le logo en mode sombre
-    </ResponseField>
-    <ResponseField name="href" type="string" default="/">
-      Où le clic sur le logo vous redirige
-    </ResponseField>
-  </Expandable>
-</ResponseField>
+- Les variables de jetons de base vivent dans `vaultwares-themes/vaultwares-revisited/revisited.css`.
+- Le mapping Tailwind v4 et les ajustements typographiques vivent dans `src/index.css`.
 
-<ResponseField name="favicon" type="string">
-  Chemin vers l'image du favicon
-</ResponseField>
+Si vous avez besoin de nouveaux composants UI pour les pages (cards, callouts, tabs, accordéons), modifiez :
 
-<ResponseField name="colors" type="Colors">
-  Codes couleur hexadécimaux pour votre thème global
-  <Expandable title="Couleurs">
-    <ResponseField name="primary" type="string" required>
-      La couleur principale. Utilisée le plus souvent pour le contenu mis en évidence, les en-têtes de section, les accents, en mode clair
-    </ResponseField>
-    <ResponseField name="light" type="string">
-      La couleur principale pour le mode sombre. Utilisée le plus souvent pour le contenu mis en évidence, les en-têtes de section, les accents, en mode sombre
-    </ResponseField>
-    <ResponseField name="dark" type="string">
-      La couleur principale pour les boutons importants
-    </ResponseField>
-    <ResponseField name="background" type="object">
-      La couleur d'arrière-plan pour les modes clair et sombre
-      <Expandable title="Objet">
-        <ResponseField name="light" type="string" required>
-          Le code couleur hexadécimal de l'arrière-plan en mode clair
-        </ResponseField>
-        <ResponseField name="dark" type="string" required>
-          Le code couleur hexadécimal de l'arrière-plan en mode sombre
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-  </Expandable>
-</ResponseField>
+- `src/markdownComponents.tsx` (composants MDX + Markdown).
 
-<ResponseField name="topbarLinks" type="TopbarLink[]">
-  Tableau de noms et d'URL des liens que vous souhaitez inclure dans la barre supérieure
-  <Expandable title="TopbarLink">
-    <ResponseField name="name" type="string">
-    Le nom du bouton.
+## Logo et favicon
 
-    Exemple : `Contactez-nous`
-    </ResponseField>
-    <ResponseField name="url" type="string">
-    L'URL lorsque vous cliquez sur le bouton. Exemple : `https://vaultwares.ca/docs/docs`
-    </ResponseField>
-
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="topbarCtaButton" type="Call to Action">
-  <Expandable title="Bouton d'appel à l'action dans la barre supérieure">
-    <ResponseField name="type" type={'"link" or "github"'} default="link">
-    Un lien affiche un bouton. GitHub affiche les informations du dépôt à l'URL fournie, y compris le nombre d'étoiles GitHub.
-    </ResponseField>
-    <ResponseField name="url" type="string">
-    Si `link` : À quoi le bouton est lié.
-
-    Si `github` : Lien vers le dépôt pour charger les informations GitHub.
-    </ResponseField>
-    <ResponseField name="name" type="string">
-    Texte à l'intérieur du bouton. Seulement requis si `type` est un `link`.
-    </ResponseField>
-
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="versions" type="string[]">
-  Tableau de noms de versions. À utiliser uniquement si vous souhaitez afficher différentes versions
-  de la documentation avec un menu déroulant dans la barre de navigation.
-</ResponseField>
-
-<ResponseField name="anchors" type="Anchor[]">
-  Un tableau d'ancres, incluant l'`icon`, la `color` et l'`url`.
-  <Expandable title="Ancre">
-    <ResponseField name="icon" type="string">
-    L'icône [Font Awesome](https://fontawesome.com/search?q=heart) utilisée pour présenter l'ancre.
-
-    Exemple : `comments`
-    </ResponseField>
-    <ResponseField name="name" type="string">
-    Le nom de l'étiquette d'ancre.
-
-    Exemple : `Communauté`
-    </ResponseField>
-    <ResponseField name="url" type="string">
-      Le début de l'URL qui marque les pages incluses dans l'ancre. Généralement, il s'agit du nom du dossier où vous placez vos pages.
-    </ResponseField>
-    <ResponseField name="color" type="string">
-      La couleur hexadécimale de l'arrière-plan de l'icône d'ancre. Peut également être un dégradé si vous passez un objet avec les propriétés `from` et `to` qui sont chacun une couleur hexadécimale.
-    </ResponseField>
-    <ResponseField name="version" type="string">
-      Utilisé si vous souhaitez masquer une ancre jusqu'à ce que la bonne version de la documentation soit sélectionnée.
-    </ResponseField>
-    <ResponseField name="isDefaultHidden" type="boolean" default="false">
-      Passez `true` si vous souhaitez masquer l'ancre jusqu'à ce que quelqu'un vous lie directement à la documentation qu'elle contient.
-    </ResponseField>
-    <ResponseField name="iconType" default="duotone" type="string">
-      L'une des valeurs suivantes : "brands", "duotone", "light", "sharp-solid", "solid", ou "thin"
-    </ResponseField>
-
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="topAnchor" type="Object">
-  Remplace les configurations par défaut pour l'ancre la plus haute.
-  <Expandable title="Objet">
-    <ResponseField name="name" default="Documentation" type="string">
-      Le nom de l'ancre la plus haute
-    </ResponseField>
-    <ResponseField name="icon" default="book-open" type="string">
-      Icône Font Awesome.
-    </ResponseField>
-    <ResponseField name="iconType" default="duotone" type="string">
-      L'une des valeurs suivantes : "brands", "duotone", "light", "sharp-solid", "solid", ou "thin"
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="tabs" type="Tabs[]">
-  Un tableau d'onglets de navigation.
-  <Expandable title="Onglets">
-    <ResponseField name="name" type="string">
-      Le nom de l'étiquette de l'onglet.
-    </ResponseField>
-    <ResponseField name="url" type="string">
-      Le début de l'URL qui marque les pages incluses dans l'onglet. Généralement, il s'agit du nom du dossier où vous placez vos pages.
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="api" type="API">
-  Configuration pour les paramètres API. Apprenez-en plus sur les pages API à [API Components](/api-playground/demo).
-  <Expandable title="API">
-    <ResponseField name="baseUrl" type="string">
-      L'URL de base pour tous les points de terminaison API. Si `baseUrl` est un tableau, il activera plusieurs options d'URL de base que l'utilisateur peut basculer.
-    </ResponseField>
-
-    <ResponseField name="auth" type="Auth">
-      <Expandable title="Authentification">
-        <ResponseField name="method" type='"bearer" | "basic" | "key"'>
-          La stratégie d'authentification utilisée pour tous les points de terminaison API.
-        </ResponseField>
-        <ResponseField name="name" type="string">
-        Le nom du paramètre d'authentification utilisé dans le bac à sable API.
-
-        Si la méthode est `basic`, le format doit être `[nomUtilisateur]:[nomMotDePasse]`
-        </ResponseField>
-        <ResponseField name="inputPrefix" type="string">
-        La valeur par défaut conçue pour être un préfixe pour le champ de saisie d'authentification.
-
-        Ex. Si un `inputPrefix` de `AuthKey` hériterait du résultat de saisie par défaut du champ d'authentification comme `AuthKey`.
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-
-    <ResponseField name="playground" type="Playground">
-      Configurations pour le bac à sable API
-
-      <Expandable title="Bac à sable">
-        <ResponseField name="mode" default="show" type='"show" | "simple" | "hide"'>
-          Si le bac à sable doit afficher, être masqué, ou seulement afficher le point de terminaison sans interactivité utilisateur ajoutée `simple`
-
-          En savoir plus à [playground guides](/api-playground/demo)
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-
-    <ResponseField name="maintainOrder" type="boolean">
-      Activer ce drapeau garantit que l'ordre des clés dans les pages OpenAPI correspond à l'ordre des clés défini dans le fichier OpenAPI.
-
-      <Warning>Ce comportement sera bientôt activé par défaut, moment auquel ce champ sera déprécié.</Warning>
-    </ResponseField>
-
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="openapi" type="string | string[]">
-  Une chaîne ou un tableau de chaînes d'URL ou de chemins relatifs pointant vers votre
-  fichier OpenAPI.
-
-  Exemples :
-  <CodeGroup>
-    ```json Absolute
-    "openapi": "https://example.com/openapi.json"
-    ```
-    ```json Relative
-    "openapi": "/openapi.json"
-    ```
-    ```json Multiple
-    "openapi": ["https://example.com/openapi1.json", "/openapi2.json", "/openapi3.json"]
-    ```
-  </CodeGroup>
-
-</ResponseField>
-
-<ResponseField name="footerSocials" type="FooterSocials">
-  Un objet de comptes de médias sociaux où le couple clé:propriété représente la plateforme de médias sociaux et l'URL du compte.
-
-  Exemple :
-  ```json
-  {
-    "x": "https://x.com/VaultWares Docs",
-    "website": "https://vaultwares.ca/docs"
-  }
-  ```
-  <Expandable title="FooterSocials">
-    <ResponseField name="[key]" type="string">
-    L'une des valeurs suivantes : `website`, `facebook`, `x`, `discord`, `slack`, `github`, `linkedin`, `instagram`, `hacker-news`
-
-    Exemple : `x`
-    </ResponseField>
-    <ResponseField name="property" type="string">
-    L'URL de la plateforme sociale.
-
-    Exemple : `https://x.com/VaultWares Docs`
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="feedback" type="Feedback">
-  Configurations pour activer les boutons de commentaires
-
-  <Expandable title="Commentaires">
-    <ResponseField name="suggestEdit" type="boolean" default="false">
-    Active un bouton permettant aux utilisateurs de suggérer des modifications via des pull requests
-    </ResponseField>
-    <ResponseField name="raiseIssue" type="boolean" default="false">
-    Active un bouton permettant aux utilisateurs de signaler un problème concernant la documentation
-    </ResponseField>
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="modeToggle" type="ModeToggle">
-  Personnaliser le basculement du mode sombre.
-  <Expandable title="ModeToggle">
-    <ResponseField name="default" type={'"light" or "dark"'}>
-      Définir si vous voulez toujours afficher le mode clair ou sombre pour les nouveaux utilisateurs. Lorsqu'il n'est pas défini, nous par défaut sur le même mode que le système d'exploitation de l'utilisateur.
-    </ResponseField>
-    <ResponseField name="isHidden" type="boolean" default="false">
-      Définir sur `true` pour masquer le basculement du mode sombre/clair. Vous pouvez combiner `isHidden` avec `default` pour forcer votre documentation à n'utiliser que le mode clair ou sombre. Par exemple :
-
-      <CodeGroup>
-      ```json Only Dark Mode
-      "modeToggle": {
-        "default": "dark",
-        "isHidden": true
-      }
-      ```
-
-      ```json Only Light Mode
-      "modeToggle": {
-        "default": "light",
-        "isHidden": true
-      }
-      ```
-      </CodeGroup>
-
-    </ResponseField>
-
-  </Expandable>
-</ResponseField>
-
-<ResponseField name="backgroundImage" type="string">
-  Une image d'arrière-plan à afficher derrière chaque page. Voir l'exemple avec
-  [Infisical](https://infisical.com/docs) et [FRPC](https://frpc.io).
-</ResponseField>
-
+- Le logo de la barre supérieure est configuré dans `src/App.tsx` et servi depuis `public/`.
+- Le favicon est configuré dans `index.html` et servi depuis `public/`.

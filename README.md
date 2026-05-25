@@ -11,7 +11,6 @@ Primary goals:
 ## Repo layout
 
 - `docs-content/` — source documentation pages as `.mdx` (frontmatter required, internal source).
-- `docs.json` — navigation structure (SoT for docs ordering/sections).
 - `src/resources/pages/*.json` — generated EN/QC page resources consumed by the frontend.
 - `src/resources/pageResourcesManifest.ts` — generated route/resource index.
 - `src/App.tsx` — router + nav rendering + locale resource rendering.
@@ -37,12 +36,11 @@ description: "One sentence description"
 ### Add a new page
 
 1) Add EN + QC source files under `docs-content/` (example: `docs-content/getting-started/foo.mdx` and `foo-QC.mdx`).
-2) Add the page to `docs.json` navigation.
-3) Regenerate frontend page resources:
+2) Regenerate frontend page resources:
    - `npm run generate:page-resources`
-4) Keep nav labels bilingual (English + Quebec French):
+3) Keep nav labels bilingual (English + Quebec French):
    - update section labels/order in `src/resources/uiResources.ts`.
-5) Verify the route renders (see “Verification”).
+4) Verify the route renders (see “Verification”).
 
 ## Development
 

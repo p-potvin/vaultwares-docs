@@ -1,88 +1,40 @@
 ---
 title: 'Navigation'
-description: 'The navigation field in docs.json defines the pages that go in the navigation menu'
+description: 'How routes and sidebar groups are generated from docs-content'
 icon: 'map'
 ---
 
-The navigation menu is the list of links on every website.
+VaultWares Docs does not use a `docs.json` navigation file. The sidebar is generated from your `docs-content/` pages.
 
-You will likely update `docs.json` every time you add a new page. Pages do not show up automatically.
+## Where the sidebar comes from
 
-## Navigation syntax
+1. Source pages live under `docs-content/**/*.mdx` (EN), optionally paired with `*-QC.mdx` (QC).
+2. Run `npm run generate:page-resources` to generate:
+   - `src/resources/pages/*.json` (EN/QC bodies)
+   - `src/resources/pageResourcesManifest.ts` (route index)
+3. The app uses the generated manifest to build the sidebar and routes.
 
-Our navigation syntax is recursive which means you can make nested navigation groups. You don't need to include `.mdx` in page names.
+## Route rules
 
-<CodeGroup>
-
-```json Regular Navigation
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Getting Started",
-          "pages": ["quickstart"]
-        }
-      ]
-    }
-  ]
-}
-```
-
-```json Nested Navigation
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Getting Started",
-          "pages": [
-            "quickstart",
-            {
-              "group": "Nested Reference Pages",
-              "pages": ["nested-reference-page"]
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-</CodeGroup>
-
-## Folders
-
-Simply put your MDX files in folders and update the paths in `docs.json`.
-
-For example, to have a page at `https://yoursite.com/your-folder/your-page` you would make a folder called `your-folder` containing an MDX file called `your-page.mdx`.
+- `docs-content/index.mdx` → `/`
+- `docs-content/getting-started/overview.mdx` → `/getting-started/overview`
+- `docs-content/hardware/index.mdx` → `/hardware`
+- `*-QC.mdx` is the QC locale for the same route (the toggle switches languages; QC falls back to EN when missing).
 
 <Warning>
-
-You cannot use `api` for the name of a folder unless you nest it inside another folder. VaultWares Docs uses Next.js which reserves the top-level `api` folder for internal server calls. A folder name such as `api-reference` would be accepted.
-
+Avoid creating pages whose top-level route conflicts with static assets in `public/` (for example `/images`) or other reserved paths. Prefer descriptive top-level folders like `api-reference`, `getting-started`, `operations`, etc.
 </Warning>
 
-```json Navigation With Folder
-"navigation": {
-  "tabs": [
-    {
-      "tab": "Docs",
-      "groups": [
-        {
-          "group": "Group Name",
-          "pages": ["your-folder/your-page"]
-        }
-      ]
-    }
-  ]
-}
-```
+## Ordering and labels
 
-## Hidden pages
+- **Section groups** are derived from the first route segment (`/hardware/...` groups under `hardware`).
+- Group order is controlled by `SECTION_ORDER` in `src/resources/uiResources.ts`.
+- Page labels come from each page frontmatter `title` (if missing, the route slug is used as a fallback).
+- Within a group, routes are currently sorted by `routePath`.
 
-MDX files not included in `docs.json` will not show up in the sidebar but are accessible through the search bar and by linking directly to them.
+## Add a new page
+
+1. Create `docs-content/<section>/<page>.mdx` and optionally `<page>-QC.mdx`.
+2. Ensure frontmatter includes `title` and `description`.
+3. Run `npm run generate:page-resources` and restart the dev server if needed.
 

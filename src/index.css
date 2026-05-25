@@ -59,6 +59,26 @@ body {
   max-width: 88ch;
 }
 
+/* Inline links: underline. Block/utility links (cards/nav wrappers) should not. */
+.prose-vw :is(p, li, blockquote, td, th) a:not(.vw-no-underline) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.prose-vw :is(p, li, blockquote, td, th) a:not(.vw-no-underline):hover {
+  text-decoration-thickness: 2px;
+}
+
+.prose-vw a.vw-no-underline,
+.prose-vw a.vw-no-underline * {
+  text-decoration: none !important;
+}
+
+.prose-vw :where(code, strong, em, span) {
+  text-decoration: none;
+}
+
 .prose-vw h1,
 .prose-vw h2,
 .prose-vw h3,
