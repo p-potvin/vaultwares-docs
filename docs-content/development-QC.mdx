@@ -1,6 +1,6 @@
 ---
 title: 'Développement'
-description: 'Aperçu des changements localement pour mettre à jour votre documentation'
+description: 'Comment voir et modifier les docs localement (explication simple).'
 ---
 
 <Info>
@@ -9,7 +9,15 @@ description: 'Aperçu des changements localement pour mettre à jour votre docum
   - Pages sources `docs-content/` avec frontmatter YAML
 </Info>
 
-Suivez ces étapes pour installer et exécuter VaultWares Docs sur votre système d'exploitation.
+## Pourquoi cette page existe?
+
+Si tu veux **modifier la documentation**, tu veux pouvoir :
+
+1) faire un changement,
+2) le voir sur ton écran,
+3) l’envoyer (PR) pour révision.
+
+Cette page t’explique ça sans détour.
 
 <Steps>
 <Step title="Installer les dépendances">
@@ -32,7 +40,7 @@ npm run generate:page-resources
 
 ## Aperçu local
 
-Démarrez le serveur de développement :
+Démarre le serveur local (ça te donne un lien à ouvrir dans ton navigateur) :
 
 ```bash
 npm run dev
@@ -60,11 +68,19 @@ npm run preview
 
 ## Déploiement
 
-Si le déploiement est réussi, vous devriez voir ce qui suit :
+### Important : GitHub ne déploie pas
 
-<Frame>
-  <img src="/images/checks-passed.png" alt="Capture d'écran d'un message de confirmation de déploiement indiquant que tous les contrôles ont réussi." style={{ borderRadius: '0.5rem' }} />
-</Frame>
+On n’utilise pas GitHub Actions pour déployer en prod.
+
+Le modèle canonique est documenté ici :
+
+- `/operations/deployment-flow` (version QC)
+
+Si tu es juste en train d’éditer des docs, ton “déploiement” à toi, c’est : **voir les changements en local** + ouvrir une PR.
+
+<Tip>
+  Tu peux ignorer la partie “infra” si tu fais juste des corrections de texte.
+</Tip>
 
 ## Formatage du code
 

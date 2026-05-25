@@ -1,97 +1,88 @@
 ---
 title: "Documentation VaultWares"
-description: "Matériel et logiciel de sécurité pour l'entreprise — stockage chiffré, HSM, dispositifs biométriques, appareils réseau et logiciels de chiffrement"
+description: "C’est quoi VaultWares? Une façon simple de garder tes données privées et d’automatiser ton travail — sans envoyer ta vie au “cloud”."
 ---
-
 
 ## Bienvenue chez VaultWares
 
-VaultWares propose des solutions de sécurité de niveau entreprise conçues pour les organisations qui prennent la protection des données au sérieux. Des dispositifs de stockage chiffré de qualité militaire et des modules de sécurité matérielle aux logiciels de contrôle d'accès zéro confiance et à la surveillance des menaces en temps réel, nos produits travaillent ensemble pour créer une posture de sécurité complète de défense en profondeur.
+### En une phrase
+
+VaultWares t’aide à **garder tes données chez toi (ou sur tes machines de confiance)** et à **automatiser des tâches** sans que ça devienne un spaghetti de logiciels.
+
+### L’image mentale (très simple)
+
+Pense à VaultWares comme :
+
+- un **coffre-fort** pour tes données,
+- une **boîte d’outils** pour automatiser des tâches,
+- une **route privée** (un petit “réseau secret”) pour que tes machines se parlent sans passer par l’Internet public.
+
+```mermaid
+flowchart LR
+  You["Toi / ton équipe"] --> UI["Vault Flows (écran simple)"]
+  UI --> Engine["Vault Pipelines (le moteur)"]
+  Engine --> PC["Ton PC (modèles IA locaux)"]
+  Engine --> VPS["Serveur de confiance (greencloud-vps)"]
+  PC <--> Tailnet["Réseau privé (Tailscale)"]
+  VPS <--> Tailnet
+  Engine --> Vault["Tes données (chez toi)"]
+```
+
+### Ce qu’on fait (sans jargon)
+
+| Ce que tu veux | Ce que VaultWares te donne | Exemple concret |
+|---|---|---|
+| Protéger tes fichiers | Chiffrement + rangement + accès contrôlé | “Mes docs restent lisibles seulement par moi.” |
+| Automatiser sans te faire suivre | Des “recettes” (workflows) qui tournent sur tes machines | “Je résume des PDFs sans les uploader à une compagnie.” |
+| Garder le contrôle | Un réseau privé + des déploiements contrôlés | “On n’expose pas nos trucs sensibles sur Internet.” |
+
+<Note>
+  Si un terme te semble flou (ex.: “workflow”, “tailnet”), c’est normal. Les pages “Démarrage” expliquent tout avec des exemples.
+</Note>
 
 <Card
-  title="Commencer en quelques minutes"
+  title="Commencer (version très simple)"
   icon="rocket"
-  href="/quickstart"
+  href="/getting-started/overview"
   horizontal
 >
-  Initialisez votre premier VaultDrive ou activez VaultCrypt avec notre guide de démarrage rapide étape par étape.
+  C’est la meilleure porte d’entrée si tu veux comprendre “qu’est-ce que VaultWares fait” sans être technique.
 </Card>
 
 ## Explorer la documentation
 
 <CardGroup cols={3}>
-  <Card title="Produits matériels" icon="microchip" href="/hardware/encrypted-storage">
-    Stockage chiffré VaultDrive, modules VaultHSM, dispositifs biométriques VaultScan et appareils réseau VaultGate.
-  </Card>
-  <Card title="Produits logiciels" icon="shield-halved" href="/software/encryption-software">
-    VaultCrypt, VaultAccess, VaultBackup et VaultMonitor — la couche logicielle de votre pile de sécurité.
-  </Card>
   <Card title="Démarrage" icon="circle-play" href="/getting-started/overview">
-    Nouveau chez VaultWares? Commencez ici pour les aperçus de produits, les licences et la planification du déploiement.
+    Pour comprendre VaultWares en 10 minutes (avec des exemples et des images).
   </Card>
-  <Card title="Référence API" icon="code" href="/api-reference/authentication">
-    Authentification de l'API REST, les points de terminaison, les webhooks et les SDK officiels pour Python, Node.js, Java et Go.
+  <Card title="Produits et services" icon="sitemap" href="/getting-started/products-and-services">
+    La liste de ce qu’on offre (et ce qui est “à venir”), expliqué en langage humain.
   </Card>
-  <Card title="Sécurité et conformité" icon="lock" href="/security/certifications">
-    FIPS 140-3, Common Criteria, RGPD, HIPAA, PCI DSS et autres guides de certification et de conformité.
-  </Card>
-  <Card title="Support" icon="headset" href="/support/contact">
-    Contactez le support, consultez les FAQ, les informations de garantie et le processus de RMA.
+  <Card title="Opérations (privé)" icon="network-wired" href="/operations/network-map">
+    Comment nos machines se parlent en privé (pour les personnes qui gèrent l’infra).
   </Card>
 </CardGroup>
 
 ## Liens rapides
 
 <CardGroup cols={2}>
-  <Card title="Initialiser un VaultDrive" icon="usb-drive" href="/quickstart#hardware-quickstart">
-    Déballez, connectez et définissez votre mot de passe maître en moins de 5 minutes.
+  <Card title="C’est quoi un workflow?" icon="diagram-project" href="/getting-started/overview">
+    Une “recette” : tu donnes des étapes, VaultWares exécute.
   </Card>
-  <Card title="Installer VaultCrypt" icon="download" href="/quickstart#software-quickstart">
-    Installez, activez votre licence et chiffrez votre premier volume.
+  <Card title="Réseau privé (Tailscale)" icon="shield" href="/operations/tailscale">
+    Explication simple : pourquoi on utilise ça et comment ça protège.
   </Card>
-  <Card title="Déployer en entreprise" icon="building" href="/installation/software-deployment">
-    Options de déploiement silencieux, MDM, GPO, Docker et Kubernetes.
-  </Card>
-  <Card title="Intégrer avec Active Directory" icon="sitemap" href="/installation/integration-guides">
-    Connectez VaultWares à votre infrastructure AD/LDAP, SAML et SSO existante.
-  </Card>
-  <Card title="Parcourir les points de terminaison API" icon="terminal" href="/api-reference/endpoints">
-    Référence complète de l'API REST pour les dispositifs, les politiques, les utilisateurs, les clés et les certificats.
-  </Card>
-  <Card title="Guides de conformité" icon="file-certificate" href="/compliance/gdpr">
-    Parcours et listes de contrôle de mise en œuvre pour la conformité RGPD, HIPAA et PCI DSS.
+  <Card title="Déploiement (simple)" icon="rocket" href="/operations/deployment-flow">
+    Comment on met à jour les sites sans laisser GitHub faire des déploiements.
   </Card>
 </CardGroup>
 
-## Familles de produits
+## Mini-glossaire (2 lignes chaque)
 
-<Tabs>
-  <Tab title="Matériel">
-    | Produit | Description | Certification |
-    |---------|-------------|---------------|
-    | **VaultDrive Pro / Enterprise / Rugged / Biometric** | Stockage USB chiffré matériel | FIPS 140-2/140-3 Niveau 3 |
-    | **VaultHSM PCIe / Network / Enterprise / Cloud** | Modules de gestion de clés cryptographiques | FIPS 140-2/140-3 Niveau 3-4 |
-    | **VaultScan** | Terminaux d'authentification biométrique | FBI PIV-071006, ISO 19794 |
-    | **VaultGate** | Appareil de sécurité réseau | FIPS 140-2 Niveau 2, CC EAL4+ |
-  </Tab>
-  <Tab title="Logiciel">
-    | Produit | Description | Éditions |
-    |---------|-------------|----------|
-    | **VaultCrypt** | Chiffrement au niveau du disque et des fichiers | Standard, Professionnel, Entreprise |
-    | **VaultAccess** | Contrôle d'accès zéro confiance et IAM | Standard, Professionnel, Entreprise |
-    | **VaultBackup** | Sauvegarde automatisée et chiffrée / Reprise après sinistre | Standard, Professionnel, Entreprise |
-    | **VaultMonitor** | Détection des menaces intégré à SIEM | Professionnel, Entreprise |
-  </Tab>
-  <Tab title="Services">
-    | Service | Description |
-    |---------|-------------|
-    | **VaultHSM Cloud** | HSM basé sur le cloud avec SLA de 99,99 % |
-    | **Sécurité gérée VaultWares** | Surveillance et réponse SOC 24/7 |
-    | **Services professionnels** | Déploiement, intégration et formation |
-    | **Plans de support** | Niveaux Argent, Or et Platine |
-  </Tab>
-</Tabs>
-
-<Note>
-  Tous les produits VaultWares sont livrés avec une licence d'évaluation de 30 jours. Contactez [sales@vaultwares.com](mailto:sales@vaultwares.com) pour demander une évaluation complète ou des prix en volume.
-</Note>
+| Mot | Ça veut dire quoi? |
+|---|---|
+| **Workflow** | Une “recette” : une suite d’étapes qui fait une tâche à ta place. |
+| **Local** | Ça tourne sur ton PC (pas sur un serveur public). |
+| **Tailscale / tailnet** | Un réseau privé (comme un tunnel sécurisé) entre tes machines. |
+| **VPS** | Un ordinateur “loué” sur Internet, mais que TU contrôles. |
+| **Chiffrement** | Transformer des données en “charabia” illisible sans la clé. |

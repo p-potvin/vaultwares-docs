@@ -1,54 +1,48 @@
 ---
 title: "Catalogue de produits et services"
-description: "Un aperçu complet des logiciels, du matériel et des solutions intégrées de VaultWares, axés sur la vie privée."
+description: "Une version très simple : qu’est-ce qu’on offre, à quoi ça sert, et où ça tourne (chez toi, pas dans un cloud)."
 ---
 
-## Bienvenue dans l'écosystème VaultWares
+## Bienvenue dans l’écosystème VaultWares
 
-VaultWares est dédié à la philosophie de **La vie privée d'abord, la sécurité ensuite, la fonctionnalité troisièmement**. Notre écosystème couvre les applications logicielles, le matériel spécialisé et les services intégrés conçus pour donner aux utilisateurs un contrôle total sur leur empreinte numérique. Nous exploitons la cryptographie post-quantique (PQC), le chiffrement côté client et les principes de zéro suivi dans toutes nos offres.
+### La promesse (en mots simples)
 
-Vous trouverez ci-dessous le catalogue complet de nos produits et services actuels et à venir.
+- **Tes données restent à toi.** On évite d’envoyer tes affaires personnelles dans des services publics.
+- **Ça roule sur tes machines.** Ton PC, ton serveur, ton réseau privé.
+- **On te donne des recettes.** Des workflows réutilisables, pour que tu ne recommences pas tout à zéro.
 
-## Solutions logicielles
+> Important : certaines choses ci-dessous peuvent être “en cours / à venir”. Si quelque chose est flou, on le marque comme tel.
 
-Notre suite logicielle est conçue pour fonctionner localement ou sur une infrastructure de confiance, garantissant que vos données ne quittent jamais votre contrôle sans être chiffrées.
+## La “carte du resto” (quoi choisir?)
 
-<CardGroup cols={2}>
-  <Card title="Vault-Pipelines" icon="diagram-project">
-    L'API centrale de VaultWares. Un moteur backend puissant pour l'exécution de flux de travail complexes et préservant la vie privée, et pour la gestion de tâches agentiques.
-  </Card>
-  <Card title="Vault-Flows" icon="network-wired">
-    Le frontend basé sur le web pour Vault-Pipelines. Permet aux utilisateurs de créer, gérer et partager visuellement des flux de travail, de parcourir des modèles communautaires et de s'abonner à des services d'API.
-  </Card>
-  <Card title="Vault-Central" icon="browser">
-    Notre extension de navigateur phare (Chrome/Firefox) offrant un tableau de bord unifié pour gérer votre écosystème VaultWares directement depuis votre navigateur.
-  </Card>
-  <Card title="Identity-Manager" icon="id-card">
-    Un système sécurisé de gestion des identités et des identifiants chiffré côté client.
-  </Card>
-  <Card title="Vault File Explorer" icon="folder-tree">
-    Une alternative axée sur la vie privée à l'Explorateur Windows, comprenant un chiffrement intégré, une suppression sécurisée et une intégration transparente avec le stockage VaultWares.
-  </Card>
-  <Card title="Vault Player" icon="film">
-    Un lecteur vidéo chiffré qui tire parti des ressources GPU locales pour offrir un mise à l'échelle IA, une amélioration et une manipulation de trames en temps réel sans envoyer de données au cloud.
-  </Card>
-  <Card title="VaultWares Media Suite" icon="photo-film-music">
-    Un programme tout-en-un pour la transcription, la traduction et la mise à l'échelle vidéo/audio pilotée par IA, fonctionnant entièrement sur le matériel local.
-  </Card>
-  <Card title="Vaultwares-Agentciation" icon="robot">
-    Notre orchestrateur de flux de travail multi-agents propriétaire. Comprend un retour visuel et un langage de balisage agentique personnalisé pour gérer des équipes d'agents IA complexes.
-  </Card>
-  <Card title="VaultWares TUI" icon="terminal">
-    Une interface utilisateur en terminal (TUI) basée sur Rust pour exécuter des agents IA locaux (similaire à Open Interpreter/Claw) avec une surcharge minimale de ressources.
-  </Card>
-  <Card title="Windows Bootstrapper" icon="windows">
-    Un outil de déploiement complet pour les nouvelles installations Windows. Comprend l'installation/désinstallation de programmes en vrac, le nettoyage des logiciels espions/télémétrie, la gestion des services, la personnalisation du menu contextuel et un interrupteur de sécurité Defender en temps réel.
-  </Card>
-</CardGroup>
+Voici une vue ultra simple :
+
+```mermaid
+flowchart LR
+  UI["Vault Flows (l’écran)"] --> Engine["Vault Pipelines (le moteur)"]
+  Engine --> LocalAI["IA locale (sur ton PC)"]
+  Engine --> Storage["Données (chez toi)"]
+  Engine --> Browser["Vault Central (dans ton navigateur)"]
+```
+
+## Produits logiciels (explication “grand-maman”)
+
+| Produit | À quoi ça sert? | Où ça roule? | En une phrase |
+|---|---|---|---|
+| **Vault Flows** | Un écran simple pour lancer des recettes | Navigateur web | “Je clique, ça roule.” |
+| **Vault Pipelines** | Le moteur derrière les recettes | PC/serveur | “Ça exécute les étapes.” |
+| **Vault Central** | Un tableau de bord dans ton navigateur | Extension | “Tout voir au même endroit.” |
+| **Identity Manager** | Gérer des identités/accès de façon sécurisée | Local | “Mon trousseau de clés, mais solide.” |
+
+<Note>
+  “Où ça roule?” = sur quelle machine ça s’exécute. Le but est de garder ça **le plus local possible**.
+</Note>
 
 ## Matériel et appareils réseau
 
-Le matériel VaultWares est conçu pour sécuriser votre environnement physique et votre périmètre réseau.
+### On t’explique sans exagérer
+
+Le matériel, c’est la partie “boîtes physiques” (routeurs, stockage, etc.). Si tu n’en as pas besoin, tu peux ignorer cette section.
 
 <Tabs>
   <Tab title="Sécurité réseau">
@@ -68,13 +62,19 @@ Le matériel VaultWares est conçu pour sécuriser votre environnement physique 
 
 ## Services et ajouts
 
-Nous offrons des services spécialisés pour étendre les capacités de nos logiciels et de notre matériel.
+On peut aussi offrir :
 
-*   **Services chiffrés basés sur le client PQC :** Protégez vos données contre l'avenir avec la cryptographie post-quantique appliquée directement côté client.
-*   **Modèles IA locaux :** Accès à des modèles IA préservant la vie privée et hébergés localement pour le traitement de texte, d'images et de données.
-*   **Services de tests de pénétration frontend :** Évaluations de sécurité automatisées et manuelles pour les applications web.
-*   **Reconnaissance vocale en temps réel :** Applications natives offrant une transcription hors ligne très précise.
-*   **Adblock et anti-empreinte curatés :** Une liste Adblock propriétaire et manuellement curatée (affinée au fil d'un an) et des algorithmes anti-empreinte avancés intégrés à nos appareils réseau.
+- de l’aide pour installer/configurer,
+- des recettes/workflows sur mesure,
+- des audits simples (“est-ce que ton setup est correct?”).
+
+### Exemples concrets (plus parlant)
+
+| Ce que tu demandes | Ce qu’on livre |
+|---|---|
+| “Je veux que mes données sortent jamais de mon PC.” | Une recette qui roule localement + une config réseau privée |
+| “Je veux résumer mes docs chaque semaine.” | Un workflow planifié + un export lisible |
+| “Je veux pas me faire suivre sur le web.” | Des réglages navigateur + listes anti-pistage + bonnes pratiques |
 
 <Note>
   Tous les produits VaultWares adhèrent à notre politique stricte de zéro suivi. Nous ne collectons pas d'analyses, de télémétrie ou de journaux à distance. Vos données restent les vôtres.

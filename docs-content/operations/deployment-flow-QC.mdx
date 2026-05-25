@@ -5,13 +5,50 @@ description: "Modèle CI/CD canonique : webhooks GitHub → vw-webhookd → runn
 
 # Flux de déploiement (Privé)
 
-Cette page est la **source de vérité** pour la façon dont les déploiements sont exécutés pour les sites VaultWares + Prom‑King.
+Cette page est la **source de vérité** pour la façon dont on met à jour nos sites/apps.
+
+## Résumé en 30 secondes (version “grand-maman”)
+
+Quand on “pousse du code” (un changement), **GitHub ne fait PAS le déploiement**.
+
+GitHub fait juste une chose : **envoyer un message signé** à notre serveur.
+
+Ensuite, **notre serveur** (dans notre réseau privé) fait le déploiement.
+
+```mermaid
+sequenceDiagram
+  participant Dev as Toi (développeur)
+  participant GH as GitHub
+  participant Hooks as hooks.vaultwares.ca
+  participant VPS as greencloud-vps
+  Dev->>GH: push sur main
+  GH->>Hooks: webhook signé (push)
+  Hooks->>VPS: vw-webhookd (vérifie + déclenche)
+  VPS->>VPS: runner (pull + deploy)
+```
 
 ## Principes (obligatoire)
 
 - **Aucun déploiement via GitHub Actions.** Un `git push` sur `main` ne doit pas lancer de jobs build/deploy dans GitHub.
 - **GitHub sert uniquement de source d’événements.** Le seul comportement côté GitHub lors d’un push sur `main` est une **livraison de webhook signée**.
 - **Le déploiement s’exécute dans le tailnet** sur `greencloud-vps` (autorité de déploiement).
+
+### Pourquoi on fait ça?
+
+Parce qu’on veut :
+
+- **Contrôle** : le déploiement est fait par *nos* machines.
+- **Sécurité** : notre “vrai” système de déploiement est dans le réseau privé.
+- **Cohérence** : même logique pour tous les sites, pas 12 façons différentes.
+
+### Comparaison (plus concret)
+
+| Sujet | GitHub Actions déploie | Notre modèle (webhook → runner privé) |
+|---|---|---|
+| Qui déploie? | Un ordinateur “à GitHub” | `greencloud-vps` (nous) |
+| Où sont les secrets? | Dans GitHub | Dans VaultWarden sur le VPS |
+| Contrôle réseau | Public | Privé (tailnet) |
+| Risque de “surprise” | Moyen | Plus faible (on contrôle la machine) |
 
 ## Machines / endpoints
 
@@ -32,6 +69,11 @@ Développeur pousse vers GitHub (main)
        (via vaultwares-hooks / déclencheur de job interne)
   → le runner pull le repo + déploie sur greencloud-vps
 ```
+
+## “Message signé” : c’est quoi?
+
+Un webhook, c’est comme un **reçu** (un message) que GitHub envoie automatiquement.
+“Signé” veut dire : on peut vérifier que le message vient vraiment de GitHub (pas d’un inconnu).
 
 ## Exigences par repo
 
