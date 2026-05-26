@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
+import { isValidElement } from 'react'
+import { MermaidBlock } from './MermaidBlock'
 
 type GenericProps = {
   children?: ReactNode
@@ -129,6 +131,28 @@ function SimpleBlock({ children }: { children: ReactNode }) {
   return <div className="my-4">{toChildren(children)}</div>
 }
 
+function PreBlock(props: GenericProps) {
+  const child = props.children
+  if (isValidElement(child) && child.type === 'code') {
+    const className = String((child.props as { className?: unknown }).className ?? '')
+    const isMermaid = className.includes('language-mermaid') || className.includes('lang-mermaid')
+    if (isMermaid) {
+      const code = (child.props as { children?: unknown }).children
+      const chart =
+        typeof code === 'string'
+          ? code
+          : Array.isArray(code)
+            ? code.join('')
+            : code
+              ? String(code)
+              : ''
+      return <MermaidBlock chart={chart} />
+    }
+  }
+
+  return <pre {...props} />
+}
+
 function FieldBlock(props: FieldProps) {
   const attrs = [
     props.path ? `path: ${String(props.path)}` : '',
@@ -170,6 +194,7 @@ const components = {
   Expandable: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
   ParamField: (props: GenericProps) => <FieldBlock {...(props as FieldProps)} />,
   ResponseField: (props: GenericProps) => <FieldBlock {...(props as FieldProps)} />,
+  pre: (props: GenericProps) => <PreBlock {...props} />,
 
   // Common documentation placeholders that may appear in translated or example pages.
   Latex: ({ children }: GenericProps) => <SimpleBlock>{children}</SimpleBlock>,
