@@ -199,13 +199,13 @@ export function MermaidBlock({ chart }: { chart: string }) {
             onClick={fitToWidth}
             className="rounded-lg border border-white/10 bg-black/15 px-2 py-1 font-mono text-[11px] text-violet-100/75 hover:text-white"
           >
-            Fit
+            Ajuster
           </button>
           <button
             type="button"
             onClick={zoomOut}
             className="rounded-lg border border-white/10 bg-black/15 px-2 py-1 font-mono text-[11px] text-violet-100/75 hover:text-white"
-            aria-label="Zoom out"
+            aria-label="Réduire le zoom"
           >
             -
           </button>
@@ -216,7 +216,7 @@ export function MermaidBlock({ chart }: { chart: string }) {
             type="button"
             onClick={zoomIn}
             className="rounded-lg border border-white/10 bg-black/15 px-2 py-1 font-mono text-[11px] text-violet-100/75 hover:text-white"
-            aria-label="Zoom in"
+            aria-label="Augmenter le zoom"
           >
             +
           </button>
@@ -225,7 +225,7 @@ export function MermaidBlock({ chart }: { chart: string }) {
             onClick={resetZoom}
             className="rounded-lg border border-white/10 bg-black/15 px-2 py-1 font-mono text-[11px] text-violet-100/75 hover:text-white"
           >
-            Reset
+            Remettre
           </button>
         </div>
       </div>
