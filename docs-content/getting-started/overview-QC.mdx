@@ -23,6 +23,20 @@ flowchart TB
   E <--> F["Réseau privé (Tailscale)"]
 ```
 
+### Un workflow, c’est une “recette”
+
+Une recette = des étapes simples, dans un ordre.
+
+Exemple (super concret) :
+
+```mermaid
+flowchart LR
+  Doc["1 document"] --> Read["Lire"]
+  Read --> Summ["Résumer"]
+  Summ --> Save["Sauver le résultat"]
+  Save --> Done["Texte final"]
+```
+
 ## Ce que nous offrons
 
 <CardGroup cols={2}>
@@ -51,6 +65,12 @@ flowchart TB
 | Sécurité | Accès limité + réseau privé | “Mon serveur n’est pas ‘grand ouvert’ sur Internet.” |
 | Simplicité | Des recettes réutilisables | “Je clique sur une recette au lieu de refaire 10 étapes.” |
 
+## Ce que VaultWares n’est PAS (pour éviter les malentendus)
+
+- Ce n’est pas “un cloud où on envoie tout”.
+- Ce n’est pas “un outil magique” : c’est une façon claire d’organiser et d’automatiser.
+- Ce n’est pas “un truc compliqué réservé aux experts” : on vise des recettes faciles.
+
 ## Pour commencer
 
 <Steps>
@@ -68,6 +88,14 @@ flowchart TB
     Si tu as un PC + un serveur : le réseau privé (Tailscale) rend ça simple et sécuritaire.
   </Step>
 </Steps>
+
+### Petit test (si tu veux vérifier que t’as compris)
+
+Réponds à cette question :
+
+> “Où mes données vivent?”
+
+Réponse attendue : **chez toi / sur tes machines**, pas “dans un cloud public par défaut”.
 
 ## Besoin d'aide?
 
