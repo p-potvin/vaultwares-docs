@@ -352,6 +352,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "essentials__settings"
   },
   {
+    "routePath": "/getting-started/daily-flows",
+    "routeKey": "getting-started/daily-flows",
+    "sectionKey": "getting-started",
+    "resourceKey": "getting-started__daily-flows"
+  },
+  {
     "routePath": "/getting-started/overview",
     "routeKey": "getting-started/overview",
     "sectionKey": "getting-started",

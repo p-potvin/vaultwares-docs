@@ -1,0 +1,189 @@
+---
+title: "Recettes du jour (exemples)"
+description: "Des workflows générés chaque jour pour montrer c’est quoi une “recette” Vault Flows, avec des exemples de la vraie vie."
+---
+
+# Recettes du jour (exemples)
+
+Cette page sert à montrer, **en images**, c’est quoi une *recette* (un workflow).
+
+## Comment lire ça (sans être tech)
+
+- Chaque **boîte** = une étape.
+- Chaque **flèche** = “après ça, on fait ça”.
+- Le but : tu vois que n’importe quel hobby/métier peut devenir une recette.
+
+<Tip>
+  Ces recettes viennent de `C:\Users\Administrator\Desktop\gemini-daily-flow.md`. On les utilise comme **exemples** pour inspirer la bibliothèque de workflows dans `vault-flows`.
+</Tip>
+
+---
+
+## Jour 1 — Observation d’oiseaux + identification
+
+```mermaid
+flowchart LR
+  A["Dossier: nouvelles photos"] --> B["Lire les infos (date/lieu)"]
+  B --> C["IA (vision): propose l’espèce + confiance"]
+  D["Notes de l’humain: où/quoi/combien"] --> E["Assembler l’info"]
+  C --> E
+  E --> F{"Tu confirmes?"}
+  F -->|Oui| G["Renommer + classer les fichiers"]
+  F -->|Non| H["Corriger l’espèce (manuel)"]
+  H --> G
+  G --> I["Ajouter au journal (JSON)"]
+  G --> J["Journal lisible (Markdown)"]
+```
+
+---
+
+## Jour 2 — Planificateur de levain (pain)
+
+```mermaid
+flowchart TB
+  A["Entrées: température, force du levain, heure de cuisson"] --> B["Calcul: vitesse de fermentation"]
+  B --> C["Timeline: nourrir → mélanger → repos → façonnage → pousse → cuisson"]
+  C --> D["Si la temp change: recalculer les temps"]
+  D --> E{"Décision requise?"}
+  E -->|Oui| F["Humain: 'c’est prêt? (volume/texture)'"]
+  E -->|Non| G["Continuer"]
+  F --> G
+  G --> H["Rappels/notifications"]
+  G --> I["Feuille imprimable"]
+```
+
+---
+
+## Jour 3 — Recette de glaçure (céramique) à partir de cendre volcanique
+
+```mermaid
+flowchart LR
+  A["Entrée: analyse de minéraux (oxydes %)"] --> B["Nettoyer + valider"]
+  B --> C["Calcul: équilibre de la recette"]
+  C --> D["Suggérer des ajustements"]
+  D --> E{"Choix humain"}
+  E -->|Vibe/couleur| F["Choisir un style (mat/brillant)"]
+  E -->|Défaut| G["Cible standard"]
+  F --> H["Recette finale (grammes + notes)"]
+  G --> H
+  H --> I["Export: carte PDF + JSON"]
+```
+
+---
+
+## Jour 4 — “Cueillette sécuritaire” (plantes / champignons)
+
+```mermaid
+flowchart TB
+  A["Photos: détails (dessous, tige, etc.)"] --> B["Checklist: habitat + saison + notes"]
+  B --> C["IA (vision): candidats + confiance"]
+  C --> D["Règles: drapeaux rouges / sosies toxiques"]
+  D --> E{"Confiance assez haute?"}
+  E -->|Non| F["Refuser: 'ne pas manger' + notes"]
+  E -->|Oui| G{"Revue humaine"}
+  G -->|OK| H["Cataloguer + rappel sécurité"]
+  G -->|Pas sûr| F
+  H --> I["Exporter: journal perso / format communauté"]
+```
+
+---
+
+## Jour 5 — Micro‑boulangerie: horaire dynamique
+
+```mermaid
+flowchart LR
+  A["Entrées: commandes + nombre de pains"] --> B["Lire l’environnement (temp/humidité)"]
+  B --> C["Planifier les lots"]
+  C --> D["Ajuster les temps (selon température)"]
+  D --> E["Notifications (téléphone)"]
+  D --> F{"Checkpoint"}
+  F -->|Prêt| G["Étape suivante"]
+  F -->|Pas prêt| D
+  G --> H["Feuille de production (print)"]
+  G --> I["Résumé fin de journée"]
+```
+
+---
+
+## Jour 6 — Stratégie: générateur de recettes (anti‑répétition)
+
+```mermaid
+flowchart TB
+  A["Liste de domaines (hobbies/métiers)"] --> B["Choisir un domaine (pas le même qu’hier)"]
+  B --> C["Choisir un type: commun / original / surprenant"]
+  C --> D{"Déjà fait?"}
+  D -->|Oui| B
+  D -->|Non| E["Décider: IA ou pas IA"]
+  E --> F["Générer: titre + diagramme + JSON"]
+  F --> G["Ajouter au log + mémoire"]
+```
+
+---
+
+## Jour 7 — Restauration de sneakers vintage
+
+```mermaid
+flowchart TB
+  A["Photos: semelle, cuir, coutures, taches"] --> B["IA: carte des dommages"]
+  B --> C["Plan: nettoyer → réparer → repeindre → sceller"]
+  C --> D{"Customiser?"}
+  D -->|Non| E["Liste de matériel + checklist"]
+  D -->|Oui| F["IA: idées de design (variantes)"]
+  F --> G["Humain: choisir 1 concept"]
+  G --> E
+  E --> H["Rappels: séchage/colle"]
+  H --> I["Avant/Après + résumé partageable"]
+```
+
+---
+
+## Jour 8 — Conservation de semences (botanique)
+
+```mermaid
+flowchart LR
+  A["Info plante: espèce + date + source"] --> B["Checklist: maturité"]
+  B --> C["Séchage: temps + conditions"]
+  C --> D["Nettoyage: enlever les résidus"]
+  D --> E["Étiquettes: pot/enveloppe (QR optionnel)"]
+  E --> F["Plan rangement: endroit sec/frais"]
+  F --> G["Exporter: journal + rappels (test germination)"]
+```
+
+---
+
+## Jour 9 — Scan quotidien (diversité de domaines)
+
+```mermaid
+flowchart TB
+  A["Domaines: cuisine, arts, plein air, enseignement…"] --> B["Choisir un domaine (pas le dernier)"]
+  B --> C["Choisir une tâche (pas déjà faite)"]
+  C --> D["Classer: commun/original/surprenant"]
+  D --> E["Sauver la mémoire (anti‑doublons)"]
+  E --> F["Générer la prochaine recette"]
+```
+
+---
+
+## Jour 10 — Script‑to‑Lux (éclairage de théâtre)
+
+```mermaid
+flowchart LR
+  A["Script (PDF/TXT)"] --> B["Découper en scènes"]
+  C["Notes du metteur en scène"] --> D["Analyser l’ambiance"]
+  B --> D
+  D --> E["Séquence: cues (temps → intensité → couleur)"]
+  E --> F["Palette (RGB/gels)"]
+  F --> G{"Revue humaine"}
+  G -->|OK| H["Table: feuille de cues (DMX)"]
+  G -->|Modifier| I["Ajuster cues/palette"]
+  I --> H
+  H --> J["Export: PDF + CSV"]
+```
+
+---
+
+## Pourquoi c’est important pour Vault Flows
+
+Ces exemples montrent que “workflow” ne veut pas dire “programmation”.
+C’est juste une façon de rendre une tâche **claire**, **répétable**, et **facile à partager**.
+
