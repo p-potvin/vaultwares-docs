@@ -1,52 +1,101 @@
 ---
 title: Vue d'ensemble
-description: Bienvenue chez VaultWares - des solutions de protection des données et de sécurité de niveau entreprise
+description: Explication ultra simple de VaultWares (sans jargon) + comment commencer.
 ---
 
 ## Bienvenue chez VaultWares
 
-VaultWares offre des solutions complètes de protection des données et de sécurité, combinant du matériel et des logiciels de pointe pour protéger les actifs les plus critiques de votre organisation.
+### C’est quoi VaultWares, pour vrai?
+
+VaultWares, c’est une façon de **protéger tes données** et de **faire rouler des tâches automatiquement**, tout en gardant le maximum de choses **chez toi** (ou sur des machines que TU contrôles).
+
+Si tu veux une comparaison de “la vraie vie” :
+
+- Tes données = **tes papiers importants** (photos, contrats, mots de passe, projets).
+- VaultWares = **un coffre-fort + un assistant + une route privée**.
+
+```mermaid
+flowchart TB
+  A["Tes données (photos, docs, projets)"] --> B["Coffre-fort (chiffrement + accès)"]
+  B --> C["Recettes (workflows)"]
+  C --> D["Résultats (résumés, classements, exports)"]
+  E["Tes machines (PC / serveur)"] --> C
+  E <--> F["Réseau privé (Tailscale)"]
+```
+
+### Un workflow, c’est une “recette”
+
+Une recette = des étapes simples, dans un ordre.
+
+Exemple (super concret) :
+
+```mermaid
+flowchart LR
+  Doc["1 document"] --> Read["Lire"]
+  Read --> Summ["Résumer"]
+  Summ --> Save["Sauver le résultat"]
+  Save --> Done["Texte final"]
+```
 
 ## Ce que nous offrons
 
 <CardGroup cols={2}>
-  <Card title="Sécurité matérielle" icon="microchip" href="/hardware/encrypted-storage">
-    Dispositifs de stockage chiffré, HSM, authentification biométrique et appareils de sécurité réseau
+  <Card title="Outils (logiciel)" icon="diagram-project" href="/getting-started/products-and-services">
+    Des apps et des écrans qui te laissent construire des “recettes” (workflows) et gérer tes données.
   </Card>
-  <Card title="Solutions logicielles" icon="code" href="/software/encryption-software">
-    Logiciels de chiffrement, systèmes de contrôle d'accès, outils de sauvegarde et de récupération, et surveillance de la sécurité
+  <Card title="Réseau privé" icon="shield" href="/operations/tailscale">
+    Un tunnel sécurisé entre tes machines. Pas besoin d’ouvrir ton serveur à tout Internet.
   </Card>
-  <Card title="Prêt pour la conformité" icon="shield-check" href="/security/certifications">
-    Solutions certifiées FIPS 140-2, Common Criteria, ISO 27001 et SOC 2
+  <Card title="Opérations (pour l’équipe)" icon="network-wired" href="/operations/network-map">
+    Pages “runbook” : où sont nos machines, comment on déploie, comment on garde ça stable.
   </Card>
-  <Card title="Soutien expert" icon="headset" href="/support/contact">
-    Soutien technique 24/7 et consultants en sécurité dédiés
+  <Card title="Support" icon="headset" href="/support/faq">
+    Les questions simples (et les réponses simples).
   </Card>
 </CardGroup>
 
 ## Fonctionnalités clés
 
-- **Chiffrement PQC à connaissance zéro**: Protection des données même contre nous-mêmes et les menaces futures des ordinateurs quantiques
-- **Conformité automatisée**: Rapports de conformité intégrés pour le RGPD, HIPAA et PCI DSS
-- **Intégration transparente**: Compatible avec l'infrastructure d'entreprise existante
-- **Surveillance en temps réel**: Détection avancée des menaces et analyse de sécurité
+> Ici, “fonctionnalités” veut surtout dire : qu’est-ce que ça change dans ta vie.
+
+| Besoin | En clair | Exemple |
+|---|---|---|
+| Vie privée | On évite d’envoyer tes données à des services publics | “Je peux résumer des documents sans les uploader sur un site.” |
+| Contrôle | Tu sais où ça roule (PC / serveur) | “Mes jobs tournent sur mon ordi, pas sur un cloud random.” |
+| Sécurité | Accès limité + réseau privé | “Mon serveur n’est pas ‘grand ouvert’ sur Internet.” |
+| Simplicité | Des recettes réutilisables | “Je clique sur une recette au lieu de refaire 10 étapes.” |
+
+## Ce que VaultWares n’est PAS (pour éviter les malentendus)
+
+- Ce n’est pas “un cloud où on envoie tout”.
+- Ce n’est pas “un outil magique” : c’est une façon claire d’organiser et d’automatiser.
+- Ce n’est pas “un truc compliqué réservé aux experts” : on vise des recettes faciles.
 
 ## Pour commencer
 
 <Steps>
-  <Step title="Vérifier les exigences système">
-    Vérifiez les [exigences système](/getting-started/system-requirements) pour assurer la compatibilité avec votre infrastructure.
+  <Step title="Étape 1 — Choisis ton scénario">
+    Choisis une phrase qui te ressemble :
+    - “Je veux garder mes données privées.”
+    - “Je veux automatiser des tâches répétitives.”
+    - “Je veux une façon simple d’utiliser des modèles IA localement.”
   </Step>
-  <Step title="Choisir votre solution">
-    Explorez nos produits [matériels](/hardware/encrypted-storage) et [logiciels](/software/encryption-software) pour trouver la solution idéale.
+  <Step title="Étape 2 — Commence avec une recette simple">
+    Même si tu connais rien à la tech : commence par une recette “1 clic”.
+    Tu vas comprendre le concept de workflow rapidement.
   </Step>
-  <Step title="Installer et configurer">
-    Suivez notre [guide d'installation rapide](/getting-started/quick-installation) pour déployer votre solution de sécurité.
-  </Step>
-  <Step title="Vérifier la conformité">
-    Consultez nos [guides de conformité](/compliance/gdpr) pour vous assurer que votre déploiement répond aux exigences réglementaires.
+  <Step title="Étape 3 — Si tu as plusieurs machines, utilise le réseau privé">
+    Si tu as un PC + un serveur : le réseau privé (Tailscale) rend ça simple et sécuritaire.
   </Step>
 </Steps>
+
+### Petit test (si tu veux vérifier que t’as compris)
+
+Réponds à cette question :
+
+> “Où mes données vivent?”
+
+Réponse attendue : **chez toi / sur tes machines**, pas “dans un cloud public par défaut”.
 
 ## Besoin d'aide?
 
@@ -58,3 +107,7 @@ VaultWares offre des solutions complètes de protection des données et de sécu
     Trouvez des réponses aux questions courantes
   </Card>
 </CardGroup>
+
+<Tip>
+  Tu veux la version “grand public” en 60 secondes? Lis la page d’accueil : `/index-QC`.
+</Tip>

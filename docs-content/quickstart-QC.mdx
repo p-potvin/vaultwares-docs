@@ -1,258 +1,69 @@
 ---
 title: "Démarrage rapide"
-description: "Être opérationnel avec le matériel et le logiciel VaultWares en quelques minutes"
+description: "Le premier succès en 10 minutes : comprendre VaultWares + lancer une première “recette” (workflow)."
 ---
 
 
 ## Avant de commencer
 
 <Info>
-  Assurez-vous d'avoir votre **clé de licence** VaultWares prête. Vous la trouverez dans l'e-mail de confirmation de [portal.vaultwares.com](https://portal.vaultwares.com), ou contactez [support@vaultwares.com](mailto:support@vaultwares.com) si vous avez besoin d'aide pour la localiser.
+  Objectif : arriver à une victoire rapide — **tu comprends ce qu’on fait**, et tu vois **un résultat concret**.
 </Info>
 
-Choisissez le chemin de démarrage rapide qui correspond à votre déploiement :
+## Ton “script” de 2 phrases (à dire à quelqu’un)
 
-<CardGroup cols={2}>
-  <Card title="Démarrage rapide matériel" icon="usb-drive" href="#hardware-quickstart">
-    Initialisez un périphérique de stockage chiffré VaultDrive.
-  </Card>
-  <Card title="Démarrage rapide logiciel" icon="shield-halved" href="#software-quickstart">
-    Installez VaultCrypt et chiffrez votre premier volume.
-  </Card>
-</CardGroup>
+1) “VaultWares aide à garder tes données chez toi et à les protéger.”
+2) “Puis on automatise des tâches avec des recettes (workflows) qui tournent sur tes machines.”
+
+### Une minute de vocabulaire (sans douleur)
+
+| Mot | Ça veut dire quoi? |
+|---|---|
+| **Workflow** | Une recette : des étapes qui font une tâche pour toi. |
+| **Local** | Ça roule sur ton PC / tes machines, pas sur un cloud public. |
+| **Réseau privé (Tailscale)** | Un tunnel sécurisé entre tes machines. |
 
 ---
 
 
-## Démarrage rapide matériel
+## Démarrage rapide (le chemin simple)
 
-Faites initialiser votre VaultDrive et soyez prêt à l'utiliser en moins de 5 minutes.
+### Résultat visé
 
-### Ce dont vous avez besoin
+- Tu peux expliquer VaultWares en 2 phrases.
+- Tu vois une recette/workflow “tourner” et te donner un résultat.
 
-- Périphérique VaultDrive (tout modèle)
-- Ordinateur avec port USB 3.0 ou supérieur
-- VaultWares Manager (optionnel, pour des fonctionnalités avancées)
-
-### Initialiser votre VaultDrive
+### Étapes
 
 <Steps>
-  <Step title="Connecter l'appareil">
-    Branchez le VaultDrive sur un port USB-C ou USB-A disponible. Le voyant LED de statut clignotera en ambre, indiquant que l'appareil attend une initialisation.
+  <Step title="1) Lis la page “Vue d’ensemble” (vraiment simple)">
+    Va lire : `/getting-started/overview` (version QC).
+  </Step>
+
+  <Step title="2) Regarde la page “Produits et services” (menu très simple)">
+    Va lire : `/getting-started/products-and-services` (version QC).
+    Choisis 1 produit à retenir (ex.: Vault Flows).
+  </Step>
+
+  <Step title="3) Lance une première recette (exemple)">
+    Exemple de workflow (idée) :
+    - Tu donnes 1 document
+    - La recette le résume
+    - Tu obtiens un texte lisible
 
     <Note>
-      Lors de la première utilisation, l'appareil monte une petite partition en lecture seule contenant l'utilitaire de configuration. N'essayez pas de formater cette partition.
+      Même si tu comprends pas tous les détails : l’idée, c’est “je clique → ça roule → j’ai un résultat”.
     </Note>
   </Step>
 
-  <Step title="Lancer l'utilitaire de configuration">
-    L'appareil lance automatiquement l'utilitaire de configuration sur les systèmes pris en charge. Alternativement, ouvrez le volume monté et exécutez :
-
-    <Tabs>
-      <Tab title="Windows">
-        ```cmd
-        E:\VaultWares-Setup.exe
-        ```
-      </Tab>
-      <Tab title="macOS">
-        ```bash
-        open /Volumes/VAULTDRIVE/VaultWares-Setup.app
-        ```
-      </Tab>
-      <Tab title="Linux">
-        ```bash
-        /media/$USER/VAULTDRIVE/vaultdrive-setup
-        ```
-      </Tab>
-    </Tabs>
+  <Step title="Bonus — Comprendre le mot “local” (super important)">
+    “Local” veut dire : ça roule sur TON ordi/serveur.
+    Pas besoin d’envoyer tes fichiers à une plateforme publique.
   </Step>
 
-  <Step title="Définir votre mot de passe maître">
-    Lorsque vous y êtes invité, créez un mot de passe maître fort. VaultWares applique par défaut ces exigences minimales :
-
-    - Au moins 8 caractères (12+ recommandé)
-    - Au moins une lettre majuscule
-    - Au moins un chiffre
-    - Au moins un caractère spécial
-
-    <Warning>
-      Votre mot de passe maître ne peut pas être récupéré par VaultWares. Si vous l'oubliez, les données chiffrées ne pourront pas être accédées. Stockez votre mot de passe dans un gestionnaire de mots de passe sécurisé.
-    </Warning>
-  </Step>
-
-  <Step title="Enrôler les données biométriques (modèles biométriques uniquement)">
-    Pour le VaultDrive Biometric, on vous demandera de scanner votre empreinte digitale trois fois pour compléter l'enrôlement. Jusqu'à 10 empreintes digitales peuvent être enrôlées pour des scénarios d'appareils partagés.
-  </Step>
-
-  <Step title="Accéder à votre volume chiffré">
-    Après une authentification réussie, le volume chiffré est monté automatiquement :
-
-    | OS | Emplacement de montage |
-    |----|---------------|
-    | Windows | Lettre de lecteur assignée (ex. : `E:\`) |
-    | macOS | `/Volumes/VaultDrive` |
-    | Linux | `/media/$USER/VaultDrive` |
-
-    Le voyant LED de statut devient vert fixe lorsque le volume est déverrouillé et monté.
-  </Step>
-</Steps>
-
-### Gestion par CLI (optionnel)
-
-Installez VaultWares Manager pour la gestion en ligne de commande :
-
-```bash
-# Install VaultWares Manager
-# macOS/Linux
-curl -sSL https://get.vaultwares.com/manager | bash
-
-# Windows (PowerShell)
-iwr https://get.vaultwares.com/manager/install.ps1 | iex
-
-# Verify installation
-vw-storage --version
-
-# Check connected devices
-vw-storage list-devices
-
-# Change password
-vw-storage change-password --device /dev/sdb
-
-# Enable auto-lock after 5 minutes of inactivity
-vw-storage set-policy --device /dev/sdb --auto-lock 5
-```
-
----
-
-## Démarrage rapide logiciel
-
-Installez VaultCrypt et chiffrez votre premier volume en moins de 10 minutes.
-
-### Exigences système
-
-| Composant | Minimum | Recommandé |
-|-----------|---------|-------------|
-| OS | Windows 10 / macOS 11 / Ubuntu 20.04 | Windows 11 / macOS 13 / Ubuntu 22.04 |
-| CPU | x86-64 2 cœurs | x86-64 4 cœurs ou Apple Silicon |
-| RAM | 4 Go | 8 Go |
-| Espace disque | 500 Mo | 1 Go |
-| .NET / JRE | .NET 6.0+ | .NET 8.0+ |
-
-### Installer et activer VaultCrypt
-
-<Steps>
-  <Step title="Télécharger l'installateur">
-    Téléchargez VaultCrypt depuis le [portail client](https://portal.vaultwares.com/downloads) ou utilisez la CLI :
-
-    ```bash
-    # Download latest stable release
-    curl -O https://releases.vaultwares.com/vaultcrypt/latest/vaultcrypt-installer.sh
-    chmod +x vaultcrypt-installer.sh
-    sudo ./vaultcrypt-installer.sh
-    ```
-
-    <Tip>
-      Les clients d'entreprise peuvent également déployer VaultCrypt silencieusement via des paquets MSI, PKG ou DEB/RPM. Consultez le [guide de déploiement logiciel](/installation/software-deployment).
-    </Tip>
-  </Step>
-
-  <Step title="Activer votre licence">
-    Après l'installation, activez VaultCrypt avec votre clé de licence :
-
-    <Tabs>
-      <Tab title="GUI">
-        Lancez VaultCrypt. Lorsque vous y êtes invité, entrez votre clé de licence et cliquez sur **Activer**. Une connexion Internet est requise pour l'activation en ligne.
-      </Tab>
-      <Tab title="CLI">
-        ```bash
-        # Online activation
-        vaultcrypt activate --key VWCR-XXXX-XXXX-XXXX-XXXX
-
-        # Offline activation (air-gapped systems)
-        vaultcrypt activate --key VWCR-XXXX-XXXX-XXXX-XXXX --offline
-        # Follow the on-screen instructions to generate an activation request file
-        # and submit it at https://portal.vaultwares.com/offline-activation
-        ```
-      </Tab>
-    </Tabs>
-
-    Une activation réussie affiche :
-    ```
-    License activated successfully.
-    Edition:    Enterprise
-    Valid until: 2026-12-31
-    Seats:       250 / 500 used
-    ```
-  </Step>
-
-  <Step title="Chiffrer votre premier volume">
-    Choisissez entre le chiffrement complet du disque ou le chiffrement basé sur conteneur :
-
-    <Tabs>
-      <Tab title="Chiffrement complet du disque">
-        ```bash
-        # Encrypt an entire disk partition
-        vaultcrypt encrypt-disk \
-          --device /dev/sdc \
-          --algorithm AES-256-XTS \
-          --key-source password
-
-        # Or encrypt an existing Windows drive
-        vaultcrypt encrypt-disk --drive D: --algorithm AES-256-XTS
-        ```
-
-        <Warning>
-          Le chiffrement complet du disque formate la partition cible. Sauvegardez vos données avant de continuer.
-        </Warning>
-      </Tab>
-      <Tab title="Conteneur chiffré">
-        ```bash
-        # Create a 10 GB encrypted container file
-        vaultcrypt create-container \
-          --output ~/secure-vault.vc \
-          --size 10G \
-          --algorithm AES-256-XTS \
-          --key-source password
-
-        # Mount the container
-        vaultcrypt mount ~/secure-vault.vc --mountpoint ~/vault
-
-        # Unmount when done
-        vaultcrypt unmount ~/vault
-        ```
-      </Tab>
-    </Tabs>
-  </Step>
-
-  <Step title="Vérifier le statut de chiffrement">
-    ```bash
-    # Check encryption status for all managed volumes
-    vaultcrypt status
-
-    # Sample output:
-    # Volume             Algorithm      Status     Mounted
-    # /dev/sdc           AES-256-XTS    Encrypted  Yes
-    # ~/secure-vault.vc  AES-256-XTS    Encrypted  Yes
-    ```
-  </Step>
-
-  <Step title="Configurer le montage automatique (optionnel)">
-    Pour les serveurs et les systèmes sans interface graphique (headless), configurez VaultCrypt pour monter les volumes automatiquement au démarrage :
-
-    ```bash
-    # Register a volume for auto-mount using HSM key
-    vaultcrypt auto-mount \
-      --volume /dev/sdc \
-      --key-source hsm \
-      --hsm-slot 1 \
-      --at-boot
-
-    # Or use a key file stored in a secure location
-    vaultcrypt auto-mount \
-      --volume /dev/sdc \
-      --key-file /etc/vaultcrypt/keys/sdc.key \
-      --at-boot
-    ```
+  <Step title="4) Si tu as un PC + un serveur : lis la page Tailscale">
+    Va lire : `/operations/tailscale` (version QC).
+    L’objectif : comprendre l’idée du réseau privé.
   </Step>
 </Steps>
 
@@ -261,22 +72,10 @@ Installez VaultCrypt et chiffrez votre premier volume en moins de 10 minutes.
 ## Prochaines étapes
 
 <CardGroup cols={2}>
-  <Card title="Installation matérielle" icon="screwdriver-wrench" href="/installation/hardware-installation">
-    Guides de configuration détaillés pour VaultHSM, VaultScan et VaultGate.
+  <Card title="Vue d’ensemble" icon="circle-play" href="/getting-started/overview">
+    La version la plus facile à partager à quelqu’un qui connaît pas la tech.
   </Card>
-  <Card title="Déploiement logiciel" icon="server" href="/installation/software-deployment">
-    Déploiement d'entreprise via MDM, GPO, Docker et Kubernetes.
-  </Card>
-  <Card title="Configuration initiale" icon="sliders" href="/installation/initial-configuration">
-    Se connecter à Active Directory, configurer les alertes par courriel et définir les politiques de sauvegarde.
-  </Card>
-  <Card title="Guides d'intégration" icon="plug" href="/installation/integration-guides">
-    Intégrer avec AD, LDAP, SAML, SIEM, PKI et fournisseurs de cloud.
-  </Card>
-  <Card title="Meilleures pratiques de sécurité" icon="star" href="/guides/best-practices">
-    Gestion des clés, politiques de mot de passe et recommandations de réponse aux incidents.
-  </Card>
-  <Card title="Référence API" icon="code" href="/api-reference/authentication">
-    Automatiser la gestion VaultWares avec l'API REST.
+  <Card title="Produits et services" icon="sitemap" href="/getting-started/products-and-services">
+    Le menu : ce qui existe, à quoi ça sert, et ce qui est à venir.
   </Card>
 </CardGroup>

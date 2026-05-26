@@ -5,6 +5,25 @@ description: "Tailnet, VPS, PC, services, ports et comment nous y accédons. Pri
 
 # Carte réseau (Privé)
 
+## Comment lire cette page (super simple)
+
+Imagine 3 “endroits” :
+
+1. **Internet (public)** : la grande rue. N’importe qui peut frapper à la porte.
+2. **Tailnet (privé)** : un corridor privé. Juste les appareils autorisés peuvent entrer.
+3. **Machines** : nos ordinateurs (PC + serveurs) qui font rouler les services.
+
+```mermaid
+flowchart LR
+  Public["Internet (public)"] -->|HTTPS 443| VPS["greencloud-vps\n(le serveur public)"]
+  Tailnet["Tailnet (privé)\nTailscale"] <--> VPS
+  Tailnet <--> PC["Clopeux-Desktop\n(le PC)"]
+```
+
+<Tip>
+  Si tu montres ça à un public non-tech : garde juste l’idée “Internet = public, Tailnet = corridor privé”.
+</Tip>
+
 ## Faits rapides
 
 - **Tailnet:** `tail1764b8.ts.net`
@@ -70,7 +89,7 @@ flowchart TB
 
 ## Machines
 
-> Cette page évite intentionnellement les mots de passe/jetons. Stockez les secrets dans VaultWarden (`https://secrets.vaultwares.ca`, seulement sur le tailnet).
+> Cette page évite intentionnellement les mots de passe/jetons. Stockez les secrets dans VaultWarden (`https://warden.vaultwares.ca`, seulement sur le tailnet).
 
 | Machine | Rôle | OS | IP Tailnet | IP Publique | Accès |
 |---|---|---|---|---|---|

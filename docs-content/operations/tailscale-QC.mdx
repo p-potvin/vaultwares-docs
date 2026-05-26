@@ -5,10 +5,32 @@ description: "Comment Tailnet est utilisé pour le contrôle d'accès, SSH et le
 
 # Tailscale (Privé)
 
+## Résumé en 30 secondes (pour non-tech)
+
+Tailscale, c’est comme une **clé magnétique** pour entrer dans notre “corridor privé”.
+
+- Sans la clé : tu vois seulement la porte publique (ou un refus).
+- Avec la clé : tu peux accéder aux services internes **sans ouvrir l’accès au monde entier**.
+
+```mermaid
+flowchart LR
+  Outside["Internet (tout le monde)"] --> Deny["Porte fermée\n(403 / refus)"]
+  Tailnet["Tailnet (appareils autorisés)"] --> Allow["Porte interne\n(accès OK)"]
+```
+
 ## Objectifs de politique
 - Tailnet est le **plan de contrôle par défaut**.
 - Le SSH VPS est **uniquement sur le tailnet**.
 - Les services sont explicitement autorisés par la politique (refus par défaut).
+
+### Pourquoi c’est important?
+
+Parce que ça réduit 2 risques fréquents :
+
+| Risque | Exemple | Ce que Tailscale aide à éviter |
+|---|---|---|
+| Serveur “grand ouvert” | “N’importe qui peut scanner ton IP.” | On n’ouvre pas SSH/adm au public |
+| Partage de secrets partout | “Les mots de passe sont copiés partout.” | Accès via réseau privé + listes blanches |
 
 ## Règles clés (actuelles)
 - Le Propriétaire peut atteindre `tag:server` sur les ports `22`, `80`, `443`.
@@ -21,6 +43,8 @@ description: "Comment Tailnet est utilisé pour le contrôle d'accès, SSH et le
 Certains sous-domaines (ex. `stats.vaultwares.ca`) sont des services **uniquement sur le tailnet**. L'enregistrement DNS public renvoie l'IP publique du VPS, qui sert un 403 à tous les clients non-tailnet. Les nœuds Tailnet résolvent le même nom d'hôte vers l'**IP Tailscale** de `greencloud-vps` via une substitution DNS Tailscale, contournant entièrement le vhost nginx public et atteignant un bloc de serveur nginx séparé et interne uniquement.
 
 ### Comment ça fonctionne
+
+> L’analogie : même adresse sur l’enveloppe, mais **deux portes** selon si tu es “dans le corridor privé” ou non.
 
 ```
 Public client  →  stats.vaultwares.ca  →  <public IP>  →  nginx (403, intentional)
