@@ -1,0 +1,65 @@
+---
+title: "Agent Ledger Schema"
+description: "Event JSON shape and the canonical kind enum for multi-kind ledger entries."
+---
+
+## Event JSON shape
+
+Each ledger event is a JSON file under `agent-ledger/events/YYYY/MM/`. Key fields:
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | string | Unique event ID (timestamp + project slug + content hash prefix) |
+| `createdAt` | string | ISO 8601 UTC timestamp |
+| `createdAtLocal` | string | Local timestamp (`yyyy-MM-dd HH:mm`) |
+| `project` | string | Canonical project name (resolved via `project-aliases.json`) |
+| `kind` | string | Comma-separated list of canonical kind values |
+| `summary` | string | Free-text summary (max ~1024 tokens) |
+| `commands` | string[] | Important commands run during the work |
+| `files` | string[] | Important files touched |
+| `actor` | string | Agent or human name |
+| `git` | object | `{ repo, root, branch, head, hasChanges }` |
+| `runtime` | object | `{ role, model, thinking, mode, permissions, network, toolsUsed, mcpServersAccessed }` |
+| `telemetry` | object | `{ flags, metrics }` |
+
+## The `kind` field
+
+`kind` is a **comma-separated string** where each piece is a value from the canonical enum.
+
+### Canonical enum
+
+| Value | Meaning |
+|---|---|
+| `plan` | Scoping, planning, design work |
+| `commands` | Ran ad-hoc shell or git operations |
+| `code-change` | Wrote or modified code |
+| `verification` | Ran tests, verified behavior |
+| `handoff` | Preparing context for next agent or human |
+| `general` | Everything else |
+
+### Rules
+
+- Single kind (backward compatible): `"code-change"`
+- Multi-kind: `"code-change,verification"` — counted under **both** buckets in dashboards
+- Whitespace around commas is tolerated and normalized on write
+- Unknown values are **accepted** (not rejected) but aggregate under `general` in charts
+- The intake script emits a `Write-Warning` for unknown values
+
+### Examples
+
+```powershell
+# Single kind
+& record-agent-change.ps1 -Project "my-repo" -Kind "code-change" -Summary "Added helper"
+
+# Multi-kind
+& record-agent-change.ps1 -Project "my-repo" -Kind "code-change,verification" -Summary "Added foo and confirmed bar works"
+
+# Three kinds
+& record-agent-change.ps1 -Project "my-repo" -Kind "plan,code-change,verification" -Summary "Planned, built, tested the feature"
+```
+
+## How aggregations work
+
+An event with `kind: "code-change,verification"` is counted under **both** kind buckets in the work-impact dashboard. The split happens at read time via `Get-KindListForAggregation` (PowerShell) or `parseKinds` (TypeScript).
+
+Unknown values (e.g. `"code-change,vibes"`) are stored verbatim in the event JSON. At aggregation time, `vibes` is bucketed under `general`. In the UI, unknown kinds render with a dashed border to visually flag them.
