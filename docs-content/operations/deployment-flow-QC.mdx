@@ -7,6 +7,10 @@ description: "Modèle CI/CD canonique : webhooks GitHub → vw-webhookd → runn
 
 Cette page est la **source de vérité** pour la façon dont on met à jour nos sites/apps.
 
+Pages liées :
+- `operations/services-inventory` (table unique de toutes les URLs/services)
+- `operations/webhook-secret-rotation` (comment tourner `VW_GITHUB_WEBHOOK_SECRET` sans casser les deploys)
+
 ## Résumé en 30 secondes (version “grand-maman”)
 
 Quand on “pousse du code” (un changement), **GitHub ne fait PAS le déploiement**.
@@ -85,6 +89,7 @@ Un webhook, c’est comme un **reçu** (un message) que GitHub envoie automatiqu
 ## Secrets / vérification
 
 - `VW_GITHUB_WEBHOOK_SECRET` vit dans VaultWarden (`https://warden.vaultwares.ca`, tailnet-only) et est provisionné sur `greencloud-vps`.
+- Si tu tournes ce secret, tu dois mettre à jour **les deux** : `vw-webhookd` + chaque webhook de repo. Voir `operations/webhook-secret-rotation`.
 - Vérifiez la livraison + le traitement en confirmant :
   - `https://hooks.vaultwares.ca/health` retourne `200`
   - les logs de `vw-webhookd` sur `greencloud-vps` (et les logs du runner en aval)

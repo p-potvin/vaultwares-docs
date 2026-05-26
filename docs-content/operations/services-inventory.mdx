@@ -1,0 +1,42 @@
+---
+title: "Services inventory (Private)"
+description: "Single table of VaultWares + Prom‑King services: URL, where it runs, repo, and visibility."
+---
+
+# Services inventory (Private)
+
+This page is a **single source of truth table** for “what we run”.
+
+It exists so that:
+
+- a non-technical person can understand *what each URL is*
+- an assistant can quickly map a URL → machine → repo → deployment flow
+
+> If you add a new public URL, update this table the same day.
+
+## Table
+
+| Service | URL | Where (runtime) | GitHub repo | Visibility |
+|---|---|---|---|---|
+| Main website | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
+| Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (static) | `vaultwares-docs` | Tailnet-only |
+| API | `https://api.vaultwares.ca` | nginx proxy → `http://100.71.101.21:9001` | `vaultwares-pipelines` | Tailnet-only + `X-VW-Gateway-Secret` |
+| vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
+| noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
+| GitHub webhooks | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (ops service) | Public (required by GitHub) |
+| Secrets manager | `https://warden.vaultwares.ca` | `vw-secretsd` → `127.0.0.1:9444` | (ops service) | Tailnet-only |
+| (alias) secrets | `https://secrets.vaultwares.ca` | redirect → `warden.vaultwares.ca` | (ops config) | Tailnet-only |
+| Prom‑King site | `https://prom-king.xyz` | `/var/www/prom-king.xyz` (static) | `prom-king/prelanding-page` | Public |
+| Link sharing | `https://links.prom-king.xyz` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+| Link sharing | `https://links.fullxxx.video` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+| fullxxx.video | `https://fullxxx.video` | `/var/www/fullxxx.video` (static) | `Prom-King/tube-sites` | Public |
+
+## Deployment note (same for every site)
+
+Every repo in this table must follow the **same deployment model**:
+
+- GitHub is only an event source (webhook)
+- deploy happens inside the tailnet on `greencloud-vps`
+- **no GitHub Actions deploys**
+
+Source of truth: `operations/deployment-flow`.

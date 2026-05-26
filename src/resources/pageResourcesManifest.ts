@@ -466,6 +466,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "logs__ops-log-2026-05-21"
   },
   {
+    "routePath": "/operations/agent-ledger-schema",
+    "routeKey": "operations/agent-ledger-schema",
+    "sectionKey": "operations",
+    "resourceKey": "operations__agent-ledger-schema"
+  },
+  {
     "routePath": "/operations/backups",
     "routeKey": "operations/backups",
     "sectionKey": "operations",
@@ -502,10 +508,22 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "operations__secrets"
   },
   {
+    "routePath": "/operations/services-inventory",
+    "routeKey": "operations/services-inventory",
+    "sectionKey": "operations",
+    "resourceKey": "operations__services-inventory"
+  },
+  {
     "routePath": "/operations/tailscale",
     "routeKey": "operations/tailscale",
     "sectionKey": "operations",
     "resourceKey": "operations__tailscale"
+  },
+  {
+    "routePath": "/operations/webhook-secret-rotation",
+    "routeKey": "operations/webhook-secret-rotation",
+    "sectionKey": "operations",
+    "resourceKey": "operations__webhook-secret-rotation"
   },
   {
     "routePath": "/quickstart",

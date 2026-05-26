@@ -7,6 +7,10 @@ description: "Canonical CI/CD model: GitHub webhooks → vw-webhookd → tailnet
 
 This page is the **source of truth** for how deployments happen for VaultWares + Prom‑King sites.
 
+Related:
+- `operations/services-inventory` (single table of all URLs/services)
+- `operations/webhook-secret-rotation` (how to rotate `VW_GITHUB_WEBHOOK_SECRET` safely)
+
 ## Principles (mandatory)
 
 - **No GitHub Actions deployments.** A `git push` to `main` must not run build/deploy jobs inside GitHub.
@@ -43,6 +47,7 @@ Developer pushes to GitHub (main)
 ## Secrets / verification
 
 - `VW_GITHUB_WEBHOOK_SECRET` lives in VaultWarden (`https://warden.vaultwares.ca`, tailnet-only) and is provisioned on `greencloud-vps`.
+- If you rotate this secret, you must update **both** `vw-webhookd` and every repo webhook. See `operations/webhook-secret-rotation`.
 - Verify delivery + processing by checking:
   - `https://hooks.vaultwares.ca/health` returns `200`
   - `vw-webhookd` logs on `greencloud-vps` (and the downstream runner logs)

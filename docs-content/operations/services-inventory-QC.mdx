@@ -1,0 +1,42 @@
+---
+title: "Inventaire des services (Privé)"
+description: "Table unique des services VaultWares + Prom‑King: URL, où ça roule, repo, visibilité."
+---
+
+# Inventaire des services (Privé)
+
+Cette page est une **table source de vérité** pour répondre à : “Qu’est-ce qu’on roule, pis où?”
+
+Elle sert à :
+
+- aider quelqu’un de non-tech à comprendre *c’est quoi chaque URL*
+- aider un assistant à faire le lien **URL → machine → repo → déploiement**
+
+> Si on ajoute une nouvelle URL publique, on met à jour cette table la même journée.
+
+## Table
+
+| Service | URL | Où (runtime) | Repo GitHub | Visibilité |
+|---|---|---|---|---|
+| Site principal | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
+| Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (statique) | `vaultwares-docs` | Tailnet-only |
+| API | `https://api.vaultwares.ca` | proxy nginx → `http://100.71.101.21:9001` | `vaultwares-pipelines` | Tailnet-only + header `X-VW-Gateway-Secret` |
+| vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
+| noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
+| Webhooks GitHub | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (service ops) | Public (requis par GitHub) |
+| Gestionnaire de secrets | `https://warden.vaultwares.ca` | `vw-secretsd` → `127.0.0.1:9444` | (service ops) | Tailnet-only |
+| (alias) secrets | `https://secrets.vaultwares.ca` | redirection → `warden.vaultwares.ca` | (config ops) | Tailnet-only |
+| Site Prom‑King | `https://prom-king.xyz` | `/var/www/prom-king.xyz` (statique) | `prom-king/prelanding-page` | Public |
+| Link sharing | `https://links.prom-king.xyz` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+| Link sharing | `https://links.fullxxx.video` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+| fullxxx.video | `https://fullxxx.video` | `/var/www/fullxxx.video` (statique) | `Prom-King/tube-sites` | Public |
+
+## Note de déploiement (pareil pour tout le monde)
+
+Chaque repo dans cette table doit suivre **le même modèle de déploiement** :
+
+- GitHub sert juste à envoyer l’événement (webhook)
+- le déploiement se fait dans le tailnet sur `greencloud-vps`
+- **aucun déploiement via GitHub Actions**
+
+Source de vérité : `operations/deployment-flow`.

@@ -30,6 +30,7 @@ flowchart LR
 - **Docs privés:** `docs.vaultwares.ca` (seulement sur le tailnet)
 - **Site web public:** `vaultwares.ca` (public)
 - **Journal des opérations (aujourd'hui):** `operations/ops-log-2026-05-21`
+- **Inventaire des services:** `operations/services-inventory`
 
 ## Diagramme (Mermaid)
 
@@ -39,16 +40,20 @@ flowchart TB
   subgraph Internet["Public (Internet)"]
     Users["Public users"]
     VaultWaresCA["vaultwares.ca\n(vaultwares-website)\nHTTPS :443"]
+    Flows["flows.vaultwares.ca\n(vault-flows SPA)\nHTTPS :443"]
     Noddit["noddit.org\n(vault-flows SPA)\nHTTPS :443"]
     PromKing["prom-king.xyz\n(tube)\nHTTPS :443"]
     FullXXX["fullxxx.video\n(tube)\nHTTPS :443"]
+    LinksPK["links.prom-king.xyz\n(link-sharing)\nHTTPS :443"]
+    LinksFXV["links.fullxxx.video\n(link-sharing)\nHTTPS :443"]
   end
 
   %% Tailnet-only entrypoints
   subgraph Tailnet["Private (Tailnet-only)"]
     Docs["docs.vaultwares.ca\n(vaultwares-docs)\nHTTPS :443"]
     Secrets["warden.vaultwares.ca\n(VaultWarden / vault-warden)\nHTTPS :443"]
-    Hooks["hooks.vaultwares.ca\n(vaultwares-webhooks)\nHTTPS :443"]
+    Hooks["hooks.vaultwares.ca/github\n(vw-webhookd)\nHTTPS :443"]
+    Api["api.vaultwares.ca\n(nginx proxy)\nHTTPS :443"]
     PCAPI["Clopeux-Desktop\nFastAPI pipelines\nhttp://100.71.101.21:9001"]
     VaultFlowsSPA["Clopeux-Desktop\nvault-flows (local preview)\nhttps://localhost:3100"]
     RDP["Clopeux-Desktop RDP\n100.71.101.21:3389"]
@@ -64,14 +69,18 @@ flowchart TB
 
   %% Public routing (nginx on VPS)
   Users -->|HTTPS| VaultWaresCA --> V1
+  Users -->|HTTPS| Flows --> V1
   Users -->|HTTPS| Noddit --> V1
   Users -->|HTTPS| PromKing --> V1
   Users -->|HTTPS| FullXXX --> V1
+  Users -->|HTTPS| LinksPK --> V1
+  Users -->|HTTPS| LinksFXV --> V1
 
   %% Tailnet routing
   Docs --> V1
   Secrets --> V1
   Hooks --> V1
+  Api -->|proxy| PCAPI --> PC
   Noddit -->|proxy| VaultFlowsSPA --> PC
   VaultWaresCA -->|future API calls| PCAPI --> PC
 
@@ -105,15 +114,19 @@ flowchart TB
 | Service | URL | Où | Ports | TLS |
 |---|---|---:|---:|---|
 | Site web VaultWares | `https://vaultwares.ca` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| vault-flows SPA | `https://flows.vaultwares.ca` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 | Noddit | `https://noddit.org` | `greencloud-vps` (proxy vers PC) | `443` | Let’s Encrypt (nginx) |
 | Prom King | `https://prom-king.xyz` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 | FullXXX | `https://fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| Link sharing (PK) | `https://links.prom-king.xyz` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| Link sharing (FXV) | `https://links.fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 
 ### Privé (Tailnet seulement)
 
 | Service | URL / Point d'accès | Où | Ports | Auth |
 |---|---|---:|---:|---|
 | Docs privés | `https://docs.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + liste blanche nginx |
+| API (gateway) | `https://api.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + header `X-VW-Gateway-Secret` |
 | API Pipelines (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | Auth d'application (JWT/clé API), ACL Tailnet |
 | VaultWarden (service de secrets) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + autorisation VaultWarden |
 | Webhooks GitHub (récepteur) | `https://hooks.vaultwares.ca/github` | `greencloud-vps` | `443` | Vérification de signature de webhook (nginx → `vw-webhookd` sur `127.0.0.1:9033`) |

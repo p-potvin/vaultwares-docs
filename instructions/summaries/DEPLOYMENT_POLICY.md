@@ -3,6 +3,10 @@ Applies when: deploying, VPS changes, release operations, production routing.
 Do:
 - Tailnet-first admin; minimize blast radius; keep rollback path.
 - Verify deploy behavior with concrete probes and UI checks when relevant.
+- For VaultWares deployments, always consult:
+  - `docs-content/operations/deployment-flow.mdx`
+  - `docs-content/operations/services-inventory.mdx`
+  - `docs-content/operations/webhook-secret-rotation.mdx` (when rotating webhook secrets)
 Do not:
 - Deploy from assumptions; verify the actual environment state.
 Done when:
