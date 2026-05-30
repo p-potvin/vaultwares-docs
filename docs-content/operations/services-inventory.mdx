@@ -38,5 +38,26 @@ Every repo in this table must follow the **same deployment model**:
 - GitHub is only an event source (webhook)
 - deploy happens inside the tailnet on `greencloud-vps`
 - **no GitHub Actions deploys**
+- failures fire an alert that opens a GitHub issue + mentions `@copilot`
+  via `vw-deploy-notify.sh` (see `operations/deploy-alerts`)
 
 Source of truth: `operations/deployment-flow`.
+
+## Ops surfaces on `greencloud-vps` (not user-facing)
+
+| Surface | Listener / unit | Role |
+|---|---|---|
+| `vw-webhookd` | systemd service, `127.0.0.1:9033` | Verifies GitHub webhook signatures + dispatches per-repo deploy scripts. Runs as `vwdeploy`. |
+| `vaultwares-hooks` | systemd service, `127.0.0.1:8787` | Tailnet-only webhook handler (uvicorn). |
+| `vw-secretsd` | systemd service, `127.0.0.1:9444` | Local secrets shim behind `warden.vaultwares.ca`. |
+| `vw-deny-watch.timer` | systemd timer, runs every 5 min | Watches `/var/log/vw-webhookd.log` for `bad_signature` denies and opens a consolidated GitHub issue when the threshold is crossed. |
+| `vw-token-expiry-watch.timer` | systemd timer, daily | Calls `gh api user` with `GH_TOKEN`, opens a rotation issue when expiry is ≤ 7 days away. |
+
+## Notes on the table above
+
+- `fullxxx.video` and `prom-king.xyz` are **WordPress installs** under
+  `/var/www/<site>/public/`. The plugins driving the catalog live under
+  `wp-content/plugins/{fullxxx-video,promking-tube,tube-shared}` and are
+  rsynced from `/var/www/tube-sites-src/` by the deploy script.
+- The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for
+  every repo in this list — the lowercase form `prom-king/...` won't match.

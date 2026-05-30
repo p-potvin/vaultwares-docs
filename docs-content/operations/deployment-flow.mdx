@@ -10,6 +10,7 @@ This page is the **source of truth** for how deployments happen for VaultWares +
 Related:
 - `operations/services-inventory` (single table of all URLs/services)
 - `operations/webhook-secret-rotation` (how to rotate `VW_GITHUB_WEBHOOK_SECRET` safely)
+- `operations/deploy-alerts` (how we get notified when a deploy fails or webhook signatures stop matching)
 
 ## Principles (mandatory)
 
@@ -51,4 +52,46 @@ Developer pushes to GitHub (main)
 - Verify delivery + processing by checking:
   - `https://hooks.vaultwares.ca/health` returns `200`
   - `vw-webhookd` logs on `greencloud-vps` (and the downstream runner logs)
+
+## vw_jira_sync (non-blocking)
+
+`vw-webhookd` runs the Jira-sync side car (`/usr/local/bin/vw-jira-sync-run.sh`)
+in parallel with the deploy command. **The dispatcher is patched so a
+`vw_jira_sync` failure does not block the deploy**: failure is logged
+(`vw_jira_sync_nonblocking_failure exit=<code>`) and the deploy still runs.
+If `vw_jira_token` goes missing from `vw-secretsd`, deploys keep flowing.
+
+If you ever re-roll `/opt/vaultwares-adk/webhookd/vw_webhookd.py`, **re-apply this
+patch** around line 295:
+
+```python
+if ran_jira and jira_code != 0:
+    # jira_sync failures are logged but never block deploy dispatch
+    # (the script reaches out to vw-secretsd / Jira, both of which can
+    # transiently misbehave for reasons unrelated to the push).
+    _append_log(log_path, f"[{_now_iso()}] vw_jira_sync_nonblocking_failure exit={jira_code}")
+```
+
+You can also disable `vw_jira_sync` entirely via
+`server.jira_sync.enabled: false` in `/etc/vw-webhookd/config.yml`.
+
+## Deploy script invariants (`deploy-tube-sites.sh` and siblings)
+
+These are the boring details that have bitten us when a script gets re-rolled.
+Every deploy script that runs as `vwdeploy` must respect them:
+
+| Invariant | Why |
+|---|---|
+| **No `git fetch origin <SHA>`** | GitHub's HTTPS upload-pack rejects fetching by raw SHA with `not our ref` for any commit not directly advertised. `git fetch --all --prune` already brings in `origin/main`, which contains the SHA. Use `git checkout -f "$SHA"` directly after the `--all` fetch. |
+| **Lock file owned by `vwdeploy:vwdeploy`** | `/var/lock/vw-deploy-<repo>.lock` must be writable by `vwdeploy`. If it's left at `root:root` from a prior manual run, deploys exit 1 on `flock`. |
+| **`rsync -rltD --delete`, not `rsync -a`** | `-a` (`-rlptgoD`) tries to preserve owner+group from source. As `vwdeploy`, `chgrp` to anything else fails. Use `-rltD` (drop the `-og`). |
+| **Plugin dirs owned `vwdeploy:www-data` with `2775`** | rsync writes new files as the running user. Setgid on the dir keeps the group as `www-data` so the web server can read. After perms drift (e.g. someone did `chown -R www-data:www-data`), reset with: `chown -R vwdeploy:www-data <plugin-dir>` + `find <plugin-dir> -type d -exec chmod 2775 {} +` + `find <plugin-dir> -type f -exec chmod 0664 {} +`. |
+| **wp-cli wrapped with `sudo -u www-data`** | wp-cli refuses to run as root (the YIKES warning, exit code 1). The deploy script must call `sudo -u www-data wp --path=… rewrite flush --hard \|\| true`. The trailing `\|\| true` tolerates the case where `vwdeploy` cannot sudo (plugins self-flush on version bumps anyway). |
+| **GIT_ASKPASS in env** | The git operations inside `runuser -l vwdeploy …` need `GIT_ASKPASS=/var/www/deploy-scripts/git-askpass-vw-gh-token.sh` and `GIT_TERMINAL_PROMPT=0` exported. |
+
+## Deploy failure alerts
+
+The runner files a GitHub issue (with `@copilot` mentioned) on any non-zero
+exit from the deploy command. See `operations/deploy-alerts` for the script
+paths, perms, log files, and rotation procedure for the GitHub PAT.
 

@@ -5,5 +5,6 @@ Do:
 - Design for QC strings being 15-20% longer than EN.
 Do not:
 - Ship new user-facing strings in EN only.
+- Use FR,fr instead of QC,qc,ca-fr
 Done when:
 - Both EN and QC are present and layout is tolerant.
