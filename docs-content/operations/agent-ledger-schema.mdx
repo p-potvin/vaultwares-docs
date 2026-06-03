@@ -63,3 +63,29 @@ Each ledger event is a JSON file under `agent-ledger/events/YYYY/MM/`. Key field
 An event with `kind: "code-change,verification"` is counted under **both** kind buckets in the work-impact dashboard. The split happens at read time via `Get-KindListForAggregation` (PowerShell) or `parseKinds` (TypeScript).
 
 Unknown values (e.g. `"code-change,vibes"`) are stored verbatim in the event JSON. At aggregation time, `vibes` is bucketed under `general`. In the UI, unknown kinds render with a dashed border to visually flag them.
+
+## Project aliases / renames
+
+Ledger events store `project` as a **canonical** project name, resolved via `agent-ledger/project-aliases.json`.
+
+When a repo/project is renamed, append an entry to `project-aliases.json` with:
+- `canonical`: the new repo/project name
+- `aliases`: prior names that should bucket into the canonical name
+- `renamedAt`: the rename date (`YYYY-MM-DD`)
+
+### Known renames (from `project-aliases.json`)
+
+| Canonical project | Old names (aliases) |
+|---|---|
+| `vaultwares-glass` | `glass-ui` |
+| `vaultwares-dispatch` | `dispatch-wares` |
+| `vaultwares-decompile` | `deconstructed-website-a-la-mode` |
+| `vaultwares-media-processing` | `vault-video-enhancer`, `video-transcriber-translator` |
+| `vaultwares-realtime` | `realtime-stt` |
+| `vaultwares-studio` | `usd-playground` |
+| `vaultwares-website` | `vaultwares-v1` |
+| `vaultwares-docs` | `tmp-app` |
+| `vaultwares-identity-manager` | `vaultwares-auto-signup` |
+| `tube-sites` | `tube-site` |
+| `vaultwares-themes` | `vault-themes` |
+| `vaultwares-adk` | `vaultwares-agentciation` |
