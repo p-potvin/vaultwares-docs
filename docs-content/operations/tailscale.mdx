@@ -19,7 +19,7 @@ description: "How Tailnet is used for access control, SSH, and internal services
 - `tag:server` can reach `100.71.101.21:9001` (VPS reverse-proxy to PC).
 ## Exposing internal web services to the tailnet (Split DNS)
 
-Some subdomains (e.g. `stats.vaultwares.ca`) are **tailnet-only** services. The public DNS record returns the VPS public IP, which serves a 403 to all non-tailnet clients. Tailnet nodes resolve the same hostname to the **Tailscale IP** of `greencloud-vps` via a Tailscale DNS override, bypassing the public nginx vhost entirely and hitting a separate internal-only nginx server block.
+Some subdomains (for example, a future `stats.vaultwares.ca`) are **tailnet-only** services. The public DNS record returns the VPS public IP, which serves a 403 to all non-tailnet clients. Tailnet nodes resolve the same hostname to the **Tailscale IP** of `greencloud-vps` via a Tailscale DNS override, bypassing the public nginx vhost entirely and hitting a separate internal-only nginx server block.
 
 ### How it works
 
@@ -32,8 +32,24 @@ Tailnet node   →  stats.vaultwares.ca  →  100.x.x.x    →  nginx (internal 
 
 In the [Tailscale admin console](https://login.tailscale.com/admin/dns) → **Nameservers**:
 
-- Add a **Split DNS** entry for domain `vaultwares.ca` pointing to the Tailscale IP of `greencloud-vps` (e.g. `100.x.x.x`).
-- This makes `*.vaultwares.ca` resolve to the Tailscale IP **only for tailnet nodes**. Public DNS is unaffected.
+- Add **Restricted / Split DNS** entries for each private hostname that must resolve through the tailnet.
+- Point each entry to the Tailscale IP of `greencloud-vps` (`100.73.93.84`).
+- Keep public names (for example `vaultwares.ca`, `www.vaultwares.ca`, `flows.vaultwares.ca`) out of this exact-host override unless you intentionally want tailnet clients to use the VPS tailnet address for those public services.
+
+Current private hostnames:
+
+```text
+docs.vaultwares.ca
+api.vaultwares.ca
+hooks.vaultwares.ca
+secrets.vaultwares.ca
+warden.vaultwares.ca
+ledger.vaultwares.ca
+```
+
+`greencloud-vps` runs `dnsmasq` on `tailscale0` and answers those names from `/etc/dnsmasq.d/vaultwares-tailnet.conf`. The config uses exact `host-record` entries instead of a wildcard, so it does not take over the whole `vaultwares.ca` zone.
+
+If you choose to route the parent zone `vaultwares.ca` to `greencloud-vps`, `dnsmasq` must also forward unknown `vaultwares.ca` names to an external resolver. Do not use the VPS default resolver (`100.100.100.100`) for that parent-zone forwarding path, because Tailscale DNS can route the query back to the same split-DNS target.
 
 > The ACL must allow `tag:server` on port **53** (TCP+UDP) if `greencloud-vps` is the authoritative nameserver. See Key rules above.
 

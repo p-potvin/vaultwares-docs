@@ -33,6 +33,7 @@ flowchart TB
   subgraph Tailnet["Private (Tailnet-only)"]
     Docs["docs.vaultwares.ca\n(vaultwares-docs)\nHTTPS :443"]
     Secrets["warden.vaultwares.ca\n(VaultWarden / vault-warden)\nHTTPS :443"]
+    Ledger["ledger.vaultwares.ca\n(agent-ledger SPA)\nHTTPS :443"]
     Hooks["hooks.vaultwares.ca/github\n(vw-webhookd)\nHTTPS :443"]
     Api["api.vaultwares.ca\n(nginx proxy)\nHTTPS :443"]
     PCAPI["Clopeux-Desktop\nFastAPI pipelines\nhttp://100.71.101.21:9001"]
@@ -60,6 +61,7 @@ flowchart TB
   %% Tailnet routing
   Docs --> V1
   Secrets --> V1
+  Ledger --> V1
   Hooks --> V1
   Api -->|proxy| PCAPI --> PC
   Noddit -->|proxy| VaultFlowsSPA --> PC
@@ -107,6 +109,7 @@ flowchart TB
 | Service | URL / Endpoint | Where | Ports | Auth |
 |---|---|---:|---:|---|
 | Private docs | `https://docs.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
+| Agent ledger | `https://ledger.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
 | API (gateway) | `https://api.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + `X-VW-Gateway-Secret` |
 | Pipelines API (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | App auth (JWT/API key), Tailnet ACL |
 | VaultWarden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |
