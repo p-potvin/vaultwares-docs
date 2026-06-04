@@ -25,7 +25,7 @@ Related:
 |---|---|---|---|---|
 | Main website | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
 | Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (static) | `vaultwares-docs` | Tailnet-only |
-| API | `https://api.vaultwares.ca` | nginx HTTPS edge on `greencloud-vps` → tailnet proxy to `http://100.71.101.21:9001` | `vaultwares-pipelines` | Tailnet-only; gateway secret is required by app gateways but is not currently set in the `api.vaultwares.ca` nginx vhost |
+| API | `https://api.vaultwares.ca` | nginx HTTPS edge on `greencloud-vps` -> tailnet proxy to `http://100.71.101.21:9001`; nginx sets `X-VW-Gateway-Secret` from the server-side gateway secret boundary | `vaultwares-pipelines` | Tailnet-only; gateway secret required |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | GitHub webhooks | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (ops service) | Public (required by GitHub) |
@@ -61,6 +61,7 @@ Source of truth: `operations/deployment-flow`.
 | `vaultwares-hooks` | systemd service, `127.0.0.1:8787` | Tailnet-only webhook handler (uvicorn). |
 | `vw-secretsd` | systemd service, `127.0.0.1:9444` | Local secrets shim behind `warden.vaultwares.ca`. |
 | `health-ledger-probe.service` | systemd service | Active Probe Joker loop under `/opt/health-ledger`; writes Health Ledger events and rollups. |
+| `health-ledger-dashboard.service` | systemd service, `127.0.0.1:8790` | First-party Health Ledger dashboard; reads rollups/events and does not run probes. |
 | `vw-deny-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for webhook `bad_signature` clusters. Replaced by Health Ledger direction. |
 | `vw-token-expiry-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for token expiry. Replaced by Token Joker direction. |
 

@@ -93,6 +93,9 @@ As of 2026-06-04:
 - `greencloud-vps` runs `health-ledger-probe.service` from `/opt/health-ledger`.
   The service is enabled and writes probe events/rollups under
   `/opt/health-ledger/data`.
+- `greencloud-vps` runs `health-ledger-dashboard.service` from
+  `/opt/health-ledger`. It binds to `127.0.0.1:8790` and reads Health Ledger
+  rollups/events only; it does not run probes or append data.
 - `Clopeux-Desktop` runs Windows scheduled task `HealthLedgerProbeJoker`, using
   the headless `conhost.exe` wrapper from
   `health-ledger/ops/windows/start-health-ledger-probe.ps1`.
@@ -104,7 +107,11 @@ As of 2026-06-04:
 - Ollama is registered as its own environment and probed from Clopeux with
   `/api/version`, `/api/tags`, and `/api/ps`.
 - The VaultWares API has two probe views: public gateway from greencloud, and
-  local Clopeux runtime through `/openapi.json`.
+  local Clopeux runtime through `/openapi.json`. Gateway-only probes use
+  `X_VW_GATEWAY_SECRET`; on `greencloud-vps`, the systemd environment file is
+  `/etc/health-ledger/gateway.env` and the API nginx vhost sets the matching
+  `X-VW-Gateway-Secret` header. Do not copy the secret value into docs, ledger
+  events, GitHub, Jira, or assistant chat.
 - Legacy `vw-deny-watch.timer` and `vw-token-expiry-watch.timer` are disabled;
   `vw-webhookd` `notifications.on_error_command` is `/bin/true`.
 
