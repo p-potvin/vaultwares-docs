@@ -20,16 +20,18 @@ Elle sert à :
 |---|---|---|---|---|
 | Site principal | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
 | Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (statique) | `vaultwares-docs` | Tailnet-only |
-| API | `https://api.vaultwares.ca` | proxy nginx → `http://100.71.101.21:9001` | `vaultwares-pipelines` | Tailnet-only + header `X-VW-Gateway-Secret` |
+| API | `https://api.vaultwares.ca` | bord HTTPS nginx sur `greencloud-vps` → proxy tailnet vers `http://100.71.101.21:9001` | `vaultwares-pipelines` | Tailnet-only; le secret de gateway est requis par les gateways applicatives, mais il n'est pas actuellement injecté par le vhost nginx `api.vaultwares.ca` |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | Webhooks GitHub | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (service ops) | Public (requis par GitHub) |
 | Gestionnaire de secrets | `https://warden.vaultwares.ca` | `vw-secretsd` → `127.0.0.1:9444` | (service ops) | Tailnet-only |
 | (alias) secrets | `https://secrets.vaultwares.ca` | redirection → `warden.vaultwares.ca` | (config ops) | Tailnet-only |
-| Site Prom‑King | `https://prom-king.xyz` | `/var/www/prom-king.xyz` (statique) | `prom-king/prelanding-page` | Public |
-| Link sharing | `https://links.prom-king.xyz` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
-| Link sharing | `https://links.fullxxx.video` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
-| fullxxx.video | `https://fullxxx.video` | `/var/www/fullxxx.video` (statique) | `Prom-King/tube-sites` | Public |
+| Front door / prelanding Prom‑King | `https://prom-king.xyz` | front door WordPress à `/var/www/prom-king.xyz/public`; le repo prelanding est suivi séparément | `Prom-King/prelanding-page` | Public |
+| Front door / prelanding FullXXX | `https://fullxxx.video` | front door WordPress à `/var/www/fullxxx.video/public`; la variante FullXXX est suivie séparément | `Prom-King/prelanding-page` | Public |
+| Tube site Prom‑King | `https://prom-king.xyz` | plugin WordPress `/var/www/prom-king.xyz/public/wp-content/plugins/promking-tube` | `Prom-King/tube-sites` | Public |
+| Tube site FullXXX | `https://fullxxx.video` | plugin WordPress `/var/www/fullxxx.video/public/wp-content/plugins/fullxxx-video` | `Prom-King/tube-sites` | Public |
+| Link sharing Prom‑King | `https://links.prom-king.xyz` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+| Link sharing FullXXX | `https://links.fullxxx.video` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
 
 ## Note de déploiement (pareil pour tout le monde)
 
@@ -40,3 +42,15 @@ Chaque repo dans cette table doit suivre **le même modèle de déploiement** :
 - **aucun déploiement via GitHub Actions**
 
 Source de vérité : `operations/deployment-flow`.
+
+## Notes sur Prom-King / FullXXX
+
+- `fullxxx.video` et `prom-king.xyz` sont des **installations WordPress** sous
+  `/var/www/<site>/public/`.
+- Leur front door/prelanding et leurs plugins tube sont suivis séparément dans
+  Health Ledger pour rendre l'ownership repo/runtime explicite.
+- Les plugins qui alimentent les catalogues vivent sous
+  `wp-content/plugins/{fullxxx-video,promking-tube,tube-shared}` et sont
+  rsynced depuis `/var/www/tube-sites-src/` par le script de déploiement.
+- L'org GitHub est **`Prom-King`** pour ces repos. La forme minuscule
+  `prom-king/...` ne doit pas être utilisée comme nom de repo.

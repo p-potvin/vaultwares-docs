@@ -25,16 +25,18 @@ Related:
 |---|---|---|---|---|
 | Main website | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
 | Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (static) | `vaultwares-docs` | Tailnet-only |
-| API | `https://api.vaultwares.ca` | nginx proxy → `http://100.71.101.21:9001` | `vaultwares-pipelines` | Tailnet-only + `X-VW-Gateway-Secret` |
+| API | `https://api.vaultwares.ca` | nginx HTTPS edge on `greencloud-vps` → tailnet proxy to `http://100.71.101.21:9001` | `vaultwares-pipelines` | Tailnet-only; gateway secret is required by app gateways but is not currently set in the `api.vaultwares.ca` nginx vhost |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | GitHub webhooks | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (ops service) | Public (required by GitHub) |
 | Secrets manager | `https://warden.vaultwares.ca` | `vw-secretsd` → `127.0.0.1:9444` | (ops service) | Tailnet-only |
 | (alias) secrets | `https://secrets.vaultwares.ca` | redirect → `warden.vaultwares.ca` | (ops config) | Tailnet-only |
-| Prom‑King site | `https://prom-king.xyz` | `/var/www/prom-king.xyz` (static) | `prom-king/prelanding-page` | Public |
-| Link sharing | `https://links.prom-king.xyz` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
-| Link sharing | `https://links.fullxxx.video` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
-| fullxxx.video | `https://fullxxx.video` | `/var/www/fullxxx.video` (static) | `Prom-King/tube-sites` | Public |
+| Prom‑King prelanding/front door | `https://prom-king.xyz` | WordPress front door at `/var/www/prom-king.xyz/public`; prelanding source repo is tracked separately | `Prom-King/prelanding-page` | Public |
+| FullXXX prelanding/front door | `https://fullxxx.video` | WordPress front door at `/var/www/fullxxx.video/public`; FullXXX front-door variant is tracked separately | `Prom-King/prelanding-page` | Public |
+| Prom‑King tube site | `https://prom-king.xyz` | WordPress plugin `/var/www/prom-king.xyz/public/wp-content/plugins/promking-tube` | `Prom-King/tube-sites` | Public |
+| FullXXX tube site | `https://fullxxx.video` | WordPress plugin `/var/www/fullxxx.video/public/wp-content/plugins/fullxxx-video` | `Prom-King/tube-sites` | Public |
+| Prom‑King link sharing | `https://links.prom-king.xyz` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+| FullXXX link sharing | `https://links.fullxxx.video` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
 
 ## Deployment and alert note
 
@@ -65,7 +67,9 @@ Source of truth: `operations/deployment-flow`.
 ## Notes on the table above
 
 - `fullxxx.video` and `prom-king.xyz` are **WordPress installs** under
-  `/var/www/<site>/public/`. The plugins driving the catalog live under
+  `/var/www/<site>/public/`. Their front-door/prelanding behavior and their
+  tube plugins are tracked separately in Health Ledger so the repo/runtime
+  ownership is explicit. The plugins driving the catalogs live under
   `wp-content/plugins/{fullxxx-video,promking-tube,tube-shared}` and are
   rsynced from `/var/www/tube-sites-src/` by the deploy script.
 - The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for
