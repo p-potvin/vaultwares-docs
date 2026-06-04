@@ -5,15 +5,21 @@ description: "How the runner notifies us when a deploy fails or webhook signatur
 
 # Deploy alerts (Private)
 
-The webhookd dispatcher on `greencloud-vps` runs two notification surfaces:
+> Status: legacy alert writers were disabled on `greencloud-vps` on
+> 2026-06-03. This page remains as a reference for the old scripts and for
+> rollback/forensics. The replacement direction is Health Ledger plus Alarm
+> Joker and Token Joker.
+
+Historically, the webhookd dispatcher on `greencloud-vps` ran two notification surfaces:
 
 1. **On-error notify** — fires the moment a target deploy script exits non-zero.
 2. **Bad-signature watcher** — a 5-minute systemd timer that opens a single
    consolidated issue when a cluster of `deny: bad_signature` lines appears
    in the webhookd log (the runner is silently rejecting GitHub deliveries).
 
-Both surfaces file a GitHub issue and mention `@copilot` so the Copilot
-assignee can pick up the fix without a human round-trip.
+Both surfaces filed a GitHub issue and mentioned `@copilot`. They were disabled
+because the path was GitHub-only, intermittently broken by token scope/auth
+state, and too noisy for the new Health Ledger alert model.
 
 Related:
 - `operations/deployment-flow` (canonical flow)
@@ -24,13 +30,24 @@ Related:
 
 | Path | Owner / mode | Role |
 |---|---|---|
-| `/usr/local/bin/vw-deploy-notify.sh`     | `root:vwdeploy 0750` | Invoked by `vw-webhookd` via `notifications.on_error_command`. Parses `VW_NOTIFY_TITLE` (`Command failed: <owner>/<repo>`), opens a GitHub issue tagging `@copilot`. |
-| `/usr/local/bin/vw-deny-watch.sh`        | `root:root 0750`     | Run by systemd every 5 min. Diffs `/var/log/vw-webhookd.log` against `/var/lib/vw-webhookd/last-deny-mark` and files **one** consolidated issue when the new `bad_signature` count crosses `THRESHOLD` (default `3`). |
+| `/usr/local/bin/vw-deploy-notify.sh`     | `root:vwdeploy 0750` | Legacy script. Previously invoked by `vw-webhookd`; now kept only for reference. |
+| `/usr/local/bin/vw-deny-watch.sh`        | `root:root 0750`     | Legacy script. Timer disabled on 2026-06-03. |
 | `/var/log/vw-deploy-notify.log`          | `root:vwdeploy 0660` | Append-only log for both scripts. Records `notify fired:` + `issue opened:` (or the failure reason). Never contains the token. |
 | `/var/lib/vw-webhookd/last-deny-mark`    | `root:root 0600`     | Single line containing the timestamp of the most recently alerted `bad_signature` row. |
 | `/etc/vw-webhookd/env`                   | `root:vwdeploy 0640` | Holds `VW_GITHUB_WEBHOOK_SECRET` **and** `GH_TOKEN`. The notify script sources this file when run. **No CRLF** — see "Common mistakes" below. |
-| `/etc/systemd/system/vw-deny-watch.timer` + `.service` | `root 0644` | The 5-minute timer + the oneshot service that runs `vw-deny-watch.sh`. |
-| `/etc/vw-webhookd/config.yml`            | `root 0644`          | `notifications.on_error_command: "/usr/local/bin/vw-deploy-notify.sh"` wires the on-error path. |
+| `/etc/systemd/system/vw-deny-watch.timer` + `.service` | `root 0644` | Disabled legacy timer + oneshot service. |
+| `/etc/vw-webhookd/config.yml`            | `root 0644`          | Current value: `notifications.on_error_command: "/bin/true"`. Backup from the discard action: `/etc/vw-webhookd/config.yml.bak-20260603-disable-legacy-alerts`. |
+
+## Replacement direction
+
+Health Ledger owns the active direction:
+
+- project routing is a lookup table, not a host-based production decision,
+- alert profile determines Low/Medium/High/Critical behavior,
+- local Ollama/Gemma remediation is allowed only for explicitly permitted
+  non-production Low flows,
+- production incidents use Alarm Joker and must not depend on local Ollama,
+- Token Joker replaces the GitHub-token expiry watcher.
 
 ## How the on-error path fires
 

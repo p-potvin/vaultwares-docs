@@ -10,17 +10,20 @@ This page is the **source of truth** for how deployments happen for VaultWares +
 Related:
 - `operations/services-inventory` (single table of all URLs/services)
 - `operations/webhook-secret-rotation` (how to rotate `VW_GITHUB_WEBHOOK_SECRET` safely)
-- `operations/deploy-alerts` (how we get notified when a deploy fails or webhook signatures stop matching)
+- `operations/health-ledger` (active health, routing, alert profile, and Joker model)
+- `operations/deploy-alerts` (legacy deploy-alert scripts and replacement notes)
 
 ## Principles (mandatory)
 
 - **No GitHub Actions deployments.** A `git push` to `main` must not run build/deploy jobs inside GitHub.
 - **GitHub is only an event source.** The only GitHub-side behavior on `main` pushes is a **signed webhook delivery**.
-- **Deploy executes inside the tailnet** on `greencloud-vps` (the deployment authority).
+- **Deploy executes inside the tailnet.** Today `greencloud-vps` is the public
+  webhook entry point and deployment dispatcher, but production status is defined
+  by the project alert profile, not by the host.
 
 ## Machines / endpoints
 
-- **Deployment authority:** `greencloud-vps` (Public `173.249.194.15`, Tailnet `100.73.93.84`)
+- **Current webhook entry point / dispatcher:** `greencloud-vps` (Public `173.249.194.15`, Tailnet `100.73.93.84`)
 - **GitHub webhook receiver (public, required by GitHub):** `https://hooks.vaultwares.ca/github`
   - nginx → `vw-webhookd` on `127.0.0.1:9033`
 - **Tailscale webhook handler (tailnet-local):** `vaultwares-hooks` on `127.0.0.1:8787`
@@ -35,7 +38,8 @@ Developer pushes to GitHub (main)
   → vw-webhookd (127.0.0.1:9033) verifies signature + writes event payload
   → vw-webhookd triggers the deployment runner inside the tailnet
        (via vaultwares-hooks / internal job trigger)
-  → runner pulls repo + deploys on greencloud-vps
+  → runner looks up project routing + alert profile in Health Ledger
+  → runner pulls repo + deploys or tests on the configured target host
 ```
 
 ## Repository requirements
@@ -91,7 +95,9 @@ Every deploy script that runs as `vwdeploy` must respect them:
 
 ## Deploy failure alerts
 
-The runner files a GitHub issue (with `@copilot` mentioned) on any non-zero
-exit from the deploy command. See `operations/deploy-alerts` for the script
-paths, perms, log files, and rotation procedure for the GitHub PAT.
+Legacy GitHub-only alert writers were disabled on 2026-06-03 after review. The
+replacement direction is Health Ledger plus Alarm Joker: project routing is
+separate from severity, and Medium+ alert fanout must go through the Health
+Ledger incident lock/dedupe model. See `operations/health-ledger` and
+`operations/deploy-alerts`.
 

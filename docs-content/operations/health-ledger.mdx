@@ -1,0 +1,122 @@
+---
+title: "Health Ledger (Private)"
+description: "Where service health, Joker probes, alert state, dashboards, and token maintenance live."
+---
+
+# Health Ledger (Private)
+
+Health Ledger is the source of truth for service health evidence and Joker
+operations.
+
+The canonical repository is:
+
+- `C:\Users\Administrator\Desktop\Github Repos\health-ledger`
+- GitHub: `p-potvin/health-ledger`
+
+Use that repo for:
+
+- Probe Joker configuration and probe results.
+- Alarm Joker severity policy and incident state.
+- Token Joker expiry, rotation, and scope-verification notes.
+- The first-party health dashboard.
+- Medium+ GitHub/Jira issue routing and `@copilot` assignment or mention rules.
+- Existing alert audit notes.
+
+## Runner model
+
+Do not infer production status from the host that receives a webhook or runs a
+job. Health Ledger keeps these concerns separate:
+
+| Axis | Meaning | Example |
+|---|---|---|
+| Ingress/control plane | Where the signed GitHub webhook arrives first. | `greencloud-vps` today, because it is the public tailnet entry point. |
+| Project routing | Which host/IP should run a probe, build, deploy, or local check. | `vaultwares-api` routes to `Clopeux-Desktop` / `100.71.101.21`. |
+| Alert profile | What severity and automation are allowed for the project. | Production services can escalate High/Critical; non-production repo CI failures start Low. |
+| AI remediation policy | Whether a local model may be used to repair failures. | Local Ollama/Gemma may be used for non-production Low loops, not important production incidents. |
+
+`greencloud-vps` is the current webhook entry point. It is not the definition of
+production. `Clopeux-Desktop` hosts part of production because the VaultWares API
+runs there. Future hosts can be added by changing the project routing sheet,
+without changing severity policy.
+
+Production webhooks may fan out to `greencloud-vps`, `Clopeux-Desktop`, or any
+future registered tailnet server. Non-production webhooks currently route to
+`Clopeux-Desktop`, but that is a routing detail only.
+
+## Non-production CI Joker
+
+For projects with no production environment, such as `vault-guardian`, a push or
+PR event should trigger a tailnet runner job instead of defaulting to GitHub
+Actions. The first version should:
+
+- receive a signed GitHub webhook,
+- look up the project route in Health Ledger,
+- run the repo's configured build and tests on the target host,
+- record success or failure in Health Ledger,
+- classify build/test failure as Low unless the project has a production alert
+profile,
+- allow a bounded local Ollama repair loop only when the project's AI
+remediation policy allows it.
+
+The runner must not decide severity from the host. It reads the project route and
+alert profile.
+
+## Ollama Environment
+
+Ollama is its own environment because it may move from `Clopeux-Desktop` to a
+cloud host later. Monitor it separately from production services, even when it
+runs on the same machine.
+
+The Health Ledger monitor should check:
+
+- API availability and version with `GET /api/version`.
+- Installed model inventory with `GET /api/tags`.
+- Loaded/running model inventory with `GET /api/ps`.
+- Hook-scoped job metrics while a CI Joker repair loop is active.
+- Host resource impact during model work: CPU, memory, GPU/VRAM when available,
+  disk I/O, network I/O, queue depth, request duration, token throughput, and
+  failure/timeout counts.
+
+Ollama metrics are not perfect because the process may be used by other tools.
+That is acceptable. Mark hook-scoped samples with a run id so the dashboard can
+separate "probably caused by this runner" from background usage.
+
+## Probe Locations
+
+- `greencloud-vps`
+- `Clopeux-Desktop`
+
+## Current implementation state
+
+As of 2026-06-04:
+
+- `greencloud-vps` runs `health-ledger-probe.service` from `/opt/health-ledger`.
+  The service is enabled and writes probe events/rollups under
+  `/opt/health-ledger/data`.
+- `Clopeux-Desktop` runs Windows scheduled task `HealthLedgerProbeJoker`, using
+  the headless `conhost.exe` wrapper from
+  `health-ledger/ops/windows/start-health-ledger-probe.ps1`.
+- `Clopeux-Desktop` also runs `HealthLedgerCiJoker`, a separate local webhook
+  listener on `127.0.0.1:8788`. It records CI webhook events and applies
+  project route/alert-floor policy; bounded Ollama remediation is a later step.
+- `vault-guardian` is registered in `health-ledger/services.yaml` as
+  `environment: non_production` with `alert_floor: low`.
+- Ollama is registered as its own environment and probed from Clopeux with
+  `/api/version`, `/api/tags`, and `/api/ps`.
+- The VaultWares API has two probe views: public gateway from greencloud, and
+  local Clopeux runtime through `/openapi.json`.
+- Legacy `vw-deny-watch.timer` and `vw-token-expiry-watch.timer` are disabled;
+  `vw-webhookd` `notifications.on_error_command` is `/bin/true`.
+
+## Relationship to this docs repo
+
+This docs repo keeps the pointer so assistants and operators know where to look.
+Do not duplicate the Health Ledger config here. Update the dedicated
+`health-ledger` repo, then link back here only when the operational surface
+changes.
+
+Related:
+- `operations/services-inventory`
+- `operations/deployment-flow`
+- `operations/deploy-alerts`
+- `operations/webhook-secret-rotation`

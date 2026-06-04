@@ -14,6 +14,11 @@ It exists so that:
 
 > If you add a new public URL, update this table the same day.
 
+Related:
+- `operations/deployment-flow` (canonical deployment flow)
+- `operations/health-ledger` (service health, Probe Joker, Alarm Joker, Token Joker)
+- `operations/deploy-alerts` (deploy failure and bad-signature alerts)
+
 ## Table
 
 | Service | URL | Where (runtime) | GitHub repo | Visibility |
@@ -31,15 +36,18 @@ It exists so that:
 | Link sharing | `https://links.fullxxx.video` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
 | fullxxx.video | `https://fullxxx.video` | `/var/www/fullxxx.video` (static) | `Prom-King/tube-sites` | Public |
 
-## Deployment note (same for every site)
+## Deployment and alert note
 
-Every repo in this table must follow the **same deployment model**:
+Every repo in this table must follow the same control-plane model:
 
 - GitHub is only an event source (webhook)
-- deploy happens inside the tailnet on `greencloud-vps`
+- deploy/test/probe jobs happen inside the tailnet on the configured project
+  target host
 - **no GitHub Actions deploys**
-- failures fire an alert that opens a GitHub issue + mentions `@copilot`
-  via `vw-deploy-notify.sh` (see `operations/deploy-alerts`)
+- alert severity is determined by the Health Ledger alert profile, not by the
+  host that receives the webhook
+- local Ollama/Gemma remediation is allowed only for explicitly permitted
+  non-production Low flows
 
 Source of truth: `operations/deployment-flow`.
 
@@ -50,8 +58,9 @@ Source of truth: `operations/deployment-flow`.
 | `vw-webhookd` | systemd service, `127.0.0.1:9033` | Verifies GitHub webhook signatures + dispatches per-repo deploy scripts. Runs as `vwdeploy`. |
 | `vaultwares-hooks` | systemd service, `127.0.0.1:8787` | Tailnet-only webhook handler (uvicorn). |
 | `vw-secretsd` | systemd service, `127.0.0.1:9444` | Local secrets shim behind `warden.vaultwares.ca`. |
-| `vw-deny-watch.timer` | systemd timer, runs every 5 min | Watches `/var/log/vw-webhookd.log` for `bad_signature` denies and opens a consolidated GitHub issue when the threshold is crossed. |
-| `vw-token-expiry-watch.timer` | systemd timer, daily | Calls `gh api user` with `GH_TOKEN`, opens a rotation issue when expiry is ≤ 7 days away. |
+| `health-ledger-probe.service` | systemd service | Active Probe Joker loop under `/opt/health-ledger`; writes Health Ledger events and rollups. |
+| `vw-deny-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for webhook `bad_signature` clusters. Replaced by Health Ledger direction. |
+| `vw-token-expiry-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for token expiry. Replaced by Token Joker direction. |
 
 ## Notes on the table above
 
