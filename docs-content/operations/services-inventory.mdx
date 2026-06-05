@@ -62,6 +62,7 @@ Source of truth: `operations/deployment-flow`.
 | `vw-secretsd` | systemd service, `127.0.0.1:9444` | Local secrets shim behind `warden.vaultwares.ca`. |
 | `health-ledger-probe.service` | systemd service | Active Probe Joker loop under `/opt/health-ledger`; writes Health Ledger events and rollups. |
 | `health-ledger-dashboard.service` | systemd service, `127.0.0.1:8790` | First-party Health Ledger dashboard; reads rollups/events and does not run probes. |
+| `health-ledger-alarm.service` | systemd service, disabled until `/etc/health-ledger/alarm.env` is configured | Alarm Joker notification loop for incident locks and SMS/email/desktop fanout. |
 | `vw-deny-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for webhook `bad_signature` clusters. Replaced by Health Ledger direction. |
 | `vw-token-expiry-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for token expiry. Replaced by Token Joker direction. |
 

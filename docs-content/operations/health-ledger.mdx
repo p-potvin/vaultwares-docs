@@ -16,7 +16,7 @@ The canonical repository is:
 Use that repo for:
 
 - Probe Joker configuration and probe results.
-- Alarm Joker severity policy and incident state.
+- Alarm Joker severity policy, incident state, and notification fanout.
 - Token Joker expiry, rotation, and scope-verification notes.
 - The first-party health dashboard.
 - Medium+ GitHub/Jira issue routing and `@copilot` assignment or mention rules.
@@ -88,7 +88,7 @@ separate "probably caused by this runner" from background usage.
 
 ## Current implementation state
 
-As of 2026-06-04:
+As of 2026-06-05:
 
 - `greencloud-vps` runs `health-ledger-probe.service` from `/opt/health-ledger`.
   The service is enabled and writes probe events/rollups under
@@ -96,6 +96,12 @@ As of 2026-06-04:
 - `greencloud-vps` runs `health-ledger-dashboard.service` from
   `/opt/health-ledger`. It binds to `127.0.0.1:8790` and reads Health Ledger
   rollups/events only; it does not run probes or append data.
+- `greencloud-vps` has `health-ledger-alarm.service` installed from
+  `/opt/health-ledger`, but it is intentionally disabled until
+  `/etc/health-ledger/alarm.env` contains real operator notification settings.
+  The implementation supports Twilio SMS, SMTP email, and optional
+  `Clopeux-Desktop` Windows desktop notification. Real sending requires
+  `ALARM_JOKER_ALLOW_SEND=1`.
 - `Clopeux-Desktop` runs Windows scheduled task `HealthLedgerProbeJoker`, using
   the headless `conhost.exe` wrapper from
   `health-ledger/ops/windows/start-health-ledger-probe.ps1`.
