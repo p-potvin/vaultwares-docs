@@ -41,6 +41,7 @@ Protocol categories are executed only when relevant.
 | GLOBAL_INSTRUCTION_SYNC | Editing Tier-1 global instructions | instructions/summaries/GLOBAL_INSTRUCTION_SYNC.md | instructions/notes/GLOBAL_INSTRUCTION_SYNC.md | sync,instructions,hosts |
 | KNOWLEDGE_SYNC | Maintaining durable knowledge across repos | instructions/summaries/KNOWLEDGE_SYNC.md | instructions/notes/KNOWLEDGE_SYNC.md | knowledge,runbook,ssot,docs |
 | KNOWLEDGE_SCOUT | Consulting or updating KNOWLEDGE_SCOUT.md | instructions/summaries/KNOWLEDGE_SCOUT.md | instructions/notes/KNOWLEDGE_SCOUT.md | scout,expensive,quirk |
+| LEDGER_LOOKUP | Resuming prior session, "what did the last agent do", "has this been fixed before", probe failure history, recent deploy state | docs-content/operations/mcp-ledger-tools.mdx | — | ledger,history,probe,health,continuity,last session,recent agent,resume |
 | MULTI_AGENT_FLOW | Trigger phrases or multi-agent orchestration | instructions/summaries/MULTI_AGENT_FLOW.md | instructions/notes/MULTI_AGENT_FLOW.md | team,swarm,le stéphane,le méchant |
 | AUTOMATION_POLICY | Monitors, schedules, background jobs | instructions/summaries/AUTOMATION_POLICY.md | instructions/notes/AUTOMATION_POLICY.md | cron,automation,monitor,pm2 |
 | DEPLOYMENT_POLICY | Deploy/release ops, VPS changes | instructions/summaries/DEPLOYMENT_POLICY.md | instructions/notes/DEPLOYMENT_POLICY.md | deploy,release,vercel,nginx |

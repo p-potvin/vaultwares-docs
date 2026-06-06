@@ -1,0 +1,83 @@
+---
+title: "MCP ledger tools (agent-ledger + health-ledger)"
+description: "Four read-only MCP tools that let an assistant query past agent work and past probe results without parsing the raw event store."
+---
+
+# MCP ledger tools
+
+The vaultwares-mcp server exposes **four read-only tools** that turn the
+two on-disk ledgers into queryable surfaces. They were lost to a tool
+hallucination on 2026-06-05 (vaultwares-mcp issue #2) and rebuilt
+2026-06-06.
+
+| Tool                          | Reads from                                     | Use when                                                                                  |
+| ----------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `agent_ledger_get_recent`     | `agent-ledger/events/<y>/<m>/<file>.json`      | "What did the last agent do?" / "Show recent commits to shared-tube" / "Resume from prior session" |
+| `agent_ledger_search`         | same                                           | "Find the entry where we set up Drizzle" / "Has anyone deployed certbot before?"          |
+| `health_ledger_get_recent`    | `health-ledger/data/events/<y>/<m>/<d>.jsonl`  | "Was vaultwares-main healthy yesterday?" / "Latest run for service X"                     |
+| `health_ledger_search`        | same                                           | "Show probe failures mentioning gateway" / "Anything broken about prom-king?"             |
+
+## Where the data lives
+
+- **Agent-ledger** — one JSON file per ledger entry. Schema is camelCase
+  (`project`, `kind`, `actor`, `summary`, `commands`, `files`, `runtime.model`,
+  …). Written by `agent-ledger/scripts/record-agent-change.ps1`.
+- **Health-ledger** — one **JSONL line** per probe event under the day
+  file. Schema includes `event_type`, `run_id`, `service_id`, `ok`,
+  `status_code`, `duration_ms`, `failure_class`, `error`, etc. Written
+  by the health-ledger probe service running on greencloud-vps and on
+  Clopeux-Desktop.
+
+Both roots are overridable for non-default workstations via env vars:
+
+```env
+VW_AGENT_LEDGER_ROOT=C:\path\to\agent-ledger\events
+VW_HEALTH_LEDGER_ROOT=C:\path\to\health-ledger\data\events
+```
+
+## Filter semantics
+
+- All `project` / `kind` / `model` / `service_id` / `run_id` / `event_type`
+  filters are **case-insensitive substring** matches.
+- `ok` (health) is a strict True/False match.
+- `date` (`YYYY-MM-DD`) restricts:
+  - agent: to files whose name starts with the compact form
+    (`20260606-…`).
+  - health: to that single day's `.jsonl` file.
+- All `get_*` calls walk backwards from "today" (or the supplied `date`)
+  until either `n` matches are found or the calendar floor (year 2025)
+  is reached.
+
+## When to invoke them — ROUTER routine
+
+Add a quick check at the top of any task that touches recent work:
+
+1. **Continuity** — "what was the last agent doing?" → `agent_ledger_get_recent(n=5, project=…)`.
+2. **Was this fixed already?** — before re-litigating a class of bug,
+   `agent_ledger_search(query="<the symptom>")`.
+3. **Production health** — before claiming "looks fine" → `health_ledger_search(query=<service>)` for the
+   last failure, or `health_ledger_get_recent(service_id=…, ok=False)`.
+
+These are read-only and cheap; preferring them over ad-hoc
+`Get-ChildItem | Sort-Object | Select-Object -First` keeps assistants
+honest about cross-session state.
+
+## Smoke gate
+
+`vaultwares-mcp/tests/test_import_smoke.py` verifies that
+`vaultwares_mcp.server` imports cleanly and the four functions are
+present, callable, and return lists on default args. Run it after any
+change that touches `ledger_tools.py` or `server.py`:
+
+```bash
+cd vaultwares-mcp
+.venv/Scripts/python.exe tests/test_import_smoke.py
+```
+
+It's intentionally pytest-optional and runs in <2s.
+
+## Related
+
+- vaultwares-mcp issue #2 — original hallucination + the rebuild.
+- `operations/health-ledger.mdx` — what the health-ledger stores.
+- `agent-ledger/docs/schema.md` — schema for the agent-ledger entries.
