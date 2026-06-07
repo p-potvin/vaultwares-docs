@@ -19,7 +19,7 @@ description: "How Tailnet is used for access control, SSH, and internal services
 - `tag:server` can reach `100.71.101.21:9001` (VPS reverse-proxy to PC).
 ## Exposing internal web services to the tailnet (Split DNS)
 
-Some subdomains (for example, a future `stats.vaultwares.ca`) are **tailnet-only** services. The public DNS record returns the VPS public IP, which serves a 403 to all non-tailnet clients. Tailnet nodes resolve the same hostname to the **Tailscale IP** of `greencloud-vps` via a Tailscale DNS override, bypassing the public nginx vhost entirely and hitting a separate internal-only nginx server block.
+Some subdomains, including `stats.vaultwares.ca`, are **tailnet-only** services. The public DNS record returns the VPS public IP, which serves a 403 to all non-tailnet clients. Tailnet nodes resolve the same hostname to the **Tailscale IP** of `greencloud-vps` via a Tailscale DNS override, bypassing the public nginx vhost entirely and hitting a separate internal-only nginx server block.
 
 ### How it works
 
@@ -40,6 +40,8 @@ Current private hostnames:
 
 ```text
 docs.vaultwares.ca
+monitor.vaultwares.ca
+stats.vaultwares.ca
 api.vaultwares.ca
 hooks.vaultwares.ca
 secrets.vaultwares.ca

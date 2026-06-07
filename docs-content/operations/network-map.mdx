@@ -32,6 +32,8 @@ flowchart TB
   %% Tailnet-only entrypoints
   subgraph Tailnet["Private (Tailnet-only)"]
     Docs["docs.vaultwares.ca\n(vaultwares-docs)\nHTTPS :443"]
+    Monitor["monitor.vaultwares.ca\n(vault-monitor)\nHTTPS :443"]
+    Stats["stats.vaultwares.ca\n(agent-ledger stats SPA)\nHTTPS :443"]
     Secrets["warden.vaultwares.ca\n(VaultWarden / vault-warden)\nHTTPS :443"]
     Ledger["ledger.vaultwares.ca\n(agent-ledger SPA)\nHTTPS :443"]
     Hooks["hooks.vaultwares.ca/github\n(vw-webhookd)\nHTTPS :443"]
@@ -60,10 +62,13 @@ flowchart TB
 
   %% Tailnet routing
   Docs --> V1
+  Monitor --> V1
+  Stats --> V1
   Secrets --> V1
   Ledger --> V1
   Hooks --> V1
   Api -->|proxy| PCAPI --> PC
+  Stats -->|/monitor + telemetry proxy| PCAPI
   Noddit -->|proxy| VaultFlowsSPA --> PC
   VaultWaresCA -->|future API calls| PCAPI --> PC
 
@@ -110,6 +115,8 @@ flowchart TB
 |---|---|---:|---:|---|
 | Private docs | `https://docs.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
 | Agent ledger | `https://ledger.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
+| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; `/monitor/*` proxies to `Clopeux-Desktop:9001` |
+| Stats dashboard | `https://stats.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; static agent-ledger SPA with `/monitor/*` and `/api/telemetry/*` proxied to `Clopeux-Desktop:9001` |
 | API (gateway) | `https://api.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + `X-VW-Gateway-Secret` |
 | Pipelines API (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | App auth (JWT/API key), Tailnet ACL |
 | VaultWarden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |
