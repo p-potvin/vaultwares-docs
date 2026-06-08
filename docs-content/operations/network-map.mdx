@@ -38,7 +38,7 @@ flowchart TB
     Ledger["ledger.vaultwares.ca\n(agent-ledger SPA)\nHTTPS :443"]
     Hooks["hooks.vaultwares.ca/github\n(vw-webhookd)\nHTTPS :443"]
     Api["api.vaultwares.ca\n(nginx proxy)\nHTTPS :443"]
-    PCAPI["Clopeux-Desktop\nFastAPI pipelines\nhttp://100.71.101.21:9001"]
+    PCAPI["Clopeux-Desktop\nVaultWares API\nhttp://100.71.101.21:9001"]
     VaultFlowsSPA["Clopeux-Desktop\nvault-flows (local preview)\nhttps://localhost:3100"]
     RDP["Clopeux-Desktop RDP\n100.71.101.21:3389"]
   end
@@ -90,7 +90,7 @@ flowchart TB
 
 | Machine | Role | OS | Tailnet IP | Public IP | Access |
 |---|---|---|---|---|---|
-| `Clopeux-Desktop` | PC / pipelines host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`), API on `9001` |
+| `Clopeux-Desktop` | PC / API host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`), API on `9001` |
 | `Brume2` | Home gateway (DHCP/DNS/router) | OpenWrt | `100.67.153.112` | (home) | Tailnet admin only |
 | `greencloud-vps` | **New VPS** (GreenCloud) | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only**, HTTPS public services |
 | `ci-egress-vps` | **Old VPS** | Debian 12 | `100.73.57.6` | `212.193.6.35` | SSH **tailnet-only**, legacy services |
@@ -118,7 +118,7 @@ flowchart TB
 | V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; `/monitor/*` proxies to `Clopeux-Desktop:9001` |
 | Stats dashboard | `https://stats.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; static agent-ledger SPA with `/monitor/*` and `/api/telemetry/*` proxied to `Clopeux-Desktop:9001` |
 | API (gateway) | `https://api.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + `X-VW-Gateway-Secret` |
-| Pipelines API (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | App auth (JWT/API key), Tailnet ACL |
+| VaultWares API (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | App auth (JWT/API key), Tailnet ACL |
 | VaultWarden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |
 | GitHub webhooks (receiver) | `https://hooks.vaultwares.ca/github` | `greencloud-vps` | `443` | Webhook signature verification (nginx → `vw-webhookd` on `127.0.0.1:9033`) |
 | Tailscale webhook handler | `http://127.0.0.1:8787` | `greencloud-vps` | `8787` | Tailnet-local only (`vaultwares-hooks`) |

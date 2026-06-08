@@ -16,6 +16,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "index"
   },
   {
+    "routePath": "/adr/0001-shared-tube-rebuild",
+    "routeKey": "adr/0001-shared-tube-rebuild",
+    "sectionKey": "adr",
+    "resourceKey": "adr__0001-shared-tube-rebuild"
+  },
+  {
     "routePath": "/ai-tools/assistant-protocols",
     "routeKey": "ai-tools/assistant-protocols",
     "sectionKey": "ai-tools",
@@ -170,6 +176,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "routeKey": "ai-tools/assistant-protocols/security-posture",
     "sectionKey": "ai-tools",
     "resourceKey": "ai-tools__assistant-protocols__security-posture"
+  },
+  {
+    "routePath": "/ai-tools/assistant-protocols/skill-sync",
+    "routeKey": "ai-tools/assistant-protocols/skill-sync",
+    "sectionKey": "ai-tools",
+    "resourceKey": "ai-tools__assistant-protocols__skill-sync"
   },
   {
     "routePath": "/ai-tools/assistant-protocols/source-of-truth",
@@ -500,6 +512,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "routeKey": "operations/jira-sync",
     "sectionKey": "operations",
     "resourceKey": "operations__jira-sync"
+  },
+  {
+    "routePath": "/operations/mcp-ledger-tools",
+    "routeKey": "operations/mcp-ledger-tools",
+    "sectionKey": "operations",
+    "resourceKey": "operations__mcp-ledger-tools"
   },
   {
     "routePath": "/operations/network-map",

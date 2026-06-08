@@ -56,6 +56,22 @@ Every repo in this table must follow the same control-plane model:
   auth, normalized monitor APIs, and future business rules. Static dashboards
   such as `stats.vaultwares.ca` must not read source ledger files or Postgres
   directly.
+- VaultWares apps pass request correlation IDs as the `correlationId` query
+  parameter, not as the primary header contract. VaultWares-generated IDs use
+  `vw_{3-or-4-char Jira code}_c{7 hex chars}`, for example
+  `vw_API_c123abc4`; non-VaultWares products may use their own prefix, for
+  example `pk_PKT_c123456h`. The same correlation ID should persist from
+  client request creation until the request completes or fails at the API
+  boundary. Streams, downloads, and other continuous connections may create a
+  child ID for the long-lived transfer.
+- `vaultwares-api` request logging defaults to important events only: blocked
+  requests, crashes, HTTP errors, and slow requests. Routine successful calls
+  are intentionally suppressed to keep Kiwi volume usable. API syslog records
+  must include source/client context in addition to the VPS proxy peer address.
+- Vault-flows ComfyUI jobs submitted through `vaultwares-api` are serialized:
+  one ComfyUI workflow job may execute at a time, regardless of source IP.
+  Asynchronous queue clients can provide a completion callback URL; callbacks
+  are limited to loopback, private, or tailnet hosts unless explicitly allowed.
 
 Source of truth: `operations/deployment-flow`.
 

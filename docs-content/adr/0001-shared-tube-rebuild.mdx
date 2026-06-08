@@ -1,9 +1,9 @@
 ---
-title: "ADR-001: Retire WordPress for tube sites; rebuild as Astro + vaultwares-pipelines"
-description: "Retire the WordPress install behind fullxxx.video + prom-king.xyz. Replace with an Astro monorepo (shared-tube engine + per-site apps) talking to a Prom-King router inside vaultwares-pipelines. Hard cutover with a fresh catalog refetch. Adding a new site in the mix, the shared-tube should be a semi-replica of the layout of this site: https://www.fullvideos.xxx/sites/ (NOT the same domain as FXV)". Ignore everything in this plan about a DNS swap, the new sites will directly replace the old ones, down time is not to be considered.
+title: "ADR-001: Retire WordPress for tube sites; rebuild as Astro + vaultwares-api"
+description: "Retire the WordPress install behind fullxxx.video + prom-king.xyz. Replace with an Astro monorepo (shared-tube engine + per-site apps) talking to a Prom-King router inside vaultwares-api. Hard cutover with a fresh catalog refetch. Adding a new site in the mix, the shared-tube should be a semi-replica of the layout of this site: https://www.fullvideos.xxx/sites/ (NOT the same domain as FXV)". Ignore everything in this plan about a DNS swap, the new sites will directly replace the old ones, down time is not to be considered.
 ---
 
-# ADR-001: Retire WordPress for tube sites; rebuild as Astro + vaultwares-pipelines
+# ADR-001: Retire WordPress for tube sites; rebuild as Astro + vaultwares-api
 
 | Field             | Value                                                   |
 | ----------------- | ------------------------------------------------------- |
@@ -45,7 +45,7 @@ We **retire the WordPress installs at `fullxxx.video` and `prom-king.xyz`** and 
 1. **`Prom-King/shared-tube`** — new repo, pnpm monorepo.
 2. **`shared/`** — npm package: design tokens, Astro components (header, footer, card, player, consent banner, age gate, ad-slot wrapper), fetcher engine (per-source XPath configs + normalize), Drizzle schema, shared TypeScript types.
 3. **`apps/fxv` + `apps/pkt`** — thin Astro apps. Hybrid SSR: legal pages and the home shell are pre-rendered at build time (SSG, served by nginx); catalog pages (listings, single video, taxonomy archives, search, admin) are SSR per request. Each app composes `shared/` with a per-site config (brand tokens, source list, GTM container, ad codes, legal text).
-4. **`vaultwares-pipelines`** — extended with a new **Prom-King router** that owns: video/actor/studio/category CRUD, fetcher cron + manual trigger, settings, stats, auth integration (deferred enable). DB writes live here. Logging/monitoring stays uniform with the rest of the fleet.
+4. **`vaultwares-api`** — extended with a new **Prom-King router** that owns: video/actor/studio/category CRUD, fetcher cron + manual trigger, settings, stats, auth integration (deferred enable). DB writes live here. Logging/monitoring stays uniform with the rest of the fleet.
 
 Postgres replaces MySQL. Drizzle replaces the WP query surface. React replaces the entire `wp-admin` extension layer for our workflows. Astro replaces the template loader + rewrite rule layer.
 
@@ -97,11 +97,11 @@ Postgres replaces MySQL. Drizzle replaces the WP query surface. React replaces t
 
 **Pros:** Clean per-site boundary. Cheaper for the FXV/PKT scope alone.
 
-**Cons:** Bifurcates monitoring/logging from the rest of the VaultWares fleet. Auth would have to be re-invented per site or punted forever. Misses the synergy with `vaultwares-pipelines` becoming the central API.
+**Cons:** Bifurcates monitoring/logging from the rest of the VaultWares fleet. Auth would have to be re-invented per site or punted forever. Misses the synergy with `vaultwares-api` becoming the central API.
 
-**Rejected** in favour of Option D after the owner confirmed `vaultwares-pipelines` is becoming the canonical API for every VaultWares + Prom-King app.
+**Rejected** in favour of Option D after the owner confirmed `vaultwares-api` is becoming the canonical API for every VaultWares + Prom-King app.
 
-### Option D — Astro frontends + Prom-King router in vaultwares-pipelines + Postgres (chosen)
+### Option D — Astro frontends + Prom-King router in vaultwares-api + Postgres (chosen)
 
 | Dimension          | Assessment                                                   |
 | ------------------ | ------------------------------------------------------------ |
@@ -113,7 +113,7 @@ Postgres replaces MySQL. Drizzle replaces the WP query surface. React replaces t
 
 **Pros:** One API to monitor. One auth implementation. One DB connection pool. One logging story. Reusable design tokens (vault-flows). Owner velocity goes up because the iteration loop matches the rest of their fleet.
 
-**Cons:** `vaultwares-pipelines` now hosts tube-specific business logic alongside everything else. Boundary is enforced by a `routes/promking/` subtree and a `db/promking/` schema. Worth the trade because the central monitoring story is what the owner explicitly named as the reason to do this.
+**Cons:** `vaultwares-api` now hosts tube-specific business logic alongside everything else. Boundary is enforced by a `routes/promking/` subtree and a `db/promking/` schema. Worth the trade because the central monitoring story is what the owner explicitly named as the reason to do this.
 
 ## Trade-off Analysis
 
@@ -127,9 +127,9 @@ The third trade-off is **Astro hybrid SSR vs. SSG**. Pure SSG buys the cheapest 
 
 ### What becomes easier
 
-- Every admin workflow is React behind `vaultwares-pipelines` auth. Adding a new bulk action is one file under `apps/<site>/src/admin/`.
+- Every admin workflow is React behind `vaultwares-api` auth. Adding a new bulk action is one file under `apps/<site>/src/admin/`.
 - Adding a new source to the fetcher is one config block + one normalize function in `shared/src/fetcher/sources/`, no rewrite-rule dance, no detail-page extractor hooks unless the source actually needs them.
-- Stats, monitoring, and Health Ledger integration flow through `vaultwares-pipelines` like every other VaultWares app.
+- Stats, monitoring, and Health Ledger integration flow through `vaultwares-api` like every other VaultWares app.
 - React tokens / vault-flows components compose directly into the catalog.
 - Deploys are one `pnpm build` + one rsync per app. No PHP version dependency, no plugin dirs to chown.
 - Cutover **deletes ~5000 lines of PHP** that exist because WP needs them, not because the catalog does.
@@ -216,7 +216,7 @@ Prom-King/shared-tube/                    ← new repo
 ### Data flow
 
 ```
-Astro page (SSR)  ─── HTTPS ───►  vaultwares-pipelines /api/promking/*
+Astro page (SSR)  ─── HTTPS ───►  vaultwares-api /api/promking/*
                                        │
                                        ├── routes/promking/videos.ts
                                        ├── routes/promking/taxonomies.ts
@@ -251,7 +251,7 @@ Per-site rows are namespaced by `videos.site` (enum: `fxv`, `pkt`). Same table, 
 ### Hosting
 
 - `apps/fxv` and `apps/pkt` deploy as standalone Node processes on `greencloud-vps` via `@astrojs/node` standalone, fronted by nginx for static asset cache + TLS.
-- `vaultwares-pipelines` already runs on `100.71.101.21:9001`; the new `/api/promking/*` routes deploy with the existing pipelines deploy flow.
+- `vaultwares-api` already runs on `100.71.101.21:9001`; the new `/api/promking/*` routes deploy with the existing pipelines deploy flow.
 - Postgres lives wherever pipelines points at (whatever the existing fleet uses — confirm before scaffold).
 - WordPress installs at `/var/www/fullxxx.video` and `/var/www/prom-king.xyz` are tarballed to `/var/backups/wp-archive-<date>.tar.gz` and removed right away.
 
@@ -273,7 +273,7 @@ Ambition level **#4 — aim wide**, including:
   - Anonymous favourites (localStorage key + a `favourites` table keyed on a generated anon-id for cross-device when auth turns on).
   - Postgres FTS search backend, with taxonomy term-name union (currently a `posts_search` filter hack in WP).
   - Per-actor and per-studio gallery pages with thumbnail grids. This will be a copy of https://www.fullvideos.xxx/sites/ (careful, the domain is slightly different than ours)
-  - Custom admin: bulk-move/bulk-gender for taxonomies, one-button fetcher with a live console (server-sent events stream from `vaultwares-pipelines`), stats dashboard (videos per source over time, fetch run history, dedupe ratio, per-video view counts), canned SQL panel with 8–10 pre-made queries.
+  - Custom admin: bulk-move/bulk-gender for taxonomies, one-button fetcher with a live console (server-sent events stream from `vaultwares-api`), stats dashboard (videos per source over time, fetch run history, dedupe ratio, per-video view counts), canned SQL panel with 8–10 pre-made queries.
   - Visual ad-slot editor (drag rotation order, paste codes, preview gated by consent state).
   - Per-site theming via design tokens — vault-flows palette extension for FXV/PKT.
   - Health Ledger emit on every fetch run + deploy event.
@@ -291,19 +291,19 @@ Deferred to v1.1:
 3. [x] Scaffold pnpm monorepo: `pnpm-workspace.yaml` + TS base config + ESLint + Prettier + Vitest. (Session 2026-06-05.)
 4. [x] `shared/` package skeleton: Drizzle schema + design tokens (fxv.ts + pkt.ts) + Astro component shells. **Real markup for components is still TODO** — shells only.
 5. [x] `apps/fxv` + `apps/pkt`: Astro 5 init with per-site config files. **See "Implementation deviation: Astro 5 dropped `hybrid`"** below.
-6. [x] `vaultwares-pipelines`: branch `feat/promking-router` merged to `main` (2026-06-05, commit `66c9e3a`). Adds `app/routers/promking/{__init__,db,_models,videos,taxonomies,settings_routes,stats,fetcher,cron}.py`, mounted via `include_router` in `api_server.py` (try/except guarded so missing `PROMKING_DATABASE_URL` doesn't crash other routes). **Router lives on the FastAPI side**, calling the TS fetcher as a subprocess.
+6. [x] `vaultwares-api`: branch `feat/promking-router` merged to `main` (2026-06-05, commit `66c9e3a`). Adds `app/routers/promking/{__init__,db,_models,videos,taxonomies,settings_routes,stats,fetcher,cron}.py`, mounted via `include_router` in `api_server.py` (try/except guarded so missing `PROMKING_DATABASE_URL` doesn't crash other routes). **Router lives on the FastAPI side**, calling the TS fetcher as a subprocess.
 7. [x] Fetcher port done — 7 sources (`pornxp` on `pornxp.bz`, `1porn` on `1porn.tv`, `fullvideos`, `xvideos`, `xhamster`, `spankbang`, `redtube`) live in `shared/src/fetcher/sources/`. `redtube` uses the new `customFetch` escape hatch (JSON API, no JSDOM). PKT URL/content reject patterns ported into `_filters.ts`. **Verified end-to-end 2026-06-06**: pornxp/1porn/fullvideos/xvideos/xhamster all persist real rows; spankbang returns 403 (Cloudflare); redtube API returns 0 items. Both broken sources are tracked as v1.1 follow-ups.
 8. [x] Fetcher wired. `POST /api/promking/fetcher/run` spawns the TS CLI; `GET /fetcher/stream/{run_id}` relays NDJSON → SSE; `GET /fetcher/runs` returns recent rows. APScheduler reads `settings.value->'schedules'` per (site, source) and registers cron jobs at startup. node-cron deviation logged.
 9. [x] Astro pages shipped both apps: home (SSR), 4 legal (SSG), `/videos/` listing (SSR), `/videos/[slug]` single with JSON-LD, taxonomy archives, `/search`, `/sitemap.xml.ts`, `/llms.txt.ts`. All pages config-agnostic; fxv and pkt share the same source tree (mirrored, not symlinked, so per-site overrides remain easy).
 10. [x] React admin at `/admin` per app — App shell with bearer-token sign-in against `/auth/me` (pipelines exposes the verify endpoint under `/auth/`, not at root), Fetcher console with live SSE stream (uses `fetch + reader` because `EventSource` can't set custom headers), Catalog browser, Stats dashboard, SQL canned queries panel. Admin uses `window.location.origin` as API base — nginx proxies to pipelines with the gateway secret injected (see deviation #9).
-11. [x] Deploy glue in `Prom-King/shared-tube/scripts/`: `deploy-shared-tube.sh` (honours every operations/deployment-flow invariant), `systemd/{fxv,pkt}.service`, `nginx/{fullxxx.video,prom-king.xyz}.conf` with `/admin` + SSE buffering disabled, `vw-webhookd.targets.yml` fragment, `deploy-vaultwares-pipelines.patch.md` for the existing pipelines deploy script, and a `scripts/README.md` bootstrap recipe.
+11. [x] Deploy glue in `Prom-King/shared-tube/scripts/`: `deploy-shared-tube.sh` (honours every operations/deployment-flow invariant), `systemd/{fxv,pkt}.service`, `nginx/{fullxxx.video,prom-king.xyz}.conf` with `/admin` + SSE buffering disabled, `vw-webhookd.targets.yml` fragment, `deploy-vaultwares-api.patch.md` for the existing pipelines deploy script, and a `scripts/README.md` bootstrap recipe.
 12. [x] **Local + prod smoke green.** Local: `pnpm -r build` clean, `db:generate` + `db:migrate` against `promking` produced 11 tables, `pnpm preview` served home/legal/llms.txt/sitemap.xml correctly. Prod (2026-06-06): both apps live with real letsencrypt certs; `https://fullxxx.video/api/promking/stats` returns shape-correct JSON; admin sign-in works; multiple fetcher runs persisted real rows. The two outstanding items — Lighthouse + GA gate — are operator polish, not blockers.
 
 ## Locked decisions confirmed in session 2026-06-05
 
 These were re-confirmed when scaffolding started so they don't need re-debating in future sessions:
 
-- **Router language**: Python (FastAPI), not the Node side of `vaultwares-pipelines`. The TS fetcher engine in `shared/` is invoked as a subprocess from FastAPI (`shared/src/fetcher/cli.ts`); FastAPI relays the CLI's NDJSON stream as SSE to the admin console.
+- **Router language**: Python (FastAPI), not the Node side of `vaultwares-api`. The TS fetcher engine in `shared/` is invoked as a subprocess from FastAPI (`shared/src/fetcher/cli.ts`); FastAPI relays the CLI's NDJSON stream as SSE to the admin console.
 - **Astro stack**: Astro 5 + React 19 + `@astrojs/node` standalone. (See deviation note below.)
 - **Workspace package scope**: `@promking/*` — `@promking/shared-tube`, `@promking/site-fxv`, `@promking/site-pkt`. Unpublished; workspace-only.
 - **Postgres**: same fleet Postgres host, **separate database `promking`** (not a schema inside `vaultwares`). Local dev: PostgreSQL 18 on the workstation, db created next to `vaultwares` with `CREATE DATABASE promking;`.
@@ -315,7 +315,7 @@ These are intentional — anywhere this ADR's prose conflicts with what's in the
 1. **`output: 'hybrid'` → default `static` + per-page `prerender = false`.** Astro 5 removed the `hybrid` output mode; `static` is now the default and behaves identically. SSR pages (`videos/`, `videos/[slug]`, taxonomy archives, `search.astro`, `sitemap.xml.ts`, `/admin/*`) opt in with `export const prerender = false;`. Where this ADR says "hybrid SSR", read "static-default + per-page SSR opt-out."
 2. **Fetcher CLI entrypoint.** The `shared/` file tree in this ADR doesn't show `shared/src/fetcher/cli.ts`. It exists and is the contract surface for FastAPI → fetcher (NDJSON over stdout). See the in-repo `docs/router-integration.md` for the wire format.
 3. **`fullvideos.xxx` selectors are now locked.** The ADR mentioned modeling after this site; the actual listing-page + detail-page selectors landed during scaffold based on owner-provided DOM notes. See `shared/src/fetcher/sources/fullvideos.ts` and `docs/fetcher-sources.md` — frontpage DMCA placeholders are filtered via `skipItemIf`.
-4. **`node-cron` → APScheduler.** The router lives on the Python (FastAPI) side of `vaultwares-pipelines`, so the nightly fetch cron uses APScheduler in-process (`app/routers/promking/cron.py`) instead of node-cron. Schedule configuration is per-(site, source), stored in the `settings` table under key `fetcher_cron`, and reloadable without restart. Same intent as the ADR's "node-cron for the scheduled run" — just on the Python runtime.
+4. **`node-cron` → APScheduler.** The router lives on the Python (FastAPI) side of `vaultwares-api`, so the nightly fetch cron uses APScheduler in-process (`app/routers/promking/cron.py`) instead of node-cron. Schedule configuration is per-(site, source), stored in the `settings` table under key `fetcher_cron`, and reloadable without restart. Same intent as the ADR's "node-cron for the scheduled run" — just on the Python runtime.
 5. **`pornxp.com` → `pornxp.bz`** (was `.fo` in the PHP-port; `.fo` 301s to `.bz`, we pin `.bz` directly to skip the hop). **`1porn.com` → `1porn.tv`.** Anywhere the ADR or earlier docs say `.com`, the working host is the modern variant.
 6. **Apps run from `/srv/repos`, not `/var/www`.** The original cutover plan rsync'd `apps/<site>/dist/` into `/var/www/<domain>/` after `pnpm -r build` and pointed systemd `ExecStart` at that copy. `@astrojs/node` standalone externalises `react`/`react-dom`; without the workspace pnpm symlinks under `shared-tube/node_modules/.pnpm/...`, Node crashes with `ERR_MODULE_NOT_FOUND`. Systemd units now run from `/srv/repos/Prom-King/shared-tube/apps/<site>/dist/server/entry.mjs` with `WorkingDirectory=/srv/repos/Prom-King/shared-tube/apps/<site>/`. `/var/www/<domain>/` is no longer a deploy target. The deploy script no longer rsyncs.
 7. **xvideos is 1-indexed live**, contrary to the PHP-port's assumption of 0-indexed. `/new/0` now returns 404; `/new/1` is the first page. `Math.max(0, page-1)` was wrong; the source config now uses `page` directly.
@@ -323,7 +323,7 @@ These are intentional — anywhere this ADR's prose conflicts with what's in the
 9. **Admin browser → API path is same-origin via nginx**, not direct-to-tailnet. The first admin design had a configurable API-base field defaulting to `http://100.71.101.21:9001`. From an HTTPS page that's blocked by mixed-content + CORS. nginx now proxies `/api/promking/*` and `/auth/*` to pipelines, injecting `x-vw-gateway-secret` from `/etc/nginx/snippets/vw-gateway-secret.conf` (0640 root:www-data; never committed). The admin React code uses `window.location.origin`; the override field was removed after stale localStorage values caused operators to keep hitting cross-origin URLs.
 10. **CLI emits one `videos` event per item, not one big array.** A 3-page `fullvideos` run produced a single ~80 KB `videos` line that blew past `asyncio.StreamReader`'s 64 KiB default. FastAPI's `readline()` silently failed and the persistence path never ran. The CLI now emits one `videos` event per item (single-element array each); FastAPI accumulates. As belt-and-braces, the subprocess `StreamReader` `limit` is raised to 10 MiB.
 11. **`_persist_videos` is per-row autocommit, no batch transaction.** The first design wrapped the batch in `async with conn.transaction():`. A single `NOT NULL` violation (e.g. `embed_url` empty on a fullvideos card with no `data-preview`) aborted the Postgres transaction; the inner `try/except` swallowed the immediate error but subsequent `INSERT`s all raised "current transaction is aborted, commands ignored", and the outer manager re-raised at commit — so `_finalize_run` never ran. Each row is now its own autocommit `INSERT … ON CONFLICT (site, source_url) DO NOTHING`. FastAPI also emits a `persisted` SSE event after persistence with the real `added` count, since the CLI's `done` always reports `added: 0`.
-12. **No public bearer fallback for the admin path.** `vaultwares-pipelines` (FastAPI) gates `/auth/me`, `/auth/login`, `/auth/api-keys` against `BOOTSTRAP_ADMIN_*` in its `.env`. Tokens are minted via `POST /auth/login` (1h JWT) or `POST /auth/api-keys` (long-lived). The admin React app verifies against `/auth/me` (not `/me`) and persists the token in localStorage.
+12. **No public bearer fallback for the admin path.** `vaultwares-api` (FastAPI) gates `/auth/me`, `/auth/login`, `/auth/api-keys` against `BOOTSTRAP_ADMIN_*` in its `.env`. Tokens are minted via `POST /auth/login` (1h JWT) or `POST /auth/api-keys` (long-lived). The admin React app verifies against `/auth/me` (not `/me`) and persists the token in localStorage.
 
 ## Verification
 

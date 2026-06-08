@@ -15,7 +15,7 @@ description: "How Tailnet is used for access control, SSH, and internal services
 
 - Owner can reach `tag:server` on `22`, `80`, `443`.
 - If we use split DNS with `greencloud-vps` as the nameserver, also allow `tag:server` on **DNS** (`53` TCP+UDP).
-- Owner can reach `100.71.101.21` on `3389` (RDP) and `9001` (pipelines API).
+- Owner can reach `100.71.101.21` on `3389` (RDP) and `9001` (VaultWares API).
 - `tag:server` can reach `100.71.101.21:9001` (VPS reverse-proxy to PC).
 ## Exposing internal web services to the tailnet (Split DNS)
 
