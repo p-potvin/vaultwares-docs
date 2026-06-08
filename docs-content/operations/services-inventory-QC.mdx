@@ -20,6 +20,7 @@ Elle sert à :
 |---|---|---|---|---|
 | Site principal | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
 | Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (statique) | `vaultwares-docs` | Tailnet-only |
+| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca` (SPA + proxy `/monitor/*` vers l'API pipelines via le tailnet) | `vault-monitor` | Tailnet-only |
 | API | `https://api.vaultwares.ca` | bord HTTPS nginx sur `greencloud-vps` → proxy tailnet vers `http://100.71.101.21:9001` | `vaultwares-pipelines` | Tailnet-only; le secret de gateway est requis par les gateways applicatives, mais il n'est pas actuellement injecté par le vhost nginx `api.vaultwares.ca` |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |

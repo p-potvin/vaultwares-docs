@@ -40,6 +40,7 @@ Protocol categories are executed only when relevant.
 | DOCS_STANDARDS | Writing docs pages, frontmatter, navigation | instructions/summaries/DOCS_STANDARDS.md | instructions/notes/DOCS_STANDARDS.md | mdx,frontmatter,docs.json,navigation |
 | GLOBAL_INSTRUCTION_SYNC | Editing Tier-1 global instructions | instructions/summaries/GLOBAL_INSTRUCTION_SYNC.md | instructions/notes/GLOBAL_INSTRUCTION_SYNC.md | sync,instructions,hosts |
 | KNOWLEDGE_SYNC | Maintaining durable knowledge across repos | instructions/summaries/KNOWLEDGE_SYNC.md | instructions/notes/KNOWLEDGE_SYNC.md | knowledge,runbook,ssot,docs |
+| SKILL_SYNC | Authoring, editing, or disseminating an agent skill across hosts | instructions/summaries/SKILL_SYNC.md | instructions/notes/SKILL_SYNC.md | skill,create skill,new skill,grill me,interrogation,sync-global-skills |
 | KNOWLEDGE_SCOUT | Consulting or updating KNOWLEDGE_SCOUT.md | instructions/summaries/KNOWLEDGE_SCOUT.md | instructions/notes/KNOWLEDGE_SCOUT.md | scout,expensive,quirk |
 | LEDGER_LOOKUP | Resuming prior session, "what did the last agent do", "has this been fixed before", probe failure history, recent deploy state | docs-content/operations/mcp-ledger-tools.mdx | — | ledger,history,probe,health,continuity,last session,recent agent,resume |
 | MULTI_AGENT_FLOW | Trigger phrases or multi-agent orchestration | instructions/summaries/MULTI_AGENT_FLOW.md | instructions/notes/MULTI_AGENT_FLOW.md | team,swarm,le stéphane,le méchant |

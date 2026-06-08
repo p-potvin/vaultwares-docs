@@ -1,0 +1,31 @@
+---
+title: "Synchronisation des compétences"
+description: "Résumé du protocole assistant : Synchronisation des compétences"
+---
+
+# Synchronisation des compétences
+
+- Identifiant de catégorie : `SKILL_SYNC`
+- Source du résumé : `instructions/summaries/SKILL_SYNC.md`
+- Source des notes : `instructions/notes/SKILL_SYNC.md`
+
+S'applique quand : on rédige, modifie ou diffuse une compétence d'agent à travers les hôtes (Claude Code, Codex, Gemini, OpenCode, Windsurf, VS Code).
+
+À faire :
+- Source de vérité = `vaultwares-docs/skills/<nom>/SKILL.md` (un dossier par compétence, frontmatter YAML `name` + `description` + `metadata` optionnel).
+- Créer les nouvelles compétences via la compétence `create-skill` — elle déclenche l'interrogation, rédige le fichier, demande la confirmation, puis lance la synchronisation comme dernière étape.
+- Après toute modification de la source, diffuser avec : `vaultwares-docs/scripts/sync-global-skills.ps1 [-SkillName <nom>] [-DryRun]`.
+- Adaptateurs par hôte : Claude Code / Codex / Gemini / OpenCode = copie verbatim du dossier; Windsurf = markdown aplati (sans frontmatter); VS Code = `<nom>.prompt.md` avec `mode: agent` + `description`.
+- Vérifier les six cibles sur disque avant de déclarer la tâche terminée.
+
+À ne pas faire :
+- Modifier à la main les fichiers de compétence par hôte. La source fait foi; les cibles sont écrasées.
+- Écrire sur disque avant que l'utilisateur ait confirmé le brouillon.
+- Ajouter de nouveaux hôtes cibles sans aussi mettre à jour le registre dans `sync-global-skills.ps1`.
+
+Terminé quand :
+- `vaultwares-docs/skills/<nom>/SKILL.md` existe, la synchronisation a roulé sans avertissement, les six cibles sont présentes sur disque, un événement de grand livre (ledger) est enregistré.
+
+## Notes
+Les assistants ne lisent les notes complètes que sur demande explicite : `read full notes`.
+Chemin des notes : `instructions/notes/SKILL_SYNC.md`
