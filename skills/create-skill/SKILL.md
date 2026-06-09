@@ -37,7 +37,7 @@ You are about to author a new agent skill. Do not write `SKILL.md` yet. Run the 
    - Anti-triggers — phrasings that look similar but should NOT fire (note these explicitly so the agent learns the boundary).
 4. **Behavioral mode** — pick one:
    - **Interrogation** (like `grill-me` / `create-skill`): forced Q&A before any output.
-   - **Workflow** (like `firecrawl-*` / `deploy-to-vercel`): runs steps autonomously.
+   - **Workflow** (like `firecrawl-*` / `deploy-to-greencloud`): runs steps autonomously.
    - **Reference** (like `claude-api` / `web-design-guidelines`): the agent reads it for context, no forced steps.
    - **Hybrid** — describe in free-text.
 5. **Hard rules** the agent must obey (3–7 bullets). Examples: "no code until X", "one question at a time", "always read Y before answering". Pull from the user's intent.

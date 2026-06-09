@@ -45,7 +45,7 @@ Protocol categories are executed only when relevant.
 | LEDGER_LOOKUP | Resuming prior session, "what did the last agent do", "has this been fixed before", probe failure history, recent deploy state | docs-content/operations/mcp-ledger-tools.mdx | — | ledger,history,probe,health,continuity,last session,recent agent,resume |
 | MULTI_AGENT_FLOW | Trigger phrases or multi-agent orchestration | instructions/summaries/MULTI_AGENT_FLOW.md | instructions/notes/MULTI_AGENT_FLOW.md | team,swarm,le stéphane,le méchant |
 | AUTOMATION_POLICY | Monitors, schedules, background jobs | instructions/summaries/AUTOMATION_POLICY.md | instructions/notes/AUTOMATION_POLICY.md | cron,automation,monitor,pm2 |
-| DEPLOYMENT_POLICY | Deploy/release ops, VPS changes | instructions/summaries/DEPLOYMENT_POLICY.md | instructions/notes/DEPLOYMENT_POLICY.md | deploy,release,vercel,nginx |
+| DEPLOYMENT_POLICY | Deploy/release ops, VPS changes | instructions/summaries/DEPLOYMENT_POLICY.md | instructions/notes/DEPLOYMENT_POLICY.md | deploy,release,greencloud,nginx |
 | BACKUP_EXPORT_POLICY | Backups, exports, restore testing | instructions/summaries/BACKUP_EXPORT_POLICY.md | instructions/notes/BACKUP_EXPORT_POLICY.md | backup,export,restore |
 | LONG_RUNNING_TASKS | Overlay: estimated_output_tokens >= 8000 | instructions/summaries/LONG_RUNNING_TASKS.md | instructions/notes/LONG_RUNNING_TASKS.md | long running,checkpoint,resume,vw_state |
 | HANDLING_BUGS | Bugs, defects, unexpected behavior | instructions/summaries/HANDLING_BUGS.md | instructions/notes/HANDLING_BUGS.md | bug,broken,error,regression |
