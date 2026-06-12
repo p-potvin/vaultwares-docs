@@ -74,9 +74,9 @@ ledger.vaultwares.ca
 
 `api.vaultwares.ca` est volontairement exclu du groupe DNS divisé de Greencloud.
 Il résout vers `vps-ovhcloud` (`100.67.25.118`) parce que OVH possède
-l'exécution de l'API VaultWares et de Postgres local. Pendant la réparation du
-bord HTTPS OVH, utiliser `http://100.67.25.118:9001` comme chemin de santé
-tailnet connu comme fonctionnel.
+l'exécution de l'API VaultWares et de Postgres local. Nginx sur OVH possède
+`100.67.25.118:443`; ne pas activer Tailscale Serve sur HTTPS `443` sur OVH,
+car il intercepte les clients tailnet avant nginx et casse `api.vaultwares.ca`.
 
 > L'ACL doit autoriser `tag:server` sur le port **53** (TCP+UDP) si `greencloud-vps` est le serveur de noms faisant autorité. Voir Règles clés ci-dessus.
 

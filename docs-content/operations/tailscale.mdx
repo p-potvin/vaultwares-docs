@@ -55,9 +55,9 @@ ledger.vaultwares.ca
 
 `api.vaultwares.ca` is intentionally excluded from the Greencloud split-DNS
 set. It resolves to `vps-ovhcloud` (`100.67.25.118`) because OVH owns the
-VaultWares API and local Postgres runtime. While the OVH HTTPS edge is being
-repaired, use `http://100.67.25.118:9001` as the known-good tailnet health
-path.
+VaultWares API and local Postgres runtime. OVH nginx owns `100.67.25.118:443`;
+do not enable Tailscale Serve on HTTPS `443` on OVH, because it intercepts
+tailnet clients before nginx and breaks `api.vaultwares.ca`.
 
 `greencloud-vps` runs `dnsmasq` on `tailscale0` and answers those names from `/etc/dnsmasq.d/vaultwares-tailnet.conf`. The config uses exact `host-record` entries instead of a wildcard, so it does not take over the whole `vaultwares.ca` zone.
 

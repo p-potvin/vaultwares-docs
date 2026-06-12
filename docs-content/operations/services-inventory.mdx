@@ -27,7 +27,7 @@ Related:
 | Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (static) | `vaultwares-docs` | Tailnet-only |
 | V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca` (SPA + `/monitor/*` proxy to VaultWares API over tailnet) | `vault-monitor` | Tailnet-only |
 | Stats dashboard | `https://stats.vaultwares.ca` | `/var/www/stats.vaultwares.ca` (agent-ledger React/Vite SPA; `/monitor/*` and `/api/telemetry/*` proxy to VaultWares API over tailnet) | `agent-ledger` | Tailnet-only |
-| API | `https://api.vaultwares.ca` / `http://100.67.25.118:9001` | DNS resolves to `vps-ovhcloud`; FastAPI listens on `100.67.25.118:9001`. Direct `:9001` is the known-good health path while OVH HTTPS `:443` repair is tracked in `vaultwares-api#63`. | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; app auth/gateway secret required |
+| API | `https://api.vaultwares.ca` / `http://100.67.25.118:9001` | DNS resolves to `vps-ovhcloud`; nginx owns `100.67.25.118:443` and proxies to FastAPI on `127.0.0.1:9001`; direct `:9001` remains the internal health/debug path. Tailscale Serve must stay disabled on OVH HTTPS `443`. | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; app auth/gateway secret required |
 | MCP server | `https://mcp.vaultwares.ca/mcp` | nginx HTTPS edge on `greencloud-vps` -> tailnet proxy to `vaultwares-mcp` on OVH (`vps-ovhcloud`) | `vaultwares-mcp` | Tailnet-only |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |

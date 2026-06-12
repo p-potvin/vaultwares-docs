@@ -118,7 +118,7 @@ flowchart TB
 | Agent ledger | `https://ledger.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
 | V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; `/monitor/*` proxies to `vps-ovhcloud:9001` |
 | Stats dashboard | `https://stats.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; static agent-ledger SPA with `/monitor/*` and `/api/telemetry/*` proxied to `vps-ovhcloud:9001` |
-| API (gateway/domain) | `https://api.vaultwares.ca` | `vps-ovhcloud` | `443` | Tailnet ACL + app/gateway auth; OVH HTTPS repair tracked in `vaultwares-api#63` |
+| API (gateway/domain) | `https://api.vaultwares.ca` | `vps-ovhcloud` | `443` | Tailnet ACL + app/gateway auth; nginx owns `443`; keep Tailscale Serve disabled on this port |
 | MCP server | `https://mcp.vaultwares.ca/mcp` | `greencloud-vps` edge -> `vps-ovhcloud` | `443` | Tailnet ACL |
 | VaultWares API (direct) | `http://100.67.25.118:9001` | `vps-ovhcloud` | `9001` | App auth (JWT/API key), Tailnet ACL |
 | VaultWarden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |

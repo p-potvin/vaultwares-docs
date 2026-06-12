@@ -128,7 +128,7 @@ flowchart TB
 |---|---|---:|---:|---|
 | Docs privés | `https://docs.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + liste blanche nginx |
 | V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + liste blanche nginx; `/monitor/*` proxy vers `vps-ovhcloud:9001` |
-| API (gateway/domaine) | `https://api.vaultwares.ca` | `vps-ovhcloud` | `443` | ACL Tailnet + auth d'application/gateway; réparation HTTPS OVH suivie dans `vaultwares-api#63` |
+| API (gateway/domaine) | `https://api.vaultwares.ca` | `vps-ovhcloud` | `443` | ACL Tailnet + auth d'application/gateway; nginx possède `443`; garder Tailscale Serve désactivé sur ce port |
 | API VaultWares (direct) | `http://100.67.25.118:9001` | `vps-ovhcloud` | `9001` | Auth d'application (JWT/clé API), ACL Tailnet |
 | VaultWarden (service de secrets) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + autorisation VaultWarden |
 | Webhooks GitHub (récepteur) | `https://hooks.vaultwares.ca/github` | `greencloud-vps` | `443` | Vérification de signature de webhook (nginx → `vw-webhookd` sur `127.0.0.1:9033`) |
