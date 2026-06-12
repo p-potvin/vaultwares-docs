@@ -15,8 +15,12 @@ description: "How Tailnet is used for access control, SSH, and internal services
 
 - Owner can reach `tag:server` on `22`, `80`, `443`.
 - If we use split DNS with `greencloud-vps` as the nameserver, also allow `tag:server` on **DNS** (`53` TCP+UDP).
-- Owner can reach `100.71.101.21` on `3389` (RDP) and `9001` (VaultWares API).
-- `tag:server` can reach `100.71.101.21:9001` (VPS reverse-proxy to PC).
+- Owner can reach `100.71.101.21` on `3389` (RDP) and `100.67.25.118:9001` (VaultWares API).
+- `tag:server` can reach `100.67.25.118:9001` (VPS reverse-proxy to the OVH API host).
+- For the Health Ledger probe triangle, `tag:server` must also be able to
+  reach other `tag:server` nodes on `80` and `443`. Without that, OVH probes
+  can resolve Greencloud private names but cannot connect to the Greencloud
+  nginx surfaces.
 ## Exposing internal web services to the tailnet (Split DNS)
 
 Some subdomains, including `stats.vaultwares.ca`, are **tailnet-only** services. The public DNS record returns the VPS public IP, which serves a 403 to all non-tailnet clients. Tailnet nodes resolve the same hostname to the **Tailscale IP** of `greencloud-vps` via a Tailscale DNS override, bypassing the public nginx vhost entirely and hitting a separate internal-only nginx server block.
@@ -43,6 +47,7 @@ docs.vaultwares.ca
 monitor.vaultwares.ca
 stats.vaultwares.ca
 api.vaultwares.ca
+mcp.vaultwares.ca
 hooks.vaultwares.ca
 secrets.vaultwares.ca
 warden.vaultwares.ca

@@ -85,6 +85,13 @@ separate "probably caused by this runner" from background usage.
 
 - `greencloud-vps`
 - `Clopeux-Desktop`
+- `vps-ovhcloud`
+
+Probe routing should avoid self-probing for host-owned services. Greencloud
+surfaces are checked from `Clopeux-Desktop` and `vps-ovhcloud`; OVH API
+surfaces are checked from `greencloud-vps` and `Clopeux-Desktop`. This gives
+the monitor a triangle view instead of letting a host prove only that its own
+local stack can see itself.
 
 ## Current implementation state
 
@@ -92,7 +99,12 @@ As of 2026-06-05:
 
 - `greencloud-vps` runs `health-ledger-probe.service` from `/opt/health-ledger`.
   The service is enabled and writes probe events/rollups under
-  `/opt/health-ledger/data`.
+  `/opt/health-ledger/data`. As of 2026-06-12, it should not be assigned
+  Greencloud-hosted services; it is the remote probe leg for OVH and Clopeux
+  surfaces.
+- `vps-ovhcloud` runs `health-ledger-probe.service` from `/opt/health-ledger`
+  with `JOKER_PROBE_LOCATION=vps-ovhcloud`. It is the remote probe leg for
+  Greencloud-hosted surfaces.
 - `greencloud-vps` runs `health-ledger-dashboard.service` from
   `/opt/health-ledger`. It binds to `127.0.0.1:8790` and reads Health Ledger
   rollups/events only; it does not run probes or append data.
@@ -112,8 +124,8 @@ As of 2026-06-05:
   `environment: non_production` with `alert_floor: low`.
 - Ollama is registered as its own environment and probed from Clopeux with
   `/api/version`, `/api/tags`, and `/api/ps`.
-- The VaultWares API has two probe views: public gateway from greencloud, and
-  local Clopeux runtime through `/openapi.json`. Gateway-only probes use
+- The VaultWares API has remote probe views from Greencloud and Clopeux, plus
+  the direct OVH runtime through `/openapi.json` and `/healthz`. Gateway-only probes use
   `X_VW_GATEWAY_SECRET`; on `greencloud-vps`, the systemd environment file is
   `/etc/health-ledger/gateway.env` and the API nginx vhost sets the matching
   `X-VW-Gateway-Secret` header. Do not copy the secret value into docs, ledger
