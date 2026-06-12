@@ -37,8 +37,9 @@ flowchart TB
     Secrets["warden.vaultwares.ca\n(VaultWarden / vault-warden)\nHTTPS :443"]
     Ledger["ledger.vaultwares.ca\n(agent-ledger SPA)\nHTTPS :443"]
     Hooks["hooks.vaultwares.ca/github\n(vw-webhookd)\nHTTPS :443"]
-    Api["api.vaultwares.ca\n(nginx proxy)\nHTTPS :443"]
-    PCAPI["Clopeux-Desktop\nVaultWares API\nhttp://100.71.101.21:9001"]
+    Api["api.vaultwares.ca\n(vps-ovhcloud)\nHTTPS :443 / HTTP :9001"]
+    Mcp["mcp.vaultwares.ca/mcp\n(vaultwares-mcp)\nHTTPS :443"]
+    OVHAPI["vps-ovhcloud\nVaultWares API\nhttp://100.67.25.118:9001"]
     VaultFlowsSPA["Clopeux-Desktop\nvault-flows (local preview)\nhttps://localhost:3100"]
     RDP["Clopeux-Desktop RDP\n100.71.101.21:3389"]
   end
@@ -46,7 +47,7 @@ flowchart TB
   %% Machines
   subgraph Machines["Machines"]
     V1["greencloud-vps (GreenCloud VPS)\nDebian 12\nPublic 173.249.194.15\nTailnet 100.73.93.84"]
-    V0["ci-egress-vps (Old VPS)\nDebian 12\nPublic 212.193.6.35\nTailnet 100.73.57.6"]
+    V2["vps-ovhcloud\nOVH VPS\nTailnet 100.67.25.118"]
     PC["Clopeux-Desktop\nWindows\nTailnet 100.71.101.21"]
     Brume2["Brume2\nOpenWrt\nTailnet 100.67.153.112"]
   end
@@ -67,14 +68,14 @@ flowchart TB
   Secrets --> V1
   Ledger --> V1
   Hooks --> V1
-  Api -->|proxy| PCAPI --> PC
-  Stats -->|/monitor + telemetry proxy| PCAPI
+  Api --> OVHAPI --> V2
+  Mcp -->|proxy over tailnet| V2
+  Stats -->|/monitor + telemetry proxy| OVHAPI
   Noddit -->|proxy| VaultFlowsSPA --> PC
-  VaultWaresCA -->|future API calls| PCAPI --> PC
+  VaultWaresCA -->|future API calls| OVHAPI --> V2
 
   %% Ops access
   V1 <-->|Tailscale (WireGuard)| PC
-  V0 <-->|Tailscale (WireGuard)| PC
   Brume2 <-->|Tailscale (WireGuard)| PC
   RDP --> PC
 ```
@@ -90,10 +91,10 @@ flowchart TB
 
 | Machine | Role | OS | Tailnet IP | Public IP | Access |
 |---|---|---|---|---|---|
-| `Clopeux-Desktop` | PC / API host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`), API on `9001` |
+| `Clopeux-Desktop` | PC / workstation + local AI host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`) |
+| `vps-ovhcloud` | API + DB host | Linux | `100.67.25.118` | (OVH) | SSH tailnet-only, VaultWares API on `9001` |
 | `Brume2` | Home gateway (DHCP/DNS/router) | OpenWrt | `100.67.153.112` | (home) | Tailnet admin only |
 | `greencloud-vps` | **New VPS** (GreenCloud) | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only**, HTTPS public services |
-| `ci-egress-vps` | **Old VPS** | Debian 12 | `100.73.57.6` | `212.193.6.35` | SSH **tailnet-only**, legacy services |
 
 ## Services / Services
 
@@ -115,10 +116,11 @@ flowchart TB
 |---|---|---:|---:|---|
 | Private docs | `https://docs.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
 | Agent ledger | `https://ledger.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist |
-| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; `/monitor/*` proxies to `Clopeux-Desktop:9001` |
-| Stats dashboard | `https://stats.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; static agent-ledger SPA with `/monitor/*` and `/api/telemetry/*` proxied to `Clopeux-Desktop:9001` |
-| API (gateway) | `https://api.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + `X-VW-Gateway-Secret` |
-| VaultWares API (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | App auth (JWT/API key), Tailnet ACL |
+| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; `/monitor/*` proxies to `vps-ovhcloud:9001` |
+| Stats dashboard | `https://stats.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; static agent-ledger SPA with `/monitor/*` and `/api/telemetry/*` proxied to `vps-ovhcloud:9001` |
+| API (gateway/domain) | `https://api.vaultwares.ca` | `vps-ovhcloud` | `443` | Tailnet ACL + app/gateway auth; OVH HTTPS repair tracked in `vaultwares-api#63` |
+| MCP server | `https://mcp.vaultwares.ca/mcp` | `greencloud-vps` edge -> `vps-ovhcloud` | `443` | Tailnet ACL |
+| VaultWares API (direct) | `http://100.67.25.118:9001` | `vps-ovhcloud` | `9001` | App auth (JWT/API key), Tailnet ACL |
 | VaultWarden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |
 | GitHub webhooks (receiver) | `https://hooks.vaultwares.ca/github` | `greencloud-vps` | `443` | Webhook signature verification (nginx → `vw-webhookd` on `127.0.0.1:9033`) |
 | Tailscale webhook handler | `http://127.0.0.1:8787` | `greencloud-vps` | `8787` | Tailnet-local only (`vaultwares-hooks`) |
@@ -139,4 +141,4 @@ flowchart TB
 5. Verify:
    - You can reach `docs.vaultwares.ca` from tailnet.
    - You can reach `vaultwares.ca` publicly.
-   - You can reach the PC API endpoint needed for your work (policy permitting).
+   - You can reach the VaultWares API endpoint needed for your work (policy permitting).

@@ -30,18 +30,18 @@ job. Health Ledger keeps these concerns separate:
 | Axis | Meaning | Example |
 |---|---|---|
 | Ingress/control plane | Where the signed GitHub webhook arrives first. | `greencloud-vps` today, because it is the public tailnet entry point. |
-| Project routing | Which host/IP should run a probe, build, deploy, or local check. | `vaultwares-api` routes to `Clopeux-Desktop` / `100.71.101.21`. |
+| Project routing | Which host/IP should run a probe, build, deploy, or local check. | `vaultwares-api` routes to `vps-ovhcloud` / `100.67.25.118`. |
 | Alert profile | What severity and automation are allowed for the project. | Production services can escalate High/Critical; non-production repo CI failures start Low. |
 | AI remediation policy | Whether a local model may be used to repair failures. | Local Ollama/Gemma may be used for non-production Low loops, not important production incidents. |
 
 `greencloud-vps` is the current webhook entry point. It is not the definition of
-production. `Clopeux-Desktop` hosts part of production because the VaultWares API
-runs there. Future hosts can be added by changing the project routing sheet,
+production. `vps-ovhcloud` currently hosts the VaultWares API and its Postgres
+database. Future hosts can be added by changing the project routing sheet,
 without changing severity policy.
 
-Production webhooks may fan out to `greencloud-vps`, `Clopeux-Desktop`, or any
-future registered tailnet server. Non-production webhooks currently route to
-`Clopeux-Desktop`, but that is a routing detail only.
+Production webhooks may fan out to `greencloud-vps`, `vps-ovhcloud`,
+`Clopeux-Desktop`, or any future registered tailnet server. Non-production
+webhooks currently route to `Clopeux-Desktop`, but that is a routing detail only.
 
 ## Non-production CI Joker
 
@@ -89,9 +89,10 @@ separate "probably caused by this runner" from background usage.
 
 Probe routing should avoid self-probing for host-owned services. Greencloud
 surfaces are checked from `Clopeux-Desktop` and `vps-ovhcloud`; OVH API
-surfaces are checked from `greencloud-vps` and `Clopeux-Desktop`. This gives
-the monitor a triangle view instead of letting a host prove only that its own
-local stack can see itself.
+surfaces are checked from `greencloud-vps` and `Clopeux-Desktop`. Server nodes
+must be allowed to reach one another on `80` and `443`, otherwise the triangle
+collapses into false network failures. This gives the monitor a triangle view
+instead of letting a host prove only that its own local stack can see itself.
 
 ## Current implementation state
 

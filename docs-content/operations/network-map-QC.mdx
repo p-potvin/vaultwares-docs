@@ -54,8 +54,8 @@ flowchart TB
     Monitor["monitor.vaultwares.ca\n(vault-monitor)\nHTTPS :443"]
     Secrets["warden.vaultwares.ca\n(VaultWarden / vault-warden)\nHTTPS :443"]
     Hooks["hooks.vaultwares.ca/github\n(vw-webhookd)\nHTTPS :443"]
-    Api["api.vaultwares.ca\n(nginx proxy)\nHTTPS :443"]
-    PCAPI["Clopeux-Desktop\nVaultWares API\nhttp://100.71.101.21:9001"]
+    Api["api.vaultwares.ca\n(vps-ovhcloud)\nHTTPS :443 / HTTP :9001"]
+    OVHAPI["vps-ovhcloud\nVaultWares API\nhttp://100.67.25.118:9001"]
     VaultFlowsSPA["Clopeux-Desktop\nvault-flows (local preview)\nhttps://localhost:3100"]
     RDP["Clopeux-Desktop RDP\n100.71.101.21:3389"]
   end
@@ -63,7 +63,7 @@ flowchart TB
   %% Machines
   subgraph Machines["Machines"]
     V1["greencloud-vps (GreenCloud VPS)\nDebian 12\nPublic 173.249.194.15\nTailnet 100.73.93.84"]
-    V0["ci-egress-vps (Old VPS)\nDebian 12\nPublic 212.193.6.35\nTailnet 100.73.57.6"]
+    V2["vps-ovhcloud\nOVH VPS\nTailnet 100.67.25.118"]
     PC["Clopeux-Desktop\nWindows\nTailnet 100.71.101.21"]
     Brume2["Brume2\nOpenWrt\nTailnet 100.67.153.112"]
   end
@@ -82,13 +82,12 @@ flowchart TB
   Monitor --> V1
   Secrets --> V1
   Hooks --> V1
-  Api -->|proxy| PCAPI --> PC
+  Api --> OVHAPI --> V2
   Noddit -->|proxy| VaultFlowsSPA --> PC
-  VaultWaresCA -->|future API calls| PCAPI --> PC
+  VaultWaresCA -->|future API calls| OVHAPI --> V2
 
   %% Ops access
   V1 <-->|Tailscale (WireGuard)| PC
-  V0 <-->|Tailscale (WireGuard)| PC
   Brume2 <-->|Tailscale (WireGuard)| PC
   RDP --> PC
 ```
@@ -104,10 +103,10 @@ flowchart TB
 
 | Machine | Rôle | OS | IP Tailnet | IP Publique | Accès |
 |---|---|---|---|---|---|
-| `Clopeux-Desktop` | PC / hôte de pipelines | Windows | `100.71.101.21` | (domicile) | Bureau à distance (RDP) sur le Tailnet (`3389`), API sur `9001` |
+| `Clopeux-Desktop` | PC / poste de travail + hôte IA local | Windows | `100.71.101.21` | (domicile) | Bureau à distance (RDP) sur le Tailnet (`3389`) |
+| `vps-ovhcloud` | Hôte API + DB | Linux | `100.67.25.118` | (OVH) | SSH tailnet-only, API VaultWares sur `9001` |
 | `Brume2` | Passerelle domestique (DHCP/DNS/routeur) | OpenWrt | `100.67.153.112` | (domicile) | Administration Tailnet seulement |
 | `greencloud-vps` | **Nouveau VPS** (GreenCloud) | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **seulement sur le tailnet**, services HTTPS publics |
-| `ci-egress-vps` | **Ancien VPS** | Debian 12 | `100.73.57.6` | `212.193.6.35` | SSH **seulement sur le tailnet**, services hérités |
 
 ## Services
 
@@ -128,9 +127,9 @@ flowchart TB
 | Service | URL / Point d'accès | Où | Ports | Auth |
 |---|---|---:|---:|---|
 | Docs privés | `https://docs.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + liste blanche nginx |
-| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + liste blanche nginx; `/monitor/*` proxy vers `Clopeux-Desktop:9001` |
-| API (gateway) | `https://api.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + header `X-VW-Gateway-Secret` |
-| API Pipelines (direct) | `http://100.71.101.21:9001` | `Clopeux-Desktop` | `9001` | Auth d'application (JWT/clé API), ACL Tailnet |
+| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + liste blanche nginx; `/monitor/*` proxy vers `vps-ovhcloud:9001` |
+| API (gateway/domaine) | `https://api.vaultwares.ca` | `vps-ovhcloud` | `443` | ACL Tailnet + auth d'application/gateway; réparation HTTPS OVH suivie dans `vaultwares-api#63` |
+| API VaultWares (direct) | `http://100.67.25.118:9001` | `vps-ovhcloud` | `9001` | Auth d'application (JWT/clé API), ACL Tailnet |
 | VaultWarden (service de secrets) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | ACL Tailnet + autorisation VaultWarden |
 | Webhooks GitHub (récepteur) | `https://hooks.vaultwares.ca/github` | `greencloud-vps` | `443` | Vérification de signature de webhook (nginx → `vw-webhookd` sur `127.0.0.1:9033`) |
 | Gestionnaire de webhooks Tailscale | `http://127.0.0.1:8787` | `greencloud-vps` | `8787` | Tailnet-local seulement (`vaultwares-hooks`) |
@@ -151,4 +150,4 @@ flowchart TB
 5. Vérifier :
    - Vous pouvez atteindre `docs.vaultwares.ca` depuis le tailnet.
    - Vous pouvez atteindre `vaultwares.ca` publiquement.
-   - Vous pouvez atteindre le point d'accès API PC nécessaire pour votre travail (si la politique le permet).
+   - Vous pouvez atteindre le point d'accès API VaultWares nécessaire pour votre travail (si la politique le permet).

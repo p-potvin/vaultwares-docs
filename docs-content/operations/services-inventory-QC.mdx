@@ -20,8 +20,10 @@ Elle sert à :
 |---|---|---|---|---|
 | Site principal | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
 | Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (statique) | `vaultwares-docs` | Tailnet-only |
-| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca` (SPA + proxy `/monitor/*` vers l'API pipelines via le tailnet) | `vault-monitor` | Tailnet-only |
-| API | `https://api.vaultwares.ca` | bord HTTPS nginx sur `greencloud-vps` → proxy tailnet vers `http://100.71.101.21:9001` | `vaultwares-api` | Tailnet-only; le secret de gateway est requis par les gateways applicatives, mais il n'est pas actuellement injecté par le vhost nginx `api.vaultwares.ca` |
+| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca` (SPA + proxy `/monitor/*` vers l'API VaultWares via le tailnet) | `vault-monitor` | Tailnet-only |
+| Stats dashboard | `https://stats.vaultwares.ca` | `/var/www/stats.vaultwares.ca` (SPA React/Vite d'agent-ledger; `/monitor/*` et `/api/telemetry/*` passent par l'API VaultWares via le tailnet) | `agent-ledger` | Tailnet-only |
+| API | `https://api.vaultwares.ca` / `http://100.67.25.118:9001` | DNS vers `vps-ovhcloud`; FastAPI écoute sur `100.67.25.118:9001`. Le port direct `:9001` est le chemin de santé connu comme fonctionnel pendant que la réparation HTTPS OVH `:443` est suivie dans `vaultwares-api#63`. | `vaultwares-api` | Tailnet-only; auth d'application / secret de gateway requis |
+| Serveur MCP | `https://mcp.vaultwares.ca/mcp` | bord HTTPS nginx sur `greencloud-vps` -> proxy tailnet vers `vaultwares-mcp` sur OVH (`vps-ovhcloud`) | `vaultwares-mcp` | Tailnet-only |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | Webhooks GitHub | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (service ops) | Public (requis par GitHub) |
@@ -43,6 +45,21 @@ Chaque repo dans cette table doit suivre **le même modèle de déploiement** :
 - **aucun déploiement via GitHub Actions**
 
 Source de vérité : `operations/deployment-flow`.
+
+## Surfaces média tailnet sur `vps-ovhcloud`
+
+Ces services sont destinés aux opérateurs dans le tailnet. Les services Docker
+vivent sur `vps-ovhcloud` dans `/opt/vw-media-stack/docker-compose.yml`, avec
+la config et les données persistantes sous `/srv/vw-media/`. `greencloud-vps`
+répond aux noms privés via `dnsmasq`, puis nginx proxy vers OVH sur le tailnet.
+
+Greencloud sert les surfaces média avec le certificat SAN
+`/etc/letsencrypt/live/media.vaultwares.ca/`. Les autres noms privés
+(`docs.vaultwares.ca`, `hooks.vaultwares.ca`, `warden.vaultwares.ca`,
+`monitor.vaultwares.ca`, `stats.vaultwares.ca`, `mcp.vaultwares.ca`, etc.)
+doivent garder des `listen 100.73.93.84:443 ssl;` explicites. Sans ces listeners,
+nginx peut choisir le certificat média pour les requêtes qui arrivent par le
+tailnet.
 
 ## Notes sur Prom-King / FullXXX
 

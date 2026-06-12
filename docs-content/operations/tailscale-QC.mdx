@@ -35,8 +35,8 @@ Parce que ça réduit 2 risques fréquents :
 ## Règles clés (actuelles)
 - Le Propriétaire peut atteindre `tag:server` sur les ports `22`, `80`, `443`.
 - Si nous utilisons un DNS divisé avec `greencloud-vps` comme serveur de noms, autoriser également `tag:server` sur le **DNS** (`53` TCP+UDP).
-- Le Propriétaire peut atteindre `100.71.101.21` sur `3389` (RDP) et `9001` (API de pipelines).
-- `tag:server` peut atteindre `100.71.101.21:9001` (reverse-proxy VPS vers PC).
+- Le Propriétaire peut atteindre `100.71.101.21` sur `3389` (RDP) et `100.67.25.118:9001` (API VaultWares).
+- `tag:server` peut atteindre `100.67.25.118:9001` (reverse-proxy VPS vers l'hôte API OVH).
 
 ## Exposer les services web internes au tailnet (DNS divisé)
 
@@ -55,8 +55,28 @@ Tailnet node   →  stats.vaultwares.ca  →  100.x.x.x    →  nginx (internal 
 
 Dans la [console d'administration Tailscale](https://login.tailscale.com/admin/dns) → **Nameservers** :
 
-- Ajouter une entrée de **DNS divisé** pour le domaine `vaultwares.ca` pointant vers l'IP Tailscale de `greencloud-vps` (ex. `100.x.x.x`).
-- Cela fait que `*.vaultwares.ca` se résout vers l'IP Tailscale **uniquement pour les nœuds tailnet**. Le DNS public n'est pas affecté.
+- Ajouter des entrées de **DNS divisé** exactes pour chaque nom privé qui doit passer par `greencloud-vps`.
+- Pointer chaque entrée vers l'IP Tailscale de `greencloud-vps` (`100.73.93.84`).
+- Garder les noms publics, comme `vaultwares.ca`, `www.vaultwares.ca` et `flows.vaultwares.ca`, hors de cette substitution exacte sauf si l'objectif est vraiment de forcer les clients tailnet vers l'adresse tailnet du VPS.
+
+Noms privés actuels :
+
+```text
+docs.vaultwares.ca
+monitor.vaultwares.ca
+stats.vaultwares.ca
+mcp.vaultwares.ca
+hooks.vaultwares.ca
+secrets.vaultwares.ca
+warden.vaultwares.ca
+ledger.vaultwares.ca
+```
+
+`api.vaultwares.ca` est volontairement exclu du groupe DNS divisé de Greencloud.
+Il résout vers `vps-ovhcloud` (`100.67.25.118`) parce que OVH possède
+l'exécution de l'API VaultWares et de Postgres local. Pendant la réparation du
+bord HTTPS OVH, utiliser `http://100.67.25.118:9001` comme chemin de santé
+tailnet connu comme fonctionnel.
 
 > L'ACL doit autoriser `tag:server` sur le port **53** (TCP+UDP) si `greencloud-vps` est le serveur de noms faisant autorité. Voir Règles clés ci-dessus.
 

@@ -27,7 +27,8 @@ Related:
 | Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (static) | `vaultwares-docs` | Tailnet-only |
 | V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca` (SPA + `/monitor/*` proxy to VaultWares API over tailnet) | `vault-monitor` | Tailnet-only |
 | Stats dashboard | `https://stats.vaultwares.ca` | `/var/www/stats.vaultwares.ca` (agent-ledger React/Vite SPA; `/monitor/*` and `/api/telemetry/*` proxy to VaultWares API over tailnet) | `agent-ledger` | Tailnet-only |
-| API | `https://api.vaultwares.ca` | nginx HTTPS edge on `greencloud-vps` -> tailnet proxy to `http://100.71.101.21:9001`; nginx sets `X-VW-Gateway-Secret` from the server-side gateway secret boundary | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; gateway secret required |
+| API | `https://api.vaultwares.ca` / `http://100.67.25.118:9001` | DNS resolves to `vps-ovhcloud`; FastAPI listens on `100.67.25.118:9001`. Direct `:9001` is the known-good health path while OVH HTTPS `:443` repair is tracked in `vaultwares-api#63`. | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; app auth/gateway secret required |
+| MCP server | `https://mcp.vaultwares.ca/mcp` | nginx HTTPS edge on `greencloud-vps` -> tailnet proxy to `vaultwares-mcp` on OVH (`vps-ovhcloud`) | `vaultwares-mcp` | Tailnet-only |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | noddit.org | `https://noddit.org` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
 | GitHub webhooks | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (ops service) | Public (required by GitHub) |
@@ -87,6 +88,48 @@ Source of truth: `operations/deployment-flow`.
 | `health-ledger-alarm.service` | systemd service, disabled until `/etc/health-ledger/alarm.env` is configured | Alarm Joker notification loop for incident locks and SMS/email/desktop fanout. |
 | `vw-deny-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for webhook `bad_signature` clusters. Replaced by Health Ledger direction. |
 | `vw-token-expiry-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for token expiry. Replaced by Token Joker direction. |
+
+## Tailnet media surfaces on `vps-ovhcloud`
+
+These services are intended for tailnet-only operator use. Docker-backed services
+live on `vps-ovhcloud` in `/opt/vw-media-stack/docker-compose.yml` with
+persistent config and data under `/srv/vw-media/`. Greencloud `dnsmasq` maps the
+service hostnames below to `100.73.93.84`; Greencloud nginx then proxies to OVH
+over the tailnet. Client DNS must include the matching Tailscale split-DNS/NRPT
+names, otherwise public wildcard DNS resolves these hosts to Greencloud's public
+address and the tailnet-only proxy path is bypassed.
+Greencloud serves HTTPS for these hostnames with the
+`/etc/letsencrypt/live/media.vaultwares.ca/` SAN certificate.
+
+Greencloud also has explicit `listen 100.73.93.84:443 ssl;` entries for
+tailnet service names such as `docs.vaultwares.ca`, `hooks.vaultwares.ca`,
+`warden.vaultwares.ca`, `monitor.vaultwares.ca`, `stats.vaultwares.ca`, and
+`mcp.vaultwares.ca`. Keep those listeners when adding private hostnames; without
+them, nginx can select the media certificate on tailnet-originated requests.
+
+Mullvad VPN routing for this stack is opt-in only. The staged gateway lives in
+`/opt/vw-media-stack/docker-compose.mullvad.yml` as `mullvad-gateway`; no
+service uses it unless an explicit override, such as
+`docker-compose.mullvad.qbittorrent.yml`, moves that service into
+`network_mode: service:mullvad-gateway`. Profile rotation is handled by
+`/opt/vw-media-stack/bin/mullvad-rotate-profile` using dedicated VPS profiles
+under `/opt/vw-media-stack/mullvad-profiles/`; personal-device address
+`10.69.232.98/32` is intentionally rejected by default. The gateway keeps
+`100.64.0.0/10` outside the tunnel so tailnet access, including
+`100.67.25.118`, stays reachable. Do not add host-wide WireGuard routes for
+this stack.
+
+| Surface | Listener / unit | Role |
+|---|---|---|
+| `pyload-ng` | `https://pyload.vaultwares.ca` -> Greencloud nginx -> `100.67.25.118:8003` -> container `8000` | pyLoad web UI and download manager. |
+| `flaresolverr` | Docker, `100.67.25.118:8191` -> container `8191`; intended DNS: `flaresolverr.vaultwares.ca` | Cloudflare challenge solver API for compatible media/indexer tools. |
+| `jackett` | `https://jackett.vaultwares.ca` -> Greencloud nginx -> `100.67.25.118:9117` | Jackett indexer UI; installed natively under `/opt/Jackett`. |
+| `qbittorrent` | `https://qbittorrent.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8081` -> Docker loopback `127.0.0.1:8081` -> container `8080` | qBittorrent web UI. |
+| `sonarr` | `https://sonarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8989` -> Docker loopback `127.0.0.1:8989` | Series manager. |
+| `radarr` | `https://radarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:7878` -> Docker loopback `127.0.0.1:7878` | Movie manager. |
+| `lidarr` | `https://lidarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8686` -> Docker loopback `127.0.0.1:8686` | Music manager. |
+| `prowlarr` | `https://prowlarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:9696` -> Docker loopback `127.0.0.1:9696` | Indexer manager. |
+| `whisparr` | `https://whisparr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:6969` -> Docker loopback `127.0.0.1:6969` | Media manager. |
 
 ## Notes on the table above
 

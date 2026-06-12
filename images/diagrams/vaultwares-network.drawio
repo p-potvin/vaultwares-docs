@@ -13,10 +13,7 @@
         <mxCell id="v1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7e6;strokeColor=#b7791f;" value="vaultwares-1 (GreenCloud)&#xa;Debian 12&#xa;Public: 173.249.194.15&#xa;Tailnet: 100.73.93.84" vertex="1">
           <mxGeometry height="140" width="300" x="320" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="v0" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7e6;strokeColor=#b7791f;" value="ci-egress-vps (Old VPS)&#xa;Debian 12&#xa;Public: 212.193.6.35&#xa;Tailnet: 100.73.57.6" vertex="1">
-          <mxGeometry height="120" width="300" x="320" y="210" as="geometry" />
-        </mxCell>
-        <mxCell id="pc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6fffa;strokeColor=#2c7a7b;" value="Clopeux-Desktop&#xa;Windows&#xa;Tailnet: 100.71.101.21&#xa;RDP:3389&#xa;API:9001&#xa;vault-flows:3100" vertex="1">
+        <mxCell id="pc" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6fffa;strokeColor=#2c7a7b;" value="Clopeux-Desktop&#xa;Windows&#xa;Tailnet: 100.71.101.21&#xa;RDP:3389&#xa;vault-flows:3100" vertex="1">
           <mxGeometry height="160" width="300" x="680" y="40" as="geometry" />
         </mxCell>
         <mxCell id="brume2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#edf2f7;strokeColor=#4a5568;" value="Brume2&#xa;OpenWrt&#xa;Tailnet: 100.67.153.112" vertex="1">
@@ -26,9 +23,6 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="edge2" edge="1" parent="1" source="tailnet" style="endArrow=block;html=1;strokeColor=#2b6cb0;" target="v1" value="Tailscale">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="edge3" edge="1" parent="1" source="tailnet" style="endArrow=block;html=1;strokeColor=#2b6cb0;" target="v0" value="Tailscale">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="edge4" edge="1" parent="1" source="tailnet" style="endArrow=block;html=1;strokeColor=#2b6cb0;" target="pc" value="Tailscale">
