@@ -1,7 +1,7 @@
 # BRAND_TOKENS_UI
 Applies when: UI/UX, styling, layout, branding, themes, tokens, icons, visual rules.
 Do:
-- Use the VaultWares redesign system (updated May 29, 2026) as SoT.
+- Use the VaultWares Redesign system (updated May 29, 2026) as SoT.
 - Read and follow:
   - vaultwares-themes/AGENTS.md
   - vaultwares-themes/brand/ui-kit.md

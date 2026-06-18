@@ -14,7 +14,7 @@ Protocol categories are executed only when relevant.
 6) Read the selected summary files in table order (mandatory).
 7) Compute estimate: estimated_output_tokens for the task (mandatory). Tokens are the primary estimate. Time is derived if needed.
 8) Apply overlay protocols driven by the estimate:
-- If estimated_output_tokens >= 8000: add overlay LONG_RUNNING_TASKS (even if other protocols already match).
+- If estimated_output_tokens >= 16000: add overlay LONG_RUNNING_TASKS (even if other protocols already match).
 ## Other routines (run only when relevant)
 - Tools/routines (optional): if an MCP routine exists (credit optimization, batching, etc.), decide whether to run it. This does not change which protocols apply.
 - Ledger (always, last step before replying): record completed work in agent-ledger. If you cannot access agent-ledger, state that in the reply and include only a compact ledger summary plus a VW_STATE_REF-style pointer; do not paste VW_STATE into chat unless the user explicitly asks.

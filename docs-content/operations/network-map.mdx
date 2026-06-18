@@ -92,7 +92,7 @@ flowchart TB
 | Machine | Role | OS | Tailnet IP | Public IP | Access |
 |---|---|---|---|---|---|
 | `Clopeux-Desktop` | PC / workstation + local AI host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`) |
-| `vps-ovhcloud` | API + DB host | Linux | `100.67.25.118` | (OVH) | SSH tailnet-only, VaultWares API on `9001` |
+| `vps-ovhcloud` | API + DB host | Linux | `100.67.25.118` | (OVH) | SSH tailnet-only as `ubuntu` with `tube-site-vps`, VaultWares API on `9001` |
 | `Brume2` | Home gateway (DHCP/DNS/router) | OpenWrt | `100.67.153.112` | (home) | Tailnet admin only |
 | `greencloud-vps` | **New VPS** (GreenCloud) | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only**, HTTPS public services |
 
@@ -130,7 +130,19 @@ flowchart TB
 - **Network encryption:** Tailscale (WireGuard).
 - **Public TLS:** nginx + Let’s Encrypt on VPSes.
 - **SSH:** **Tailnet-only** (port `22` allowed only on `tailscale0`).
-- **RDP:** Tailnet-only to `Clopeux-Desktop:3389` (policy-controlled).
+
+### SSH commands / Commandes SSH
+
+```powershell
+# OVH / OVHCloud / vps-ovhcloud (user: ubuntu, key: tube-site-vps)
+ssh -i "$env:USERPROFILE\.ssh\tube-site-vps" ubuntu@100.67.25.118
+```
+
+> Do not use `root@100.67.25.118` for normal diagnostics on OVH; that account rejects the local operator key. Use `ubuntu@` instead.
+
+- **RDP:** `Clopeux-Desktop:3389` is restricted to the operator's other PC.
+  VPS hosts such as `vps-ovhcloud` and `greencloud-vps` should not be able to
+  open RDP sessions to Clopeux.
 
 ## Onboarding checklist / Liste d’intégration
 
