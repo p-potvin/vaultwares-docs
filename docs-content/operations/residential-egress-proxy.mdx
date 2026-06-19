@@ -1,0 +1,195 @@
+---
+title: "Residential egress proxy (Private)"
+description: "How shared-tube /api/stream/* fetches reach Cloudflare-protected source CDNs without datacenter-IP blocks: a tinyproxy on the Brume2 router, exposed on the tailnet, egressing the home residential WAN."
+---
+
+# Residential egress proxy (Private)
+
+Single source of truth for the **tailnet HTTP proxy that lets `shared-tube` fetch source pages and MP4 bytes from Cloudflare-protected tube-site CDNs**. Without this, every stream endpoint on `oneporn` / `sexyprn` (OVH) and `fxv` / `pkt` (greencloud) 502s.
+
+Related:
+- `operations/services-inventory` (the tinyproxy entry)
+- `operations/network-map` (Brume2 in the topology)
+- `operations/tailscale` (ACL rules)
+- `operations/deployment-flow` (env var rolled into `/etc/shared-tube/*.env`)
+
+## Why this exists
+
+The `shared-tube` apps proxy MP4 streaming from upstream tube sites (`fullvideos.xxx`, `1porn.tv`, `pornxp.bz/sh`). Three independent CDN behaviors compound to make a server-side proxy from datacenter IPs impossible:
+
+1. **Cloudflare IP reputation.** Both OVH (`51.79.55.113`) and Greencloud (`173.249.194.15`) land in datacenter ranges Cloudflare scores hostile by default. Source-page fetches return `403 cf-mitigated: challenge` ("Just a moment...") even with browser-shaped UA + Referer headers.
+2. **`cf_clearance` is bound to UA + IP + TLS fingerprint.** FlareSolverr can solve the challenge once and hand us a `cf_clearance` cookie, but Node's `fetch()` (undici TLS fingerprint) doesn't match Chromium's, so the cookie doesn't survive the handoff to the byte-range fetch.
+3. **Signed MP4 URLs are IP-bound.** Even with valid cookies, the `<source>` URLs that `fullvideos.xxx`'s player exposes encode the requesting IP. A token issued to OVH only serves bytes back to OVH. A 302 redirect to the user's browser fails — verified, from a residential IP an OVH-issued token returns `410 "Access denied (errno 3)"`.
+
+Cleanest fix: do **both** the source-page resolve and the byte-range proxy from a non-datacenter IP. The home network's residential WAN is exactly that — Cloudflare waves it through without challenge, and tokens issued from it work for byte-range fetches *from the same IP*. The Brume2 router is on the tailnet, always-on, and physically sits in the home network, so we run a tiny forward proxy on it that VPSes can use over WireGuard.
+
+## Architecture
+
+```
+                                  Tailnet
+   ┌────────────┐                                      ┌──────────────┐
+   │ vps-       │  HTTPS via                           │ Brume2       │
+   │ ovhcloud   │  HTTP CONNECT                        │ (OpenWrt)    │
+   │ 100.67.25.118 │ ──────────────────────────────►   │ 100.114.136.28│
+   └────────────┘   to proxy on :8888                  │  :8888       │
+                                                       │  tinyproxy   │
+   ┌────────────┐                                      └──────┬───────┘
+   │ greencloud-vps │  HTTPS via                              │
+   │ 100.73.93.84   │  HTTP CONNECT          ──────►          │
+   └────────────┘                                             │
+                                                              │
+                            Brume2 WAN (residential)          ▼
+                                          ┌─────────────────────────────┐
+                                          │ Bell/Videotron 74.57.x.x    │
+                                          └──────────────┬──────────────┘
+                                                         ▼
+                                              Cloudflare-fronted CDNs
+                                              (fullvideos.xxx, 1porn.tv,
+                                               pornxp.bz, pornxp.sh)
+```
+
+The `shared-tube` stream handler reads `STREAM_OUTBOUND_PROXY` at startup. If set, it routes both:
+- Direct `fetch()` to allowlisted hostnames through `undici.ProxyAgent(STREAM_OUTBOUND_PROXY)`
+- The `proxy.url` payload field on FlareSolverr requests (so Chromium fetches the source page through the same exit)
+
+This is **mandatory**: a source page resolved on OVH's IP issues tokens valid only for OVH's IP. Both legs must share the residential exit or the byte-range fetch fails.
+
+## Components
+
+### Brume2 (GL-MT2500)
+
+- Tailnet IP: `100.114.136.28` (hostname `brumeux`)
+- LAN IP: `10.0.0.50` (DHCP from the ISP router)
+- Residential WAN: `74.57.201.206` (Bell/Videotron, no CF flags)
+- Spec: aarch64 cortex-a53, 1 GB RAM, 7 GB free overlay — plenty of headroom for tinyproxy
+- Tailscale 1.66.4 (built-in GL.iNet integration), tailscale-SSH enabled (no OpenSSH key auth)
+
+The Brume **does not** act as a drop-in gateway or run AdGuard in this configuration; it was reflashed cleanly to a stock GL.iNet image specifically to be a proxy-only node. If you re-introduce drop-in gateway mode, the device loses its own ability to initiate outbound connections — the known-bug we hit before flashing — and the proxy becomes unusable.
+
+### tinyproxy
+
+Installed via `opkg install tinyproxy`. Config lives in OpenWrt UCI at `/etc/config/tinyproxy`; runtime config is generated at `/var/etc/tinyproxy.conf` at service start.
+
+Relevant settings:
+
+```ini
+config tinyproxy
+    option enabled 1
+    option Listen 100.114.136.28      # tailnet IP only
+    option Port 8888
+    list   Allow 100.64.0.0/10        # tailnet CGNAT range only
+    list   ConnectPort 443
+    list   ConnectPort 80
+    list   ConnectPort 8080
+    option LogLevel Connect
+```
+
+A separate firewall ACCEPT rule for `tailscale0:8888` was added (the GL.iNet default zone policy is `input=ACCEPT`, but an explicit rule survives firmware updates that might tighten the default):
+
+```sh
+uci add firewall rule
+uci set firewall.@rule[-1].name="Allow-Tinyproxy-Tailnet"
+uci set firewall.@rule[-1].src="tailscale0"
+uci set firewall.@rule[-1].proto="tcp"
+uci set firewall.@rule[-1].dest_port="8888"
+uci set firewall.@rule[-1].target="ACCEPT"
+uci commit firewall && /etc/init.d/firewall reload
+```
+
+### Tailscale ACL
+
+Two rules govern reachability:
+
+```hujson
+// SSH into Brume2 (for ops; Tailscale-SSH only, password/key auth disabled)
+{
+  "action": "accept",
+  "src":    ["100.71.101.21", "100.75.112.67", "100.84.168.106",
+             "100.90.168.111", "100.91.249.45"],
+  "dst":    ["100.114.136.28:22,53,80,443"],
+},
+// VPS apps reach the proxy
+{
+  "action": "accept",
+  "src":    ["tag:vps-ovhcloud", "tag:vps-greencloud", "100.71.101.21"],
+  "dst":    ["100.114.136.28:8888"],
+},
+```
+
+If you split SSH rules per-tag, make sure **no rule for Brume includes a `recorder` field** unless you've actually provisioned a tsrecorder — without one, sessions are killed immediately with *"This SSH session was terminated by Tailscale because the server could not stream session logs to the session recorder."*
+
+### shared-tube handler
+
+`apps/<site>/src/pages/api/stream/[slug].ts` reads:
+
+```typescript
+const STREAM_PROXY_URL = process.env.STREAM_OUTBOUND_PROXY ?? '';
+const PROXIED_HOST_RE = /(^|\.)(fullvideos\.xxx|1porn\.tv|pornxp\.bz|pornxp\.fo|pornxp\.sh)$/i;
+```
+
+Only hostnames matching `PROXIED_HOST_RE` get tunneled. Everything else (vaultwares-api, analytics, FlareSolverr itself) keeps direct egress so internal traffic doesn't accidentally route through the home WAN. Add new tube-site hosts to the regex if you onboard new sources.
+
+### Environment
+
+`/etc/shared-tube/{fxv,pkt,oneporn,sexyprn}.env` on both `vps-ovhcloud` and `greencloud-vps`:
+
+```ini
+FLARESOLVERR_URL=http://100.67.25.118:8191/v1
+STREAM_OUTBOUND_PROXY=http://100.114.136.28:8888
+```
+
+Both vars must be set on **both** hosts, because either set of apps can do the resolve. `FLARESOLVERR_URL` always points at the OVH-hosted FlareSolverr container — only Chromium's outbound is proxied, via the `proxy.url` payload field.
+
+## Operational invariants
+
+- **`undici` must be pinned to `^6.21` in each app's `package.json`.** Node 22 ships an internal `undici@6.x` for its global `fetch()`. If you upgrade an app's direct `undici` dep to `^8`, the dispatcher contract changes and every proxied request fails with `invalid onRequestStart method` (surfaced to the user as a generic 502 "fetch failed").
+- **FlareSolverr `maxTimeout` must be `60_000` ms when proxied, not the default 30_000.** Cold-start Chromium + an extra TCP hop through Brume routinely takes 35–45s on the first challenge solve. The outer `AbortSignal.timeout()` must exceed `maxTimeout` so FlareSolverr gets to return its own response.
+- **If Brume's WAN changes (ISP, modem swap, VPN client on Brume itself), validate the egress IP again with:**
+  ```sh
+  ssh ubuntu@100.67.25.118 'curl -s -x http://100.114.136.28:8888 https://api.ipify.org'
+  ```
+  Output should be the home residential IP. If it returns a datacenter range or Cloudflare gates you, every video page will 502.
+- **The proxy is a single point of failure for playback.** Home internet down, Brume powered off, or a Tailscale auth/lapse on Brume = no playback on any site. The stream handler falls through to "Source page returned 403" or "Proxy streaming error: CDN rejected request" in this state, both 502 from nginx. There is no graceful degradation today — the only fix is restoring the proxy.
+- **Bandwidth and concurrency scale with home upload.** Every concurrent stream is one TLS tunnel through Brume → home WAN. Acceptable for current traffic; revisit if `oneporn` / `sexyprn` grow.
+
+## Troubleshooting
+
+**Symptom: `/api/stream/...` returns 502 "Fetch error: fetch failed"**
+- Check Brume is online: `tailscale ping --c 1 brume2` from any tailnet node
+- Check the proxy from a VPS: `ssh ubuntu@100.67.25.118 'curl -s -x http://100.114.136.28:8888 https://api.ipify.org'` — should return the home IP
+- Check undici version in the *deployed* bundle: `grep -A1 \"version\" /srv/repos/Prom-King/shared-tube/apps/fxv/node_modules/undici/package.json` — must be `6.x`
+
+**Symptom: 502 "FlareSolverr returned 500"**
+- Tail FlareSolverr: `docker logs --tail 30 flaresolverr` on OVH. Look for `Error: Error solving the challenge. Timeout after 30.0 seconds.` → bump `maxTimeout` past 60s.
+- Verify FlareSolverr is accepting `proxy.url`:
+  ```sh
+  curl -X POST http://100.67.25.118:8191/v1 -H 'Content-Type: application/json' \
+    -d '{"cmd":"request.get","url":"https://www.fullvideos.xxx/","maxTimeout":60000,"proxy":{"url":"http://100.114.136.28:8888"}}'
+  ```
+
+**Symptom: 502 "Proxy streaming error: CDN rejected request"**
+- The source page resolved but the byte-range fetch was rejected. Usually means the source-page leg went through one IP and the MP4 leg went through another. Verify both `fetchSourceHtml` *and* `proxyStream` are routing through `STREAM_OUTBOUND_PROXY` for that hostname (check `PROXIED_HOST_RE`).
+
+**Symptom: stream works for a few minutes then starts failing**
+- Brume CPU spike or Chromium session in FlareSolverr is stale. `systemctl restart flaresolverr` on OVH and retry. Brume tinyproxy is single-threaded per request but tolerates restarts: `/etc/init.d/tinyproxy restart` on Brume.
+
+## Provisioning a replacement Brume
+
+If the Brume dies or you swap it, the rebuild order is:
+
+1. Flash GL.iNet stock firmware, set admin password (set the LAN-side IP to something inside your home subnet so you can admin it locally).
+2. **VPN → Tailscale → Install → Enable** in GL.iNet UI. Authorize the new node; note its tailnet IP.
+3. Update Tailscale ACL: replace `100.114.136.28` everywhere it appears with the new node's IP (or tag the new node `tag:vps-brume` and use the tag).
+4. Update DNS for the proxy hostname if you've set one (today we use the IP directly in env).
+5. SSH (Tailscale-SSH, not password):
+   ```sh
+   ssh root@<new-brume-ip>
+   opkg update && opkg install tinyproxy
+   # apply the UCI config from the "Components → tinyproxy" section above
+   uci commit tinyproxy && /etc/init.d/tinyproxy enable && /etc/init.d/tinyproxy restart
+   # add the firewall rule
+   ```
+6. Update `STREAM_OUTBOUND_PROXY` in `/etc/shared-tube/*.env` on **both** OVH and greencloud, restart all four apps.
+7. Verify with the troubleshooting `curl -x ...` from a VPS — must return the home IP.
+
+A fresh Brume + flashed image + tinyproxy config + ACL update is ~20 min end-to-end. Keep the UCI config snippet above in sync if you ever change ports or allow-list.

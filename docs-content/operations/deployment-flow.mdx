@@ -88,10 +88,34 @@ Every deploy script that runs as `vwdeploy` must respect them:
 |---|---|
 | **No `git fetch origin <SHA>`** | GitHub's HTTPS upload-pack rejects fetching by raw SHA with `not our ref` for any commit not directly advertised. `git fetch --all --prune` already brings in `origin/main`, which contains the SHA. Use `git checkout -f "$SHA"` directly after the `--all` fetch. |
 | **Lock file owned by `vwdeploy:vwdeploy`** | `/var/lock/vw-deploy-<repo>.lock` must be writable by `vwdeploy`. If it's left at `root:root` from a prior manual run, deploys exit 1 on `flock`. |
+| **`vaultwares-api` lock lives in `/var/lib/vw-deploy/`, mode 0666** | `/var/lock` is `/run/lock` tmpfs (world-writable + sticky). Ubuntu 24.04 ships `fs.protected_regular=2`, which **blocks root from `O_CREAT`-opening a regular file it does not own** in that kind of directory. When `/usr/local/bin/deploy-vaultwares-api.sh` is run manually via `sudo` after a webhook deploy created `vw-deploy-vaultwares-api.lock` as `ubuntu:ubuntu`, root hits `EACCES` on `exec 9>"$LOCK_FILE"`. The script moves the lock to `/var/lib/vw-deploy/vaultwares-api.lock` (non-sticky, not world-writable) and `chmod 0666`s it at the top of every run so whoever invokes (ubuntu via webhook, root via manual sudo) can still open the same file. Don't revert this to `/var/lock`. |
 | **`rsync -rltD --delete`, not `rsync -a`** | `-a` (`-rlptgoD`) tries to preserve owner+group from source. As `vwdeploy`, `chgrp` to anything else fails. Use `-rltD` (drop the `-og`). |
 | **Plugin dirs owned `vwdeploy:www-data` with `2775`** | rsync writes new files as the running user. Setgid on the dir keeps the group as `www-data` so the web server can read. After perms drift (e.g. someone did `chown -R www-data:www-data`), reset with: `chown -R vwdeploy:www-data <plugin-dir>` + `find <plugin-dir> -type d -exec chmod 2775 {} +` + `find <plugin-dir> -type f -exec chmod 0664 {} +`. |
 | **wp-cli wrapped with `sudo -u www-data`** | wp-cli refuses to run as root (the YIKES warning, exit code 1). The deploy script must call `sudo -u www-data wp --path=… rewrite flush --hard \|\| true`. The trailing `\|\| true` tolerates the case where `vwdeploy` cannot sudo (plugins self-flush on version bumps anyway). |
 | **GIT_ASKPASS in env** | The git operations inside `runuser -l vwdeploy …` need `GIT_ASKPASS=/var/www/deploy-scripts/git-askpass-vw-gh-token.sh` and `GIT_TERMINAL_PROMPT=0` exported. |
+
+## Greencloud → OVH SSH dispatch (Tailscale ACL gate)
+
+The dispatcher scripts on `greencloud-vps` (e.g. `/var/www/deploy-scripts/deploy-vaultwares-api.sh`) SSH `ubuntu@100.67.25.118` over the tailnet to run the OVH-side deploy. Tailscale-SSH is enabled on `vps-ovhcloud`, so the connection is gated by the **Tailscale SSH policy**, not OpenSSH `authorized_keys`. The policy `src` list must include `tag:vps-greencloud` (and any other tag from which deploys are dispatched) for `dst: tag:vps-ovhcloud`.
+
+Symptom when missing: dispatcher logs `tailscale: tailnet policy does not permit you to SSH to this node` and exits non-zero; OVH-side deploy log shows nothing for that commit, repo HEAD on OVH stays behind `origin/main`. We have hit this exactly once when only individual personal IPs were in the SSH rule and not the VPS tag.
+
+If you enable session recording for these SSH rules, **provision a `tsrecorder`** node first or set `enforceRecorder: false`. Without a reachable recorder, sessions are killed immediately with *"This SSH session was terminated by Tailscale because the server could not stream session logs to the session recorder."* — including the dispatcher's automated sessions, which silently breaks all deploys.
+
+## Webhook chain end-to-end check
+
+The fastest after-change sanity test: push a no-op commit to a target repo and confirm both the dispatcher log on greencloud and the deploy log on OVH advance to the new SHA.
+
+```sh
+# from any tailnet box
+ssh root@100.73.93.84 'tail -3 /var/log/vw-deploy/vaultwares-api-dispatch.log'
+ssh ubuntu@100.67.25.118 'sudo -n tail -3 /var/log/vw-deploy/vaultwares-api.log'
+```
+
+If the dispatcher fires but OVH log doesn't progress, it's almost always one of:
+1. Tailscale SSH ACL doesn't include the source tag (see above).
+2. The OVH-side script hit the lock-file ownership invariant — see `/var/log/vw-deploy/<repo>.log` for `line N: /var/lib/vw-deploy/<repo>.lock: Permission denied`.
+3. The dispatcher SSH session was killed by an over-eager recorder rule.
 
 ## Deploy failure alerts
 

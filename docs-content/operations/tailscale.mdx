@@ -21,6 +21,17 @@ description: "How Tailnet is used for access control, SSH, and internal services
   reach other `tag:server` nodes on `80` and `443`. Without that, OVH probes
   can resolve Greencloud private names but cannot connect to the Greencloud
   nginx surfaces.
+- **SSH dispatch:** the SSH policy (`ssh` block) for `dst: tag:vps-ovhcloud` must
+  include `tag:vps-greencloud` in `src`. The deploy dispatcher scripts on
+  greencloud SSH `ubuntu@100.67.25.118` over the tailnet to run OVH-side deploys;
+  Tailscale-SSH gates that connection, not OpenSSH `authorized_keys`. Missing
+  this tag silently breaks **all** OVH-deployed services. See
+  `operations/deployment-flow` for the failure signature.
+- **Residential egress proxy:** `tag:vps-ovhcloud` and `tag:vps-greencloud` (plus
+  owner personal devices) must be able to reach `100.114.136.28:8888` (the
+  tinyproxy on Brume2). This is the path `shared-tube /api/stream/*` uses to
+  fetch Cloudflare-protected source CDNs from a residential IP. See
+  `operations/residential-egress-proxy` for context.
 ## Exposing internal web services to the tailnet (Split DNS)
 
 Some subdomains, including `stats.vaultwares.ca`, are **tailnet-only** services. The public DNS record returns the VPS public IP, which serves a 403 to all non-tailnet clients. Tailnet nodes resolve the same hostname to the **Tailscale IP** of `greencloud-vps` via a Tailscale DNS override, bypassing the public nginx vhost entirely and hitting a separate internal-only nginx server block.
@@ -107,4 +118,22 @@ No ACL change is needed for the web traffic itself — the existing rule `owner 
 
 - Avoid tagging personal devices unless you intentionally want them to behave like “service accounts”.
 - Prefer dedicated tags for infrastructure: `tag:server`, `tag:vps-old`, `tag:vps-greencloud`.
-- Brume2 runs the home network; update Tailscale carefully to avoid disrupting routing.
+- Brume2 (`brumeux`, `100.114.136.28`) is a stock-flashed proxy-only node; it
+  no longer runs the home drop-in gateway / AdGuard. Its SSH is Tailscale-SSH
+  only (OpenSSH key/password auth is disabled by the GL.iNet firmware when
+  Tailscale-SSH is on). See `operations/residential-egress-proxy`.
+
+### SSH session-recording pitfall
+
+If you add `recorder` to any SSH ACL rule without standing up a `tsrecorder`
+node first, **every session matching that rule is killed at the protocol
+banner** with:
+
+> *This SSH session was terminated by Tailscale because the server could not
+> stream session logs to the session recorder.*
+
+This includes the automated dispatcher sessions used by `vw-webhookd`. Symptom:
+deploys silently stop firing across the fleet even though the webhook delivers
+and the dispatcher script starts. Either provision a recorder or set
+`enforceRecorder: false` on the rule (allows session through when the recorder
+is unreachable).

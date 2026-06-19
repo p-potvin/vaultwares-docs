@@ -131,6 +131,20 @@ this stack.
 | `prowlarr` | `https://prowlarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:9696` -> Docker loopback `127.0.0.1:9696` | Indexer manager. |
 | `whisparr` | `https://whisparr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:6969` -> Docker loopback `127.0.0.1:6969` | Media manager. |
 
+## Residential egress proxy on `brume2`
+
+Tube-site source CDNs (`fullvideos.xxx`, `1porn.tv`, `pornxp.*`) IP-block both
+OVH and Greencloud datacenter ranges via Cloudflare and bind their signed MP4
+URLs to the requester's IP. `shared-tube`'s `/api/stream/[slug]` route fetches
+both the source page and the byte-range MP4 through a residential proxy on the
+home-network Brume2 router so both legs egress the same residential IP.
+
+| Surface | Listener / unit | Role |
+|---|---|---|
+| `tinyproxy` | `http://100.114.136.28:8888` (tailnet-only, allowlisted to `100.64.0.0/10`) | HTTP/CONNECT forward proxy on `brume2` (OpenWrt, GL-MT2500). Egresses the home WAN (`74.57.201.206`, Bell/Videotron). Read `operations/residential-egress-proxy` for the full architecture, env vars, and provisioning steps. |
+
+Both `vps-ovhcloud` and `greencloud-vps` carry `STREAM_OUTBOUND_PROXY=http://100.114.136.28:8888` in `/etc/shared-tube/{fxv,pkt,oneporn,sexyprn}.env` so all four `shared-tube` apps share the same exit. The proxy is a single point of failure for video playback; see the troubleshooting section of the egress-proxy page if streams 502.
+
 ## Notes on the table above
 
 - `fullxxx.video` and `prom-king.xyz` are **WordPress installs** under

@@ -9,6 +9,7 @@ Do:
 - Consult these SoT pages before changes:
   - vaultwares-docs/docs-content/operations/network-map.mdx
   - vaultwares-docs/docs-content/operations/tailscale.mdx
+  - vaultwares-docs/docs-content/operations/residential-egress-proxy.mdx (Brume2 tinyproxy used by shared-tube /api/stream — touching its ACL, env, or the Brume device itself can take all video playback down)
 Do not:
 - Add “quick temporary” public access paths.
 Done when:
