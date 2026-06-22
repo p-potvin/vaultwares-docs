@@ -34,12 +34,12 @@ Related:
 | GitHub webhooks | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (ops service) | Public (required by GitHub) |
 | Secrets manager | `https://warden.vaultwares.ca` | `vw-secretsd` → `127.0.0.1:9444` | (ops service) | Tailnet-only |
 | (alias) secrets | `https://secrets.vaultwares.ca` | redirect → `warden.vaultwares.ca` | (ops config) | Tailnet-only |
-| Prom‑King prelanding/front door | `https://prom-king.xyz` | WordPress front door at `/var/www/prom-king.xyz/public`; prelanding source repo is tracked separately | `Prom-King/prelanding-page` | Public |
+| Prom‑King wallpaper site (PKT) | `https://prom-king.xyz` | Express API + React SPA running on port `4322` via systemd `pkt.service` at `/srv/repos/Prom-King/content-site` | `Prom-King/content-site` | Public |
 | FullXXX prelanding/front door | `https://fullxxx.video` | WordPress front door at `/var/www/fullxxx.video/public`; FullXXX front-door variant is tracked separately | `Prom-King/prelanding-page` | Public |
-| Prom‑King tube site | `https://prom-king.xyz` | WordPress plugin `/var/www/prom-king.xyz/public/wp-content/plugins/promking-tube` | `Prom-King/tube-sites` | Public |
 | FullXXX tube site | `https://fullxxx.video` | WordPress plugin `/var/www/fullxxx.video/public/wp-content/plugins/fullxxx-video` | `Prom-King/tube-sites` | Public |
 | Prom‑King link sharing | `https://links.prom-king.xyz` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
 | FullXXX link sharing | `https://links.fullxxx.video` | Fastify on `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+
 
 ## Deployment and alert note
 
@@ -147,11 +147,7 @@ Both `vps-ovhcloud` and `greencloud-vps` carry `STREAM_OUTBOUND_PROXY=http://100
 
 ## Notes on the table above
 
-- `fullxxx.video` and `prom-king.xyz` are **WordPress installs** under
-  `/var/www/<site>/public/`. Their front-door/prelanding behavior and their
-  tube plugins are tracked separately in Health Ledger so the repo/runtime
-  ownership is explicit. The plugins driving the catalogs live under
-  `wp-content/plugins/{fullxxx-video,promking-tube,tube-shared}` and are
-  rsynced from `/var/www/tube-sites-src/` by the deploy script.
-- The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for
-  every repo in this list — the lowercase form `prom-king/...` won't match.
+- `fullxxx.video` is a **WordPress install** under `/var/www/fullxxx.video/public/`. Its front-door/prelanding behavior and tube plugins are tracked separately in Health Ledger so repo/runtime ownership is explicit. The plugins driving its catalog live under `wp-content/plugins/{fullxxx-video,tube-shared}` and are rsynced from `/var/www/tube-sites-src/` by the deploy script.
+- `prom-king.xyz` runs a **standalone React/Express wallpaper application** at `/srv/repos/Prom-King/content-site`. Thumbs/meta are stored in `/srv/pkt-wallpapers`.
+- The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for every repo in this list — the lowercase form `prom-king/...` won't match.
+
