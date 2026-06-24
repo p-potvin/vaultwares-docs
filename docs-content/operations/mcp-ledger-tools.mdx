@@ -1,21 +1,26 @@
 ---
 title: "MCP ledger tools (agent-ledger + health-ledger)"
-description: "Four read-only MCP tools that let an assistant query past agent work and past probe results without parsing the raw event store."
+description: "A suite of MCP tools that let an assistant read, write, and sync agent work and health probe results."
 ---
 
 # MCP ledger tools
 
-The vaultwares-mcp server exposes **four read-only tools** that turn the
-two on-disk ledgers into queryable surfaces. They were lost to a tool
-hallucination on 2026-06-05 (vaultwares-mcp issue #2) and rebuilt
-2026-06-06.
+The vaultwares-mcp server exposes **read and write tools** that turn the
+two on-disk ledgers into queryable and manageable surfaces. The initial read-only
+tools were lost to a tool hallucination on 2026-06-05 (vaultwares-mcp issue #2) and rebuilt
+2026-06-06. The write and execution capabilities were introduced later to allow autonomous agents to operate the ledgers.
 
-| Tool                          | Reads from                                     | Use when                                                                                  |
+| Tool                          | Reads/Writes from                                     | Use when                                                                                  |
 | ----------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | `agent_ledger_get_recent`     | `agent-ledger/events/<y>/<m>/<file>.json`      | "What did the last agent do?" / "Show recent commits to shared-tube" / "Resume from prior session" |
 | `agent_ledger_search`         | same                                           | "Find the entry where we set up Drizzle" / "Has anyone deployed certbot before?"          |
+| `agent_ledger_record_change`  | `agent-ledger/scripts/record-agent-change.ps1` | After finishing a task, record a summary, tools used, and files changed.                  |
+| `agent_ledger_render_ledger`  | `agent-ledger/scripts/render-agent-ledger.ps1` | Regenerate the HTML/MD log site if you just synced or recorded massive changes.             |
+| `agent_ledger_render_impact`  | `agent-ledger/scripts/render-work-impact.ps1`  | Recompute agent metrics and work progression stats.                                       |
+| `agent_ledger_sync_ledger`    | `agent-ledger/scripts/sync-agent-ledger.ps1`   | Pull remote events from DB/GitHub and push local changes upstream.                        |
 | `health_ledger_get_recent`    | `health-ledger/data/events/<y>/<m>/<d>.jsonl`  | "Was vaultwares-main healthy yesterday?" / "Latest run for service X"                     |
 | `health_ledger_search`        | same                                           | "Show probe failures mentioning gateway" / "Anything broken about prom-king?"             |
+| `health_ledger_run_probe`     | `health-ledger/scripts/probe-joker.mjs`        | Force an immediate probe check against 1 or all services to verify uptime.                |
 
 ## Where the data lives
 

@@ -38,6 +38,9 @@ Commands are grouped into logical operational categories:
 - **`recreate-venvs`**: Reinitialize virtual environments (`.venv`) across workspaces.
 - **`launch-team`**: Dispatch team of supervisor and worker AI agents.
 - **`deploy-dispatch`**: Bootstrap VaultWares dispatch server directories.
+- **`backup-task`**: Create a scheduled task to run the Auto Backup script silently every 5 minutes.
+- **`swap-sfw`**: Toggle and hide/unhide directories based on IsSFW environment variable.
+- **`find-scripts`**: Search workspace and output script file listings to the Desktop.
 
 ### Git Automation
 - **`git-pull-all`**: Iterate through workspace and pull updates for submodules and branches.
@@ -57,12 +60,30 @@ Commands are grouped into logical operational categories:
 - **`pg-watchdog`**: Launch background monitor to auto-restart Postgres service if hung.
 - **`drill-kill-pg`**: Forcefully close active Postgres database connections and clean locks.
 - **`test-alarm`**: Dispatch simulated SMTP notification message for alert verification.
+- **`audit-menu`**: Audit Windows Explorer shell context menu handler registry keys.
+- **`list-thirdparty`**: Identify custom/third-party executables and PowerShell commands in session.
+- **`list-programs`**: Query local registry hives and remote connections for installed software.
+- **`kill-cowork`**: Stop the CoworkVMService windows service.
 
 ### Media Pipeline
 - **`move-videos`**: Move all video files from subfolders recursively to the root directory.
 - **`unzip-dedupe`**: Decompress volumes and delete matching hash duplicates automatically.
 - **`upscale-test`**: Execute standalone upscaling test using local PyTorch/Real-ESRGAN dependencies.
 - **`telegram-pipeline`**: Execute telethon link resolver pipeline with system notifications.
+- **`auto-sync`**: Align external audio with a target video by waveform correlation and fingerprinting.
+- **`manual-sync`**: Offset video or audio tracks by a specified millisecond value using FFmpeg.
+- **`fix-audio-subs`**: Separate and normalize voice tracks, mix with background audio, and encode via CUDA.
+
+### Backup & Recovery
+- **`auto-backup`**: Maintain two backup slots (latest and daily) across primary and secondary storage.
+
+### Service Management
+- **`install-service-mcp`**: Install and start the VaultWares MCP Server background service.
+- **`install-service-realtime`**: Install and start the Vaultwares Realtime background service.
+- **`install-service-central`**: Install and start the VaultCentral background service.
+- **`install-service-automation`**: Install and start the Automation Suite background service.
+- **`install-service-transcriber`**: Install and start the Video Transcriber background service.
+- **`install-service-weeklymenu`**: Install and start the Weekly Menu background service.
 
 ### Vault Explorer
 - **`benchmark-asr`**: Measure speech-to-text benchmark performance using local Whisper models.
@@ -106,7 +127,7 @@ To extend the global `vw` CLI with a new automation script, follow these standar
   </Step>
 
   <Step title="Register the command">
-    Open the registry file `vaultwares-cli/vw-commands.ps1` and add a new entry to the `$Commands` hashtable:
+    Open the registry file `C:\Users\Administrator\Desktop\pwsh\VaultWares CLI\vw-commands.ps1` and add a new entry to the `$Commands` hashtable:
 
     ```powershell
     "my-new-command" = @{

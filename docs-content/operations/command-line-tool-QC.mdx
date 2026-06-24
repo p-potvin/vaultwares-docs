@@ -38,6 +38,9 @@ Les commandes sont regroupées en catégories opérationnelles logiques :
 - **`recreate-venvs`** : Réinitialise les environnements virtuels (`.venv`) dans l'espace de travail.
 - **`launch-team`** : Déploie l'équipe d'agents IA superviseurs et travailleurs.
 - **`deploy-dispatch`** : Amorce les répertoires du serveur de répartition VaultWares.
+- **`backup-task`** : Crée une tâche planifiée pour exécuter silencieusement le script Auto Backup toutes les 5 minutes.
+- **`swap-sfw`** : Alterne et masque/affiche les dossiers basés sur la variable d'environnement IsSFW.
+- **`find-scripts`** : Recherche les scripts dans l'espace de travail et exporte la liste sur le Bureau.
 
 ### Git Automation (Automatisation Git)
 - **`git-pull-all`** : Parcourt l'espace de travail et récupère les mises à jour des sous-modules et des branches.
@@ -57,12 +60,30 @@ Les commandes sont regroupées en catégories opérationnelles logiques :
 - **`pg-watchdog`** : Lance un moniteur en arrière-plan pour redémarrer automatiquement PostgreSQL s'il se bloque.
 - **`drill-kill-pg`** : Ferme de force les connexions actives à la base de données Postgres et nettoie les verrous.
 - **`test-alarm`** : Envoie un courriel de notification SMTP simulé pour tester les alertes.
+- **`audit-menu`** : Audite les clés de registre des gestionnaires du menu contextuel de Windows.
+- **`list-thirdparty`** : Identifie les exécutables tiers et les commandes PowerShell personnalisées.
+- **`list-programs`** : Interroge les registres locaux et distants pour lister les logiciels installés.
+- **`kill-cowork`** : Arrête le service Windows CoworkVMService.
 
 ### Media Pipeline (Pipeline multimédia)
 - **`move-videos`** : Déplace récursivement tous les fichiers vidéo des sous-dossiers vers le dossier racine.
 - **`unzip-dedupe`** : Décompresse les volumes et supprime automatiquement les doublons de hachage.
 - **`upscale-test`** : Exécute un test de mise à l'échelle autonome avec les dépendances locales PyTorch/Real-ESRGAN.
 - **`telegram-pipeline`** : Exécute le pipeline de résolution de liens telethon avec des notifications système.
+- **`auto-sync`** : Aligne l'audio externe avec une vidéo par corrélation de forme d'onde.
+- **`manual-sync`** : Décale les pistes audio ou vidéo d'une valeur en millisecondes avec FFmpeg.
+- **`fix-audio-subs`** : Sépare et normalise les voix, mixe l'arrière-plan et encode via CUDA.
+
+### Backup & Recovery (Sauvegarde et récupération)
+- **`auto-backup`** : Gère deux emplacements de sauvegarde (latest et daily) sur stockage primaire et secondaire.
+
+### Service Management (Gestion des services)
+- **`install-service-mcp`** : Installe et démarre le service d'arrière-plan du serveur VaultWares MCP.
+- **`install-service-realtime`** : Installe et démarre le service d'arrière-plan Vaultwares Realtime.
+- **`install-service-central`** : Installe et démarre le service d'arrière-plan VaultCentral.
+- **`install-service-automation`** : Installe et démarre le service d'arrière-plan de la suite d'automatisation.
+- **`install-service-transcriber`** : Installe et démarre le service d'arrière-plan Video Transcriber.
+- **`install-service-weeklymenu`** : Installe et démarre le service d'arrière-plan Weekly Menu.
 
 ### Vault Explorer
 - **`benchmark-asr`** : Mesure les performances de reconnaissance vocale avec les modèles Whisper locaux.
@@ -106,7 +127,7 @@ Pour étendre l'interface en ligne de commande globale `vw` avec un nouveau scri
   </Step>
 
   <Step title="Enregistrer la commande">
-    Ouvrez le fichier de registre `vaultwares-cli/vw-commands.ps1` et ajoutez une entrée à la table `$Commands` :
+    Ouvrez le fichier de registre `C:\Users\Administrator\Desktop\pwsh\VaultWares CLI\vw-commands.ps1` et ajoutez une entrée à la table `$Commands` :
 
     ```powershell
     "mon-nouveau-script" = @{
