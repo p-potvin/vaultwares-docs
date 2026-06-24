@@ -124,7 +124,8 @@ $targets = @(
     @{ Name = 'Gemini';      Root = (Join-Path $env:USERPROFILE '.gemini\skills');                       Adapter = 'Adapter-CopyVerbatim'     },
     @{ Name = 'OpenCode';    Root = (Join-Path $env:USERPROFILE '.config\opencode\skills');              Adapter = 'Adapter-CopyVerbatim'     },
     @{ Name = 'Windsurf';    Root = (Join-Path $env:USERPROFILE '.codeium\windsurf\memories\skills');    Adapter = 'Adapter-FlattenToMarkdown'},
-    @{ Name = 'VS Code';     Root = (Join-Path $env:APPDATA      'Code\User\prompts');                   Adapter = 'Adapter-ToPromptMd'       }
+    @{ Name = 'VS Code';     Root = (Join-Path $env:APPDATA      'Code\User\prompts');                   Adapter = 'Adapter-ToPromptMd'       },
+    @{ Name = 'Mistral';     Root = (Join-Path $env:USERPROFILE '.agents\skills');                    Adapter = 'Adapter-CopyVerbatim'     }
     # Claude Desktop: no per-skill primitive — intentionally skipped in v1.
 )
 

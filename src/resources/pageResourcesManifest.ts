@@ -418,22 +418,10 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "guides__troubleshooting"
   },
   {
-    "routePath": "/hardware/biometric-devices",
-    "routeKey": "hardware/biometric-devices",
-    "sectionKey": "hardware",
-    "resourceKey": "hardware__biometric-devices"
-  },
-  {
     "routePath": "/hardware/encrypted-storage",
     "routeKey": "hardware/encrypted-storage",
     "sectionKey": "hardware",
     "resourceKey": "hardware__encrypted-storage"
-  },
-  {
-    "routePath": "/hardware/hsm",
-    "routeKey": "hardware/hsm",
-    "sectionKey": "hardware",
-    "resourceKey": "hardware__hsm"
   },
   {
     "routePath": "/hardware/network-appliances",
@@ -490,6 +478,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "operations__backups"
   },
   {
+    "routePath": "/operations/command-line-tool",
+    "routeKey": "operations/command-line-tool",
+    "sectionKey": "operations",
+    "resourceKey": "operations__command-line-tool"
+  },
+  {
     "routePath": "/operations/deploy-alerts",
     "routeKey": "operations/deploy-alerts",
     "sectionKey": "operations",
@@ -530,6 +524,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "routeKey": "operations/project-bootstrap",
     "sectionKey": "operations",
     "resourceKey": "operations__project-bootstrap"
+  },
+  {
+    "routePath": "/operations/residential-egress-proxy",
+    "routeKey": "operations/residential-egress-proxy",
+    "sectionKey": "operations",
+    "resourceKey": "operations__residential-egress-proxy"
   },
   {
     "routePath": "/operations/secrets",

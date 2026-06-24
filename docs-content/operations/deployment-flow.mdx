@@ -93,6 +93,7 @@ Every deploy script that runs as `vwdeploy` must respect them:
 | **Plugin dirs owned `vwdeploy:www-data` with `2775`** | rsync writes new files as the running user. Setgid on the dir keeps the group as `www-data` so the web server can read. After perms drift (e.g. someone did `chown -R www-data:www-data`), reset with: `chown -R vwdeploy:www-data <plugin-dir>` + `find <plugin-dir> -type d -exec chmod 2775 {} +` + `find <plugin-dir> -type f -exec chmod 0664 {} +`. |
 | **wp-cli wrapped with `sudo -u www-data`** | wp-cli refuses to run as root (the YIKES warning, exit code 1). The deploy script must call `sudo -u www-data wp --path=… rewrite flush --hard \|\| true`. The trailing `\|\| true` tolerates the case where `vwdeploy` cannot sudo (plugins self-flush on version bumps anyway). |
 | **GIT_ASKPASS in env** | The git operations inside `runuser -l vwdeploy …` need `GIT_ASKPASS=/var/www/deploy-scripts/git-askpass-vw-gh-token.sh` and `GIT_TERMINAL_PROMPT=0` exported. |
+| **`shared-tube` lock / dispatch** | Uses `/var/lib/vw-deploy/shared-tube.lock` with mode `0666` or pre-created with `umask 000` so that both the dispatcher (`vwdeploy`) and remote executing user (`ubuntu` on `vps-ovhcloud` via Tailscale SSH) can read, write, and obtain the flock. |
 
 ## Greencloud → OVH SSH dispatch (Tailscale ACL gate)
 

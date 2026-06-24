@@ -1,0 +1,139 @@
+---
+title: "Command-Line Tool (vw)"
+description: "Centralized PowerShell automation entrypoint and utility script router for VaultWares"
+---
+
+# Command-Line Tool (`vw`)
+
+To streamline and unify the vast collection of PowerShell automation, synchronization, and media-processing scripts across the VaultWares workspace, all useful utilities have been consolidated under a single command-line interface called `vw`.
+
+The `vw` utility operates globally, routing parameters down to modular scripts located in various repositories across the workspace.
+
+---
+
+## Global Access
+
+The CLI is exposed as the global `vw` command. It is implemented as a batch wrapper (`vw.bat`) pointing to the PowerShell router (`vw.ps1`).
+
+```bash
+vw <command> [arguments]
+```
+
+To view the main help menu, run:
+
+```bash
+vw --help
+```
+
+---
+
+## Command Registry
+
+Commands are grouped into logical operational categories:
+
+### Workspace Management
+- **`sync`**: Run bulk Git pull and workspace synchronization across repository layers.
+- **`shortcuts`**: Install or refresh Desktop shortcuts for standard tool configurations.
+- **`rebuild`**: Clean and rebuild python packages, node modules, and dependencies.
+- **`recreate-venvs`**: Reinitialize virtual environments (`.venv`) across workspaces.
+- **`launch-team`**: Dispatch team of supervisor and worker AI agents.
+- **`deploy-dispatch`**: Bootstrap VaultWares dispatch server directories.
+
+### Git Automation
+- **`git-pull-all`**: Iterate through workspace and pull updates for submodules and branches.
+- **`git-auto`**: Execute repository checks and send email alerts on remote changes.
+
+### Agent Ledger
+- **`archive-ledger`**: Archive historical ledger entries to optimize performance.
+- **`record-change`**: Log an agent transaction or changes to the Shared Agent Ledger database.
+- **`render-ledger`**: Generate detailed HTML/Markdown reports of agent activities.
+- **`render-impact`**: Compile work metrics and update visual workspace progression indicators.
+- **`sync-ledger`**: Sync local ledger records to central database endpoints.
+- **`start-tracker`**: Launch the keyboard/mouse idle telemetry service in the background.
+
+### System Monitoring
+- **`health-alarm`**: Start the telemetry status alert service using local environment configuration.
+- **`health-probe`**: Run immediate ping checks and log network reachability for all nodes.
+- **`pg-watchdog`**: Launch background monitor to auto-restart Postgres service if hung.
+- **`drill-kill-pg`**: Forcefully close active Postgres database connections and clean locks.
+- **`test-alarm`**: Dispatch simulated SMTP notification message for alert verification.
+
+### Media Pipeline
+- **`move-videos`**: Move all video files from subfolders recursively to the root directory.
+- **`unzip-dedupe`**: Decompress volumes and delete matching hash duplicates automatically.
+- **`upscale-test`**: Execute standalone upscaling test using local PyTorch/Real-ESRGAN dependencies.
+- **`telegram-pipeline`**: Execute telethon link resolver pipeline with system notifications.
+
+### Vault Explorer
+- **`benchmark-asr`**: Measure speech-to-text benchmark performance using local Whisper models.
+- **`audio-normalize`**: Run loudness normalization package recursively on video/audio folders.
+- **`imagemagick-enhance`**: Enhance cover artwork/thumbnails using ImageMagick filters.
+- **`livestream-translator`**: Translate spoken audio tracks from RTMP/HTTP livestreams in real-time.
+- **`preview-generator`**: Compile preview hover-grids, thumbnails, and contact sheets.
+- **`realesrgan-enhance`**: Upscale thumbnail assets using PyTorch CUDA Real-ESRGAN.
+- **`rtx-vsr`**: Render video upscales using NVIDIA RTX Video Super Resolution.
+- **`subtitles`**: Generate SRT/VTT subtitles from spoken audio using speech models.
+- **`thumb-enhance`**: Optimize cover pages and preview layouts.
+- **`translate-spoken`**: Recursively translate spoken dialog in video files via Whisper/TTS.
+- **`stream-translator`**: Run Stream spoken translation for active HTTPS audio/video streams.
+
+### Security & Server
+- **`generate-certs`**: Generate local dev SSL certificates using mkcert.
+- **`start-https`**: Spin up local front-end Astro development server under HTTPS.
+- **`build-gradio`**: Compile python Gradio application using PyInstaller standalone builder.
+- **`distribute-secrets`**: Rotate and distribute `GH_TOKEN` and `JIRA_TOKEN` secrets to repositories.
+
+### Corporate Standards
+- **`sync-instructions`**: Propagate global system prompts and rules across all repositories.
+- **`sync-skills`**: Sync global assistant skills files to local repo locations.
+- **`validate-protocols`**: Validate repo system instruction formatting and metadata compliance.
+
+### USD Studio
+- **`download-colmap`**: Download portable COLMAP 3D reconstruction tool.
+- **`setup-usd`**: Bootstrap PyTorch and CUDA workspace for USD Digital Twin Playground.
+- **`build-worker-img`**: Build and push docker worker containers.
+- **`build-demo-exe`**: Compile standalone USD Studio Demo executable.
+
+---
+
+## Addition Protocol
+
+To extend the global `vw` CLI with a new automation script, follow these standard steps:
+
+<Steps>
+  <Step title="Place the script in the workspace">
+    Save the script in the most relevant sub-repository (e.g. `vault-explorer/scripts/pwsh/My-New-Script.ps1` or `agent-ledger/scripts/My-New-Script.ps1`). Ensure the script is modular, handles parameters correctly, and fails gracefully with non-zero exit codes on error.
+  </Step>
+
+  <Step title="Register the command">
+    Open the registry file `vaultwares-cli/vw-commands.ps1` and add a new entry to the `$Commands` hashtable:
+
+    ```powershell
+    "my-new-command" = @{
+        ScriptPath  = "$RepoRoot\path\to\your\My-New-Script.ps1"
+        Description = "Brief description of the tool's behavior."
+        Category    = "Workspace Management" # Or another category
+    }
+    ```
+  </Step>
+
+  <Step title="Test the integration">
+    Verify the command appears correctly in the CLI help menu and runs successfully:
+
+    ```bash
+    # Show CLI help to check categorization
+    vw --help
+
+    # Test run
+    vw my-new-command --parameter value
+    ```
+  </Step>
+
+  <Step title="Document the command">
+    Update this document (`docs-content/operations/command-line-tool.mdx`) under the appropriate category section to keep developer resources synced.
+  </Step>
+</Steps>
+
+<Info>
+  Always verify that the target script works inside non-interactive shells and does not wait on user input unless explicitly prompt-driven.
+</Info>

@@ -1,0 +1,139 @@
+---
+title: "Outil en ligne de commande (vw)"
+description: "Point d'entrée de centralisation et routeur de scripts d'automatisation PowerShell pour VaultWares"
+---
+
+# Outil en ligne de commande (`vw`)
+
+Pour simplifier et unifier la vaste collection de scripts d'automatisation, de synchronisation et de traitement de médias PowerShell répartis dans l'espace de travail VaultWares, tous les utilitaires utiles ont été regroupés sous une seule interface en ligne de commande nommée `vw`.
+
+L'utilitaire `vw` fonctionne de manière globale, acheminant les paramètres vers les scripts modulaires situés dans les différents dépôts de l'espace de travail.
+
+---
+
+## Accès global
+
+L'interface CLI est disponible via la commande globale `vw`. Elle est implémentée sous forme de script de lancement batch (`vw.bat`) pointant vers le routeur PowerShell (`vw.ps1`).
+
+```bash
+vw <commande> [arguments]
+```
+
+Pour afficher le menu d'aide principal, exécutez :
+
+```bash
+vw --help
+```
+
+---
+
+## Registre des commandes
+
+Les commandes sont regroupées en catégories opérationnelles logiques :
+
+### Workspace Management (Gestion de l'espace de travail)
+- **`sync`** : Exécute le Git pull groupé et la synchronisation de l'espace de travail sur toutes les couches.
+- **`shortcuts`** : Installe ou actualise les raccourcis de bureau pour les configurations standard.
+- **`rebuild`** : Nettoie et reconstruit les paquets Python, les modules Node et les dépendances.
+- **`recreate-venvs`** : Réinitialise les environnements virtuels (`.venv`) dans l'espace de travail.
+- **`launch-team`** : Déploie l'équipe d'agents IA superviseurs et travailleurs.
+- **`deploy-dispatch`** : Amorce les répertoires du serveur de répartition VaultWares.
+
+### Git Automation (Automatisation Git)
+- **`git-pull-all`** : Parcourt l'espace de travail et récupère les mises à jour des sous-modules et des branches.
+- **`git-auto`** : Exécute des vérifications de dépôt et envoie des alertes par courriel en cas de modifications distantes.
+
+### Agent Ledger (Registre d'agent)
+- **`archive-ledger`** : Archive les anciennes entrées du registre pour optimiser les performances.
+- **`record-change`** : Enregistre une transaction d'agent ou des modifications dans la base de données du registre partagé.
+- **`render-ledger`** : Génère des rapports HTML/Markdown détaillés sur l'activité des agents.
+- **`render-impact`** : Compile les indicateurs de travail et met à jour les indicateurs visuels de progression.
+- **`sync-ledger`** : Synchronise les enregistrements locaux du registre avec les points de terminaison de la base de données.
+- **`start-tracker`** : Lance le service de télémétrie d'inactivité du clavier/souris en arrière-plan.
+
+### System Monitoring (Surveillance du système)
+- **`health-alarm`** : Démarre le service d'alerte de télémétrie en utilisant la configuration locale.
+- **`health-probe`** : Exécute des pings immédiats et enregistre l'accessibilité réseau de tous les nœuds.
+- **`pg-watchdog`** : Lance un moniteur en arrière-plan pour redémarrer automatiquement PostgreSQL s'il se bloque.
+- **`drill-kill-pg`** : Ferme de force les connexions actives à la base de données Postgres et nettoie les verrous.
+- **`test-alarm`** : Envoie un courriel de notification SMTP simulé pour tester les alertes.
+
+### Media Pipeline (Pipeline multimédia)
+- **`move-videos`** : Déplace récursivement tous les fichiers vidéo des sous-dossiers vers le dossier racine.
+- **`unzip-dedupe`** : Décompresse les volumes et supprime automatiquement les doublons de hachage.
+- **`upscale-test`** : Exécute un test de mise à l'échelle autonome avec les dépendances locales PyTorch/Real-ESRGAN.
+- **`telegram-pipeline`** : Exécute le pipeline de résolution de liens telethon avec des notifications système.
+
+### Vault Explorer
+- **`benchmark-asr`** : Mesure les performances de reconnaissance vocale avec les modèles Whisper locaux.
+- **`audio-normalize`** : Exécute la normalisation audio récursivement sur les dossiers vidéo/audio.
+- **`imagemagick-enhance`** : Améliore les illustrations de couverture et les miniatures avec ImageMagick.
+- **`livestream-translator`** : Traduit en temps réel les pistes audio des flux RTMP/HTTP en direct.
+- **`preview-generator`** : Génère des grilles d'aperçu au survol, des miniatures et des fiches de contact.
+- **`realesrgan-enhance`** : Met à l'échelle les miniatures avec Real-ESRGAN sous PyTorch CUDA.
+- **`rtx-vsr`** : Améliore les vidéos avec NVIDIA RTX Video Super Resolution.
+- **`subtitles`** : Génère des sous-titres SRT/VTT à partir des pistes audio vocales.
+- **`thumb-enhance`** : Optimise les pages de couverture et les mises en page d'aperçu.
+- **`translate-spoken`** : Traduit récursivement les dialogues parlés dans les vidéos via Whisper/TTS.
+- **`stream-translator`** : Traduit à la volée le contenu parlé des flux audio/vidéo HTTPS actifs.
+
+### Security & Server (Sécurité et Serveurs)
+- **`generate-certs`** : Génère des certificats SSL de développement local via mkcert.
+- **`start-https`** : Lance le serveur de développement frontal Astro sous HTTPS.
+- **`build-gradio`** : Compile l'application Python Gradio à l'aide de PyInstaller.
+- **`distribute-secrets`** : Distribue et renouvelle les secrets `GH_TOKEN` et `JIRA_TOKEN` dans les dépôts.
+
+### Corporate Standards (Normes d'entreprise)
+- **`sync-instructions`** : Propage les instructions système et directives globales dans tous les dépôts.
+- **`sync-skills`** : Synchronise les fichiers de compétences globales d'assistant avec les dossiers locaux.
+- **`validate-protocols`** : Valide le format des instructions système et la conformité des métadonnées.
+
+### USD Studio
+- **`download-colmap`** : Télécharge l'outil portable de reconstruction 3D COLMAP.
+- **`setup-usd`** : Initialise l'espace de travail PyTorch et CUDA pour l'environnement USD Studio.
+- **`build-worker-img`** : Construit et pousse les conteneurs Docker de travail.
+- **`build-demo-exe`** : Compile l'exécutable autonome de démonstration USD Studio.
+
+---
+
+## Protocole d'ajout
+
+Pour étendre l'interface en ligne de commande globale `vw` avec un nouveau script, suivez ces étapes :
+
+<Steps>
+  <Step title="Placer le script dans l'espace de travail">
+    Enregistrez le script dans le dépôt approprié (par ex. `vault-explorer/scripts/pwsh/Mon-Nouveau-Script.ps1`). Assurez-vous que le script est modulaire, gère correctement ses paramètres, et retourne un code de sortie non nul en cas d'erreur.
+  </Step>
+
+  <Step title="Enregistrer la commande">
+    Ouvrez le fichier de registre `vaultwares-cli/vw-commands.ps1` et ajoutez une entrée à la table `$Commands` :
+
+    ```powershell
+    "mon-nouveau-script" = @{
+        ScriptPath  = "$RepoRoot\chemin\vers\Mon-Nouveau-Script.ps1"
+        Description = "Brève description du comportement du script."
+        Category    = "Workspace Management" # Ou une autre catégorie
+    }
+    ```
+  </Step>
+
+  <Step title="Tester l'intégration">
+    Vérifiez que la commande apparaît correctement dans l'aide et s'exécute avec succès :
+
+    ```bash
+    # Affiche l'aide pour vérifier la catégorie
+    vw --help
+
+    # Exécute la commande de test
+    vw mon-nouveau-script --paramètre valeur
+    ```
+  </Step>
+
+  <Step title="Mettre à jour la documentation">
+    Ajoutez la commande dans ce document (`docs-content/operations/command-line-tool.mdx` et `command-line-tool-QC.mdx`) dans la section appropriée.
+  </Step>
+</Steps>
+
+<Info>
+  Vérifiez toujours que le script cible fonctionne dans des shells non-interactifs et ne requiert pas d'intervention utilisateur non spécifiée.
+</Info>

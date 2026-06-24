@@ -81,6 +81,7 @@ $targets = @(
     @{ Name = 'Codex'; Path = Join-Path $env:USERPROFILE '.codex\AGENTS.md'; Method = 'full' },
     @{ Name = 'OpenCode'; Path = Join-Path $env:USERPROFILE '.config\opencode\AGENTS.md'; Method = 'full' },
     @{ Name = 'Claude Desktop'; Path = Join-Path $env:APPDATA 'Claude\claude_desktop_config.json'; Method = 'json' }
+    @{ Name = 'Mistral'; Path = Join-Path $env:USERPROFILE '.agents\AGENTS.md'; Method = 'marker' }
 )
 
 foreach ($target in $targets) {
