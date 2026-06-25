@@ -94,9 +94,36 @@ must be allowed to reach one another on `80` and `443`, otherwise the triangle
 collapses into false network failures. This gives the monitor a triangle view
 instead of letting a host prove only that its own local stack can see itself.
 
+## Distributed rollups and host heartbeats
+
+Thu, 25 Jun 2026 05:02
+
+Health Ledger 0.3.0 keeps one rollup per probe location and merges them into
+`data/rollups/fleet-latest.json`. Greencloud and Clopeux upload their rollups to
+the canonical OVH copy through
+`POST /monitor/probe-rollups/{location}`. The endpoint requires an
+HMAC-SHA256 signature using `HEALTH_LEDGER_INGEST_SECRET`, accepts timestamps
+within five minutes, limits bodies to one megabyte, and writes files atomically.
+
+Each host exposes a separate tailnet-only heartbeat on its Tailscale IP at
+`:8791/healthz`. The monitored host is excluded from its own heartbeat
+observers. Local systemd, Docker, scheduled-task, file, and database checks
+remain valid runtime evidence, while remote heartbeats detect complete host
+loss.
+
+Urgent outages page only after two independent failed probe locations. A
+service failure accompanied by a missing host heartbeat pages immediately.
+Expected inactive services are healthy while inactive and degraded if they
+activate unexpectedly.
+
+Intervals are urgency based: 60 seconds for urgent/customer-impacting paths,
+300 seconds for important internal services, 900 seconds for non-urgent
+services, and 1800 seconds for intentionally inactive configuration checks.
+Checks remain sequential and use deterministic jitter.
+
 ## Current implementation state
 
-As of 2026-06-05:
+As of Thu, 25 Jun 2026 05:02:
 
 - `greencloud-vps` runs `health-ledger-probe.service` from `/opt/health-ledger`.
   The service is enabled and writes probe events/rollups under
@@ -133,6 +160,10 @@ As of 2026-06-05:
   events, GitHub, Jira, or assistant chat.
 - Legacy `vw-deny-watch.timer` and `vw-token-expiry-watch.timer` are disabled;
   `vw-webhookd` `notifications.on_error_command` is `/bin/true`.
+- Heartbeat units/tasks and Probe Joker 0.3.0 require an operator-approved
+  activation. Do not restart them until all three hosts have matching
+  `HEALTH_LEDGER_INGEST_SECRET` values and Linux heartbeat bind addresses are
+  configured in `/etc/health-ledger/heartbeat.env`.
 
 ## Relationship to this docs repo
 

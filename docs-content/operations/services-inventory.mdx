@@ -5,7 +5,7 @@ description: "Single table of VaultWares + Prom‑King services: URL, where it r
 
 # Services inventory (Private)
 
-Last updated: Thu, 25 Jun 2026 04:41 America/Toronto.
+Last updated: Thu, 25 Jun 2026 05:02 America/Toronto.
 
 This page is a **single source of truth table** for “what we run”.
 
@@ -60,9 +60,11 @@ Every repo in this table must follow the same control-plane model:
   auth, normalized monitor APIs, and future business rules. Static dashboards
   such as `stats.vaultwares.ca` must not read source ledger files or Postgres
   directly.
-- `GET /monitor/services` normalizes the complete Health Ledger inventory,
-  including entries without probes as `unmonitored`. The monitor Services tab
-  is read-only and filters that inventory by product, type, host, and status.
+- `GET /monitor/services` reads the fleet rollup assembled from Greencloud,
+  OVH, and Clopeux evidence. Every inventory entry has a configured probe;
+  `unmonitored` now means configuration failure rather than an accepted
+  inventory state. The response includes contributing locations, confirmation
+  count, and host-heartbeat diagnostics when available.
 - VaultWares apps pass request correlation IDs as the `correlationId` query
   parameter, not as the primary header contract. VaultWares-generated IDs use
   `vw_{3-or-4-char Jira code}_c{7 hex chars}`, for example
@@ -90,6 +92,7 @@ Source of truth: `operations/deployment-flow`.
 | `vaultwares-hooks` | systemd service, `127.0.0.1:8787` | Tailnet-only webhook handler (uvicorn). |
 | `vw-secretsd` | systemd service, `127.0.0.1:9444` | Local secrets shim behind `warden.vaultwares.ca`. |
 | `health-ledger-probe.service` | systemd service | Active Probe Joker loop under `/opt/health-ledger`; writes Health Ledger events and rollups. |
+| `health-ledger-heartbeat.service` | systemd service, tailnet `:8791` after operator activation | Independent host heartbeat observed from OVH and Clopeux. |
 | `health-ledger-dashboard.service` | systemd service, `127.0.0.1:8790` | First-party Health Ledger dashboard; reads rollups/events and does not run probes. |
 | `health-ledger-alarm.service` | systemd service, disabled until `/etc/health-ledger/alarm.env` is configured | Alarm Joker notification loop for incident locks and SMS/email/desktop fanout. |
 | `vw-deny-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for webhook `bad_signature` clusters. Replaced by Health Ledger direction. |
