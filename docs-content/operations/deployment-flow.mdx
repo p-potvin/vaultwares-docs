@@ -5,6 +5,8 @@ description: "Canonical CI/CD model: GitHub webhooks → vw-webhookd → tailnet
 
 # Deployment flow (Private)
 
+Last updated: Thu, 25 Jun 2026 04:41 America/Toronto.
+
 This page is the **source of truth** for how deployments happen for VaultWares + Prom‑King sites.
 
 Related:
@@ -48,6 +50,19 @@ Developer pushes to GitHub (main)
 - PR-only checks are allowed, but any **deployment** must be webhook-driven.
 - Each repo must have a GitHub webhook configured to `https://hooks.vaultwares.ca/github`
   (see `operations/project-bootstrap`).
+
+## Unified monitor deployment order
+
+For the monitor consolidation, deploy in dependency order:
+
+1. `health-ledger` inventory and runtime probe changes.
+2. `vaultwares-api` normalized `/monitor/services` and cross-ledger search.
+3. `vault-monitor` unified five-route SPA.
+4. Legacy `stats.vaultwares.ca` and `ledger.vaultwares.ca` redirect vhosts.
+
+Do not delete `agent-ledger/site` or `agent-ledger/stats-app` until the unified
+monitor has passed user visual acceptance. Their runtime hosts may redirect
+before source cleanup so rollback remains available.
 
 ## Secrets / verification
 

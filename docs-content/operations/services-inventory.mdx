@@ -5,6 +5,8 @@ description: "Single table of VaultWares + Prom‑King services: URL, where it r
 
 # Services inventory (Private)
 
+Last updated: Thu, 25 Jun 2026 04:41 America/Toronto.
+
 This page is a **single source of truth table** for “what we run”.
 
 It exists so that:
@@ -25,8 +27,9 @@ Related:
 |---|---|---|---|---|
 | Main website | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
 | Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (static) | `vaultwares-docs` | Tailnet-only |
-| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca` (SPA + `/monitor/*` proxy to VaultWares API over tailnet) | `vault-monitor` | Tailnet-only |
-| Stats dashboard | `https://stats.vaultwares.ca` | `/var/www/stats.vaultwares.ca` (agent-ledger React/Vite SPA; `/monitor/*` and `/api/telemetry/*` proxy to VaultWares API over tailnet) | `agent-ledger` | Tailnet-only |
+| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca` (unified five-route SPA + `/monitor/*` proxy to VaultWares API over tailnet) | `vault-monitor` | Tailnet-only |
+| Stats dashboard (legacy redirect) | `https://stats.vaultwares.ca` | Permanent redirect to `https://monitor.vaultwares.ca/work-impact` | `agent-ledger` | Tailnet-only |
+| Agent Ledger UI (legacy redirect) | `https://ledger.vaultwares.ca` | Path-aware permanent redirects to `/ledger`, `/personal-stats`, and `/work-impact` on `monitor.vaultwares.ca` | `agent-ledger` | Tailnet-only |
 | API | `https://api.vaultwares.ca` / `http://100.67.25.118:9001` | DNS resolves to `vps-ovhcloud`; nginx owns `100.67.25.118:443` and proxies to FastAPI on `127.0.0.1:9001`; direct `:9001` remains the internal health/debug path. Tailscale Serve must stay disabled on OVH HTTPS `443`. | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; app auth/gateway secret required |
 | MCP server | `https://mcp.vaultwares.ca/mcp` | nginx HTTPS edge on `greencloud-vps` -> tailnet proxy to `vaultwares-mcp` on OVH (`vps-ovhcloud`) | `vaultwares-mcp` | Tailnet-only |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `/var/www/vault-flows/dist` (SPA) | `vault-flows` | Public |
@@ -57,6 +60,9 @@ Every repo in this table must follow the same control-plane model:
   auth, normalized monitor APIs, and future business rules. Static dashboards
   such as `stats.vaultwares.ca` must not read source ledger files or Postgres
   directly.
+- `GET /monitor/services` normalizes the complete Health Ledger inventory,
+  including entries without probes as `unmonitored`. The monitor Services tab
+  is read-only and filters that inventory by product, type, host, and status.
 - VaultWares apps pass request correlation IDs as the `correlationId` query
   parameter, not as the primary header contract. VaultWares-generated IDs use
   `vw_{3-or-4-char Jira code}_c{7 hex chars}`, for example
@@ -150,4 +156,3 @@ Both `vps-ovhcloud` and `greencloud-vps` carry `STREAM_OUTBOUND_PROXY=http://100
 - `fullxxx.video` is a **WordPress install** under `/var/www/fullxxx.video/public/`. Its front-door/prelanding behavior and tube plugins are tracked separately in Health Ledger so repo/runtime ownership is explicit. The plugins driving its catalog live under `wp-content/plugins/{fullxxx-video,tube-shared}` and are rsynced from `/var/www/tube-sites-src/` by the deploy script.
 - `prom-king.xyz` runs a **standalone React/Express wallpaper application** at `/srv/repos/Prom-King/content-site`. Thumbs/meta are stored in `/srv/pkt-wallpapers`.
 - The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for every repo in this list — the lowercase form `prom-king/...` won't match.
-
