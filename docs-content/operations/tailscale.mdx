@@ -72,6 +72,8 @@ tailnet clients before nginx and breaks `api.vaultwares.ca`.
 
 `greencloud-vps` runs `dnsmasq` on `tailscale0` and answers those names from `/etc/dnsmasq.d/vaultwares-tailnet.conf`. The config uses exact `host-record` entries instead of a wildcard, so it does not take over the whole `vaultwares.ca` zone.
 
+Sun, 28 Jun 2026 12:25: keep explicit `interface=lo` and `interface=tailscale0` lines in the greencloud `dnsmasq` config. Debian starts dnsmasq with `--local-service`; without explicit interfaces, remote tailnet clients can be treated as non-local because `tailscale0` is a `/32`, causing split-DNS timeouts even though UFW and Tailscale ACLs allow port `53`.
+
 If you choose to route the parent zone `vaultwares.ca` to `greencloud-vps`, `dnsmasq` must also forward unknown `vaultwares.ca` names to an external resolver. Do not use the VPS default resolver (`100.100.100.100`) for that parent-zone forwarding path, because Tailscale DNS can route the query back to the same split-DNS target.
 
 > The ACL must allow `tag:server` on port **53** (TCP+UDP) if `greencloud-vps` is the authoritative nameserver. See Key rules above.
