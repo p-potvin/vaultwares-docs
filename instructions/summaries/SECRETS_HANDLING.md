@@ -9,9 +9,8 @@ Do:
   every value becomes garbage. This bit `/etc/vw-webhookd/env`'s `GH_TOKEN`
   on 2026-05-30 (see `docs-content/operations/deploy-alerts.mdx` and the
   webhook-secret-rotation runbook).
-- Fine-grained PATs are scoped per-org. When you rotate one, verify it
-  resolves a repo in **every** org it needs to touch — a one-org scope
-  silently 404s on the others.
+- Prom-King deploy git auth is GitHub App based. Rotate the App private key and
+  verify installation access instead of trying to fix deploy access with a PAT.
 Do not:
 - Commit secrets or paste them into markdown.
 Done when:

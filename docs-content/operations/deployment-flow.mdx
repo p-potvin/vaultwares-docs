@@ -5,7 +5,7 @@ description: "Canonical CI/CD model: GitHub webhooks → vw-webhookd → tailnet
 
 # Deployment flow (Private)
 
-Last updated: Thu, 25 Jun 2026 04:41 America/Toronto.
+Last updated: Sun, 28 Jun 2026 10:24 America/Toronto.
 
 This page is the **source of truth** for how deployments happen for VaultWares + Prom‑King sites.
 
@@ -68,6 +68,9 @@ before source cleanup so rollback remains available.
 
 - `VW_GITHUB_WEBHOOK_SECRET` lives in VaultWarden (`https://warden.vaultwares.ca`, tailnet-only) and is provisioned on `greencloud-vps`.
 - If you rotate this secret, you must update **both** `vw-webhookd` and every repo webhook. See `operations/webhook-secret-rotation`.
+- Prom-King deploy git auth uses the Prom-King GitHub App, not a PAT. The App
+  config and private key live under `/etc/vw-github-app/` on greencloud and on
+  OVH where `shared-tube` runs as `ubuntu`.
 - Verify delivery + processing by checking:
   - `https://hooks.vaultwares.ca/health` returns `200`
   - `vw-webhookd` logs on `greencloud-vps` (and the downstream runner logs)
@@ -107,12 +110,18 @@ Every deploy script that runs as `vwdeploy` must respect them:
 | **`rsync -rltD --delete`, not `rsync -a`** | `-a` (`-rlptgoD`) tries to preserve owner+group from source. As `vwdeploy`, `chgrp` to anything else fails. Use `-rltD` (drop the `-og`). |
 | **Plugin dirs owned `vwdeploy:www-data` with `2775`** | rsync writes new files as the running user. Setgid on the dir keeps the group as `www-data` so the web server can read. After perms drift (e.g. someone did `chown -R www-data:www-data`), reset with: `chown -R vwdeploy:www-data <plugin-dir>` + `find <plugin-dir> -type d -exec chmod 2775 {} +` + `find <plugin-dir> -type f -exec chmod 0664 {} +`. |
 | **wp-cli wrapped with `sudo -u www-data`** | wp-cli refuses to run as root (the YIKES warning, exit code 1). The deploy script must call `sudo -u www-data wp --path=… rewrite flush --hard \|\| true`. The trailing `\|\| true` tolerates the case where `vwdeploy` cannot sudo (plugins self-flush on version bumps anyway). |
-| **GIT_ASKPASS in env** | The git operations inside `runuser -l vwdeploy …` need `GIT_ASKPASS=/var/www/deploy-scripts/git-askpass-vw-gh-token.sh` and `GIT_TERMINAL_PROMPT=0` exported. |
+| **GitHub App askpass in env** | Prom-King git operations need `VW_GITHUB_OWNER=Prom-King`, `GIT_ASKPASS=/var/www/deploy-scripts/git-askpass-vw-gh-token.sh`, and `GIT_TERMINAL_PROMPT=0` exported. The askpass script calls `/usr/local/bin/vw-github-app-token` and returns an installation token. |
 | **`shared-tube` lock / dispatch** | Uses `/var/lib/vw-deploy/shared-tube.lock` with mode `0666` or pre-created with `umask 000` so that both the dispatcher (`vwdeploy`) and remote executing user (`ubuntu` on `vps-ovhcloud` via Tailscale SSH) can read, write, and obtain the flock. |
 
 ## Greencloud → OVH SSH dispatch (Tailscale ACL gate)
 
 The dispatcher scripts on `greencloud-vps` (e.g. `/var/www/deploy-scripts/deploy-vaultwares-api.sh`) SSH `ubuntu@100.67.25.118` over the tailnet to run the OVH-side deploy. Tailscale-SSH is enabled on `vps-ovhcloud`, so the connection is gated by the **Tailscale SSH policy**, not OpenSSH `authorized_keys`. The policy `src` list must include `tag:vps-greencloud` (and any other tag from which deploys are dispatched) for `dst: tag:vps-ovhcloud`.
+
+For `shared-tube`, OVH also needs the Prom-King GitHub App helper installed:
+`/etc/vw-github-app/app.env`, `/etc/vw-github-app/private-key.pem`,
+`/usr/local/bin/vw-github-app-token`, and the askpass wrapper in
+`/var/www/deploy-scripts/`. The checkout remote must stay credential-free:
+`https://github.com/Prom-King/shared-tube.git`.
 
 Symptom when missing: dispatcher logs `tailscale: tailnet policy does not permit you to SSH to this node` and exits non-zero; OVH-side deploy log shows nothing for that commit, repo HEAD on OVH stays behind `origin/main`. We have hit this exactly once when only individual personal IPs were in the SSH rule and not the VPS tag.
 
