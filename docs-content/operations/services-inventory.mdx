@@ -117,16 +117,15 @@ tailnet service names such as `docs.vaultwares.ca`, `hooks.vaultwares.ca`,
 them, nginx can select the media certificate on tailnet-originated requests.
 
 Mullvad VPN routing for this stack is opt-in only. The staged gateway lives in
-`/opt/vw-media-stack/docker-compose.mullvad.yml` as `mullvad-gateway`; no
-service uses it unless an explicit override, such as
-`docker-compose.mullvad.qbittorrent.yml`, moves that service into
-`network_mode: service:mullvad-gateway`. Profile rotation is handled by
-`/opt/vw-media-stack/bin/mullvad-rotate-profile` using dedicated VPS profiles
-under `/opt/vw-media-stack/mullvad-profiles/`; personal-device address
-`10.69.232.98/32` is intentionally rejected by default. The gateway keeps
-`100.64.0.0/10` outside the tunnel so tailnet access, including
-`100.67.25.118`, stays reachable. Do not add host-wide WireGuard routes for
-this stack.
+`/opt/vw-media-stack/docker-compose.mullvad.yml` as `mullvad-gateway`. **DO NOT** run `docker compose up -d` directly to rebuild the stack if VPN routing is required, as this will strand services on the default network and break communication with the Arr stack.
+
+Instead, always use the dedicated wrapper script:
+```bash
+/opt/vw-media-stack/bin/mullvad-compose all-up
+```
+This script seamlessly boots the `mullvad-gateway` and automatically applies the overrides (e.g. `docker-compose.mullvad.qbittorrent.yml`) to move `qbittorrent` and `jackett` into `network_mode: service:mullvad-gateway`.
+
+The gateway configures itself via `.env.mullvad` using Gluetun's native Mullvad API (e.g., setting `MULLVAD_SERVER_CITIES=Montreal` and `MULLVAD_SERVER_HOSTNAMES=ca-mtr-wg-002`). Profile rotation is also supported via `/opt/vw-media-stack/bin/mullvad-rotate-profile` using dedicated VPS profiles under `/opt/vw-media-stack/mullvad-profiles/`. The gateway keeps `100.64.0.0/10` outside the tunnel so tailnet access, including `100.67.25.118`, stays reachable. Do not add host-wide WireGuard routes for this stack.
 
 | Surface | Listener / unit | Role |
 |---|---|---|
