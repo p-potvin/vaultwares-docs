@@ -1,0 +1,78 @@
+---
+title: "Vault TV"
+description: "Client mince de streaming VaultWares pour Fire TV, Android TV, et appareils controles a la telecommande."
+---
+
+# Vault TV
+
+Derniere mise a jour : Wed, 01 Jul 2026 00:10 America/Toronto.
+
+Vault TV est le client TV autonome pour la pile media VaultWares. C'est un
+client mince : il affiche le catalogue, les details, la recherche, la lecture,
+et les reglages pour les appareils controles a la telecommande, pendant que les
+services VaultWares cote serveur gardent la recherche de fournisseurs, la
+resolution torrent/debrid, la signature des flux, et les secrets hors du bundle
+de l'appareil.
+
+## Fiche projet
+
+| Champ | Valeur |
+|---|---|
+| Depot | `p-potvin/vault-tv` |
+| Checkout local | `C:\Users\Administrator\Desktop\Github Repos\vault-tv` |
+| Cle Jira | `VTV` |
+| Classe d'app | Client web TV; cible Android TV / Fire TV |
+| Source de theme | Sous-module `vaultwares-themes` |
+| Etat actuel | Premier jalon web implemente; creation du projet Jira bloquee tant que les identifiants/outils Jira ne sont pas disponibles dans la session agent |
+
+## Limites
+
+Vault TV doit appeler seulement les API media controlees par VaultWares et les
+URL de lecture retournees par ces API.
+
+Le client ne doit pas appeler Real-Debrid, AllDebrid, Premiumize, Torrentio,
+Jackett, Prowlarr, Bitmagnet, MediaFusion, YTS, EZTV, des miroirs de
+fournisseurs, ou des endpoints torrent/debrid directs. Ces recherches passent
+par Comet et la pile media VaultWares.
+
+## Jalon courant
+
+Le premier jalon est une coquille web pour TV :
+
+- app React, Vite, et TypeScript
+- navigation de grille media compatible D-pad
+- flux simules de catalogue, details, recherche, lecture, et reglages
+- client media garde qui refuse les bases API hors VaultWares
+- limite pour les jetons de jumelage
+- sous-module `vaultwares-themes` pour les jetons de design canoniques
+- tests pour la navigation de focus, les garde-fous du client media, et l'etat du lecteur
+
+## Jira et synchronisation
+
+Le projet Jira prevu est :
+
+| Champ | Valeur |
+|---|---|
+| Cle Jira | `VTV` |
+| Nom Jira | `Vault TV` |
+| Type Jira | Kanban gere par equipe |
+| Depot GitHub | `p-potvin/vault-tv` |
+
+Apres la creation du projet Jira, mettez a jour `vw-jira-sync` et lancez :
+
+```bash
+python scripts/create_projects.py --repo vault-tv
+python scripts/backfill.py --repo vault-tv
+```
+
+Ajoutez le webhook du depot vers `https://hooks.vaultwares.ca/github` avec le
+secret webhook GitHub standard de VaultWarden. Ne collez pas le secret dans les
+docs, commits, Jira, ou entrees ledger.
+
+## Docs liees
+
+- `/operations/jira-sync`
+- `/operations/services-inventory`
+- `/ai-tools/assistant-protocols/project-creation`
+- `/ai-tools/assistant-protocols/submodule-boundaries`
+- `/ai-tools/assistant-protocols/brand-tokens-ui`

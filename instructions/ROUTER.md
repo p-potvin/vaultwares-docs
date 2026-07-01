@@ -31,6 +31,7 @@ Protocol categories are executed only when relevant.
 | BRAND_TOKENS_UI | Any UI/UX/design/branding/themes/tokens | instructions/summaries/BRAND_TOKENS_UI.md | instructions/notes/BRAND_TOKENS_UI.md | ui,ux,theme,tokens,brand |
 | CLEANUP_REFACTOR | Refactors, cleanup, re-org, simplification | instructions/summaries/CLEANUP_REFACTOR.md | instructions/notes/CLEANUP_REFACTOR.md | refactor,cleanup,rewrite,declutter |
 | FILE_CHANGES | Creating/moving/deleting files/folders | instructions/summaries/FILE_CHANGES.md | instructions/notes/FILE_CHANGES.md | create file,delete,rename,move |
+| PROJECT_CREATION | Creating a new VaultWares repo, app, package, service, or tracked product surface | instructions/summaries/PROJECT_CREATION.md | instructions/notes/PROJECT_CREATION.md | new project,new repo,new app,create project,jira project,onboard repo |
 | RENAMING | Renaming a GitHub repo, Jira project, or any cross-system tracked identifier | instructions/summaries/RENAMING.md | instructions/notes/RENAMING.md | rename,github rename,repo rename,jira rename |
 | DEPENDENCY_POLICY | Adding/updating deps, toolchains, lockfiles | instructions/summaries/DEPENDENCY_POLICY.md | instructions/notes/DEPENDENCY_POLICY.md | dependency,npm,pip,cargo,upgrade |
 | GIT_BRANCH_POLICY | Branching/commits/main branch rules | instructions/summaries/GIT_BRANCH_POLICY.md | instructions/notes/GIT_BRANCH_POLICY.md | git,branch,commit,merge,main |

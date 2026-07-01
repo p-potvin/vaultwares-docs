@@ -154,6 +154,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "ai-tools__assistant-protocols__pr-policy"
   },
   {
+    "routePath": "/ai-tools/assistant-protocols/project-creation",
+    "routeKey": "ai-tools/assistant-protocols/project-creation",
+    "sectionKey": "ai-tools",
+    "resourceKey": "ai-tools__assistant-protocols__project-creation"
+  },
+  {
     "routePath": "/ai-tools/assistant-protocols/renaming",
     "routeKey": "ai-tools/assistant-protocols/renaming",
     "sectionKey": "ai-tools",
@@ -608,6 +614,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "routeKey": "software/security-monitoring",
     "sectionKey": "software",
     "resourceKey": "software__security-monitoring"
+  },
+  {
+    "routePath": "/software/vault-tv",
+    "routeKey": "software/vault-tv",
+    "sectionKey": "software",
+    "resourceKey": "software__vault-tv"
   },
   {
     "routePath": "/support/contact",

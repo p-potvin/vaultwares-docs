@@ -1,0 +1,36 @@
+---
+title: "Creation de projet"
+description: "Resume du protocole de l'assistant : Creation de projet"
+---
+
+# Creation de projet
+
+- Category ID: `PROJECT_CREATION`
+- Source du resume : `instructions/summaries/PROJECT_CREATION.md`
+- Source des notes : `instructions/notes/PROJECT_CREATION.md`
+
+S'applique quand : creation d'un nouveau depot, d'une app, d'un paquet, d'un service, d'une surface produit, ou d'un projet suivi dans Jira pour VaultWares.
+
+Faire :
+- Choisir le nom canonique du projet, le nom du depot, le proprietaire, la cle Jira, et la classe d'execution avant d'ecrire de la documentation large.
+- Creer ou mettre a jour `README.md`, `ROADMAP.md`, `TODO.md`, et `AGENTS.md` a la racine du depot pour que les futurs contributeurs voient le but, les limites, les commandes, et les prochaines etapes.
+- Ajouter `vaultwares-themes` comme sous-module pour les apps avec interface utilisateur, sauf raison documentee de ne pas utiliser les jetons VaultWares Redesign.
+- Creer le projet Jira ou documenter le blocage exact. Utiliser une cle majuscule de 2 a 10 caracteres et ajouter le mapping du depot dans `vw-jira-sync/config.yaml`.
+- Ajouter le webhook GitHub et lancer le backfill `vw-jira-sync` seulement apres la creation du projet Jira.
+- Ajouter une page VaultWares Docs sous `docs-content/` et regenerer les ressources de pages.
+- Mettre a jour l'inventaire des services seulement quand le projet a une URL de runtime, un canal de distribution de paquet, ou un service surveille.
+- Enregistrer la creation du projet dans agent-ledger et mentionner les etapes de systeme externe incompletes.
+
+Ne pas :
+- Pretendre que le projet Jira existe sans verification reelle via API ou interface.
+- Mettre des secrets, jetons, secrets de webhook, ou cles API privees dans les docs du depot, les descriptions Jira, ou le ledger.
+- Creer des acces publics directs pour des services prives pendant l'onboarding.
+- Dupliquer les instructions globales dans le nouveau depot; pointer plutot vers VaultWares Docs.
+
+Termine quand :
+- Les metadonnees du depot existent, les docs sont decouvrables, l'etat Jira/vw-jira-sync est explicite, les limites de sous-module sont claires, la verification a ete lancee, et le ledger enregistre la creation.
+
+## Notes
+
+Les assistants lisent les notes completes seulement lorsqu'on leur demande explicitement : `read full notes`.
+Chemin des notes : `instructions/notes/PROJECT_CREATION.md`
