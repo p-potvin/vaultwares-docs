@@ -58,7 +58,9 @@ Commands are grouped into logical operational categories:
 
 Operational note, Thu, 02 Jul 2026 16:45: the Input Tracker is a resident Python process (`agent-ledger/scripts/track-input.py`). Updating or pulling `agent-ledger` does not reload that process by itself, so an old tracker can keep running stale code even when the scheduled task appears healthy.
 
-The durable fix is to run the tracker through `agent-ledger/scripts/start-input-tracker.ps1` and register `VaultWares-InputTracker` with `MultipleInstances = Parallel`. The launcher stops any existing `track-input.py` process for the same script path before starting the new one. This makes `Start-ScheduledTask -TaskName VaultWares-InputTracker` a real code reload instead of a no-op.
+The durable fix is to run the tracker through `agent-ledger/scripts/start-input-tracker.ps1` and register `VaultWares-InputTracker` with `MultipleInstances = Parallel`. The task action must be `conhost.exe --headless "pwsh.exe" ... start-input-tracker.ps1`; this is the proven stable launch mode for the resident tracker. Do not simplify it back to plain `powershell.exe`, visible `pwsh.exe`, or a direct Python task when repairing crashes.
+
+Operational note, Thu, 02 Jul 2026 18:06: the launcher must only stop old `track-input.py` Python child processes for the same script path. It must not match `start-input-tracker.ps1` wrappers, because the headless task's parent `conhost.exe` command line contains the launcher path; killing that wrapper makes Task Scheduler report a crash such as `0xffffffff`. A healthy restart leaves Task Scheduler at `267009` while the new resident tracker is running.
 
 After any tracker code change or repo sync, verify with:
 
