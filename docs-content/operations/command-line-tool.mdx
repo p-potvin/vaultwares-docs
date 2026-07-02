@@ -54,6 +54,22 @@ Commands are grouped into logical operational categories:
 - **`sync-ledger`**: Sync local ledger records to central database endpoints.
 - **`start-tracker`**: Launch the keyboard/mouse idle telemetry service in the background.
 
+#### Input Tracker restart policy
+
+Operational note, Thu, 02 Jul 2026 16:45: the Input Tracker is a resident Python process (`agent-ledger/scripts/track-input.py`). Updating or pulling `agent-ledger` does not reload that process by itself, so an old tracker can keep running stale code even when the scheduled task appears healthy.
+
+The durable fix is to run the tracker through `agent-ledger/scripts/start-input-tracker.ps1` and register `VaultWares-InputTracker` with `MultipleInstances = Parallel`. The launcher stops any existing `track-input.py` process for the same script path before starting the new one. This makes `Start-ScheduledTask -TaskName VaultWares-InputTracker` a real code reload instead of a no-op.
+
+After any tracker code change or repo sync, verify with:
+
+```powershell
+Start-ScheduledTask -TaskName "VaultWares-InputTracker"
+Start-Sleep -Seconds 70
+Get-Content "C:\Users\Administrator\Desktop\Github Repos\agent-ledger\input-state\input-tracker-health.json"
+```
+
+The health payload should show a fresh `updated_at`, a current `pid`, `status` as `online` or `listening`, and a `last_post_at` after the restart once activity has flushed.
+
 ### System Monitoring
 - **`health-alarm`**: Start the telemetry status alert service using local environment configuration.
 - **`health-probe`**: Run immediate ping checks and log network reachability for all nodes.
