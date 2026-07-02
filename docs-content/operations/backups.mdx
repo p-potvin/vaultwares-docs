@@ -1,6 +1,6 @@
 ---
 title: "Backups (Private)"
-description: "GreenCloud VPS hourly backups to Google Drive via rclone (encrypted)."
+description: "GreenCloud VPS hourly backups to Google Drive via rclone (plain, unencrypted)."
 ---
 
 # Backups (Private)
@@ -21,11 +21,17 @@ The hourly job creates a `.tgz` containing (includes secrets):
 - `/opt/vault-warden`
 - `/opt/vaultwares-webhooks`
 
-## Encryption
+## Google Drive storage mode
 
-Backups are uploaded to a **crypt** remote (`vw_gdrive_crypt:`) so Google Drive only sees encrypted filenames + encrypted contents.
+Sun, 28 Jun 2026 15:57 America/Toronto: active backup scripts write directly to the plain Google Drive remote:
 
-The crypt keys are stored in VaultWarden as:
+```bash
+vw_gdrive:VaultWares/backups
+```
+
+Do not target `vw_gdrive_crypt:` for new backup writes. The legacy crypt remote may remain in `/etc/vw-backup/rclone.conf` only so older encrypted archives can be recovered if needed.
+
+The legacy crypt keys are stored in VaultWarden as:
 
 - `vw_rclone_crypt_password`
 - `vw_rclone_crypt_password2`
@@ -52,7 +58,7 @@ Then verify:
 
 ```bash
 sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive:
-sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive_crypt:
+sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive:VaultWares/backups
 ```
 
 ## Control / troubleshooting
@@ -68,6 +74,8 @@ If OAuth is missing, `vw-backup.service` fails fast with an error telling you to
 
 ## Restore (high-level)
 
-1. Download the desired `.tgz` from `vw_gdrive_crypt:VaultWares/backups/vaultwares-1/` (host folder name depends on hostname).
+1. Download the desired `.tgz` from `vw_gdrive:VaultWares/backups/<host>/` (host folder name depends on hostname).
 2. Extract it to a staging directory.
 3. Restore selected paths (nginx/systemd/letsencrypt) and then reload nginx/systemd.
+
+For older archives that were written through `vw_gdrive_crypt:`, read through that legacy remote so rclone decrypts them before restore.

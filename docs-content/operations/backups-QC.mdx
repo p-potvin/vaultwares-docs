@@ -1,6 +1,6 @@
 ---
 title: "Sauvegardes (Privé)"
-description: "Sauvegardes horaires GreenCloud VPS vers Google Drive via rclone (chiffrées)."
+description: "Sauvegardes horaires GreenCloud VPS vers Google Drive via rclone (non chiffrées)."
 ---
 
 # Sauvegardes (Privé)
@@ -21,11 +21,17 @@ Le job horaire crée un fichier `.tgz` contenant (inclut des secrets) :
 - `/opt/vault-warden`
 - `/opt/vaultwares-webhooks`
 
-## Chiffrement
+## Mode de stockage Google Drive
 
-Les sauvegardes sont téléchargées dans un dépôt **crypt** (`vw_gdrive_crypt:`) afin que Google Drive ne voie que des noms de fichiers et des contenus chiffrés.
+Sun, 28 Jun 2026 15:57 America/Toronto : les scripts de sauvegarde actifs écrivent directement dans le remote Google Drive non chiffré :
 
-Les clés crypt sont stockées dans VaultWarden comme :
+```bash
+vw_gdrive:VaultWares/backups
+```
+
+Ne ciblez pas `vw_gdrive_crypt:` pour les nouvelles écritures de sauvegarde. L'ancien remote crypt peut rester dans `/etc/vw-backup/rclone.conf` seulement pour récupérer d'anciennes archives chiffrées au besoin.
+
+Les anciennes clés crypt sont stockées dans VaultWarden comme :
 
 - `vw_rclone_crypt_password`
 - `vw_rclone_crypt_password2`
@@ -52,7 +58,7 @@ Vérifiez ensuite :
 
 ```bash
 sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive:
-sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive_crypt:
+sudo rclone --config /etc/vw-backup/rclone.conf lsd vw_gdrive:VaultWares/backups
 ```
 
 ## Contrôle / Dépannage
@@ -68,6 +74,8 @@ Si l'OAuth est manquant, `vw-backup.service` échoue rapidement avec une erreur 
 
 ## Restauration (vue d'ensemble)
 
-1. Téléchargez le fichier `.tgz` souhaité depuis `vw_gdrive_crypt:VaultWares/backups/vaultwares-1/` (le nom du dossier hôte dépend du nom d'hôte).
+1. Téléchargez le fichier `.tgz` souhaité depuis `vw_gdrive:VaultWares/backups/<host>/` (le nom du dossier hôte dépend du nom d'hôte).
 2. Extrayez-le dans un répertoire de staging.
 3. Restaurez les chemins sélectionnés (nginx/systemd/letsencrypt) puis rechargez nginx/systemd.
+
+Pour les anciennes archives écrites via `vw_gdrive_crypt:`, lisez-les à travers cet ancien remote pour que rclone les déchiffre avant la restauration.
