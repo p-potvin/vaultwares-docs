@@ -30,8 +30,9 @@ Elle sert à :
 | Gestionnaire de secrets | `https://warden.vaultwares.ca` | `vw-secretsd` → `127.0.0.1:9444` | (service ops) | Tailnet-only |
 | (alias) secrets | `https://secrets.vaultwares.ca` | redirection → `warden.vaultwares.ca` | (config ops) | Tailnet-only |
 | Site de papiers peints Prom‑King (PKT) | `https://prom-king.xyz` | API Express + SPA React sur le port `4322` via systemd `pkt.service` dans `/srv/repos/Prom-King/content-site` | `Prom-King/content-site` | Public |
-| Front door / prelanding FullXXX | `https://fullxxx.video` | front door WordPress à `/var/www/fullxxx.video/public`; la variante FullXXX est suivie séparément | `Prom-King/prelanding-page` | Public |
-| Tube site FullXXX | `https://fullxxx.video` | plugin WordPress `/var/www/fullxxx.video/public/wp-content/plugins/fullxxx-video` | `Prom-King/tube-sites` | Public |
+| Site tube FullXXX | `https://fullxxx.video` | application `shared-tube` sur `greencloud-vps` | `Prom-King/shared-tube` | Public |
+| Site tube 1PornHub | `https://1pornhub.vip` | application `shared-tube` sur `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
+| Site tube SexyPRN | `https://sexyprn.lol` | application `shared-tube` sur `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
 | Link sharing Prom‑King | `https://links.prom-king.xyz` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
 | Link sharing FullXXX | `https://links.fullxxx.video` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
 
@@ -63,7 +64,6 @@ tailnet.
 
 ## Notes sur Prom-King / FullXXX
 
-- `fullxxx.video` est une **installation WordPress** sous `/var/www/fullxxx.video/public/`. Sa page d'accueil/prelanding et ses plugins de tube sont suivis séparément dans le Health Ledger pour rendre l'ownership repo/runtime explicite. Les plugins qui alimentent son catalogue vivent sous `wp-content/plugins/{fullxxx-video,tube-shared}` et sont synchronisés via rsync depuis `/var/www/tube-sites-src/` par le script de déploiement.
+- Les moniteurs de prelanding Prom-King sont retirés. Les sites tube actifs sont suivis via `Prom-King/shared-tube`; FullXXX vit sur Greencloud, 1PornHub et SexyPRN vivent sur OVH.
 - `prom-king.xyz` exécute une **application autonome de papiers peints React/Express** sous `/srv/repos/Prom-King/content-site`. Les miniatures et métadonnées sont stockées dans `/srv/pkt-wallpapers`.
 - L'org GitHub est **`Prom-King`** (P et K majuscules, trait d'union) pour chaque repo de cette liste — la forme en minuscules `prom-king/...` ne correspondra pas.
-

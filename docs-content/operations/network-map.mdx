@@ -23,10 +23,14 @@ flowchart TB
     VaultWaresCA["vaultwares.ca\n(vaultwares-website)\nHTTPS :443"]
     Flows["flows.vaultwares.ca\n(vault-flows SPA)\nHTTPS :443"]
     Noddit["noddit.org\n(vault-flows SPA)\nHTTPS :443"]
-    PromKing["prom-king.xyz\n(tube)\nHTTPS :443"]
-    FullXXX["fullxxx.video\n(tube)\nHTTPS :443"]
-    LinksPK["links.prom-king.xyz\n(link-sharing)\nHTTPS :443"]
+    PromKing["prom-king.xyz\n(content-site)\nHTTPS :443"]
+    FullXXX["fullxxx.video\n(shared-tube)\nHTTPS :443"]
+    OnePorn["1pornhub.vip\n(shared-tube)\nHTTPS :443"]
+    SexyPrn["sexyprn.lol\n(shared-tube)\nHTTPS :443"]
     LinksFXV["links.fullxxx.video\n(link-sharing)\nHTTPS :443"]
+    LinksOnePorn["links.1pornhub.vip\n(link-sharing)\nHTTPS :443"]
+    LinksSexyPrn["links.sexyprn.lol\n(link-sharing)\nHTTPS :443"]
+    TechOracle["theitguyde.com\n(Tech Oracle)\nHTTPS :443"]
   end
 
   %% Tailnet-only entrypoints
@@ -61,10 +65,14 @@ flowchart TB
   Users -->|HTTPS| VaultWaresCA --> V1
   Users -->|HTTPS| Flows --> V1
   Users -->|HTTPS| Noddit --> V1
-  Users -->|HTTPS| PromKing --> V1
+  Users -->|HTTPS| PromKing --> V2
   Users -->|HTTPS| FullXXX --> V1
-  Users -->|HTTPS| LinksPK --> V1
+  Users -->|HTTPS| OnePorn --> V2
+  Users -->|HTTPS| SexyPrn --> V2
   Users -->|HTTPS| LinksFXV --> V1
+  Users -->|HTTPS| LinksOnePorn --> V2
+  Users -->|HTTPS| LinksSexyPrn --> V2
+  Users -->|HTTPS| TechOracle --> V1
 
   %% Tailnet routing
   Docs --> V1
@@ -115,10 +123,14 @@ flowchart TB
 | VaultWares website | `https://vaultwares.ca` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 | vault-flows SPA | `https://flows.vaultwares.ca` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 | Noddit | `https://noddit.org` | `greencloud-vps` (proxy to PC) | `443` | Let’s Encrypt (nginx) |
-| Prom King | `https://prom-king.xyz` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| FullXXX | `https://fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| Link sharing (PK) | `https://links.prom-king.xyz` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| Link sharing (FXV) | `https://links.fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| Prom-King content site | `https://prom-king.xyz` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
+| FullXXX tube site | `https://fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| 1PornHub tube site | `https://1pornhub.vip` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
+| SexyPRN tube site | `https://sexyprn.lol` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
+| FullXXX link sharing | `https://links.fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| 1PornHub link sharing | `https://links.1pornhub.vip` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
+| SexyPRN link sharing | `https://links.sexyprn.lol` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
+| Tech Oracle | `https://theitguyde.com` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 
 ### Private (Tailnet-only)
 
@@ -129,7 +141,7 @@ flowchart TB
 | V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; `/monitor/*` proxies to `vps-ovhcloud:9001` |
 | Stats dashboard | `https://stats.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; static agent-ledger SPA with `/monitor/*` and `/api/telemetry/*` proxied to `vps-ovhcloud:9001` |
 | API (gateway/domain) | `https://api.vaultwares.ca` | `vps-ovhcloud` | `443` | Tailnet ACL + app/gateway auth; nginx owns `443`; keep Tailscale Serve disabled on this port |
-| MCP server | `https://mcp.vaultwares.ca/mcp` | `greencloud-vps` edge -> `vps-ovhcloud` | `443` | Tailnet ACL |
+| MCP server | `http://100.67.25.118:9020/mcp` | `vps-ovhcloud` | `9020` | Tailnet ACL; SSE traffic for AI assistants |
 | VaultWares API (direct) | `http://100.67.25.118:9001` | `vps-ovhcloud` | `9001` | App auth (JWT/API key), Tailnet ACL |
 | VaultWarden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |
 | GitHub webhooks (receiver) | `https://hooks.vaultwares.ca/github` | `greencloud-vps` | `443` | Webhook signature verification (nginx → `vw-webhookd` on `127.0.0.1:9033`) |

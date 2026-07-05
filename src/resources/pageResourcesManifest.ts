@@ -496,6 +496,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "operations__deploy-alerts"
   },
   {
+    "routePath": "/operations/deploy-status-api",
+    "routeKey": "operations/deploy-status-api",
+    "sectionKey": "operations",
+    "resourceKey": "operations__deploy-status-api"
+  },
+  {
     "routePath": "/operations/deployment-flow",
     "routeKey": "operations/deployment-flow",
     "sectionKey": "operations",

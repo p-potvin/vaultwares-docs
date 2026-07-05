@@ -1,9 +1,9 @@
 ---
-title: "ADR-001: Retire WordPress for tube sites; rebuild as Astro + vaultwares-api"
-description: "Retire the WordPress install behind fullxxx.video + prom-king.xyz. Replace with an Astro monorepo (shared-tube engine + per-site apps) talking to a Prom-King router inside vaultwares-api. Hard cutover with a fresh catalog refetch. Adding a new site in the mix, the shared-tube should be a semi-replica of the layout of this site: https://www.fullvideos.xxx/sites/ (NOT the same domain as FXV)". Ignore everything in this plan about a DNS swap, the new sites will directly replace the old ones, down time is not to be considered.
+title: "ADR-001: Retire legacy tube sites; rebuild as Astro + vaultwares-api"
+description: "Retire the legacy CMS install behind fullxxx.video + prom-king.xyz. Replace with an Astro monorepo (shared-tube engine + per-site apps) talking to a Prom-King router inside vaultwares-api. Hard cutover with a fresh catalog refetch. Adding a new site in the mix, the shared-tube should be a semi-replica of the layout of this site: https://www.fullvideos.xxx/sites/ (NOT the same domain as FXV)". Ignore everything in this plan about a DNS swap, the new sites will directly replace the old ones, down time is not to be considered.
 ---
 
-# ADR-001: Retire WordPress for tube sites; rebuild as Astro + vaultwares-api
+# ADR-001: Retire legacy tube sites; rebuild as Astro + vaultwares-api
 
 | Field             | Value                                                   |
 | ----------------- | ------------------------------------------------------- |
@@ -15,7 +15,7 @@ description: "Retire the WordPress install behind fullxxx.video + prom-king.xyz.
 
 ## Context
 
-`fullxxx.video` and `prom-king.xyz` are both WordPress installs driven by two custom plugins (`fullxxx-video`, `promking-tube`) and a `tube-shared` helper plugin. The catalog is small (≈ 270 active videos, 132 studios, 245 actors), the UX is read-heavy with a few islands of interactivity (player modal, search, consent banner, age gate, admin), and **none of WordPress's headline features are in use**: no built-in theme, no posts/pages editor for content, no comments, no media library, no plugin ecosystem, no Gutenberg, no XML-RPC, no users.
+`fullxxx.video` and `prom-king.xyz` were both legacy CMS installs driven by two custom plugins (`fullxxx-video`, `promking-tube`) and a `tube-shared` helper plugin. The catalog is small (≈ 270 active videos, 132 studios, 245 actors), the UX is read-heavy with a few islands of interactivity (player modal, search, consent banner, age gate, admin), and none of the legacy CMS headline features are in use: no built-in theme, no posts/pages editor for content, no comments, no media library, no plugin ecosystem, no Gutenberg, no XML-RPC, no users.
 
 What the WP install actually buys us today:
 
@@ -40,7 +40,7 @@ The owner has flagged two specific pain drivers: **dev velocity** and **operator
 
 ## Decision
 
-We **retire the WordPress installs at `fullxxx.video` and `prom-king.xyz`** and replace them with a four-piece architecture:
+We retire the legacy CMS installs at `fullxxx.video` and `prom-king.xyz` and replace them with a four-piece architecture:
 
 1. **`Prom-King/shared-tube`** — new repo, pnpm monorepo.
 2. **`shared/`** — npm package: design tokens, Astro components (header, footer, card, player, consent banner, age gate, ad-slot wrapper), fetcher engine (per-source XPath configs + normalize), Drizzle schema, shared TypeScript types.
@@ -55,7 +55,7 @@ Postgres replaces MySQL. Drizzle replaces the WP query surface. React replaces t
 
 ## Options Considered
 
-### Option A — Keep WordPress, fix what's broken in place (do nothing)
+### Option A — Keep the legacy CMS, fix what's broken in place (do nothing)
 
 | Dimension          | Assessment                                                   |
 | ------------------ | ------------------------------------------------------------ |
@@ -144,7 +144,7 @@ The third trade-off is **Astro hybrid SSR vs. SSG**. Pure SSG buys the cheapest 
 ### What we'll need to revisit
 
 - **Auth turn-on date.** Schema lands in v1 (users table + favourites + roles). UI lands when the owner says go.
-- **The PKT WordPress install** at `prom-king.xyz`. Same plan, same monorepo, parallel cutover. v1 ships both apps; the PKT-specific work (4 upstream sources, the wipe-and-rebackfill admin button) carries over via the same `shared/fetcher` engine with different configs.
+- **The PKT legacy CMS install** at `prom-king.xyz`. Same plan, same monorepo, parallel cutover. v1 ships both apps; the PKT-specific work (4 upstream sources, the wipe-and-rebackfill admin button) carries over via the same `shared/fetcher` engine with different configs.
 - **Health Ledger integration** for deploy alerts replaces the old GitHub-issue + `@copilot` pipeline (now disabled per `operations/deploy-alerts.mdx`).
 
 ## Architecture
@@ -254,7 +254,7 @@ Per-site rows are namespaced by `videos.site` (enum: `fxv`, `pkt`). Same table, 
 - `vaultwares-api` runs on `100.67.25.118:9001`; the new `/api/promking/*` routes deploy with the existing API deploy flow.
 - Postgres lives behind `vaultwares-api`; the current production target is
   `vps-ovhcloud` alongside the API service.
-- WordPress installs at `/var/www/fullxxx.video` and `/var/www/prom-king.xyz` are tarballed to `/var/backups/wp-archive-<date>.tar.gz` and removed right away.
+- Legacy CMS installs at `/var/www/fullxxx.video` and `/var/www/prom-king.xyz` are tarballed to `/var/backups/wp-archive-<date>.tar.gz` and removed right away.
 
 ### Cutover plan
 
