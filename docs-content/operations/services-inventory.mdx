@@ -32,7 +32,7 @@ Related:
 | Agent Ledger UI | `https://monitor.vaultwares.ca/ledger` (`ledger.vaultwares.ca` redirect target) | Monitor route backed by agent-ledger data | `agent-ledger` | Tailnet-only |
 | Health Ledger UI | `https://monitor.vaultwares.ca/health-ledger` | Monitor route backed by Health Ledger rollups | `health-ledger` | Tailnet-only |
 | Input tracking | `https://monitor.vaultwares.ca/input-tracking` | Monitor route backed by input-tracking data | `agent-ledger` | Tailnet-only |
-| API | `https://api.vaultwares.ca` / `http://100.67.25.118:9001` | DNS resolves to `vps-ovhcloud`; nginx owns `100.67.25.118:443` and proxies to FastAPI on `127.0.0.1:9001`; direct `:9001` remains the internal health/debug path. Tailscale Serve must stay disabled on OVH HTTPS `443`. | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; app auth/gateway secret required |
+| API | `https://api.vaultwares.ca` | DNS resolves to `vps-ovhcloud`; nginx owns `100.67.25.118:443` and proxies to FastAPI on `127.0.0.1:9001`. FastAPI is loopback-only; direct tailnet access to `100.67.25.118:9001` is intentionally disabled so apps route through nginx. Tailscale Serve must stay disabled on OVH HTTPS `443`. | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; app auth/gateway secret required |
 | MCP server | `http://100.67.25.118:9020/mcp` | `vaultwares-mcp` SSE server on `vps-ovhcloud` port `9020`, tailnet-only for AI assistants | `vaultwares-mcp` | Tailnet-only |
 | vault-flows + noddit.org | `https://flows.vaultwares.ca`, `https://noddit.org` | One `/var/www/vault-flows/dist` service on `greencloud-vps`; `noddit.org` is the paired domain for the same service | `vault-flows` | Public |
 | GitHub webhooks | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (ops service) | Public (required by GitHub) |
@@ -143,7 +143,7 @@ The gateway configures itself via `.env.mullvad` using Gluetun's native Mullvad 
 | `lidarr` | `https://lidarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8686` -> Docker loopback `127.0.0.1:8686` | Music manager. |
 | `prowlarr` | `https://prowlarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:9696` -> Docker loopback `127.0.0.1:9696` | Indexer manager. |
 | `whisparr` | `https://whisparr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:6969` -> Docker loopback `127.0.0.1:6969` | Media manager. |
-| `sabnzbd` | `https://sabnzdb.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8082` -> Docker loopback `127.0.0.1:8082` | Usenet downloader. |
+| `sabnzbd` | `https://sabnzbd.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8082` -> Docker loopback `127.0.0.1:8082`; completed-download WebDAV at `https://sabnzbd.vaultwares.ca/dav/` -> OVH nginx `/dav/` -> Docker loopback `127.0.0.1:8083` -> `/mnt/data/usenet/complete` | Usenet downloader and WebDAV read surface for completed jobs. See `operations/media-stack-webdav`. |
 
 ## Residential egress proxy on `brume2`
 

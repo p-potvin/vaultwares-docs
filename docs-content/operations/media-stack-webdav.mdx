@@ -1,0 +1,256 @@
+---
+title: "Media stack WebDAV"
+description: "How SABnzbd completed downloads are exposed through the tailnet WebDAV mount."
+---
+
+# Media stack WebDAV
+
+Last updated: Fri, 10 Jul 2026 06:02 America/Toronto.
+
+This runbook documents the WebDAV path used to inspect SABnzbd completed downloads on the OVH media stack.
+
+## Access URL
+
+Use this URL from a tailnet-connected machine:
+
+```text
+https://sabnzbd.vaultwares.ca/dav/
+```
+
+That URL is the WebDAV root for SAB completed downloads. It is a subpath of the SAB hostname, not a separate hostname.
+
+Current behavior:
+
+- Browser `GET` returns an HTML directory index.
+- WebDAV `PROPFIND` returns a `207 Multi-Status` directory listing.
+- Anonymous read methods are enabled for `GET`, `OPTIONS`, and `PROPFIND`.
+- Writes should happen through SABnzbd, not manually through WebDAV.
+
+## Path map
+
+| Layer | Path or listener | Purpose |
+|---|---|---|
+| Client URL | `https://sabnzbd.vaultwares.ca/dav/` | Tailnet-facing WebDAV URL. |
+| Greencloud DNS | `sabnzbd.vaultwares.ca -> 100.73.93.84` | Split-DNS sends tailnet clients to Greencloud. |
+| Greencloud nginx | `sabnzbd.vaultwares.ca` on HTTPS `443` | Proxies the request to OVH over Tailscale. |
+| OVH nginx | `100.67.25.118:80`, `location /dav/` | Proxies `/dav/` to the local WebDAV container. |
+| WebDAV container | `127.0.0.1:8083 -> container :80` | Apache WebDAV endpoint. |
+| WebDAV container mount | `/var/lib/dav/data` | Container path exposed by WebDAV. |
+| OVH host mount | `/mnt/data/usenet/complete` | Host directory mounted into WebDAV. |
+| SAB complete path | `/data/downloads/usenet/complete` | SAB container path for completed jobs. |
+| SAB incomplete path | `/data/downloads/usenet/incomplete` | SAB container path for active partial jobs. |
+
+The important mapping is:
+
+```text
+SAB complete path
+  /data/downloads/usenet/complete
+
+OVH host path
+  /mnt/data/usenet/complete
+
+WebDAV container path
+  /var/lib/dav/data
+
+Tailnet URL
+  https://sabnzbd.vaultwares.ca/dav/
+```
+
+## Docker ownership
+
+The WebDAV service is defined in:
+
+```text
+/opt/vw-media-stack/docker-compose.yml
+```
+
+The active service block mounts:
+
+```yaml
+webdav:
+  image: bytemark/webdav:latest
+  container_name: webdav
+  restart: unless-stopped
+  ports:
+    - "127.0.0.1:8083:80/tcp"
+  environment:
+    ANONYMOUS_METHODS: "GET,OPTIONS,PROPFIND"
+  volumes:
+    - /mnt/data/usenet/complete:/var/lib/dav/data
+```
+
+Do not expose `8083` publicly. It should stay bound to `127.0.0.1` on OVH and only be reached through nginx.
+
+## SABnzbd configuration
+
+SABnzbd config lives at:
+
+```text
+/srv/vw-media/config/sabnzbd/sabnzbd.ini
+```
+
+Current relevant paths:
+
+```ini
+download_dir = /data/downloads/usenet/incomplete
+complete_dir = /data/downloads/usenet/complete
+```
+
+The SAB container has `/mnt/data` mounted at `/data/downloads`, so completed SAB jobs are written to:
+
+```text
+/mnt/data/usenet/complete
+```
+
+That is the same directory WebDAV exposes.
+
+## Why the folder can look empty
+
+Check these cases first:
+
+- You are opening the old SAB path. Old files remain under `/srv/vw-media/config/sabnzbd/Downloads` unless manually moved.
+- You are using the SAB UI URL without `/dav/`. The SAB UI root is not the WebDAV root.
+- Your machine is not using Tailscale split-DNS. The hostname must resolve to `100.73.93.84` from tailnet clients.
+- You are checking before SAB has completed a job. Incomplete jobs live under `/mnt/data/usenet/incomplete` and are not exposed through WebDAV.
+- Your WebDAV client does not issue `PROPFIND` correctly. Test with `curl` before assuming the mount is empty.
+
+## Verification commands
+
+Run these from a tailnet-connected workstation:
+
+```powershell
+Resolve-DnsName sabnzbd.vaultwares.ca
+curl.exe -k -i https://sabnzbd.vaultwares.ca/dav/
+curl.exe -k -i -X PROPFIND -H "Depth: 1" https://sabnzbd.vaultwares.ca/dav/
+```
+
+Expected results:
+
+- DNS answer includes `100.73.93.84`.
+- Browser-style `GET` returns `200 OK`.
+- WebDAV `PROPFIND` returns `207 Multi-Status`.
+
+Run these on OVH:
+
+```bash
+docker ps --format '{{.Names}} {{.Ports}}' | grep -E 'sabnzbd|webdav'
+grep -E '^(download_dir|complete_dir) =' /srv/vw-media/config/sabnzbd/sabnzbd.ini
+find /mnt/data/usenet/complete -maxdepth 2 -mindepth 1 -printf '%TY-%Tm-%Td %TH:%TM %p\n' | sort | tail -40
+curl -i -X PROPFIND -H 'Depth: 1' -H 'Host: sabnzbd.vaultwares.ca' http://100.67.25.118/dav/
+```
+
+Expected OVH results:
+
+- `webdav` is bound to `127.0.0.1:8083`.
+- `sabnzbd` is bound to `127.0.0.1:8082`.
+- SAB paths point to `/data/downloads/usenet/...`.
+- The nginx `PROPFIND` returns `207 Multi-Status`.
+
+## Safe test write
+
+Only use this for a short verification. Remove the marker immediately afterward.
+
+```bash
+docker exec sabnzbd sh -lc 'printf sab-webdav-ok > /data/downloads/usenet/complete/.sab-webdav-write-test'
+docker exec webdav sh -lc 'cat /var/lib/dav/data/.sab-webdav-write-test'
+rm -f /mnt/data/usenet/complete/.sab-webdav-write-test
+```
+
+Expected output:
+
+```text
+sab-webdav-ok
+```
+
+## Old files
+
+The old SAB completed and partial files were not moved when SAB was repointed to WebDAV-backed storage.
+
+Old path:
+
+```text
+/srv/vw-media/config/sabnzbd/Downloads
+```
+
+Current path:
+
+```text
+/mnt/data/usenet/complete
+```
+
+Move old files manually only after confirming available space on `/mnt/data`.
+
+## Future offload
+
+Future SAB completed downloads are moved off OVH by a dedicated rclone mover:
+
+```text
+vw-sab-rclone-mover.timer
+vw-sab-rclone-mover.service
+/usr/local/bin/vw-sab-rclone-mover.sh
+/etc/vw-sab-rclone-mover.env
+```
+
+The timer runs every 15 minutes. Each run processes at most two stable items from:
+
+```text
+/mnt/data/usenet/complete
+```
+
+The mover waits until an item has no files modified in the last 30 minutes, then alternates between:
+
+```text
+gdrive:VaultWares/media/usenet
+proton_pc:Clopeux-Desktop E drive/OVHMediaStack/usenet
+```
+
+It records an install cutoff in:
+
+```text
+/srv/vw-media/uploads/sab-rclone/cutoff.epoch
+```
+
+Anything already present before that cutoff is skipped by default. This prevents the future-download automation from moving the manually-managed old backlog.
+
+Successful moves are logged in:
+
+```text
+/srv/vw-media/uploads/sab-rclone/moved.tsv
+/var/log/vw-sab-rclone-mover.log
+```
+
+Check status:
+
+```bash
+systemctl status vw-sab-rclone-mover.timer
+systemctl status vw-sab-rclone-mover.service
+journalctl -u vw-sab-rclone-mover.service -n 80 --no-pager
+tail -80 /var/log/vw-sab-rclone-mover.log
+```
+
+Stop future offloads:
+
+```bash
+systemctl disable --now vw-sab-rclone-mover.timer
+```
+
+Run one bounded pass manually:
+
+```bash
+systemctl start vw-sab-rclone-mover.service
+```
+
+Rollback files from the initial install were stored under:
+
+```text
+/root/vw-cleanup-backups/Fri_10_Jul_2026_1255-sab-rclone-mover
+/root/vw-cleanup-backups/Fri_10_Jul_2026_1259-sab-rclone-file-fix
+```
+
+## Operational rules
+
+- Keep WebDAV read-only from the operator workflow; SAB should be the writer.
+- Keep credentials and API keys out of this page and out of ledger entries.
+- Keep the service tailnet-first. Do not open a public WebDAV listener.
+- If SAB paths change again, verify both the SAB container path and the WebDAV container path before declaring the route fixed.
+- Keep the rclone mover future-only unless the existing backlog is intentionally adopted by changing the cutoff.

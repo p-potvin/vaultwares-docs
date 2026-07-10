@@ -526,10 +526,22 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "operations__mcp-ledger-tools"
   },
   {
+    "routePath": "/operations/media-stack-webdav",
+    "routeKey": "operations/media-stack-webdav",
+    "sectionKey": "operations",
+    "resourceKey": "operations__media-stack-webdav"
+  },
+  {
     "routePath": "/operations/network-map",
     "routeKey": "operations/network-map",
     "sectionKey": "operations",
     "resourceKey": "operations__network-map"
+  },
+  {
+    "routePath": "/operations/network-routing-cors-postmortem",
+    "routeKey": "operations/network-routing-cors-postmortem",
+    "sectionKey": "operations",
+    "resourceKey": "operations__network-routing-cors-postmortem"
   },
   {
     "routePath": "/operations/project-bootstrap",

@@ -1,0 +1,94 @@
+---
+title: "Network routing and CORS postmortem"
+description: "Root causes and guardrails for nginx SNI routing, tailnet DNS, and CORS failures."
+---
+
+# Network routing and CORS postmortem
+
+Last updated: Fri, 10 Jul 2026 11:23 America/Toronto.
+
+This document outlines the root causes, diagnostic steps, and resolutions for a series of complex routing, SSL, and cross-origin (CORS) issues across the VaultWares infrastructure (Greencloud and OVH).
+
+## 1. The Symptoms
+- **Global Redirects / Misrouting**: Users navigating to various VaultWares subdomains over the Tailscale network (e.g., `monitor.vaultwares.ca`) were unexpectedly served the content of `docs.vaultwares.ca`.
+- **Phantom 404s**: After attempting an initial fix, valid endpoints (with existing files and correct permissions) started returning NGINX `404 Not Found` pages.
+- **CORS Blockage**: Single Page Applications (like `vault-monitor`) were blocked from accessing the API (`api.vaultwares.ca`) due to missing `Access-Control-Allow-Origin` headers on preflight `OPTIONS` requests.
+
+---
+
+## 2. Root Cause Analysis
+
+### A. NGINX IP Binding Precedence (The Misrouting Issue)
+The core issue stemmed from how NGINX prioritizes `listen` directives.
+
+In the initial configuration, a few specific server blocks (such as `docs`, `hooks`, and `warden`) were configured to explicitly listen on the Tailscale IP of the host:
+```nginx
+listen 100.73.93.84:443 ssl;
+```
+Meanwhile, other sites (like `monitor`) were configured to listen globally:
+```nginx
+listen 443 ssl; # Implicitly means 0.0.0.0:443
+```
+
+**How NGINX handles this:**
+When a request arrives on the `100.73.93.84` interface, NGINX **only** evaluates `server` blocks that explicitly bind to that exact IP. It completely ignores any blocks bound to `0.0.0.0`, regardless of the requested SNI (Server Name Indication).
+
+Because `docs.vaultwares.ca` was explicitly bound to the IP, any request to `monitor.vaultwares.ca` over Tailscale completely bypassed the `monitor` configuration and was handled by `docs` (or later, `hooks`, which returned a hardcoded 404).
+
+### B. Global CORS & Preflight Limitations (The API Blockage)
+SPAs making cross-origin requests require the server to respond to `OPTIONS` preflight requests.
+- FastApi/Uvicorn on OVH wasn't configured to handle CORS natively for all endpoints, resulting in a `405 Method Not Allowed` for `OPTIONS`.
+- NGINX is notoriously tricky with headers: if a `location` block contains even a single `add_header` directive, it wipes out all `add_header` directives inherited from the parent `server` block.
+
+---
+
+## 3. The Resolution
+
+### Step 1: Enforcing Pure SNI Routing
+We ran a global regex substitution across all NGINX configuration files in `/etc/nginx/sites-enabled/*` on **both** Greencloud and OVH servers.
+- **Action**: Stripped all instances of `listen 100.X.X.X:80;` and `listen 100.X.X.X:443 ssl;`.
+- **Result**: All server blocks now use `listen 80;` and `listen 443 ssl;`. NGINX is now forced to use the `server_name` (SNI) to route traffic, eliminating "IP capture" conflicts.
+
+### Step 2: Global CORS Implementation
+Instead of configuring CORS application-by-application, we implemented a global NGINX snippet to intercept and handle CORS at the edge.
+
+We created `/etc/nginx/snippets/cors.conf`:
+```nginx
+add_header "Access-Control-Allow-Origin" "*" always;
+add_header "Access-Control-Allow-Methods" "GET, POST, OPTIONS, PUT, DELETE, PATCH" always;
+add_header "Access-Control-Allow-Headers" "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,X-Api-Key,Accept,Origin" always;
+add_header "Access-Control-Expose-Headers" "Content-Length,Content-Range" always;
+add_header "Access-Control-Max-Age" 1728000 always;
+
+if ($request_method = "OPTIONS") {
+    return 204;
+}
+```
+**Why this design?**
+- NGINX does not allow `add_header` inside an `if` block at the server level.
+- By placing `add_header ... always;` outside the `if`, NGINX applies those headers to the `204 No Content` response triggered by the `if` block.
+- This immediately satisfies browser preflight checks without ever bothering the backend API.
+
+We then injected `include /etc/nginx/snippets/cors.conf;` into every SSL-enabled server block across the Tailnet.
+
+---
+
+## 4. Future Best Practices & Guardrails
+
+To prevent these issues from resurfacing, adhere to the following rules:
+
+> [!WARNING]
+> **Never use IP-Specific `listen` Directives in Shared Environments**
+> Do not use `listen 100.x.x.x:443 ssl;`. Always use `listen 443 ssl;`. If you need to restrict a site to Tailscale-only traffic, use the `allow` and `deny` directives instead:
+> ```nginx
+> allow 100.64.0.0/10; # Tailscale subnet
+> deny all;
+> ```
+
+> [!CAUTION]
+> **Beware of `add_header` Inheritance**
+> If you add a custom header (e.g., `add_header Cache-Control "public";`) inside a specific `location` block, that location will **lose** the global CORS headers from the `cors.conf` snippet. If a location requires custom headers AND CORS, you must manually re-include `cors.conf` inside that specific `location` block.
+
+> [!TIP]
+> **Centralize Common NGINX Logic**
+> Moving forward, use `/etc/nginx/snippets/` for cross-cutting logic like SSL configurations, proxy timeouts, and CORS. This ensures consistency and makes global updates trivial via basic `sed` or Python scripting.
