@@ -1,4 +1,5 @@
 # VaultWares — pre-instructions (repo stub)
+
 First thing to do: is your present working directory inside prom-king/ ? Does the user's prompt contain the words prom king? Then stop reading this file and go to `C:\Users\Administrator\Desktop\Prom-King\docs\AGENTS.md` because you are working inside the Prom-King environment, which is not exactly VaultWares.
 This file is intentionally short. It routes work to the company protocol TOC. Always assume relative paths are preceded by `C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\`.
 Always start at: `instructions\ROUTER.md`
@@ -9,9 +10,11 @@ Asking questions is encouraged at VaultWares, it is a really good initiative whe
 Request safety is mandatory: never run loops or batches of external or internal TCP/UDP/API requests without pausing and asking first.
 
 ## GATING POLICY: DESTRUCTIVE CLI COMMANDS (vw)
+
 AI assistants are STRICTLY PROHIBITED from running destructive CLI commands. The `vw` command-line utility will refuse execution if `$env:ANTIGRAVITY_AGENT`, `$env:AGENT_NAME`, or `$env:DEVIN` is set.
 Do NOT attempt to bypass this by clearing or changing environment variables.
 The list of destructive commands includes:
+
 - `archive-ledger` (archives historical ledger entries)
 - `drill-kill-pg` (forcefully terminates active Postgres connections)
 - `unzip-dedupe` (unpacks and removes matching hash duplicates)
@@ -21,13 +24,14 @@ If the user asks you to execute a destructive task or command, you MUST politely
 
 Execute other tools/routines only when relevant. Ledger is always the last step before replying.
 If the task involves CI/deployments, mandatory reading inside:
+
 - `docs-content/operations/deployment-flow.mdx`
 - `docs-content/operations/services-inventory.mdx`
 - `docs-content/operations/webhook-secret-rotation.mdx`
 - `docs-content/operations/deploy-alerts.mdx` (notify + deny-watch pipeline, GH_TOKEN rotation)
 Read full notes only when explicitly prompted: `read full notes`
 Always prefer `uv` when inside a python environment. Install if not present. Fallback to .venv if really needed.
-Mandatory ledger (last step before replying): use `C:\Users\Administrator\Desktop\Github Repos\agent-ledger\scripts\record-agent-change.ps1`
+Mandatory ledger (last step before replying): use `C:\Users\Administrator\Desktop\Github Repos\agent-ledger\scripts\record-agent-change.ps1 -Summary "Brief description of changes"`
 Versioning protocol: Every push to main MUST increment the project version. When rendering HTML output, the version MUST be printed as an HTML comment (e.g., <!-- v1.2.3 -->), never logged to the browser console.
 Always add a timestamp `DDD, dd MMM YYYY HH:mm` in your messages to me, commits, when modifying important documentation, when creating pwsh.exe scripts. NO unix epochs anywhere. Do not timestamp inside code files.
 Do not log secrets. If the ledger cannot be accessed, tell the user in your reply. Use `C:\Users\Administrator\Desktop\Github Repos\CHANGES.md`, `agent-ledger\CHANGES.md`, and repo's roadmap/todo .md files to maintain continuity.
