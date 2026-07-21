@@ -1,0 +1,267 @@
+﻿---
+title: "Host inventory (Private)"
+description: "Per-machine detailed breakdown of every host on the tailnet: listening ports, systemd services, Docker containers, timers, and local apps."
+---
+
+# Host inventory (Private)
+
+Last updated: Tue, 21 Jul 2026 11:50 America/Toronto.
+
+This page is the **per-machine companion** to `operations/services-inventory` and `operations/network-map`. It lists every listening port, systemd unit, Docker container, timer, and local application discovered during the live audit of Jul 2026.
+
+Related:
+- `operations/network-map` (topology diagram and service routing)
+- `operations/services-inventory` (service-level table with URLs and repos)
+- `operations/tailscale` (ACLs, split DNS, tailnet nodes)
+
+---
+
+## `vps-ovhcloud` (OVH VPS)
+
+| Property | Value |
+|---|---|
+| **OS** | Ubuntu |
+| **Tailnet IP** | `100.67.25.118` |
+| **Public IP** | `51.79.55.113` |
+| **SSH** | `ubuntu@100.67.25.118` (key: `tube-site-vps`) |
+| **Role** | VaultWares API, MCP, shared-tube (oneporn/sexyprn), Comet, media stack, Decypharr, Uptime Kuma |
+
+### Listening ports
+
+| Port | Bind | Process | Service |
+|---|---|---|---|
+| `22` | `0.0.0.0` / `[::]` | `sshd` | SSH (tailnet-only via ACL) |
+| `53` | `127.0.0.1` / `100.67.25.118` / `[::1]` | `dnsmasq` | Local DNS forwarding |
+| `80` | `51.79.55.113` / `100.67.25.118` | `nginx` | HTTP (redirect to HTTPS) |
+| `443` | `51.79.55.113` / `100.67.25.118` | `nginx` | HTTPS public + tailnet vhosts |
+| `3001` | `0.0.0.0` | Docker (`uptime-kuma`) | Uptime Kuma |
+| `5173` | `100.67.25.118` | Docker (`comet-vpn`) | Comet debrid manager (via ProtonVPN) |
+| `6969` | `127.0.0.1` / `100.67.25.118` | Docker (`whisparr`) / nginx | Whisparr |
+| `7878` | `127.0.0.1` / `100.67.25.118` | Docker (`radarr`) / nginx | Radarr |
+| `8081` | `127.0.0.1` / `100.67.25.118` | Docker (`mullvad-gateway`) / nginx | qBittorrent (via Mullvad) |
+| `8082` | `127.0.0.1` | Docker (`sabnzbd`) | SABnzbd |
+| `8083` | `127.0.0.1` | Docker (`webdav`) | WebDAV for SABnzbd |
+| `8191` | `100.67.25.118` | Docker (`flaresolverr`) | FlareSolverr |
+| `8282` | `127.0.0.1` | Docker (`decypharr`) | Decypharr (debrid blackhole) |
+| `8686` | `127.0.0.1` / `100.67.25.118` | Docker (`lidarr`) / nginx | Lidarr |
+| `8791` | `100.67.25.118` | `node` | Health Ledger heartbeat (OVH) |
+| `8989` | `127.0.0.1` / `100.67.25.118` | Docker (`sonarr`) / nginx | Sonarr |
+| `9001` | `127.0.0.1` | `python` (FastAPI) | VaultWares API (loopback only) |
+| `9020` | `100.67.25.118` | `python` | MCP HTTP server |
+| `9021` | `100.67.25.118` | `python` | MCP SSE server |
+| `9117` | `100.67.25.118` | Docker (`mullvad-gateway`) / nginx | Jackett (via Mullvad) |
+| `9696` | `127.0.0.1` / `100.67.25.118` | Docker (`prowlarr`) / nginx | Prowlarr |
+| `9698` | `100.67.25.118` | Docker (`gluetun-comet-idx`) | Comet indexer ProtonVPN gateway |
+| `9119` | `100.67.25.118` | Docker (`gluetun-comet-idx`) | Comet indexer Jackett (via VPN) |
+| `1085` | `0.0.0.0` | Docker (`qa_wireproxy`) | WireProxy for QA automation |
+| `8889` | `0.0.0.0` | Docker (`gluetun-proton`) | ProtonVPN gateway (control) |
+| `8890` | `0.0.0.0` | Docker (`gluetun-proton`) | ProtonVPN gateway (HTTP) |
+| `8003` | `100.67.25.118` | Docker (`pyload-ng`) | pyLoad web UI |
+
+### systemd services (active, custom)
+
+| Unit | Description |
+|---|---|
+| `vaultwares-api.service` | VaultWares API Service (VPS instance) |
+| `vaultwares-mcp.service` | VaultWares MCP HTTP Service |
+| `vaultwares-mcp-sse.service` | VaultWares MCP SSE Service |
+| `oneporn.service` | 1pornhub.vip (shared-tube oneporn app) |
+| `sexyprn.service` | sexyprn.lol (shared-tube sexyprn app) |
+| `health-ledger-probe.service` | Health Ledger Probe Joker (OVHCloud) |
+| `health-ledger-heartbeat.service` | Health Ledger Host Heartbeat (OVHCloud) |
+| `upload-torrent-daemon.service` | VaultWares Torrent Upload Daemon |
+| `mullvad-netns-restart-deps.service` | Restart qbittorrent/jackett after mullvad-gateway restarts |
+
+### systemd timers (active, custom)
+
+| Timer | Interval | Description |
+|---|---|---|
+| `vw-tube-uploader.timer` | ~15 min | rclone move tube content to Google Drive |
+| `vw-drive-upload.timer` | ~15 min | Upload media to Google Drive |
+| `vw-sab-rclone-mover.timer` | ~1 h | rclone move for SABnzbd completed downloads |
+| `vw-linkvertise.timer` | ~50-70 min | Linkvertise downloader run |
+| `vw-backup.timer` | Daily | VPS backup via rclone to Google Drive |
+
+### Docker containers
+
+| Container | Image | Ports | Role |
+|---|---|---|---|
+| `comet` | `g0ldyy/comet` | (internal) | Comet debrid manager |
+| `comet-postgres` | `postgres:18-alpine` | (internal) | Postgres for Comet |
+| `comet-vpn` | `qmcgaw/gluetun:latest` | `100.67.25.118:5173->5170` | ProtonVPN gateway for Comet |
+| `decypharr` | `cy01/blackhole:latest` | `127.0.0.1:8282->8282` | Debrid blackhole |
+| `uptime-kuma` | `louislam/uptime-kuma:2` | `0.0.0.0:3001->3001` | Uptime Kuma |
+| `gluetun-proton` | `qmcgaw/gluetun:latest` | `0.0.0.0:8890->8000`, `8889->8888` | ProtonVPN gateway |
+| `linkvertise-mullvad-rotation` | `qmcgaw/gluetun:latest` | (internal) | Mullvad rotation for Linkvertise |
+| `pyload-ng` | `lscr.io/linuxserver/pyload-ng` | `100.67.25.118:8003->8003` | pyLoad download manager |
+| `qbittorrent` | `ghcr.io/hotio/qbittorrent` | (via mullvad-gateway) | qBittorrent |
+| `jackett` | `lscr.io/linuxserver/jackett` | (via mullvad-gateway) | Jackett indexer |
+| `sabnzbd` | `ghcr.io/hotio/sabnzbd` | `127.0.0.1:8082->8080` | SABnzbd |
+| `radarr` | `ghcr.io/hotio/radarr` | `127.0.0.1:7878->7878` | Radarr |
+| `sonarr` | `ghcr.io/hotio/sonarr` | `127.0.0.1:8989->8989` | Sonarr |
+| `whisparr` | `ghcr.io/hotio/whisparr` | `127.0.0.1:6969->6969` | Whisparr |
+| `lidarr` | `ghcr.io/hotio/lidarr` | `127.0.0.1:8686->8686` | Lidarr |
+| `prowlarr` | `ghcr.io/hotio/prowlarr` | `127.0.0.1:9696->9696` | Prowlarr |
+| `webdav` | `bytemark/webdav` | `127.0.0.1:8083->80` | WebDAV |
+| `mullvad-gateway` | (custom) | `100.67.25.118:9117->9117`, `127.0.0.1:8081->8080` | Mullvad VPN gateway |
+| `flaresolverr` | `ghcr.io/flaresolverr/flaresolverr` | `100.67.25.118:8191->8191` | FlareSolverr |
+| `torbox-sab-bridge` | `python:3.12-alpine` | (internal) | Torbox to SABnzbd bridge |
+| `qa_runner` | `qa-automation-qa-runner` | (internal) | QA automation runner |
+| `qa_wireproxy` | `qa-automation-wireproxy` | `0.0.0.0:1085->1085` | WireProxy for QA |
+| `gluetun-comet-idx` | `qmcgaw/gluetun:latest` | `100.67.25.118:9698->9696`, `9119->9117` | ProtonVPN for Comet indexers |
+
+### nginx sites enabled
+
+`1pornhub.vip.conf`, `api.vaultwares.ca.conf`, `decypharr.vaultwares.ca.conf`, `mcp.vaultwares.ca.conf`, `sabnzbd.vaultwares.ca.conf`, `sexyprn.lol.conf`, `uptime.vaultwares.ca.conf`, `vw-media-tailnet.conf`
+
+### Docker Compose files
+
+`/opt/vw-comet/docker-compose.yml`, `/opt/vw-protonvpn/docker-compose.yml`, `/opt/vw-media-stack/docker-compose.yml` (+ mullvad overrides), `/opt/vw-torbox-sab-bridge/docker-compose.yml`, `/opt/qa-automation/docker-compose.yml`, `/opt/vw-linkvertise/docker/docker-compose.yml`, `/opt/vw-comet-indexers/docker-compose.yml`
+
+---
+
+## `greencloud-vps` (GreenCloud VPS)
+
+| Property | Value |
+|---|---|
+| **OS** | Debian 12 |
+| **Tailnet IP** | `100.73.93.84` |
+| **Public IP** | `173.249.194.15` |
+| **SSH** | `root@100.73.93.84` (key: `greencloud-vps`) |
+| **Role** | Web/docs/monitor host, webhook receiver, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king content-site, link-sharing |
+
+### Listening ports
+
+| Port | Bind | Process | Service |
+|---|---|---|---|
+| `22` | `0.0.0.0` / `[::]` | `sshd` | SSH (tailnet-only via ACL) |
+| `53` | `0.0.0.0` / `[::]` | `dnsmasq` | Split-DNS for tailnet hostnames |
+| `80` | `0.0.0.0` / `[::]` | `nginx` | HTTP (redirect to HTTPS) |
+| `443` | `0.0.0.0` / `[::]` / `100.73.93.84` | `nginx` | HTTPS public + tailnet vhosts |
+| `3001` | `0.0.0.0` | `node` (vwdeploy) | Link-sharing Fastify server |
+| `4321` | `127.0.0.1` | `node` | FullXXX shared-tube app |
+| `4322` | `0.0.0.0` | `node` (vwdeploy) | Prom-King content-site |
+| `5432` | `127.0.0.1` / `[::1]` | `postgres` | Local PostgreSQL |
+| `3306` | `127.0.0.1` | `mariadbd` | Local MariaDB |
+| `5444` | `127.0.0.1` | Docker (`vw-secrets-postgres`) | Postgres 16 for vault-warden |
+| `8787` | `127.0.0.1` | `uvicorn` (`vaultwares-hooks`) | Tailscale webhook handler |
+| `8790` | `127.0.0.1` | `node` | Health Ledger dashboard |
+| `8791` | `100.73.93.84` | `node` | Health Ledger heartbeat (GC) |
+| `8889` | `127.0.0.1` | Docker (`gluetun-proton`) | ProtonVPN gateway (control) |
+| `8890` | `127.0.0.1` | Docker (`gluetun-proton`) | ProtonVPN gateway (HTTP) |
+| `9033` | `127.0.0.1` | `python3` (`vw-webhookd`) | GitHub webhook receiver |
+| `9080` | `100.73.93.84` | `uvicorn` (`tech-oracle-api`) | Tech Oracle FastAPI |
+| `9444` | `127.0.0.1` | `python` (`vw-secretsd`) | VaultWares secrets service |
+| `1085` | `0.0.0.0` | Docker (`qa_wireproxy`) | WireProxy for QA automation |
+
+### systemd services (active, custom)
+
+| Unit | Description |
+|---|---|
+| `vw-webhookd.service` | VaultWares GitHub Webhook Receiver (runs as `vwdeploy`) |
+| `vaultwares-hooks.service` | VaultWares webhook receiver (uvicorn, runs as `vaultwares-hooks`) |
+| `vw-secretsd.service` | VaultWares Secrets (runs as `vwsecrets`) |
+| `health-ledger-probe.service` | Health Ledger Probe Joker |
+| `health-ledger-heartbeat.service` | Health Ledger Host Heartbeat |
+| `health-ledger-dashboard.service` | Health Ledger Dashboard |
+| `health-ledger-alarm.service` | Health Ledger Alarm Joker |
+| `health-ledger-token.service` | Health Ledger Token Joker |
+| `tech-oracle-api.service` | tech-oracle internal FastAPI health/predict service |
+
+### systemd services (disabled)
+
+| Unit | Description |
+|---|---|
+| `vw-deployd.service` | VaultWares Deploy Webhook (disabled) |
+| `vw-deny-watch.timer` | Legacy deny-watch (disabled) |
+| `vw-token-expiry-watch.timer` | Legacy token expiry watch (disabled) |
+
+### Docker containers
+
+| Container | Image | Ports | Role |
+|---|---|---|---|
+| `gluetun-proton` | `qmcgaw/gluetun:latest` | `127.0.0.1:8890->8000`, `8889->8888` | ProtonVPN gateway for QA |
+| `qa_runner` | `qa-automation_qa-runner` | (internal) | QA automation runner |
+| `qa_wireproxy` | `qa-automation_wireproxy` | `0.0.0.0:1085->1085` | WireProxy for QA |
+| `vw-secrets-postgres` | `postgres:16` | `127.0.0.1:5444->5432` | Postgres for vault-warden |
+
+### nginx sites enabled
+
+`api.vaultwares.ca.conf`, `docs.vaultwares.ca.conf`, `flows.vaultwares.ca.conf`, `fullxxx.video.conf`, `hooks.vaultwares.ca.conf`, `ledger.vaultwares.ca`, `link-sharing.conf`, `mcp.vaultwares.ca.conf`, `monitor.vaultwares.ca.conf`, `noddit.org.conf`, `prom-king.xyz.conf`, `secrets.vaultwares.ca.conf`, `stats.vaultwares.ca.conf`, `theitguyde.com.conf`, `vaultwares.ca.conf`, `vw-media-acme.conf`, `vw-media-tailnet.conf`, `warden.vaultwares.ca.conf`
+
+### Node.js applications
+
+| Path | Port | Role |
+|---|---|---|
+| `/opt/health-ledger` | `8790`/`8791` | Health Ledger scripts (dashboard, heartbeat, probe, alarm, token) |
+| `/srv/repos/Prom-King/content-site/server.js` | `4322` | Prom-King content-site |
+| `server/dist/server/index.js` | `3001` | Link-sharing Fastify server |
+
+---
+
+## `Clopeux-Desktop` (local workstation)
+
+| Property | Value |
+|---|---|
+| **OS** | Windows |
+| **Tailnet IP** | `100.71.101.21` |
+| **Public IP** | (home, behind residential WAN) |
+| **Access** | RDP over Tailnet (`3389`); Tailscale Serve on `:9999` |
+| **Role** | Workstation, local services host (Stash, Tor, FlareSolverr, Jackett, pyLoad, python-zipper, health-ledger heartbeat) |
+
+### Listening ports (notable)
+
+| Port | Bind | Process | Service |
+|---|---|---|---|
+| `3389` | `0.0.0.0` / `[::]` | Windows RDP | Remote Desktop Protocol |
+| `80` | `0.0.0.0` / `[::]` | Windows (System) | HTTP (IIS/Windows service) |
+| `445` / `139` | `0.0.0.0` / `100.71.101.21` | Windows (System) | SMB file sharing |
+| `9999` | `0.0.0.0` / `[::]` | `stash-win.exe` | Stash media manager (Tailscale Serve proxy) |
+| `5171` | `0.0.0.0` | `python.exe` (python-zipper) | Dataset builder web server |
+| `8003` | `[::1]` | `python.exe` | Local pyLoad |
+| `8191` | `0.0.0.0` | `flaresolverr.exe` | Local FlareSolverr |
+| `9117` | `0.0.0.0` / `[::]` | `JackettConsole.exe` | Local Jackett |
+| `8791` | `100.71.101.21` | `node.exe` | Health Ledger heartbeat (Clopeux) |
+| `14148` | `0.0.0.0` / `[::]` | `filezilla-server.exe` | FileZilla Server |
+| `20000` | `127.0.0.1` | `tor.exe` | Tor SOCKS proxy (python-zipper rotator) |
+| `9051` | `127.0.0.1` | `tor.exe` | Tor control port |
+| `443` | `100.71.101.21` | `tailscaled` | Tailscale Serve (HTTPS to Stash) |
+
+### Local applications
+
+| App | Path | Role |
+|---|---|---|
+| `stash-win` | `C:\Users\Administrator\Desktop\Executables\stash-win.exe` | Stash media manager |
+| `python-zipper` | `C:\Users\Administrator\Desktop\Github Repos\python-zipper` | Dataset builder, Tor proxy rotator, linkvertise, telegram bot, userscript |
+| `tor` | `C:\Users\Administrator\Desktop\Github Repos\python-zipper\Portable-Tor-Proxy-Rotator` | Tor proxy for IP rotation |
+| `flaresolverr` | `C:\Users\Administrator\Desktop\Executables\flaresolverr` | Cloudflare challenge solver |
+| `Jackett` | `C:\ProgramData\Jackett\JackettConsole.exe` | Local Jackett indexer |
+| `FileZilla Server` | `C:\Program Files\FileZilla Server\filezilla-server.exe` | FTP/SFTP server |
+| `qBittorrent` | `C:\Program Files\qBittorrent\qbittorrent.exe` | Local qBittorrent client |
+
+### Tailscale Serve
+
+```
+https://clopeux-desktop.tail1764b8.ts.net (tailnet only)
+|-- / proxy http://127.0.0.1:9999
+```
+
+---
+
+## `Brume2` / `brumeux` (network appliance)
+
+| Property | Value |
+|---|---|
+| **OS** | OpenWrt (GL-MT2500) |
+| **Tailnet IP** | `100.114.136.28` |
+| **Public IP** | (home, residential `74.57.201.206`) |
+| **Access** | Tailscale-SSH only (no OpenSSH key/password) |
+| **Role** | Residential egress proxy (tinyproxy) |
+
+### Listening ports
+
+| Port | Bind | Process | Service |
+|---|---|---|---|
+| `8888` | `100.114.136.28` | `tinyproxy` | HTTP/CONNECT forward proxy (tailnet-only, allowlisted to `100.64.0.0/10`) |
+
+See `operations/residential-egress-proxy` for full architecture and provisioning.

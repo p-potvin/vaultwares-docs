@@ -1,18 +1,18 @@
----
+﻿---
 title: "Services inventory (Private)"
-description: "Single table of VaultWares + Prom‑King services: URL, where it runs, repo, and visibility."
+description: "Single table of VaultWares + Prom-King services: URL, where it runs, repo, and visibility."
 ---
 
 # Services inventory (Private)
 
-Last updated: Sun, 05 Jul 2026 03:50 America/Toronto.
+Last updated: Tue, 21 Jul 2026 11:50 America/Toronto.
 
-This page is a **single source of truth table** for “what we run”.
+This page is a **single source of truth table** for "what we run".
 
 It exists so that:
 
 - a non-technical person can understand *what each URL is*
-- an assistant can quickly map a URL → machine → repo → deployment flow
+- an assistant can quickly map a URL to machine to repo to deployment flow
 
 > If you add a new public URL, update this table the same day.
 
@@ -20,33 +20,40 @@ Related:
 - `operations/deployment-flow` (canonical deployment flow)
 - `operations/health-ledger` (service health, Probe Joker, Alarm Joker, Token Joker)
 - `operations/deploy-alerts` (deploy failure and bad-signature alerts)
+- `operations/host-inventory` (per-machine detailed breakdown with ports)
 
 ## Table
 
 | Service | URL | Where (runtime) | GitHub repo | Visibility |
 |---|---|---|---|---|
-| Main website | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) | `vaultwares-website` | Public |
-| Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (static) | `vaultwares-docs` | Tailnet-only |
-| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca`; separately monitored routes for vault-monitor, work impact, agent-ledger, health-ledger, and input-tracking | `vault-monitor`, `agent-ledger`, `health-ledger` | Tailnet-only |
+| Main website | `https://vaultwares.ca` | `/var/www/vaultwares-website/dist` (SPA) on `greencloud-vps` | `vaultwares-website` | Public |
+| Docs | `https://docs.vaultwares.ca` | `/var/www/vaultwares-docs/dist` (static) on `greencloud-vps` | `vaultwares-docs` | Tailnet-only |
+| V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `/var/www/monitor.vaultwares.ca` on `greencloud-vps`; routes for vault-monitor, work impact, agent-ledger, health-ledger, input-tracking | `vault-monitor`, `agent-ledger`, `health-ledger` | Tailnet-only |
 | Work impact | `https://monitor.vaultwares.ca/work-impact` (`stats.vaultwares.ca` redirect target) | Monitor route backed by agent-ledger data | `agent-ledger` | Tailnet-only |
 | Agent Ledger UI | `https://monitor.vaultwares.ca/ledger` (`ledger.vaultwares.ca` redirect target) | Monitor route backed by agent-ledger data | `agent-ledger` | Tailnet-only |
 | Health Ledger UI | `https://monitor.vaultwares.ca/health-ledger` | Monitor route backed by Health Ledger rollups | `health-ledger` | Tailnet-only |
 | Input tracking | `https://monitor.vaultwares.ca/input-tracking` | Monitor route backed by input-tracking data | `agent-ledger` | Tailnet-only |
-| API | `https://api.vaultwares.ca` | DNS resolves to `vps-ovhcloud`; nginx owns `100.67.25.118:443` and proxies to FastAPI on `127.0.0.1:9001`. FastAPI is loopback-only; direct tailnet access to `100.67.25.118:9001` is intentionally disabled so apps route through nginx. Tailscale Serve must stay disabled on OVH HTTPS `443`. | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; app auth/gateway secret required |
-| MCP server | `http://100.67.25.118:9020/mcp` | `vaultwares-mcp` SSE server on `vps-ovhcloud` port `9020`, tailnet-only for AI assistants | `vaultwares-mcp` | Tailnet-only |
+| API | `https://api.vaultwares.ca` | DNS resolves to `vps-ovhcloud`; nginx owns `100.67.25.118:443` and proxies to FastAPI on `127.0.0.1:9001`. FastAPI is loopback-only. Tailscale Serve must stay disabled on OVH HTTPS `443`. | `vaultwares-api` (formerly `vaultwares-pipelines`) | Tailnet-only; app auth/gateway secret required |
+| MCP server (HTTP) | `http://100.67.25.118:9020/mcp` | `vaultwares-mcp` HTTP server on `vps-ovhcloud` port `9020`, tailnet-only for AI assistants | `vaultwares-mcp` | Tailnet-only |
+| MCP server (SSE) | `http://100.67.25.118:9021/mcp` | `vaultwares-mcp` SSE server on `vps-ovhcloud` port `9021`, tailnet-only for AI assistants | `vaultwares-mcp` | Tailnet-only |
 | vault-flows + noddit.org | `https://flows.vaultwares.ca`, `https://noddit.org` | One `/var/www/vault-flows/dist` service on `greencloud-vps`; `noddit.org` is the paired domain for the same service | `vault-flows` | Public |
-| GitHub webhooks | `https://hooks.vaultwares.ca/github` | nginx → `vw-webhookd` → `127.0.0.1:9033` | (ops service) | Public (required by GitHub) |
-| Secrets manager | `https://warden.vaultwares.ca` | `vw-secretsd` → `127.0.0.1:9444` | (ops service) | Tailnet-only |
-| (alias) secrets | `https://secrets.vaultwares.ca` | redirect → `warden.vaultwares.ca` | (ops config) | Tailnet-only |
-| Prom‑King content site | `https://prom-king.xyz` | Express API + React SPA on `vps-ovhcloud`, systemd `pkt.service`; uses ComfyUI on Clopeux `:8188` as an unmonitored dependency | `Prom-King/content-site` | Public |
-| Prom‑King wallpaper foundry | internal service | Wallpaper generation/orchestration service on `vps-ovhcloud`; depends on `prom-king.xyz` content-site and unmonitored Clopeux ComfyUI | `Prom-King/wallpaper-foundry` | Internal |
-| FullXXX tube site | `https://fullxxx.video` | `shared-tube` app on `greencloud-vps` | `Prom-King/shared-tube` | Public |
-| 1PornHub tube site | `https://1pornhub.vip` | `shared-tube` app on `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
-| SexyPRN tube site | `https://sexyprn.lol` | `shared-tube` app on `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
-| FullXXX link sharing | `https://links.fullxxx.video` | Fastify link-sharing service on `greencloud-vps` | `Prom-King/link-sharing` | Public |
-| 1PornHub link sharing | `https://links.1pornhub.vip` | Fastify link-sharing service on `vps-ovhcloud` | `Prom-King/link-sharing` | Public |
-| SexyPRN link sharing | `https://links.sexyprn.lol` | Fastify link-sharing service on `vps-ovhcloud` | `Prom-King/link-sharing` | Public |
-| Tech Oracle | `https://theitguyde.com` | Greencloud web server plus Docker RAG API, vector database, and Ollama containers | `tech-oracle` | Public |
+| GitHub webhooks | `https://hooks.vaultwares.ca/github` | nginx on `greencloud-vps` to `vw-webhookd` to `127.0.0.1:9033` | (ops service) | Public (required by GitHub) |
+| Secrets manager | `https://warden.vaultwares.ca` | `vw-secretsd` on `greencloud-vps` to `127.0.0.1:9444` | (ops service) | Tailnet-only |
+| (alias) secrets | `https://secrets.vaultwares.ca` | redirect to `warden.vaultwares.ca` | (ops config) | Tailnet-only |
+| Prom-King content site | `https://prom-king.xyz` | Express API + React SPA on `greencloud-vps` (`127.0.0.1:4322`); nginx proxies `/api/promking/` and `/auth/` to `vps-ovhcloud:9001` | `Prom-King/content-site` | Public |
+| FullXXX tube site | `https://fullxxx.video` | `shared-tube` app on `greencloud-vps` (`127.0.0.1:4321`) | `Prom-King/shared-tube` | Public |
+| 1PornHub tube site | `https://1pornhub.vip` | `shared-tube` app on `vps-ovhcloud` (systemd `oneporn.service`) | `Prom-King/shared-tube` | Public |
+| SexyPRN tube site | `https://sexyprn.lol` | `shared-tube` app on `vps-ovhcloud` (systemd `sexyprn.service`) | `Prom-King/shared-tube` | Public |
+| FullXXX link sharing | `https://links.fullxxx.video` | Fastify link-sharing service on `greencloud-vps` (`127.0.0.1:3001`) | `Prom-King/link-sharing` | Public |
+| Prom-King link sharing | `https://links.prom-king.xyz` | Fastify link-sharing service on `greencloud-vps` (`127.0.0.1:3001`, same server as FullXXX links) | `Prom-King/link-sharing` | Public |
+| Tech Oracle | `https://theitguyde.com` | `tech-oracle-api.service` (FastAPI/uvicorn) on `greencloud-vps` (`100.73.93.84:9080`); nginx serves public site | `Prom-King/tech-oracle` | Public |
+| Comet (debrid manager) | `https://comet.vaultwares.ca` | Docker `comet` + `comet-postgres` + `comet-vpn` (ProtonVPN) on `vps-ovhcloud`; VPN-exposed on `100.67.25.118:5173` | `vw-comet` | Tailnet-only |
+| Uptime Kuma | `https://uptime.vaultwares.ca` | Docker `uptime-kuma` on `vps-ovhcloud` (`0.0.0.0:3001`); nginx on `100.67.25.118:443` | (ops service) | Tailnet-only |
+| Decypharr (debrid blackhole) | `https://decypharr.vaultwares.ca` | Docker `decypharr` on `vps-ovhcloud` (`127.0.0.1:8282`); nginx on `100.67.25.118:443` | (ops service) | Tailnet-only |
+| Stash | `http://100.71.101.21:9999` | `stash-win.exe` on `Clopeux-Desktop`; exposed via Tailscale Serve | (local install) | Tailnet-only (Tailscale Serve) |
+| python-zipper dataset builder | `http://100.71.101.21:5171` | Python `dataset_builder/server.py` on `Clopeux-Desktop` | `python-zipper` | Tailnet/local |
+| Tor proxy rotator | `socks5://127.0.0.1:20000` | `tor.exe` from `python-zipper/Portable-Tor-Proxy-Rotator` on `Clopeux-Desktop`; control port `9051` | `python-zipper` | Loopback only |
+| FileZilla Server | `100.71.101.21:14148` | FileZilla Server on `Clopeux-Desktop` | (local install) | Tailnet/local |
 
 
 ## Deployment and alert note
@@ -96,12 +103,44 @@ Source of truth: `operations/deployment-flow`.
 | `vw-webhookd` | systemd service, `127.0.0.1:9033` | Verifies GitHub webhook signatures + dispatches per-repo deploy scripts. Runs as `vwdeploy`. |
 | `vaultwares-hooks` | systemd service, `127.0.0.1:8787` | Tailnet-only webhook handler (uvicorn). |
 | `vw-secretsd` | systemd service, `127.0.0.1:9444` | Local secrets shim behind `warden.vaultwares.ca`. |
+| `vw-deployd` | systemd service (disabled) | Deploy webhook service; currently inactive. |
+| `vw-deny-watch.timer` | systemd timer (disabled) | Legacy GitHub issue writer for webhook `bad_signature` clusters. |
+| `vw-token-expiry-watch.timer` | systemd timer (disabled) | Legacy GitHub issue writer for token expiry. |
 | `health-ledger-probe.service` | systemd service | Active Probe Joker loop under `/opt/health-ledger`; writes Health Ledger events and rollups. |
-| `health-ledger-heartbeat.service` | systemd service, tailnet `:8791` after operator activation | Independent host heartbeat observed from OVH and Clopeux. |
+| `health-ledger-heartbeat.service` | systemd service, `100.73.93.84:8791` | Independent host heartbeat observed from OVH and Clopeux. |
 | `health-ledger-dashboard.service` | systemd service, `127.0.0.1:8790` | First-party Health Ledger dashboard; reads rollups/events and does not run probes. |
-| `health-ledger-alarm.service` | systemd service, disabled until `/etc/health-ledger/alarm.env` is configured | Alarm Joker notification loop for incident locks and SMS/email/desktop fanout. |
-| `vw-deny-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for webhook `bad_signature` clusters. Replaced by Health Ledger direction. |
-| `vw-token-expiry-watch.timer` | systemd timer, disabled 2026-06-03 | Legacy GitHub issue writer for token expiry. Replaced by Token Joker direction. |
+| `health-ledger-alarm.service` | systemd service | Alarm Joker notification loop for incident locks and SMS/email/desktop fanout. |
+| `health-ledger-token.service` | systemd service | Token Joker loop for token expiry monitoring. |
+| `tech-oracle-api.service` | systemd service, `100.73.93.84:9080` | tech-oracle internal FastAPI health/predict service. Runs as `vwdeploy`. |
+| PostgreSQL (local) | `127.0.0.1:5432` | Local Postgres for greencloud services. |
+| MariaDB (local) | `127.0.0.1:3306` | Local MariaDB for greencloud services. |
+| `vw-secrets-postgres` | Docker, `127.0.0.1:5444` to `5432` | Postgres 16 for vault-warden secrets. |
+| `gluetun-proton` | Docker, `127.0.0.1:8890`/`8889` | ProtonVPN gateway for QA automation. |
+| `qa_runner` | Docker | QA automation runner container. |
+| `qa_wireproxy` | Docker, `0.0.0.0:1085` | WireProxy for QA automation. |
+| `dnsmasq` | `0.0.0.0:53` and `tailscale0:53` | Split-DNS for tailnet private hostnames. See `operations/tailscale`. |
+| `nginx` | `0.0.0.0:80`, `0.0.0.0:443`, `100.73.93.84:443` | Public and tailnet-only vhosts. |
+
+## Ops surfaces on `vps-ovhcloud` (not user-facing)
+
+| Surface | Listener / unit | Role |
+|---|---|---|
+| `vaultwares-api.service` | systemd service, `127.0.0.1:9001` | VaultWares API (FastAPI). |
+| `vaultwares-mcp.service` | systemd service, `100.67.25.118:9020` | MCP HTTP server. |
+| `vaultwares-mcp-sse.service` | systemd service, `100.67.25.118:9021` | MCP SSE server. |
+| `health-ledger-probe.service` | systemd service | Health Ledger Probe Joker (OVH instance). |
+| `health-ledger-heartbeat.service` | systemd service, `100.67.25.118:8791` | Health Ledger Host Heartbeat (OVH instance). |
+| `oneporn.service` | systemd service | shared-tube app for `1pornhub.vip`. |
+| `sexyprn.service` | systemd service | shared-tube app for `sexyprn.lol`. |
+| `upload-torrent-daemon.service` | systemd service | Torrent upload daemon (`/opt/vw-media-stack/upload-torrent-daemon.sh`). |
+| `mullvad-netns-restart-deps.service` | systemd service | Restarts qbittorrent/jackett after mullvad-gateway restarts. |
+| `vw-tube-uploader.timer` | systemd timer (~15 min) | rclone move tube content to Google Drive. |
+| `vw-drive-upload.timer` | systemd timer (~15 min) | Upload media to Google Drive (`upload-to-drive.py`). |
+| `vw-sab-rclone-mover.timer` | systemd timer (~1 h) | rclone move for SABnzbd completed downloads. |
+| `vw-linkvertise.timer` | systemd timer (~50-70 min) | Linkvertise downloader run. |
+| `vw-backup.timer` | systemd timer (daily) | VPS backup via rclone to Google Drive. |
+| `nginx` | `51.79.55.113:80`, `51.79.55.113:443`, `100.67.25.118:443`, `100.67.25.118:80` | Public and tailnet vhosts. |
+| `dnsmasq` | `127.0.0.1:53`, `100.67.25.118:53` | Local DNS forwarding. |
 
 ## Tailnet media surfaces on `vps-ovhcloud`
 
@@ -109,59 +148,84 @@ These services are intended for tailnet-only operator use. Docker-backed service
 live on `vps-ovhcloud` in `/opt/vw-media-stack/docker-compose.yml` with
 persistent config and data under `/srv/vw-media/`. Greencloud `dnsmasq` maps the
 service hostnames below to `100.73.93.84`; Greencloud nginx then proxies to OVH
-over the tailnet. Client DNS must include the matching Tailscale split-DNS/NRPT
-names, otherwise public wildcard DNS resolves these hosts to Greencloud's public
-address and the tailnet-only proxy path is bypassed.
-Greencloud serves HTTPS for these hostnames with the
-`/etc/letsencrypt/live/media.vaultwares.ca/` SAN certificate.
-
-Greencloud also has explicit `listen 100.73.93.84:443 ssl;` entries for
-tailnet service names such as `docs.vaultwares.ca`, `hooks.vaultwares.ca`,
-`warden.vaultwares.ca`, `monitor.vaultwares.ca`, `stats.vaultwares.ca`, and
-`mcp.vaultwares.ca`. Keep those listeners when adding private hostnames; without
-them, nginx can select the media certificate on tailnet-originated requests.
+over the tailnet.
 
 Mullvad VPN routing for this stack is opt-in only. The staged gateway lives in
-`/opt/vw-media-stack/docker-compose.mullvad.yml` as `mullvad-gateway`. **DO NOT** run `docker compose up -d` directly to rebuild the stack if VPN routing is required, as this will strand services on the default network and break communication with the Arr stack.
+`/opt/vw-media-stack/docker-compose.mullvad.yml` as `mullvad-gateway`. **DO NOT** run `docker compose up -d` directly to rebuild the stack if VPN routing is required.
 
-Instead, always use the dedicated wrapper script:
+Always use the dedicated wrapper script:
 ```bash
 /opt/vw-media-stack/bin/mullvad-compose all-up
 ```
-This script seamlessly boots the `mullvad-gateway` and automatically applies the overrides (e.g. `docker-compose.mullvad.qbittorrent.yml`) to move `qbittorrent` and `jackett` into `network_mode: service:mullvad-gateway`.
-
-The gateway configures itself via `.env.mullvad` using Gluetun's native Mullvad API (e.g., setting `MULLVAD_SERVER_CITIES=Montreal` and `MULLVAD_SERVER_HOSTNAMES=ca-mtr-wg-002`). Profile rotation is also supported via `/opt/vw-media-stack/bin/mullvad-rotate-profile` using dedicated VPS profiles under `/opt/vw-media-stack/mullvad-profiles/`. The gateway keeps `100.64.0.0/10` outside the tunnel so tailnet access, including `100.67.25.118`, stays reachable. Do not add host-wide WireGuard routes for this stack.
 
 | Surface | Listener / unit | Role |
 |---|---|---|
 | `pyload-ng` | `https://pyload.vaultwares.ca` -> Greencloud nginx -> `100.67.25.118:8003` -> container `8000` | pyLoad web UI and download manager. |
-| `flaresolverr` | Docker, `100.67.25.118:8191` -> container `8191`; intended DNS: `flaresolverr.vaultwares.ca` | Cloudflare challenge solver API for compatible media/indexer tools. |
-| `jackett` | `https://jackett.vaultwares.ca` -> Greencloud nginx -> `100.67.25.118:9117` | Jackett indexer UI; installed natively under `/opt/Jackett`. |
-| `qbittorrent` | `https://qbittorrent.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8081` -> Docker loopback `127.0.0.1:8081` -> container `8080` | qBittorrent web UI. |
-| `sonarr` | `https://sonarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8989` -> Docker loopback `127.0.0.1:8989` | Series manager. |
-| `radarr` | `https://radarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:7878` -> Docker loopback `127.0.0.1:7878` | Movie manager. |
-| `lidarr` | `https://lidarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8686` -> Docker loopback `127.0.0.1:8686` | Music manager. |
-| `prowlarr` | `https://prowlarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:9696` -> Docker loopback `127.0.0.1:9696` | Indexer manager. |
-| `whisparr` | `https://whisparr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:6969` -> Docker loopback `127.0.0.1:6969` | Media manager. |
-| `sabnzbd` | `https://sabnzbd.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8082` -> Docker loopback `127.0.0.1:8082`; completed-download WebDAV at `https://sabnzbd.vaultwares.ca/dav/` -> OVH nginx `/dav/` -> Docker loopback `127.0.0.1:8083` -> `/mnt/data/usenet/complete` | Usenet downloader and WebDAV read surface for completed jobs. See `operations/media-stack-webdav`. |
+| `flaresolverr` | Docker, `100.67.25.118:8191` -> container `8191`; DNS: `flaresolverr.vaultwares.ca` | Cloudflare challenge solver API. |
+| `jackett` | `https://jackett.vaultwares.ca` -> Greencloud nginx -> `100.67.25.118:9117` | Jackett indexer UI (Docker). |
+| `qbittorrent` | `https://qbittorrent.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8081` -> Docker `127.0.0.1:8081` | qBittorrent web UI. |
+| `sonarr` | `https://sonarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8989` -> Docker `127.0.0.1:8989` | Series manager. |
+| `radarr` | `https://radarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:7878` -> Docker `127.0.0.1:7878` | Movie manager. |
+| `lidarr` | `https://lidarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8686` -> Docker `127.0.0.1:8686` | Music manager. |
+| `prowlarr` | `https://prowlarr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:9696` -> Docker `127.0.0.1:9696` | Indexer manager. |
+| `whisparr` | `https://whisparr.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:6969` -> Docker `127.0.0.1:6969` | Media manager. |
+| `sabnzbd` | `https://sabnzbd.vaultwares.ca` -> Greencloud nginx -> OVH nginx `100.67.25.118:8082` -> Docker `127.0.0.1:8082`; WebDAV at `/dav/` -> `127.0.0.1:8083` | Usenet downloader + WebDAV. |
+| `webdav` | Docker, `127.0.0.1:8083` -> container `80` | WebDAV for SABnzbd completed downloads. |
+| `mullvad-gateway` | Docker, `127.0.0.1:8081` -> container `8080` | Mullvad VPN gateway for qBittorrent/Jackett. |
+| `gluetun-proton` | Docker, `0.0.0.0:8890`/`8889` | ProtonVPN gateway for media stack. |
+| `torbox-sab-bridge` | Docker | Torbox to SABnzbd bridge. |
+| `linkvertise-mullvad-rotation` | Docker | Gluetun Mullvad rotation for Linkvertise. |
+| `qa_runner` | Docker | QA automation runner container. |
+| `qa_wireproxy` | Docker, `0.0.0.0:1085` | WireProxy for QA automation. |
+
+## Additional Docker services on `vps-ovhcloud`
+
+| Surface | Listener / unit | Role |
+|---|---|---|
+| `comet` | Docker, `100.67.25.118:5173` via `comet-vpn` | Comet debrid manager (g0ldyy/comet). |
+| `comet-postgres` | Docker | Postgres 18 for Comet. |
+| `comet-vpn` | Docker | ProtonVPN gateway for Comet. |
+| `decypharr` | Docker, `127.0.0.1:8282` | Debrid blackhole service (cy01/blackhole). |
+| `uptime-kuma` | Docker, `0.0.0.0:3001` | Uptime Kuma monitoring dashboard. |
+| `gluetun-comet-idx` | Docker, `100.67.25.118:9698`/`9119` | ProtonVPN gateway for Comet indexers. |
+
+## Local services on `Clopeux-Desktop`
+
+| Surface | Listener / port | Role |
+|---|---|---|
+| `stash-win` | `0.0.0.0:9999` (Tailscale Serve) | Stash media manager. Exposed via Tailscale Serve proxy. |
+| `python-zipper dataset_builder` | `0.0.0.0:5171` | Dataset builder web server. |
+| `tor` (Portable-Tor-Proxy-Rotator) | `127.0.0.1:20000` (SOCKS), `127.0.0.1:9051` (control) | Tor proxy rotator for python-zipper. |
+| `flaresolverr` | `0.0.0.0:8191` | Local FlareSolverr (Cloudflare challenge solver). |
+| `JackettConsole` | `0.0.0.0:9117` | Local Jackett indexer. |
+| `pyLoad` (local) | `[::1]:8003` | Local pyLoad download manager (Python). |
+| `FileZilla Server` | `0.0.0.0:14148` | FTP/SFTP server. |
+| `qBittorrent` (local) | (desktop app) | Local qBittorrent client. |
+| `health-ledger-heartbeat` | `100.71.101.21:8791` | Health Ledger Host Heartbeat (Clopeux instance). |
+| RDP | `100.71.101.21:3389` | Remote Desktop Protocol over tailnet. |
+| SMB | `100.71.101.21:445`/`139` | Windows file sharing. |
 
 ## Residential egress proxy on `brume2`
 
 Tube-site source CDNs (`fullvideos.xxx`, `1porn.tv`, `pornxp.*`) IP-block both
 OVH and Greencloud datacenter ranges via Cloudflare and bind their signed MP4
-URLs to the requester's IP. `shared-tube`'s `/api/stream/[slug]` route fetches
-both the source page and the byte-range MP4 through a residential proxy on the
-home-network Brume2 router so both legs egress the same residential IP.
+URLs to the requester IP. `shared-tube` `/api/stream/[slug]` fetches through a
+residential proxy on Brume2 so both legs egress the same residential IP.
 
 | Surface | Listener / unit | Role |
 |---|---|---|
-| `tinyproxy` | `http://100.114.136.28:8888` (tailnet-only, allowlisted to `100.64.0.0/10`) | HTTP/CONNECT forward proxy on `brume2` (OpenWrt, GL-MT2500). Egresses the home WAN (`74.57.201.206`, Bell/Videotron). Read `operations/residential-egress-proxy` for the full architecture, env vars, and provisioning steps. |
+| `tinyproxy` | `http://100.114.136.28:8888` (tailnet-only, allowlisted to `100.64.0.0/10`) | HTTP/CONNECT forward proxy on `brume2` (OpenWrt, GL-MT2500). Egresses home WAN (`74.57.201.206`). See `operations/residential-egress-proxy`. |
 
-Both `vps-ovhcloud` and `greencloud-vps` carry `STREAM_OUTBOUND_PROXY=http://100.114.136.28:8888` in the relevant `shared-tube` env files for `fxv`, `oneporn`, and `sexyprn` so the active tube apps share the same exit. The proxy is a single point of failure for video playback; see the troubleshooting section of the egress-proxy page if streams 502.
+Both `vps-ovhcloud` and `greencloud-vps` carry `STREAM_OUTBOUND_PROXY=http://100.114.136.28:8888` in the relevant `shared-tube` env files.
 
 ## Notes on the table above
 
-- Legacy CMS and Prom-King prelanding monitors are retired. Do not add them back to Health Ledger unless the runtime is intentionally resurrected.
-- `fullxxx.video`, `1pornhub.vip`, and `sexyprn.lol` are all `Prom-King/shared-tube` sites. FullXXX lives on Greencloud; 1PornHub and SexyPRN live on OVH.
-- `prom-king.xyz` runs a standalone React/Express content-site on OVH. `wallpaper-foundry` is also hosted on OVH and uses Clopeux `ComfyUI :8188` as an unmonitored dependency.
-- The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for every repo in this list — the lowercase form `prom-king/...` won't match.
+- Legacy CMS and Prom-King prelanding monitors are retired.
+- `fullxxx.video`, `1pornhub.vip`, and `sexyprn.lol` are all `Prom-King/shared-tube` sites. FullXXX lives on Greencloud (`127.0.0.1:4321`); 1PornHub and SexyPRN live on OVH (systemd services).
+- `prom-king.xyz` runs a standalone React/Express content-site on `greencloud-vps` (`127.0.0.1:4322`). nginx proxies `/api/promking/` and `/auth/` to `vps-ovhcloud:9001` (VaultWares API).
+- Link sharing runs on `greencloud-vps` (`127.0.0.1:3001`) serving both `links.fullxxx.video` and `links.prom-king.xyz`. The old `links.1pornhub.vip` and `links.sexyprn.lol` entries are retired.
+- The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for every repo in this list.
+- `vw-deployd` on greencloud is currently disabled. Deploy dispatch goes through `vw-webhookd` instead.
+- Health Ledger runs on all three machines: Probe Joker + Heartbeat on greencloud and OVH, Heartbeat-only on Clopeux-Desktop.
+- Comet on OVH manages debrid lookups via ProtonVPN, exposed on `100.67.25.118:5173` through `comet-vpn` Docker network.
+- `python-zipper` on Clopeux-Desktop includes a Portable Tor Proxy Rotator and a dataset builder server, used for QA automation and content acquisition.

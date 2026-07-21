@@ -1,4 +1,4 @@
----
+﻿---
 title: "Network map (Private)"
 description: "Tailnet, VPSes, PCs, services, ports, and how we access them. Private (tailnet-only)."
 ---
@@ -10,8 +10,8 @@ description: "Tailnet, VPSes, PCs, services, ports, and how we access them. Priv
 - **Tailnet:** `tail1764b8.ts.net`
 - **Private docs:** `docs.vaultwares.ca` (tailnet-only)
 - **Public website:** `vaultwares.ca` (public)
-- **Ops log (today):** `operations/ops-log-2026-05-21`
 - **Services inventory:** `operations/services-inventory`
+- **Host inventory:** `operations/host-inventory` (per-machine detailed breakdown)
 
 ## Diagram (Mermaid) / Diagramme (Mermaid)
 
@@ -28,8 +28,7 @@ flowchart TB
     OnePorn["1pornhub.vip\n(shared-tube)\nHTTPS :443"]
     SexyPrn["sexyprn.lol\n(shared-tube)\nHTTPS :443"]
     LinksFXV["links.fullxxx.video\n(link-sharing)\nHTTPS :443"]
-    LinksOnePorn["links.1pornhub.vip\n(link-sharing)\nHTTPS :443"]
-    LinksSexyPrn["links.sexyprn.lol\n(link-sharing)\nHTTPS :443"]
+    LinksPK["links.prom-king.xyz\n(link-sharing)\nHTTPS :443"]
     TechOracle["theitguyde.com\n(Tech Oracle)\nHTTPS :443"]
   end
 
@@ -38,40 +37,41 @@ flowchart TB
     Docs["docs.vaultwares.ca\n(vaultwares-docs)\nHTTPS :443"]
     Monitor["monitor.vaultwares.ca\n(vault-monitor)\nHTTPS :443"]
     Stats["stats.vaultwares.ca\n(agent-ledger stats SPA)\nHTTPS :443"]
-    Secrets["warden.vaultwares.ca\n(VaultWarden / vault-warden)\nHTTPS :443"]
+    Secrets["warden.vaultwares.ca\n(vault-warden)\nHTTPS :443"]
     Ledger["ledger.vaultwares.ca\n(agent-ledger SPA)\nHTTPS :443"]
     Hooks["hooks.vaultwares.ca/github\n(vw-webhookd)\nHTTPS :443"]
     Api["api.vaultwares.ca\n(vps-ovhcloud)\nHTTPS :443 / HTTP :9001"]
     Mcp["mcp.vaultwares.ca/mcp\n(vaultwares-mcp)\nHTTPS :443"]
     OVHAPI["vps-ovhcloud\nVaultWares API\nhttp://100.67.25.118:9001"]
-    VaultFlowsSPA["Clopeux-Desktop\nvault-flows (local preview)\nhttps://localhost:3100"]
+    Comet["comet.vaultwares.ca\n(Comet debrid manager)\nHTTPS :443"]
+    Uptime["uptime.vaultwares.ca\n(Uptime Kuma)\nHTTPS :443"]
+    Decypharr["decypharr.vaultwares.ca\n(Debrid blackhole)\nHTTPS :443"]
     RDP["Clopeux-Desktop RDP\n100.71.101.21:3389"]
   end
 
   %% Machines
   subgraph Machines["Machines"]
     V1["greencloud-vps (GreenCloud VPS)\nDebian 12\nPublic 173.249.194.15\nTailnet 100.73.93.84"]
-    V2["vps-ovhcloud\nOVH VPS\nTailnet 100.67.25.118"]
+    V2["vps-ovhcloud\nOVH VPS\nPublic 51.79.55.113\nTailnet 100.67.25.118"]
     PC["Clopeux-Desktop\nWindows\nTailnet 100.71.101.21"]
     Brume2["Brume2 / brumeux\nOpenWrt (GL-MT2500)\nTailnet 100.114.136.28\nResidential egress proxy (tinyproxy :8888)"]
   end
 
   %% Residential-egress proxy (shared-tube /api/stream)
   subgraph Egress["Cloudflare-protected source CDNs"]
-    SourceCDNs["fullvideos.xxx · 1porn.tv · pornxp.bz/sh"]
+    SourceCDNs["fullvideos.xxx . 1porn.tv . pornxp.bz/sh"]
   end
 
   %% Public routing (nginx on VPS)
   Users -->|HTTPS| VaultWaresCA --> V1
   Users -->|HTTPS| Flows --> V1
   Users -->|HTTPS| Noddit --> V1
-  Users -->|HTTPS| PromKing --> V2
+  Users -->|HTTPS| PromKing --> V1
   Users -->|HTTPS| FullXXX --> V1
   Users -->|HTTPS| OnePorn --> V2
   Users -->|HTTPS| SexyPrn --> V2
   Users -->|HTTPS| LinksFXV --> V1
-  Users -->|HTTPS| LinksOnePorn --> V2
-  Users -->|HTTPS| LinksSexyPrn --> V2
+  Users -->|HTTPS| LinksPK --> V1
   Users -->|HTTPS| TechOracle --> V1
 
   %% Tailnet routing
@@ -84,7 +84,9 @@ flowchart TB
   Api --> OVHAPI --> V2
   Mcp -->|proxy over tailnet| V2
   Stats -->|/monitor + telemetry proxy| OVHAPI
-  Noddit -->|proxy| VaultFlowsSPA --> PC
+  Comet --> V2
+  Uptime --> V2
+  Decypharr --> V2
   VaultWaresCA -->|future API calls| OVHAPI --> V2
 
   %% Ops access
@@ -92,7 +94,7 @@ flowchart TB
   Brume2 <-->|Tailscale (WireGuard)| PC
   RDP --> PC
 
-  %% Stream proxy: shared-tube apps egress via Brume's residential WAN
+  %% Stream proxy: shared-tube apps egress via Brume residential WAN
   V2 -->|HTTPS via :8888 CONNECT| Brume2
   V1 -->|HTTPS via :8888 CONNECT| Brume2
   Brume2 -->|residential WAN 74.57.x.x| SourceCDNs
@@ -109,10 +111,10 @@ flowchart TB
 
 | Machine | Role | OS | Tailnet IP | Public IP | Access |
 |---|---|---|---|---|---|
-| `Clopeux-Desktop` | PC / workstation + local AI host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`) |
-| `vps-ovhcloud` | API + DB host | Linux | `100.67.25.118` | (OVH) | SSH tailnet-only as `ubuntu` with `tube-site-vps`, VaultWares API on `9001` |
+| `Clopeux-Desktop` | PC / workstation + local services host | Windows | `100.71.101.21` | (home) | RDP over Tailnet (`3389`); Tailscale Serve on `:9999` (Stash) |
+| `vps-ovhcloud` | API + DB host + media stack + Comet + debrid | Ubuntu | `100.67.25.118` | `51.79.55.113` | SSH tailnet-only as `ubuntu` with `tube-site-vps`; VaultWares API on `9001` |
 | `Brume2` / `brumeux` | Residential egress proxy for `shared-tube /api/stream` (tinyproxy on `:8888`); see `operations/residential-egress-proxy`. No longer drop-in gateway. | OpenWrt (GL-MT2500) | `100.114.136.28` | (home, residential `74.57.201.206`) | Tailscale-SSH only (no OpenSSH key/password); GL.iNet UI on LAN |
-| `greencloud-vps` | **New VPS** (GreenCloud) | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only**, HTTPS public services |
+| `greencloud-vps` | Web/docs/monitor host + webhook receiver + secrets + health-ledger hub | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only** (key: `greencloud-vps`), HTTPS public services |
 
 ## Services / Services
 
@@ -120,17 +122,16 @@ flowchart TB
 
 | Service | URL | Where | Ports | TLS |
 |---|---|---:|---:|---|
-| VaultWares website | `https://vaultwares.ca` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| vault-flows SPA | `https://flows.vaultwares.ca` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| Noddit | `https://noddit.org` | `greencloud-vps` (proxy to PC) | `443` | Let’s Encrypt (nginx) |
-| Prom-King content site | `https://prom-king.xyz` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
-| FullXXX tube site | `https://fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| 1PornHub tube site | `https://1pornhub.vip` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
-| SexyPRN tube site | `https://sexyprn.lol` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
-| FullXXX link sharing | `https://links.fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| 1PornHub link sharing | `https://links.1pornhub.vip` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
-| SexyPRN link sharing | `https://links.sexyprn.lol` | `vps-ovhcloud` | `443` | Let’s Encrypt (nginx) |
-| Tech Oracle | `https://theitguyde.com` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| VaultWares website | `https://vaultwares.ca` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
+| vault-flows SPA | `https://flows.vaultwares.ca` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
+| Noddit | `https://noddit.org` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
+| Prom-King content site | `https://prom-king.xyz` | `greencloud-vps` (nginx to `127.0.0.1:4322`) | `443` | Let's Encrypt (nginx) |
+| FullXXX tube site | `https://fullxxx.video` | `greencloud-vps` (nginx to `127.0.0.1:4321`) | `443` | Let's Encrypt (nginx) |
+| 1PornHub tube site | `https://1pornhub.vip` | `vps-ovhcloud` (nginx to `oneporn.service`) | `443` | Let's Encrypt (nginx) |
+| SexyPRN tube site | `https://sexyprn.lol` | `vps-ovhcloud` (nginx to `sexyprn.service`) | `443` | Let's Encrypt (nginx) |
+| FullXXX link sharing | `https://links.fullxxx.video` | `greencloud-vps` (nginx to `127.0.0.1:3001`) | `443` | Let's Encrypt (nginx) |
+| Prom-King link sharing | `https://links.prom-king.xyz` | `greencloud-vps` (nginx to `127.0.0.1:3001`) | `443` | Let's Encrypt (nginx) |
+| Tech Oracle | `https://theitguyde.com` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
 
 ### Private (Tailnet-only)
 
@@ -141,16 +142,33 @@ flowchart TB
 | V.A.U.L.T Monitor | `https://monitor.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; `/monitor/*` proxies to `vps-ovhcloud:9001` |
 | Stats dashboard | `https://stats.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + nginx allowlist; static agent-ledger SPA with `/monitor/*` and `/api/telemetry/*` proxied to `vps-ovhcloud:9001` |
 | API (gateway/domain) | `https://api.vaultwares.ca` | `vps-ovhcloud` | `443` | Tailnet ACL + app/gateway auth; nginx owns `443`; keep Tailscale Serve disabled on this port |
-| MCP server | `http://100.67.25.118:9020/mcp` | `vps-ovhcloud` | `9020` | Tailnet ACL; SSE traffic for AI assistants |
-| VaultWares API (direct) | `http://100.67.25.118:9001` | `vps-ovhcloud` | `9001` | App auth (JWT/API key), Tailnet ACL |
-| VaultWarden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` | `443` | Tailnet ACL + VaultWarden authz |
-| GitHub webhooks (receiver) | `https://hooks.vaultwares.ca/github` | `greencloud-vps` | `443` | Webhook signature verification (nginx → `vw-webhookd` on `127.0.0.1:9033`) |
-| Tailscale webhook handler | `http://127.0.0.1:8787` | `greencloud-vps` | `8787` | Tailnet-local only (`vaultwares-hooks`) |
+| MCP server (HTTP) | `http://100.67.25.118:9020/mcp` | `vps-ovhcloud` | `9020` | Tailnet ACL; HTTP traffic for AI assistants |
+| MCP server (SSE) | `http://100.67.25.118:9021/mcp` | `vps-ovhcloud` | `9021` | Tailnet ACL; SSE traffic for AI assistants |
+| VaultWares API (direct) | `http://100.67.25.118:9001` | `vps-ovhcloud` | `9001` | App auth (JWT/API key), loopback only |
+| vault-warden (secrets service) | `https://warden.vaultwares.ca` | `greencloud-vps` (`vw-secretsd` to `127.0.0.1:9444`) | `443` | Tailnet ACL + vault-warden authz |
+| GitHub webhooks (receiver) | `https://hooks.vaultwares.ca/github` | `greencloud-vps` (`vw-webhookd` to `127.0.0.1:9033`) | `443` | Webhook signature verification |
+| Tailscale webhook handler | `http://127.0.0.1:8787` | `greencloud-vps` (`vaultwares-hooks`) | `8787` | Tailnet-local only |
+| Comet (debrid manager) | `https://comet.vaultwares.ca` | `vps-ovhcloud` (Docker `comet` via `comet-vpn` on `100.67.25.118:5173`) | `5173` | Tailnet ACL |
+| Uptime Kuma | `https://uptime.vaultwares.ca` | `vps-ovhcloud` (Docker on `0.0.0.0:3001`) | `443` to `3001` | Tailnet ACL + gateway secret |
+| Decypharr (debrid blackhole) | `https://decypharr.vaultwares.ca` | `vps-ovhcloud` (Docker on `127.0.0.1:8282`) | `443` to `8282` | Tailnet ACL |
+| Health Ledger dashboard | `http://127.0.0.1:8790` | `greencloud-vps` | `8790` | Loopback only |
+| Health Ledger heartbeat (GC) | `100.73.93.84:8791` | `greencloud-vps` | `8791` | Tailnet ACL |
+| Health Ledger heartbeat (OVH) | `100.67.25.118:8791` | `vps-ovhcloud` | `8791` | Tailnet ACL |
+| Health Ledger heartbeat (PC) | `100.71.101.21:8791` | `Clopeux-Desktop` | `8791` | Tailnet ACL |
+| Tech Oracle API | `100.73.93.84:9080` | `greencloud-vps` (`tech-oracle-api.service`) | `9080` | Tailnet ACL |
+| Stash (local) | `http://100.71.101.21:9999` | `Clopeux-Desktop` (Tailscale Serve to `127.0.0.1:9999`) | `9999` | Tailnet ACL (Tailscale Serve) |
+| pyLoad (local) | `http://[::1]:8003` | `Clopeux-Desktop` (Python) | `8003` | Loopback only |
+| FlareSolverr (local) | `http://100.71.101.21:8191` | `Clopeux-Desktop` | `8191` | Tailnet/local |
+| Jackett (local) | `http://100.71.101.21:9117` | `Clopeux-Desktop` | `9117` | Tailnet/local |
+| Tor SOCKS (local) | `socks5://127.0.0.1:20000` | `Clopeux-Desktop` (python-zipper Tor rotator) | `20000` | Loopback only |
+| Tor control (local) | `127.0.0.1:9051` | `Clopeux-Desktop` | `9051` | Loopback only |
+| python-zipper builder | `http://100.71.101.21:5171` | `Clopeux-Desktop` (dataset_builder server) | `5171` | Tailnet/local |
+| FileZilla Server | `100.71.101.21:14148` | `Clopeux-Desktop` | `14148` | Tailnet/local |
 
-## Access model / Modèle d’accès
+## Access model / Modele d'acces
 
 - **Network encryption:** Tailscale (WireGuard).
-- **Public TLS:** nginx + Let’s Encrypt on VPSes.
+- **Public TLS:** nginx + Let's Encrypt on VPSes.
 - **SSH:** **Tailnet-only** (port `22` allowed only on `tailscale0`).
 
 ### SSH commands / Commandes SSH
@@ -158,6 +176,9 @@ flowchart TB
 ```powershell
 # OVH / OVHCloud / vps-ovhcloud (user: ubuntu, key: tube-site-vps)
 ssh -i "$env:USERPROFILE\.ssh\tube-site-vps" ubuntu@100.67.25.118
+
+# GreenCloud VPS (user: root, key: greencloud-vps)
+ssh -i "$env:USERPROFILE\.ssh\greencloud-vps" root@100.73.93.84
 ```
 
 > Do not use `root@100.67.25.118` for normal diagnostics on OVH; that account rejects the local operator key. Use `ubuntu@` instead.
@@ -166,7 +187,7 @@ ssh -i "$env:USERPROFILE\.ssh\tube-site-vps" ubuntu@100.67.25.118
   VPS hosts such as `vps-ovhcloud` and `greencloud-vps` should not be able to
   open RDP sessions to Clopeux.
 
-## Onboarding checklist / Liste d’intégration
+## Onboarding checklist / Liste d'integration
 
 1. Join the tailnet (Tailscale client).
 2. Confirm your device appears in the admin console and is authorized.
@@ -176,3 +197,16 @@ ssh -i "$env:USERPROFILE\.ssh\tube-site-vps" ubuntu@100.67.25.118
    - You can reach `docs.vaultwares.ca` from tailnet.
    - You can reach `vaultwares.ca` publicly.
    - You can reach the VaultWares API endpoint needed for your work (policy permitting).
+
+## Tailnet nodes (live audit Jul 2026)
+
+| Node | Type | Tailnet IP | OS | Notes |
+|---|---|---|---|---|
+| `clopeux-desktop` | workstation | `100.71.101.21` | Windows | RDP, Stash, Tor, FlareSolverr, Jackett, pyLoad, python-zipper, health-ledger heartbeat |
+| `greencloud-vps` | server | `100.73.93.84` | Debian 12 | nginx, webhooks, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king content-site, link-sharing |
+| `vps-ovhcloud` | server | `100.67.25.118` | Ubuntu | VaultWares API, MCP, shared-tube (oneporn/sexyprn), Comet, media stack, Decypharr, Uptime Kuma |
+| `brumeux` | appliance | `100.114.136.28` | OpenWrt | tinyproxy residential egress |
+| `aperture` | personal | `100.90.168.111` | Windows | Operator personal device |
+| `clopeux-iphone` | personal | `100.75.112.67` | iOS | Operator phone |
+| `clopeux-laptop` | personal | `100.91.249.45` | Windows | Operator laptop |
+| `ipad-9th-gen-wifi` | personal | `100.84.168.106` | iOS | Operator iPad |

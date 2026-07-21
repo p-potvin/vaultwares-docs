@@ -1,4 +1,4 @@
----
+﻿---
 title: "Tailscale (Private)"
 description: "How Tailnet is used for access control, SSH, and internal services."
 ---
@@ -32,6 +32,20 @@ description: "How Tailnet is used for access control, SSH, and internal services
   tinyproxy on Brume2). This is the path `shared-tube /api/stream/*` uses to
   fetch Cloudflare-protected source CDNs from a residential IP. See
   `operations/residential-egress-proxy` for context.
+
+## Tailnet nodes (live audit Jul 2026)
+
+| Node | Type | Tailnet IP | OS | Tags | Notes |
+|---|---|---|---|---|---|
+| `clopeux-desktop` | workstation | `100.71.101.21` | Windows | (personal) | RDP, Stash (Tailscale Serve), Tor, FlareSolverr, Jackett, pyLoad, python-zipper, health-ledger heartbeat |
+| `greencloud-vps` | server | `100.73.93.84` | Debian 12 | `tag:server`, `tag:vps-greencloud` | nginx, webhooks, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king content-site, link-sharing, dnsmasq |
+| `vps-ovhcloud` | server | `100.67.25.118` | Ubuntu | `tag:server`, `tag:vps-ovhcloud` | VaultWares API, MCP, shared-tube (oneporn/sexyprn), Comet, media stack, Decypharr, Uptime Kuma, dnsmasq |
+| `brumeux` | appliance | `100.114.136.28` | OpenWrt | `tag:server` | tinyproxy residential egress only |
+| `aperture` | personal | `100.90.168.111` | Windows | (personal) | Operator personal device |
+| `clopeux-iphone` | personal | `100.75.112.67` | iOS | (personal) | Operator phone |
+| `clopeux-laptop` | personal | `100.91.249.45` | Windows | (personal) | Operator laptop |
+| `ipad-9th-gen-wifi` | personal | `100.84.168.106` | iOS | (personal) | Operator iPad |
+
 ## Exposing internal web services to the tailnet (Split DNS)
 
 Some subdomains, including `stats.vaultwares.ca`, are **tailnet-only** services. The public DNS record returns the VPS public IP, which serves a 403 to all non-tailnet clients. Tailnet nodes resolve the same hostname to the **Tailscale IP** of `greencloud-vps` via a Tailscale DNS override, bypassing the public nginx vhost entirely and hitting a separate internal-only nginx server block.
@@ -39,19 +53,19 @@ Some subdomains, including `stats.vaultwares.ca`, are **tailnet-only** services.
 ### How it works
 
 ```
-Public client  →  stats.vaultwares.ca  →  <public IP>  →  nginx (403, intentional)
-Tailnet node   →  stats.vaultwares.ca  →  100.x.x.x    →  nginx (internal vhost, 200)
+Public client  ->  stats.vaultwares.ca  ->  <public IP>  ->  nginx (403, intentional)
+Tailnet node   ->  stats.vaultwares.ca  ->  100.x.x.x    ->  nginx (internal vhost, 200)
 ```
 
-### Step 1 — Tailscale DNS override
+### Step 1 -- Tailscale DNS override
 
-In the [Tailscale admin console](https://login.tailscale.com/admin/dns) → **Nameservers**:
+In the [Tailscale admin console](https://login.tailscale.com/admin/dns) -> **Nameservers**:
 
 - Add **Restricted / Split DNS** entries for each private hostname that must resolve through the tailnet.
 - Point each entry to the Tailscale IP of `greencloud-vps` (`100.73.93.84`).
 - Keep public names (for example `vaultwares.ca`, `www.vaultwares.ca`, `flows.vaultwares.ca`) out of this exact-host override unless you intentionally want tailnet clients to use the VPS tailnet address for those public services.
 
-Current private hostnames:
+Current private hostnames (from `/etc/dnsmasq.d/vaultwares-tailnet.conf` on greencloud):
 
 ```text
 docs.vaultwares.ca
@@ -62,6 +76,22 @@ hooks.vaultwares.ca
 secrets.vaultwares.ca
 warden.vaultwares.ca
 ledger.vaultwares.ca
+pyload.vaultwares.ca
+jackett.vaultwares.ca
+qbittorrent.vaultwares.ca
+sonarr.vaultwares.ca
+radarr.vaultwares.ca
+lidarr.vaultwares.ca
+prowlarr.vaultwares.ca
+whisparr.vaultwares.ca
+sabnzbd.vaultwares.ca
+decypharr.vaultwares.ca
+comet.vaultwares.ca
+flaresolverr.vaultwares.ca
+uptime.vaultwares.ca
+vaultwares.ca
+www.vaultwares.ca
+flows.vaultwares.ca
 ```
 
 `api.vaultwares.ca` is intentionally excluded from the Greencloud split-DNS
@@ -78,7 +108,7 @@ If you choose to route the parent zone `vaultwares.ca` to `greencloud-vps`, `dns
 
 > The ACL must allow `tag:server` on port **53** (TCP+UDP) if `greencloud-vps` is the authoritative nameserver. See Key rules above.
 
-### Step 2 — nginx internal vhost on the Tailscale interface
+### Step 2 -- nginx internal vhost on the Tailscale interface
 
 Add a second `server` block that listens only on the Tailscale IP:
 
@@ -87,7 +117,6 @@ server {
     listen 100.x.x.x:443 ssl;
     server_name stats.vaultwares.ca;
 
-    # Tailscale-issued cert (or Let's Encrypt if using tailscale cert)
     ssl_certificate     /etc/nginx/certs/stats.vaultwares.ca.crt;
     ssl_certificate_key /etc/nginx/certs/stats.vaultwares.ca.key;
 
@@ -110,15 +139,27 @@ sudo nginx -t && sudo systemctl reload nginx
 
 You have two options:
 
-- **`tailscale cert`** — generates a Let's Encrypt cert valid for the MagicDNS FQDN. Works if the vhost `server_name` matches the MagicDNS name.
-- **Existing Let's Encrypt cert** — if you already have a wildcard or SAN cert for `*.vaultwares.ca`, reuse it here.
+- **`tailscale cert`** -- generates a Let's Encrypt cert valid for the MagicDNS FQDN. Works if the vhost `server_name` matches the MagicDNS name.
+- **Existing Let's Encrypt cert** -- if you already have a wildcard or SAN cert for `*.vaultwares.ca`, reuse it here.
 
 ### ACL note
 
-No ACL change is needed for the web traffic itself — the existing rule `owner → tag:server : [80, 443]` already covers it. The Split DNS entry is the sole gate.
+No ACL change is needed for the web traffic itself -- the existing rule `owner -> tag:server : [80, 443]` already covers it. The Split DNS entry is the sole gate.
+
+## Tailscale Serve on Clopeux-Desktop
+
+`Clopeux-Desktop` runs Tailscale Serve to expose `stash-win` (Stash media manager) on port `9999` to the tailnet:
+
+```
+https://clopeux-desktop.tail1764b8.ts.net (tailnet only)
+|-- / proxy http://127.0.0.1:9999
+```
+
+This is the only Tailscale Serve endpoint in the fleet. Do not enable Tailscale Serve on `vps-ovhcloud` port `443` -- it intercepts tailnet clients before nginx and breaks `api.vaultwares.ca`.
+
 ## Operational notes
 
-- Avoid tagging personal devices unless you intentionally want them to behave like “service accounts”.
+- Avoid tagging personal devices unless you intentionally want them to behave like "service accounts".
 - Prefer dedicated tags for infrastructure: `tag:server`, `tag:vps-old`, `tag:vps-greencloud`.
 - Brume2 (`brumeux`, `100.114.136.28`) is a stock-flashed proxy-only node; it
   no longer runs the home drop-in gateway / AdGuard. Its SSH is Tailscale-SSH
