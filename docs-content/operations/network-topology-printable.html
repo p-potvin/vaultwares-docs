@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaultWares Network Topology - Printable Audit (Jul 2026)</title>
+    <!-- v1.0.0 -->
+    <style>
+        :root {
+            --bg: #fff;
+            --text: #1a1a1a;
+            --muted: #666;
+            --border: #ddd;
+            --pub-bg: #e8f0fe;
+            --pub-b: #4285f4;
+            --tn-bg: #e6f4ea;
+            --tn-b: #34a853;
+            --loc-bg: #fef7e0;
+            --loc-b: #fbbc04;
+            --prox-bg: #fce8e6;
+            --prox-b: #ea4335;
+            --ovh: #d93025;
+            --gc: #188038;
+            --pc: #f29900;
+            --brume: #9aa0a6
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: var(--text);
+            background: var(--bg);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px
+        }
+
+        h1 {
+            font-size: 22pt;
+            margin-bottom: 4px;
+            border-bottom: 3px solid #1a1a1a;
+            padding-bottom: 8px
+        }
+
+        h2 {
+            font-size: 16pt;
+            margin-top: 28px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+            page-break-after: avoid
+        }
+
+        h3 {
+            font-size: 13pt;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            page-break-after: avoid
+        }
+
+        h4 {
+            font-size: 11pt;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            color: var(--muted);
+            page-break-after: avoid
+        }
+
+        .sub {
+            color: var(--muted);
+            font-size: 10pt;
+            margin-bottom: 20px
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 9pt;
+            margin-bottom: 16px
+        }
+
+        .svg-c {
+            text-align: center;
+            margin: 20px 0;
+            page-break-inside: avoid
+        }
+
+        .svg-c svg {
+            max-width: 100%;
+            height: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0 16px 0;
+            font-size: 9.5pt;
+            page-break-inside: auto
+        }
+
+        th {
+            background: #f5f5f5;
+            border: 1px solid var(--border);
+            padding: 6px 8px;
+            text-align: left;
+            font-weight: 600
+        }
+
+        td {
+            border: 1px solid var(--border);
+            padding: 5px 8px;
+            vertical-align: top
+        }
+
+        tr:nth-child(even) {
+            background: #fafafa
+        }
+
+        tr {
+            page-break-inside: avoid
+        }
+
+        .mc {
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            page-break-inside: avoid
+        }
+
+        .mc.ovh {
+            border-color: var(--ovh);
+            background: #fff5f5
+        }
+
+        .mc.gc {
+            border-color: var(--gc);
+            background: #f5fdf5
+        }
+
+        .mc.pc {
+            border-color: var(--pc);
+            background: #fffdf5
+        }
+
+        .mc.brume {
+            border-color: var(--brume);
+            background: #f9f9f9
+        }
+
+        .mc h3 {
+            margin-top: 0
+        }
+
+        .pt {
+            font-size: 9pt
+        }
+
+        .pt td {
+            padding: 3px 8px
+        }
+
+        .pt td:first-child {
+            font-weight: 600;
+            white-space: nowrap;
+            width: 120px
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 8pt;
+            font-weight: 600;
+            text-transform: uppercase
+        }
+
+        .badge.pub {
+            background: var(--pub-bg);
+            color: var(--pub-b);
+            border: 1px solid var(--pub-b)
+        }
+
+        .badge.tn {
+            background: var(--tn-bg);
+            color: var(--tn-b);
+            border: 1px solid var(--tn-b)
+        }
+
+        .badge.loc {
+            background: var(--loc-bg);
+            color: #b06000;
+            border: 1px solid var(--loc-b)
+        }
+
+        .badge.lb {
+            background: #f0f0f0;
+            color: #555;
+            border: 1px solid #999
+        }
+
+        .leg {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 12px 0;
+            font-size: 9pt
+        }
+
+        .leg-i {
+            display: flex;
+            align-items: center;
+            gap: 4px
+        }
+
+        .leg-b {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            border: 2px solid
+        }
+
+        .pb {
+            page-break-before: always
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 20px 0
+        }
+
+        .note {
+            background: #e8f0fe;
+            border-left: 4px solid #4285f4;
+            padding: 8px 12px;
+            margin: 10px 0;
+            font-size: 9pt
+        }
+
+        code,
+        .cd {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 9pt;
+            background: #f5f5f5;
+            padding: 1px 4px;
+            border-radius: 2px
+        }
+
+        .cb {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 8.5pt;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            margin: 8px 0;
+            white-space: pre-wrap
+        }
+
+        @media print {
+            body {
+                font-size: 9pt;
+                padding: 0;
+                max-width: none
+            }
+
+            h1 {
+                font-size: 18pt
+            }
+
+            h2 {
+                font-size: 14pt
+            }
+
+            h3 {
+                font-size: 12pt
+            }
+
+            table {
+                font-size: 8pt
+            }
+
+            .mc {
+                break-inside: avoid
+            }
+
+            .svg-c {
+                break-inside: avoid
+            }
+
+            .np {
+                display: none
+            }
+
+            @page {
+                margin: 1cm;
+                size: A4 landscape
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>VaultWares Network Topology - Full Audit</h1>
+    <p class="sub">Comprehensive printable reference of all machines, services, ports, and network paths</p>
+    <p class="meta">Generated: Tue, 21 Jul 2026 12:35 America/Toronto | Tailnet: tail1764b8.ts.net | <span
+            class="np">Print: Ctrl+P, A4 Landscape</span></p>
+
+    <div class="leg">
+        <div class="leg-i">
+            <div class="leg-b" style="border-color:var(--pub-b);background:var(--pub-bg)"></div>Public
+        </div>
+        <div class="leg-i">
+            <div class="leg-b" style="border-color:var(--tn-b);background:var(--tn-bg)"></div>Tailnet-only
+        </div>
+        <div class="leg-i">
+            <div class="leg-b" style="border-color:var(--loc-b);background:var(--loc-bg)"></div>Local/Loopback
+        </div>
+        <div class="leg-i">
+            <div class="leg-b" style="border-color:var(--prox-b);background:var(--prox-bg)"></div>Residential Egress
+        </div>
+        <div class="leg-i">
+            <div class="leg-b" style="border-color:var(--ovh)"></div>OVH
+        </div>
+        <div class="leg-i">
+            <div class="leg-b" style="border-color:var(--gc)"></div>GreenCloud
+        </div>
+        <div class="leg-i">
+            <div class="leg-b" style="border-color:var(--pc)"></div>Clopeux
+        </div>
+        <div class="leg-i">
+            <div class="leg-b" style="border-color:var(--brume)"></div>Brume2
+        </div>
+    </div>
+
+    <h2>Network Topology Diagram</h2>
+    <div class="svg-c">
+        <svg viewBox="0 0 1400 920" xmlns="http://www.w3.org/2000/svg" style="font-family:'Segoe UI',Arial,sans-serif">
+            <defs>
+                <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#555" />
+                </marker>
+                <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#34a853" />
+                </marker>
+                <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#ea4335" />
+                </marker>
+                <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="#4285f4" />
+                </marker>
+                <filter id="s" x="-5%" y="-5%" width="110%" height="110%">
+                    <feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.15" />
+                </filter>
+            </defs>
+
+            <!-- Internet -->
+            <ellipse cx="700" cy="50" rx="350" ry="35" fill="#e8f0fe" stroke="#4285f4" stroke-width="2"
+                filter="url(#s)" />
+            <text x="700" y="55" text-anchor="middle" font-size="14" font-weight="bold" fill="#4285f4">Internet
+                (Public)</text>
+
+            <!-- Public services row 1 -->
+            <g font-size="8" filter="url(#s)">
+                <rect x="380" y="100" width="110" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="435" y="114" text-anchor="middle" fill="#1a56db">vaultwares.ca</text>
+                <rect x="500" y="100" width="110" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="555" y="114" text-anchor="middle"
+                    fill="#1a56db">flows.vaultwares.ca</text>
+                <rect x="620" y="100" width="90" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="665" y="114" text-anchor="middle" fill="#1a56db">noddit.org</text>
+                <rect x="720" y="100" width="100" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="770" y="114" text-anchor="middle" fill="#1a56db">prom-king.xyz</text>
+                <rect x="830" y="100" width="100" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="880" y="114" text-anchor="middle" fill="#1a56db">fullxxx.video</text>
+                <rect x="940" y="100" width="100" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="990" y="114" text-anchor="middle" fill="#1a56db">1pornhub.vip</text>
+                <!-- row 2 -->
+                <rect x="380" y="130" width="90" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="425" y="144" text-anchor="middle" fill="#1a56db">sexyprn.lol</text>
+                <rect x="480" y="130" width="120" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="540" y="144" text-anchor="middle"
+                    fill="#1a56db">links.fullxxx.video</text>
+                <rect x="610" y="130" width="130" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="675" y="144" text-anchor="middle"
+                    fill="#1a56db">links.prom-king.xyz</text>
+                <rect x="750" y="130" width="110" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="805" y="144" text-anchor="middle" fill="#1a56db">theitguyde.com</text>
+                <rect x="870" y="130" width="130" height="22" rx="11" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="935" y="144" text-anchor="middle"
+                    fill="#1a56db">hooks.vaultwares.ca</text>
+            </g>
+
+            <!-- Tailnet boundary -->
+            <rect x="30" y="180" width="1340" height="720" rx="12" fill="none" stroke="#34a853" stroke-width="2"
+                stroke-dasharray="8,4" opacity="0.5" />
+            <text x="50" y="200" font-size="11" font-weight="bold" fill="#34a853">Tailnet (WireGuard) -
+                tail1764b8.ts.net</text>
+
+            <!-- Tailnet-only services -->
+            <g font-size="8" filter="url(#s)">
+                <rect x="50" y="215" width="120" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="110" y="228" text-anchor="middle"
+                    fill="#188038">docs.vaultwares.ca</text>
+                <rect x="180" y="215" width="130" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="245" y="228" text-anchor="middle"
+                    fill="#188038">monitor.vaultwares.ca</text>
+                <rect x="320" y="215" width="120" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="380" y="228" text-anchor="middle"
+                    fill="#188038">stats.vaultwares.ca</text>
+                <rect x="450" y="215" width="130" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="515" y="228" text-anchor="middle"
+                    fill="#188038">warden.vaultwares.ca</text>
+                <rect x="590" y="215" width="120" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="650" y="228" text-anchor="middle"
+                    fill="#188038">api.vaultwares.ca</text>
+                <rect x="720" y="215" width="120" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="780" y="228" text-anchor="middle"
+                    fill="#188038">mcp.vaultwares.ca</text>
+                <rect x="850" y="215" width="120" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="910" y="228" text-anchor="middle"
+                    fill="#188038">comet.vaultwares.ca</text>
+                <rect x="980" y="215" width="120" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="1040" y="228" text-anchor="middle"
+                    fill="#188038">uptime.vaultwares.ca</text>
+                <rect x="1110" y="215" width="140" height="20" rx="10" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="1180" y="228" text-anchor="middle"
+                    fill="#188038">decypharr.vaultwares.ca</text>
+            </g>
+
+            <!-- GreenCloud VPS box -->
+            <rect x="50" y="260" width="480" height="380" rx="10" fill="#f5fdf5" stroke="#188038" stroke-width="2.5"
+                filter="url(#s)" />
+            <text x="290" y="280" text-anchor="middle" font-size="13" font-weight="bold"
+                fill="#188038">greencloud-vps</text>
+            <text x="290" y="294" text-anchor="middle" font-size="9" fill="#555">Debian 12 | 100.73.93.84 | Public
+                173.249.194.15</text>
+            <!-- GC services -->
+            <g font-size="8">
+                <rect x="70" y="305" width="130" height="28" rx="4" fill="#fff" stroke="#188038" stroke-width="1.5" />
+                <text x="135" y="323" text-anchor="middle" font-weight="600" fill="#188038">nginx :80/:443</text>
+                <rect x="210" y="305" width="130" height="28" rx="4" fill="#fff" stroke="#188038" stroke-width="1.5" />
+                <text x="275" y="318" text-anchor="middle" fill="#333">vw-webhookd</text><text x="275" y="328"
+                    text-anchor="middle" font-size="7" fill="#888">:9033</text>
+                <rect x="350" y="305" width="130" height="28" rx="4" fill="#fff" stroke="#188038" stroke-width="1.5" />
+                <text x="415" y="318" text-anchor="middle" fill="#333">vw-secretsd</text><text x="415" y="328"
+                    text-anchor="middle" font-size="7" fill="#888">:9444</text>
+                <rect x="70" y="343" width="130" height="28" rx="4" fill="#fff" stroke="#188038" stroke-width="1.5" />
+                <text x="135" y="356" text-anchor="middle" fill="#333">vaultwares-hooks</text><text x="135" y="366"
+                    text-anchor="middle" font-size="7" fill="#888">:8787</text>
+                <rect x="210" y="343" width="130" height="28" rx="4" fill="#fff" stroke="#188038" stroke-width="1.5" />
+                <text x="275" y="356" text-anchor="middle" fill="#333">tech-oracle-api</text><text x="275" y="366"
+                    text-anchor="middle" font-size="7" fill="#888">:9080</text>
+                <rect x="350" y="343" width="130" height="28" rx="4" fill="#fef7e0" stroke="#fbbc04"
+                    stroke-width="1.5" /><text x="415" y="356" text-anchor="middle"
+                    fill="#333">prom-king.xyz</text><text x="415" y="366" text-anchor="middle" font-size="7"
+                    fill="#888">:4322</text>
+                <rect x="70" y="381" width="130" height="28" rx="4" fill="#fef7e0" stroke="#fbbc04"
+                    stroke-width="1.5" /><text x="135" y="394" text-anchor="middle"
+                    fill="#333">fullxxx.video</text><text x="135" y="404" text-anchor="middle" font-size="7"
+                    fill="#888">:4321</text>
+                <rect x="210" y="381" width="130" height="28" rx="4" fill="#fef7e0" stroke="#fbbc04"
+                    stroke-width="1.5" /><text x="275" y="394" text-anchor="middle" fill="#333">link-sharing</text><text
+                    x="275" y="404" text-anchor="middle" font-size="7" fill="#888">:3001</text>
+                <rect x="350" y="381" width="130" height="28" rx="4" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="415" y="394" text-anchor="middle" fill="#333">Health
+                    Ledger</text><text x="415" y="404" text-anchor="middle" font-size="7" fill="#888">:8790/:8791</text>
+                <rect x="70" y="419" width="130" height="28" rx="4" fill="#fff" stroke="#999" stroke-width="1.5" /><text
+                    x="135" y="432" text-anchor="middle" fill="#333">PostgreSQL</text><text x="135" y="442"
+                    text-anchor="middle" font-size="7" fill="#888">:5432</text>
+                <rect x="210" y="419" width="130" height="28" rx="4" fill="#fff" stroke="#999" stroke-width="1.5" />
+                <text x="275" y="432" text-anchor="middle" fill="#333">MariaDB</text><text x="275" y="442"
+                    text-anchor="middle" font-size="7" fill="#888">:3306</text>
+                <rect x="350" y="419" width="130" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="415" y="432" text-anchor="middle" fill="#555">Docker:
+                    secrets-pg</text><text x="415" y="442" text-anchor="middle" font-size="7" fill="#888">:5444</text>
+                <rect x="70" y="457" width="130" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="135" y="470" text-anchor="middle"
+                    fill="#555">gluetun-proton</text><text x="135" y="480" text-anchor="middle" font-size="7"
+                    fill="#888">:8890/:8889</text>
+                <rect x="210" y="457" width="130" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="275" y="470" text-anchor="middle"
+                    fill="#555">qa_runner</text><text x="275" y="480" text-anchor="middle" font-size="7"
+                    fill="#888">(Docker)</text>
+                <rect x="350" y="457" width="130" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="415" y="470" text-anchor="middle"
+                    fill="#555">qa_wireproxy</text><text x="415" y="480" text-anchor="middle" font-size="7"
+                    fill="#888">:1085</text>
+                <rect x="70" y="495" width="410" height="28" rx="4" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="275" y="508" text-anchor="middle" font-size="9" font-weight="600"
+                    fill="#188038">dnsmasq :53 (Split-DNS)</text><text x="275" y="518" text-anchor="middle"
+                    font-size="7" fill="#888">docs/monitor/stats/warden/api/mcp/comet/uptime/decypharr + media
+                    services</text>
+                <rect x="70" y="533" width="410" height="22" rx="4" fill="#fce8e6" stroke="#ea4335" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="275" y="547" text-anchor="middle" font-size="8"
+                    fill="#999">vw-deployd (disabled) | vw-deny-watch.timer (disabled) | vw-token-expiry-watch.timer
+                    (disabled)</text>
+            </g>
+            <text x="290" y="588" text-anchor="middle" font-size="8" fill="#888">SSH: root@100.73.93.84 (key:
+                greencloud-vps)</text>
+
+            <!-- OVH VPS box -->
+            <rect x="550" y="260" width="480" height="380" rx="10" fill="#fff5f5" stroke="#d93025" stroke-width="2.5"
+                filter="url(#s)" />
+            <text x="790" y="280" text-anchor="middle" font-size="13" font-weight="bold"
+                fill="#d93025">vps-ovhcloud</text>
+            <text x="790" y="294" text-anchor="middle" font-size="9" fill="#555">Ubuntu | 100.67.25.118 | Public
+                51.79.55.113</text>
+            <g font-size="8">
+                <rect x="570" y="305" width="130" height="28" rx="4" fill="#fff" stroke="#d93025" stroke-width="1.5" />
+                <text x="635" y="323" text-anchor="middle" font-weight="600" fill="#d93025">nginx :80/:443</text>
+                <rect x="710" y="305" width="130" height="28" rx="4" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="775" y="318" text-anchor="middle" fill="#333">VaultWares
+                    API</text><text x="775" y="328" text-anchor="middle" font-size="7" fill="#888">:9001
+                    (loopback)</text>
+                <rect x="850" y="305" width="130" height="28" rx="4" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="915" y="318" text-anchor="middle" fill="#333">MCP HTTP/SSE</text><text
+                    x="915" y="328" text-anchor="middle" font-size="7" fill="#888">:9020/:9021</text>
+                <rect x="570" y="343" width="130" height="28" rx="4" fill="#fef7e0" stroke="#fbbc04"
+                    stroke-width="1.5" /><text x="635" y="356" text-anchor="middle" fill="#333">1pornhub.vip</text><text
+                    x="635" y="366" text-anchor="middle" font-size="7" fill="#888">oneporn.service</text>
+                <rect x="710" y="343" width="130" height="28" rx="4" fill="#fef7e0" stroke="#fbbc04"
+                    stroke-width="1.5" /><text x="775" y="356" text-anchor="middle" fill="#333">sexyprn.lol</text><text
+                    x="775" y="366" text-anchor="middle" font-size="7" fill="#888">sexyprn.service</text>
+                <rect x="850" y="343" width="130" height="28" rx="4" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="915" y="356" text-anchor="middle" fill="#333">Comet
+                    (Docker)</text><text x="915" y="366" text-anchor="middle" font-size="7" fill="#888">:5173 via
+                    VPN</text>
+                <!-- Media stack -->
+                <rect x="570" y="381" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="615" y="394" text-anchor="middle"
+                    fill="#555">qbittorrent</text><text x="615" y="404" text-anchor="middle" font-size="7"
+                    fill="#888">:8081</text>
+                <rect x="670" y="381" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="715" y="394" text-anchor="middle" fill="#555">jackett</text><text
+                    x="715" y="404" text-anchor="middle" font-size="7" fill="#888">:9117</text>
+                <rect x="770" y="381" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="815" y="394" text-anchor="middle" fill="#555">sonarr</text><text
+                    x="815" y="404" text-anchor="middle" font-size="7" fill="#888">:8989</text>
+                <rect x="870" y="381" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="915" y="394" text-anchor="middle" fill="#555">radarr</text><text
+                    x="915" y="404" text-anchor="middle" font-size="7" fill="#888">:7878</text>
+                <rect x="570" y="419" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="615" y="432" text-anchor="middle" fill="#555">lidarr</text><text
+                    x="615" y="442" text-anchor="middle" font-size="7" fill="#888">:8686</text>
+                <rect x="670" y="419" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="715" y="432" text-anchor="middle" fill="#555">prowlarr</text><text
+                    x="715" y="442" text-anchor="middle" font-size="7" fill="#888">:9696</text>
+                <rect x="770" y="419" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="815" y="432" text-anchor="middle" fill="#555">whisparr</text><text
+                    x="815" y="442" text-anchor="middle" font-size="7" fill="#888">:6969</text>
+                <rect x="870" y="419" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="915" y="432" text-anchor="middle" fill="#555">sabnzbd</text><text
+                    x="915" y="442" text-anchor="middle" font-size="7" fill="#888">:8082</text>
+                <rect x="570" y="457" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="615" y="470" text-anchor="middle"
+                    fill="#555">pyload-ng</text><text x="615" y="480" text-anchor="middle" font-size="7"
+                    fill="#888">:8003</text>
+                <rect x="670" y="457" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="715" y="470" text-anchor="middle"
+                    fill="#555">flaresolverr</text><text x="715" y="480" text-anchor="middle" font-size="7"
+                    fill="#888">:8191</text>
+                <rect x="770" y="457" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="815" y="470" text-anchor="middle" fill="#555">webdav</text><text
+                    x="815" y="480" text-anchor="middle" font-size="7" fill="#888">:8083</text>
+                <rect x="870" y="457" width="90" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="915" y="470" text-anchor="middle"
+                    fill="#555">decypharr</text><text x="915" y="480" text-anchor="middle" font-size="7"
+                    fill="#888">:8282</text>
+                <!-- VPN gateways -->
+                <rect x="570" y="495" width="130" height="28" rx="4" fill="#fce8e6" stroke="#ea4335" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="635" y="508" text-anchor="middle"
+                    fill="#555">mullvad-gateway</text><text x="635" y="518" text-anchor="middle" font-size="7"
+                    fill="#888">VPN for qbt/jackett</text>
+                <rect x="710" y="495" width="130" height="28" rx="4" fill="#fce8e6" stroke="#ea4335" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="775" y="508" text-anchor="middle"
+                    fill="#555">gluetun-proton</text><text x="775" y="518" text-anchor="middle" font-size="7"
+                    fill="#888">:8890/:8889</text>
+                <rect x="850" y="495" width="130" height="28" rx="4" fill="#fce8e6" stroke="#ea4335" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="915" y="508" text-anchor="middle"
+                    fill="#555">comet-vpn</text><text x="915" y="518" text-anchor="middle" font-size="7"
+                    fill="#888">ProtonVPN</text>
+                <!-- Other -->
+                <rect x="570" y="533" width="130" height="28" rx="4" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="635" y="546" text-anchor="middle" fill="#333">uptime-kuma</text><text
+                    x="635" y="556" text-anchor="middle" font-size="7" fill="#888">:3001</text>
+                <rect x="710" y="533" width="130" height="28" rx="4" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="775" y="546" text-anchor="middle" fill="#333">Health
+                    Ledger</text><text x="775" y="556" text-anchor="middle" font-size="7"
+                    fill="#888">probe+heartbeat</text>
+                <rect x="850" y="533" width="130" height="28" rx="4" fill="#fff" stroke="#999" stroke-width="1.5" />
+                <text x="915" y="546" text-anchor="middle" fill="#333">upload-torrent</text><text x="915" y="556"
+                    text-anchor="middle" font-size="7" fill="#888">daemon</text>
+                <!-- Timers -->
+                <rect x="570" y="571" width="410" height="22" rx="4" fill="#fff8e1" stroke="#fbbc04" stroke-width="1"
+                    stroke-dasharray="3,2" /><text x="775" y="585" text-anchor="middle" font-size="7"
+                    fill="#888">Timers: tube-uploader(~15m) | drive-upload(~15m) | sab-rclone-mover(~1h) |
+                    linkvertise(~50-70m) | backup(daily)</text>
+            </g>
+            <text x="790" y="615" text-anchor="middle" font-size="8" fill="#888">SSH: ubuntu@100.67.25.118 (key:
+                tube-site-vps)</text>
+
+            <!-- Clopeux-Desktop box -->
+            <rect x="1050" y="260" width="310" height="380" rx="10" fill="#fffdf5" stroke="#f29900" stroke-width="2.5"
+                filter="url(#s)" />
+            <text x="1205" y="280" text-anchor="middle" font-size="13" font-weight="bold"
+                fill="#f29900">Clopeux-Desktop</text>
+            <text x="1205" y="294" text-anchor="middle" font-size="9" fill="#555">Windows | 100.71.101.21</text>
+            <g font-size="8">
+                <rect x="1070" y="305" width="270" height="28" rx="4" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="1205" y="318" text-anchor="middle" fill="#333">Tailscale Serve (HTTPS
+                    :443)</text><text x="1205" y="328" text-anchor="middle" font-size="7" fill="#888">proxy to Stash
+                    :9999</text>
+                <rect x="1070" y="343" width="125" height="28" rx="4" fill="#fef7e0" stroke="#fbbc04"
+                    stroke-width="1.5" /><text x="1132" y="356" text-anchor="middle" fill="#333">stash-win</text><text
+                    x="1132" y="366" text-anchor="middle" font-size="7" fill="#888">:9999</text>
+                <rect x="1205" y="343" width="135" height="28" rx="4" fill="#fef7e0" stroke="#fbbc04"
+                    stroke-width="1.5" /><text x="1272" y="356" text-anchor="middle"
+                    fill="#333">python-zipper</text><text x="1272" y="366" text-anchor="middle" font-size="7"
+                    fill="#888">:5171</text>
+                <rect x="1070" y="381" width="125" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1.5" />
+                <text x="1132" y="394" text-anchor="middle" fill="#333">Tor SOCKS</text><text x="1132" y="404"
+                    text-anchor="middle" font-size="7" fill="#888">:20000/:9051</text>
+                <rect x="1205" y="381" width="135" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1.5" />
+                <text x="1272" y="394" text-anchor="middle" fill="#333">flaresolverr</text><text x="1272" y="404"
+                    text-anchor="middle" font-size="7" fill="#888">:8191</text>
+                <rect x="1070" y="419" width="125" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1.5" />
+                <text x="1132" y="432" text-anchor="middle" fill="#333">Jackett</text><text x="1132" y="442"
+                    text-anchor="middle" font-size="7" fill="#888">:9117</text>
+                <rect x="1205" y="419" width="135" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1.5" />
+                <text x="1272" y="432" text-anchor="middle" fill="#333">pyLoad (local)</text><text x="1272" y="442"
+                    text-anchor="middle" font-size="7" fill="#888">:8003</text>
+                <rect x="1070" y="457" width="125" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1.5" />
+                <text x="1132" y="470" text-anchor="middle" fill="#333">FileZilla</text><text x="1132" y="480"
+                    text-anchor="middle" font-size="7" fill="#888">:14148</text>
+                <rect x="1205" y="457" width="135" height="28" rx="4" fill="#f0f0f0" stroke="#999" stroke-width="1.5" />
+                <text x="1272" y="470" text-anchor="middle" fill="#333">qBittorrent</text><text x="1272" y="480"
+                    text-anchor="middle" font-size="7" fill="#888">(desktop)</text>
+                <rect x="1070" y="495" width="270" height="28" rx="4" fill="#e6f4ea" stroke="#34a853"
+                    stroke-width="1.5" /><text x="1205" y="508" text-anchor="middle" fill="#333">Health Ledger
+                    heartbeat</text><text x="1205" y="518" text-anchor="middle" font-size="7" fill="#888">:8791</text>
+                <rect x="1070" y="533" width="125" height="28" rx="4" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="1132" y="546" text-anchor="middle" fill="#333">RDP</text><text
+                    x="1132" y="556" text-anchor="middle" font-size="7" fill="#888">:3389</text>
+                <rect x="1205" y="533" width="135" height="28" rx="4" fill="#e8f0fe" stroke="#4285f4"
+                    stroke-width="1.5" /><text x="1272" y="546" text-anchor="middle" fill="#333">SMB</text><text
+                    x="1272" y="556" text-anchor="middle" font-size="7" fill="#888">:445/:139</text>
+            </g>
+            <text x="1205" y="598" text-anchor="middle" font-size="8" fill="#888">Tailscale Serve:
+                clopeux-desktop.tail1764b8.ts.net</text>
+
+            <!-- Brume2 box -->
+            <rect x="350" y="670" width="500" height="110" rx="10" fill="#f9f9f9" stroke="#9aa0a6" stroke-width="2.5"
+                filter="url(#s)" />
+            <text x="600" y="690" text-anchor="middle" font-size="13" font-weight="bold" fill="#5f6368">Brume2 /
+                brumeux</text>
+            <text x="600" y="704" text-anchor="middle" font-size="9" fill="#555">OpenWrt (GL-MT2500) | 100.114.136.28 |
+                Residential WAN 74.57.201.206</text>
+            <rect x="420" y="715" width="160" height="28" rx="4" fill="#fce8e6" stroke="#ea4335" stroke-width="1.5"
+                filter="url(#s)" />
+            <text x="500" y="728" text-anchor="middle" font-size="9" font-weight="600" fill="#ea4335">tinyproxy
+                :8888</text>
+            <text x="500" y="738" text-anchor="middle" font-size="7" fill="#888">HTTP/CONNECT proxy
+                (tailnet-only)</text>
+            <text x="600" y="760" text-anchor="middle" font-size="8" fill="#888">Residential egress for shared-tube
+                /api/stream/* | Allowlisted to 100.64.0.0/10 | Tailscale-SSH only</text>
+
+            <!-- Connections -->
+            <line x1="435" y1="122" x2="290" y2="260" stroke="#4285f4" stroke-width="1.5" marker-end="url(#ab)"
+                opacity="0.5" />
+            <line x1="990" y1="122" x2="790" y2="260" stroke="#4285f4" stroke-width="1.5" marker-end="url(#ab)"
+                opacity="0.5" />
+            <line x1="935" y1="152" x2="290" y2="260" stroke="#4285f4" stroke-width="1.5" opacity="0.3" />
+            <line x1="425" y1="152" x2="790" y2="260" stroke="#4285f4" stroke-width="1.5" opacity="0.3" />
+            <line x1="530" y1="400" x2="550" y2="320" stroke="#34a853" stroke-width="2" marker-end="url(#ag)"
+                marker-start="url(#ag)" />
+            <text x="540" y="360" font-size="7" fill="#34a853" font-weight="600">API proxy</text>
+            <line x1="530" y1="500" x2="550" y2="440" stroke="#34a853" stroke-width="1.5" marker-end="url(#ag)"
+                opacity="0.5" />
+            <text x="540" y="475" font-size="7" fill="#34a853">media proxy</text>
+            <line x1="790" y1="640" x2="600" y2="670" stroke="#ea4335" stroke-width="2" marker-end="url(#ar)" />
+            <text x="680" y="660" font-size="8" fill="#ea4335" font-weight="600">:8888 CONNECT</text>
+            <line x1="290" y1="640" x2="500" y2="670" stroke="#ea4335" stroke-width="2" marker-end="url(#ar)" />
+            <line x1="600" y1="670" x2="700" y2="85" stroke="#ea4335" stroke-width="1.5" stroke-dasharray="5,3"
+                marker-end="url(#ar)" opacity="0.4" />
+
+            <!-- Tailnet nodes -->
+            <rect x="50" y="800" width="1310" height="90" rx="8" fill="#f5f5f5" stroke="#ddd" stroke-width="1" />
+            <text x="70" y="820" font-size="10" font-weight="bold" fill="#333">Tailnet Nodes (8 total)</text>
+            <g font-size="8" fill="#555">
+                <text x="70" y="838">clopeux-desktop | 100.71.101.21 | Windows | workstation</text>
+                <text x="70" y="852">greencloud-vps | 100.73.93.84 | Debian 12 | tag:server</text>
+                <text x="70" y="866">vps-ovhcloud | 100.67.25.118 | Ubuntu | tag:server</text>
+                <text x="70" y="880">brumeux | 100.114.136.28 | OpenWrt | tag:server</text>
+                <text x="450" y="838">aperture | 100.90.168.111 | Windows | personal</text>
+                <text x="450" y="852">clopeux-iphone | 100.75.112.67 | iOS | personal</text>
+                <text x="450" y="866">clopeux-laptop | 100.91.249.45 | Windows | personal</text>
+                <text x="450" y="880">ipad-9th-gen-wifi | 100.84.168.106 | iOS | personal</text>
+            </g>
+            <g font-size="7" fill="#555">
+                <rect x="800" y="830" width="10" height="10" fill="#e8f0fe" stroke="#4285f4" /><text x="815"
+                    y="839">Public</text>
+                <rect x="870" y="830" width="10" height="10" fill="#e6f4ea" stroke="#34a853" /><text x="885"
+                    y="839">Tailnet</text>
+                <rect x="950" y="830" width="10" height="10" fill="#fef7e0" stroke="#fbbc04" /><text x="965"
+                    y="839">App</text>
+                <rect x="1010" y="830" width="10" height="10" fill="#f0f0f0" stroke="#999" stroke-dasharray="2,1" />
+                <text x="1025" y="839">Docker</text>
+                <rect x="1090" y="830" width="10" height="10" fill="#fce8e6" stroke="#ea4335" stroke-dasharray="2,1" />
+                <text x="1105" y="839">VPN</text>
+                <rect x="1160" y="830" width="10" height="10" fill="#fff8e1" stroke="#fbbc04" stroke-dasharray="2,1" />
+                <text x="1175" y="839">Timer</text>
+                <rect x="800" y="850" width="10" height="10" fill="#fce8e6" stroke="#ea4335" /><text x="815"
+                    y="859">Egress</text>
+            </g>
+        </svg>
+    </div>
+    <!-- END SVG -->
+
+    <!-- MACHINE DETAILS -->
+    <div class="pb"></div>
+    <h2>Machine Details</h2>
+
+    <div class="mc gc">
+        <h3>greencloud-vps <span class="badge tn">Tailnet</span> <span class="badge pub">Public</span></h3>
+        <table class="pt">
+            <tr>
+                <td>OS</td>
+                <td>Debian 12</td>
+            </tr>
+            <tr>
+                <td>Tailnet</td>
+                <td><code>100.73.93.84</code></td>
+            </tr>
+            <tr>
+                <td>Public</td>
+                <td><code>173.249.194.15</code></td>
+            </tr>
+            <tr>
+                <td>SSH</td>
+                <td><code>root@100.73.93.84</code> (key: greencloud-vps)</td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>Web/docs/monitor, webhooks, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king,
+                    link-sharing</td>
+            </tr>
+        </table>
+        <h4>Listening Ports</h4>
+        <table>
+            <tr>
+                <th>Port</th>
+                <th>Bind</th>
+                <th>Process</th>
+                <th>Service</th>
+            </tr>
+            <tr>
+                <td>22</td>
+                <td>0.0.0.0</td>
+                <td>sshd</td>
+                <td>SSH (tailnet-only)</td>
+            </tr>
+            <tr>
+                <td>53</td>
+                <td>0.0.0.0</td>
+                <td>dnsmasq</td>
+                <td>Split-DNS</td>
+            </tr>
+            <tr>
+                <td>80/443</td>
+                <td>0.0.0.0 / 100.73.93.84</td>
+                <td>nginx</td>
+                <td>HTTP/HTTPS public + tailnet</td>
+            </tr>
+            <tr>
+                <td>3001</td>
+                <td>0.0.0.0</td>
+                <td>node</td>
+                <td>Link-sharing Fastify</td>
+            </tr>
+            <tr>
+                <td>4321</td>
+                <td>127.0.0.1</td>
+                <td>node</td>
+                <td>FullXXX shared-tube</td>
+            </tr>
+            <tr>
+                <td>4322</td>
+                <td>0.0.0.0</td>
+                <td>node</td>
+                <td>Prom-King content-site</td>
+            </tr>
+            <tr>
+                <td>5432</td>
+                <td>127.0.0.1</td>
+                <td>postgres</td>
+                <td>PostgreSQL</td>
+            </tr>
+            <tr>
+                <td>3306</td>
+                <td>127.0.0.1</td>
+                <td>mariadbd</td>
+                <td>MariaDB</td>
+            </tr>
+            <tr>
+                <td>5444</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>secrets-postgres</td>
+            </tr>
+            <tr>
+                <td>8787</td>
+                <td>127.0.0.1</td>
+                <td>uvicorn</td>
+                <td>vaultwares-hooks</td>
+            </tr>
+            <tr>
+                <td>8790</td>
+                <td>127.0.0.1</td>
+                <td>node</td>
+                <td>Health Ledger dashboard</td>
+            </tr>
+            <tr>
+                <td>8791</td>
+                <td>100.73.93.84</td>
+                <td>node</td>
+                <td>Health Ledger heartbeat</td>
+            </tr>
+            <tr>
+                <td>8889/8890</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>gluetun-proton VPN</td>
+            </tr>
+            <tr>
+                <td>9033</td>
+                <td>127.0.0.1</td>
+                <td>python3</td>
+                <td>vw-webhookd</td>
+            </tr>
+            <tr>
+                <td>9080</td>
+                <td>100.73.93.84</td>
+                <td>uvicorn</td>
+                <td>tech-oracle-api</td>
+            </tr>
+            <tr>
+                <td>9444</td>
+                <td>127.0.0.1</td>
+                <td>python</td>
+                <td>vw-secretsd</td>
+            </tr>
+            <tr>
+                <td>1085</td>
+                <td>0.0.0.0</td>
+                <td>Docker</td>
+                <td>qa_wireproxy</td>
+            </tr>
+        </table>
+        <h4>systemd (Active)</h4>
+        <table>
+            <tr>
+                <th>Unit</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>vw-webhookd</td>
+                <td>GitHub webhook receiver (vwdeploy)</td>
+            </tr>
+            <tr>
+                <td>vaultwares-hooks</td>
+                <td>Tailnet webhook handler (uvicorn)</td>
+            </tr>
+            <tr>
+                <td>vw-secretsd</td>
+                <td>Secrets service</td>
+            </tr>
+            <tr>
+                <td>health-ledger-probe</td>
+                <td>Probe Joker</td>
+            </tr>
+            <tr>
+                <td>health-ledger-heartbeat</td>
+                <td>Host Heartbeat</td>
+            </tr>
+            <tr>
+                <td>health-ledger-dashboard</td>
+                <td>Dashboard</td>
+            </tr>
+            <tr>
+                <td>health-ledger-alarm</td>
+                <td>Alarm Joker</td>
+            </tr>
+            <tr>
+                <td>health-ledger-token</td>
+                <td>Token Joker</td>
+            </tr>
+            <tr>
+                <td>tech-oracle-api</td>
+                <td>Tech Oracle FastAPI</td>
+            </tr>
+        </table>
+        <h4>systemd (Disabled)</h4>
+        <p>vw-deployd.service | vw-deny-watch.timer | vw-token-expiry-watch.timer</p>
+        <h4>Docker</h4>
+        <table>
+            <tr>
+                <th>Container</th>
+                <th>Ports</th>
+                <th>Role</th>
+            </tr>
+            <tr>
+                <td>gluetun-proton</td>
+                <td>8890/8889</td>
+                <td>ProtonVPN for QA</td>
+            </tr>
+            <tr>
+                <td>qa_runner</td>
+                <td>-</td>
+                <td>QA automation</td>
+            </tr>
+            <tr>
+                <td>qa_wireproxy</td>
+                <td>1085</td>
+                <td>WireProxy for QA</td>
+            </tr>
+            <tr>
+                <td>vw-secrets-postgres</td>
+                <td>5444</td>
+                <td>Postgres 16 for vault-warden</td>
+            </tr>
+        </table>
+        <h4>nginx Sites</h4>
+        <p>api, docs, flows, fullxxx.video, hooks, ledger, link-sharing, mcp, monitor, noddit.org, prom-king.xyz,
+            secrets, stats, theitguyde.com, vaultwares.ca, vw-media-acme, vw-media-tailnet, warden .vaultwares.ca</p>
+    </div>
+
+    <div class="mc ovh">
+        <h3>vps-ovhcloud <span class="badge tn">Tailnet</span> <span class="badge pub">Public</span></h3>
+        <table class="pt">
+            <tr>
+                <td>OS</td>
+                <td>Ubuntu</td>
+            </tr>
+            <tr>
+                <td>Tailnet</td>
+                <td><code>100.67.25.118</code></td>
+            </tr>
+            <tr>
+                <td>Public</td>
+                <td><code>51.79.55.113</code></td>
+            </tr>
+            <tr>
+                <td>SSH</td>
+                <td><code>ubuntu@100.67.25.118</code> (key: tube-site-vps)</td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>VaultWares API, MCP, shared-tube, Comet, media stack, Decypharr, Uptime Kuma</td>
+            </tr>
+        </table>
+        <h4>Listening Ports</h4>
+        <table>
+            <tr>
+                <th>Port</th>
+                <th>Bind</th>
+                <th>Process</th>
+                <th>Service</th>
+            </tr>
+            <tr>
+                <td>22</td>
+                <td>0.0.0.0</td>
+                <td>sshd</td>
+                <td>SSH</td>
+            </tr>
+            <tr>
+                <td>53</td>
+                <td>127.0.0.1</td>
+                <td>dnsmasq</td>
+                <td>DNS forwarding</td>
+            </tr>
+            <tr>
+                <td>80/443</td>
+                <td>public + tailnet</td>
+                <td>nginx</td>
+                <td>HTTP/HTTPS</td>
+            </tr>
+            <tr>
+                <td>3001</td>
+                <td>0.0.0.0</td>
+                <td>Docker</td>
+                <td>uptime-kuma</td>
+            </tr>
+            <tr>
+                <td>5173</td>
+                <td>100.67.25.118</td>
+                <td>Docker</td>
+                <td>Comet (via VPN)</td>
+            </tr>
+            <tr>
+                <td>6969</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>whisparr</td>
+            </tr>
+            <tr>
+                <td>7878</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>radarr</td>
+            </tr>
+            <tr>
+                <td>8003</td>
+                <td>100.67.25.118</td>
+                <td>Docker</td>
+                <td>pyload-ng</td>
+            </tr>
+            <tr>
+                <td>8081</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>qbittorrent (Mullvad)</td>
+            </tr>
+            <tr>
+                <td>8082</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>sabnzbd</td>
+            </tr>
+            <tr>
+                <td>8083</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>webdav</td>
+            </tr>
+            <tr>
+                <td>8191</td>
+                <td>100.67.25.118</td>
+                <td>Docker</td>
+                <td>flaresolverr</td>
+            </tr>
+            <tr>
+                <td>8282</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>decypharr</td>
+            </tr>
+            <tr>
+                <td>8686</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>lidarr</td>
+            </tr>
+            <tr>
+                <td>8791</td>
+                <td>100.67.25.118</td>
+                <td>node</td>
+                <td>Health Ledger heartbeat</td>
+            </tr>
+            <tr>
+                <td>8989</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>sonarr</td>
+            </tr>
+            <tr>
+                <td>9001</td>
+                <td>127.0.0.1</td>
+                <td>python</td>
+                <td>VaultWares API (loopback)</td>
+            </tr>
+            <tr>
+                <td>9020</td>
+                <td>100.67.25.118</td>
+                <td>python</td>
+                <td>MCP HTTP</td>
+            </tr>
+            <tr>
+                <td>9021</td>
+                <td>100.67.25.118</td>
+                <td>python</td>
+                <td>MCP SSE</td>
+            </tr>
+            <tr>
+                <td>9117</td>
+                <td>100.67.25.118</td>
+                <td>Docker</td>
+                <td>jackett (Mullvad)</td>
+            </tr>
+            <tr>
+                <td>9696</td>
+                <td>127.0.0.1</td>
+                <td>Docker</td>
+                <td>prowlarr</td>
+            </tr>
+            <tr>
+                <td>9698/9119</td>
+                <td>100.67.25.118</td>
+                <td>Docker</td>
+                <td>comet-idx VPN</td>
+            </tr>
+            <tr>
+                <td>1085</td>
+                <td>0.0.0.0</td>
+                <td>Docker</td>
+                <td>qa_wireproxy</td>
+            </tr>
+            <tr>
+                <td>8889/8890</td>
+                <td>0.0.0.0</td>
+                <td>Docker</td>
+                <td>gluetun-proton</td>
+            </tr>
+        </table>
+        <h4>systemd (Active)</h4>
+        <table>
+            <tr>
+                <th>Unit</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>vaultwares-api</td>
+                <td>VaultWares API</td>
+            </tr>
+            <tr>
+                <td>vaultwares-mcp</td>
+                <td>MCP HTTP</td>
+            </tr>
+            <tr>
+                <td>vaultwares-mcp-sse</td>
+                <td>MCP SSE</td>
+            </tr>
+            <tr>
+                <td>oneporn</td>
+                <td>1pornhub.vip shared-tube</td>
+            </tr>
+            <tr>
+                <td>sexyprn</td>
+                <td>sexyprn.lol shared-tube</td>
+            </tr>
+            <tr>
+                <td>health-ledger-probe</td>
+                <td>Probe Joker</td>
+            </tr>
+            <tr>
+                <td>health-ledger-heartbeat</td>
+                <td>Host Heartbeat</td>
+            </tr>
+            <tr>
+                <td>upload-torrent-daemon</td>
+                <td>Torrent upload daemon</td>
+            </tr>
+            <tr>
+                <td>mullvad-netns-restart-deps</td>
+                <td>Restart qbt/jackett after mullvad</td>
+            </tr>
+        </table>
+        <h4>systemd Timers</h4>
+        <table>
+            <tr>
+                <th>Timer</th>
+                <th>Interval</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>vw-tube-uploader</td>
+                <td>~15 min</td>
+                <td>rclone move tube content to GDrive</td>
+            </tr>
+            <tr>
+                <td>vw-drive-upload</td>
+                <td>~15 min</td>
+                <td>Upload media to GDrive</td>
+            </tr>
+            <tr>
+                <td>vw-sab-rclone-mover</td>
+                <td>~1 h</td>
+                <td>rclone move SABnzbd completed</td>
+            </tr>
+            <tr>
+                <td>vw-linkvertise</td>
+                <td>~50-70 min</td>
+                <td>Linkvertise downloader</td>
+            </tr>
+            <tr>
+                <td>vw-backup</td>
+                <td>Daily</td>
+                <td>VPS backup to GDrive</td>
+            </tr>
+        </table>
+        <h4>Docker Containers (23)</h4>
+        <table>
+            <tr>
+                <th>Container</th>
+                <th>Image</th>
+                <th>Role</th>
+            </tr>
+            <tr>
+                <td>comet</td>
+                <td>g0ldyy/comet</td>
+                <td>Debrid manager</td>
+            </tr>
+            <tr>
+                <td>comet-postgres</td>
+                <td>postgres:18</td>
+                <td>Comet DB</td>
+            </tr>
+            <tr>
+                <td>comet-vpn</td>
+                <td>gluetun</td>
+                <td>ProtonVPN for Comet</td>
+            </tr>
+            <tr>
+                <td>decypharr</td>
+                <td>cy01/blackhole</td>
+                <td>Debrid blackhole</td>
+            </tr>
+            <tr>
+                <td>uptime-kuma</td>
+                <td>louislam/uptime-kuma:2</td>
+                <td>Monitoring</td>
+            </tr>
+            <tr>
+                <td>gluetun-proton</td>
+                <td>gluetun</td>
+                <td>ProtonVPN gateway</td>
+            </tr>
+            <tr>
+                <td>linkvertise-mullvad-rotation</td>
+                <td>gluetun</td>
+                <td>Mullvad rotation</td>
+            </tr>
+            <tr>
+                <td>pyload-ng</td>
+                <td>linuxserver/pyload-ng</td>
+                <td>Download manager</td>
+            </tr>
+            <tr>
+                <td>qbittorrent</td>
+                <td>hotio/qbittorrent</td>
+                <td>Torrent client</td>
+            </tr>
+            <tr>
+                <td>jackett</td>
+                <td>linuxserver/jackett</td>
+                <td>Indexer</td>
+            </tr>
+            <tr>
+                <td>sabnzbd</td>
+                <td>hotio/sabnzbd</td>
+                <td>Usenet downloader</td>
+            </tr>
+            <tr>
+                <td>radarr</td>
+                <td>hotio/radarr</td>
+                <td>Movie manager</td>
+            </tr>
+            <tr>
+                <td>sonarr</td>
+                <td>hotio/sonarr</td>
+                <td>Series manager</td>
+            </tr>
+            <tr>
+                <td>whisparr</td>
+                <td>hotio/whisparr</td>
+                <td>Media manager</td>
+            </tr>
+            <tr>
+                <td>lidarr</td>
+                <td>hotio/lidarr</td>
+                <td>Music manager</td>
+            </tr>
+            <tr>
+                <td>prowlarr</td>
+                <td>hotio/prowlarr</td>
+                <td>Indexer manager</td>
+            </tr>
+            <tr>
+                <td>webdav</td>
+                <td>bytemark/webdav</td>
+                <td>WebDAV</td>
+            </tr>
+            <tr>
+                <td>mullvad-gateway</td>
+                <td>(custom)</td>
+                <td>Mullvad VPN gateway</td>
+            </tr>
+            <tr>
+                <td>flaresolverr</td>
+                <td>flaresolverr/flaresolverr</td>
+                <td>CF challenge solver</td>
+            </tr>
+            <tr>
+                <td>torbox-sab-bridge</td>
+                <td>python:3.12</td>
+                <td>Torbox bridge</td>
+            </tr>
+            <tr>
+                <td>qa_runner</td>
+                <td>qa-automation</td>
+                <td>QA runner</td>
+            </tr>
+            <tr>
+                <td>qa_wireproxy</td>
+                <td>qa-automation</td>
+                <td>WireProxy</td>
+            </tr>
+            <tr>
+                <td>gluetun-comet-idx</td>
+                <td>gluetun</td>
+                <td>Comet indexer VPN</td>
+            </tr>
+        </table>
+        <h4>nginx Sites</h4>
+        <p>1pornhub.vip, api.vaultwares.ca, decypharr.vaultwares.ca, mcp.vaultwares.ca, sabnzbd.vaultwares.ca,
+            sexyprn.lol, uptime.vaultwares.ca, vw-media-tailnet</p>
+    </div>
+
+    <div class="mc pc">
+        <h3>Clopeux-Desktop <span class="badge tn">Tailnet</span> <span class="badge loc">Local</span></h3>
+        <table class="pt">
+            <tr>
+                <td>OS</td>
+                <td>Windows</td>
+            </tr>
+            <tr>
+                <td>Tailnet</td>
+                <td><code>100.71.101.21</code></td>
+            </tr>
+            <tr>
+                <td>Access</td>
+                <td>RDP over Tailnet (3389); Tailscale Serve on :9999</td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>Workstation, local services (Stash, Tor, FlareSolverr, Jackett, pyLoad, python-zipper)</td>
+            </tr>
+        </table>
+        <h4>Listening Ports</h4>
+        <table>
+            <tr>
+                <th>Port</th>
+                <th>Bind</th>
+                <th>Process</th>
+                <th>Service</th>
+            </tr>
+            <tr>
+                <td>3389</td>
+                <td>0.0.0.0</td>
+                <td>Windows RDP</td>
+                <td>Remote Desktop</td>
+            </tr>
+            <tr>
+                <td>80</td>
+                <td>0.0.0.0</td>
+                <td>Windows</td>
+                <td>HTTP (IIS)</td>
+            </tr>
+            <tr>
+                <td>445/139</td>
+                <td>0.0.0.0</td>
+                <td>Windows</td>
+                <td>SMB</td>
+            </tr>
+            <tr>
+                <td>443</td>
+                <td>100.71.101.21</td>
+                <td>tailscaled</td>
+                <td>Tailscale Serve</td>
+            </tr>
+            <tr>
+                <td>9999</td>
+                <td>0.0.0.0</td>
+                <td>stash-win.exe</td>
+                <td>Stash (Tailscale Serve)</td>
+            </tr>
+            <tr>
+                <td>5171</td>
+                <td>0.0.0.0</td>
+                <td>python.exe</td>
+                <td>python-zipper builder</td>
+            </tr>
+            <tr>
+                <td>8003</td>
+                <td>[::1]</td>
+                <td>python.exe</td>
+                <td>pyLoad (local)</td>
+            </tr>
+            <tr>
+                <td>8191</td>
+                <td>0.0.0.0</td>
+                <td>flaresolverr.exe</td>
+                <td>FlareSolverr</td>
+            </tr>
+            <tr>
+                <td>9117</td>
+                <td>0.0.0.0</td>
+                <td>JackettConsole.exe</td>
+                <td>Jackett</td>
+            </tr>
+            <tr>
+                <td>8791</td>
+                <td>100.71.101.21</td>
+                <td>node.exe</td>
+                <td>Health Ledger heartbeat</td>
+            </tr>
+            <tr>
+                <td>14148</td>
+                <td>0.0.0.0</td>
+                <td>filezilla-server.exe</td>
+                <td>FileZilla Server</td>
+            </tr>
+            <tr>
+                <td>20000</td>
+                <td>127.0.0.1</td>
+                <td>tor.exe</td>
+                <td>Tor SOCKS</td>
+            </tr>
+            <tr>
+                <td>9051</td>
+                <td>127.0.0.1</td>
+                <td>tor.exe</td>
+                <td>Tor control</td>
+            </tr>
+        </table>
+        <h4>Local Apps</h4>
+        <table>
+            <tr>
+                <th>App</th>
+                <th>Path</th>
+                <th>Role</th>
+            </tr>
+            <tr>
+                <td>stash-win</td>
+                <td>...\Executables\stash-win.exe</td>
+                <td>Stash media manager</td>
+            </tr>
+            <tr>
+                <td>python-zipper</td>
+                <td>...\Github Repos\python-zipper</td>
+                <td>Dataset builder, Tor rotator, telegram bot</td>
+            </tr>
+            <tr>
+                <td>tor</td>
+                <td>...\python-zipper\Portable-Tor-Proxy-Rotator</td>
+                <td>Tor proxy for IP rotation</td>
+            </tr>
+            <tr>
+                <td>flaresolverr</td>
+                <td>...\Executables\flaresolverr</td>
+                <td>CF challenge solver</td>
+            </tr>
+            <tr>
+                <td>Jackett</td>
+                <td>C:\ProgramData\Jackett\</td>
+                <td>Local indexer</td>
+            </tr>
+            <tr>
+                <td>FileZilla Server</td>
+                <td>C:\Program Files\FileZilla Server\</td>
+                <td>FTP/SFTP</td>
+            </tr>
+            <tr>
+                <td>qBittorrent</td>
+                <td>C:\Program Files\qBittorrent\</td>
+                <td>Local torrent client</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="mc brume">
+        <h3>Brume2 / brumeux <span class="badge tn">Tailnet</span></h3>
+        <table class="pt">
+            <tr>
+                <td>OS</td>
+                <td>OpenWrt (GL-MT2500)</td>
+            </tr>
+            <tr>
+                <td>Tailnet</td>
+                <td><code>100.114.136.28</code></td>
+            </tr>
+            <tr>
+                <td>Public</td>
+                <td>Residential <code>74.57.201.206</code></td>
+            </tr>
+            <tr>
+                <td>Access</td>
+                <td>Tailscale-SSH only</td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>Residential egress proxy (tinyproxy)</td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <th>Port</th>
+                <th>Bind</th>
+                <th>Service</th>
+            </tr>
+            <tr>
+                <td>8888</td>
+                <td>100.114.136.28</td>
+                <td>tinyproxy HTTP/CONNECT (allowlisted 100.64.0.0/10)</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- SERVICES INVENTORY -->
+    <div class="pb"></div>
+    <h2>Services Inventory</h2>
+    <h3>Public (Internet-facing)</h3>
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>URL</th>
+            <th>Where</th>
+            <th>Repo</th>
+        </tr>
+        <tr>
+            <td>Main website</td>
+            <td>https://vaultwares.ca</td>
+            <td>greencloud-vps</td>
+            <td>vaultwares-website</td>
+        </tr>
+        <tr>
+            <td>vault-flows</td>
+            <td>https://flows.vaultwares.ca</td>
+            <td>greencloud-vps</td>
+            <td>vault-flows</td>
+        </tr>
+        <tr>
+            <td>Noddit</td>
+            <td>https://noddit.org</td>
+            <td>greencloud-vps</td>
+            <td>vault-flows</td>
+        </tr>
+        <tr>
+            <td>Prom-King content</td>
+            <td>https://prom-king.xyz</td>
+            <td>greencloud-vps :4322</td>
+            <td>Prom-King/content-site</td>
+        </tr>
+        <tr>
+            <td>FullXXX tube</td>
+            <td>https://fullxxx.video</td>
+            <td>greencloud-vps :4321</td>
+            <td>Prom-King/shared-tube</td>
+        </tr>
+        <tr>
+            <td>1PornHub tube</td>
+            <td>https://1pornhub.vip</td>
+            <td>vps-ovhcloud (oneporn.service)</td>
+            <td>Prom-King/shared-tube</td>
+        </tr>
+        <tr>
+            <td>SexyPRN tube</td>
+            <td>https://sexyprn.lol</td>
+            <td>vps-ovhcloud (sexyprn.service)</td>
+            <td>Prom-King/shared-tube</td>
+        </tr>
+        <tr>
+            <td>FullXXX links</td>
+            <td>https://links.fullxxx.video</td>
+            <td>greencloud-vps :3001</td>
+            <td>Prom-King/link-sharing</td>
+        </tr>
+        <tr>
+            <td>Prom-King links</td>
+            <td>https://links.prom-king.xyz</td>
+            <td>greencloud-vps :3001</td>
+            <td>Prom-King/link-sharing</td>
+        </tr>
+        <tr>
+            <td>Tech Oracle</td>
+            <td>https://theitguyde.com</td>
+            <td>greencloud-vps :9080</td>
+            <td>Prom-King/tech-oracle</td>
+        </tr>
+        <tr>
+            <td>GitHub webhooks</td>
+            <td>https://hooks.vaultwares.ca/github</td>
+            <td>greencloud-vps :9033</td>
+            <td>(ops)</td>
+        </tr>
+    </table>
+
+    <h3>Tailnet-only</h3>
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>URL / Endpoint</th>
+            <th>Where</th>
+        </tr>
+        <tr>
+            <td>Docs</td>
+            <td>https://docs.vaultwares.ca</td>
+            <td>greencloud-vps</td>
+        </tr>
+        <tr>
+            <td>Monitor</td>
+            <td>https://monitor.vaultwares.ca</td>
+            <td>greencloud-vps</td>
+        </tr>
+        <tr>
+            <td>Stats</td>
+            <td>https://stats.vaultwares.ca</td>
+            <td>greencloud-vps</td>
+        </tr>
+        <tr>
+            <td>Agent Ledger</td>
+            <td>https://monitor.vaultwares.ca/ledger</td>
+            <td>greencloud-vps</td>
+        </tr>
+        <tr>
+            <td>Health Ledger UI</td>
+            <td>https://monitor.vaultwares.ca/health-ledger</td>
+            <td>greencloud-vps</td>
+        </tr>
+        <tr>
+            <td>API</td>
+            <td>https://api.vaultwares.ca</td>
+            <td>vps-ovhcloud :9001</td>
+        </tr>
+        <tr>
+            <td>MCP HTTP</td>
+            <td>http://100.67.25.118:9020/mcp</td>
+            <td>vps-ovhcloud</td>
+        </tr>
+        <tr>
+            <td>MCP SSE</td>
+            <td>http://100.67.25.118:9021/mcp</td>
+            <td>vps-ovhcloud</td>
+        </tr>
+        <tr>
+            <td>Secrets</td>
+            <td>https://warden.vaultwares.ca</td>
+            <td>greencloud-vps :9444</td>
+        </tr>
+        <tr>
+            <td>Comet</td>
+            <td>https://comet.vaultwares.ca</td>
+            <td>vps-ovhcloud :5173 VPN</td>
+        </tr>
+        <tr>
+            <td>Uptime Kuma</td>
+            <td>https://uptime.vaultwares.ca</td>
+            <td>vps-ovhcloud :3001</td>
+        </tr>
+        <tr>
+            <td>Decypharr</td>
+            <td>https://decypharr.vaultwares.ca</td>
+            <td>vps-ovhcloud :8282</td>
+        </tr>
+        <tr>
+            <td>Tech Oracle API</td>
+            <td>100.73.93.84:9080</td>
+            <td>greencloud-vps</td>
+        </tr>
+        <tr>
+            <td>Stash</td>
+            <td>http://100.71.101.21:9999</td>
+            <td>Clopeux (Tailscale Serve)</td>
+        </tr>
+        <tr>
+            <td>HL heartbeat GC</td>
+            <td>100.73.93.84:8791</td>
+            <td>greencloud-vps</td>
+        </tr>
+        <tr>
+            <td>HL heartbeat OVH</td>
+            <td>100.67.25.118:8791</td>
+            <td>vps-ovhcloud</td>
+        </tr>
+        <tr>
+            <td>HL heartbeat PC</td>
+            <td>100.71.101.21:8791</td>
+            <td>Clopeux-Desktop</td>
+        </tr>
+    </table>
+
+    <h3>Local/Loopback (Clopeux-Desktop)</h3>
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>Endpoint</th>
+            <th>Visibility</th>
+        </tr>
+        <tr>
+            <td>python-zipper builder</td>
+            <td>http://100.71.101.21:5171</td>
+            <td><span class="badge loc">Tailnet/local</span></td>
+        </tr>
+        <tr>
+            <td>Tor SOCKS</td>
+            <td>socks5://127.0.0.1:20000</td>
+            <td><span class="badge lb">Loopback</span></td>
+        </tr>
+        <tr>
+            <td>Tor control</td>
+            <td>127.0.0.1:9051</td>
+            <td><span class="badge lb">Loopback</span></td>
+        </tr>
+        <tr>
+            <td>pyLoad (local)</td>
+            <td>http://[::1]:8003</td>
+            <td><span class="badge lb">Loopback</span></td>
+        </tr>
+        <tr>
+            <td>FlareSolverr</td>
+            <td>http://100.71.101.21:8191</td>
+            <td><span class="badge loc">Tailnet/local</span></td>
+        </tr>
+        <tr>
+            <td>Jackett</td>
+            <td>http://100.71.101.21:9117</td>
+            <td><span class="badge loc">Tailnet/local</span></td>
+        </tr>
+        <tr>
+            <td>FileZilla</td>
+            <td>100.71.101.21:14148</td>
+            <td><span class="badge loc">Tailnet/local</span></td>
+        </tr>
+        <tr>
+            <td>RDP</td>
+            <td>100.71.101.21:3389</td>
+            <td><span class="badge tn">Tailnet</span></td>
+        </tr>
+        <tr>
+            <td>SMB</td>
+            <td>100.71.101.21:445/139</td>
+            <td><span class="badge loc">Tailnet/local</span></td>
+        </tr>
+    </table>
+
+    <h3>Residential Egress (Brume2)</h3>
+    <table>
+        <tr>
+            <th>Service</th>
+            <th>Endpoint</th>
+            <th>Role</th>
+        </tr>
+        <tr>
+            <td>tinyproxy</td>
+            <td>http://100.114.136.28:8888</td>
+            <td>HTTP/CONNECT proxy on Brume2. Egresses home WAN (74.57.201.206). Allowlisted to 100.64.0.0/10. Used by
+                shared-tube /api/stream/* on both VPSes.</td>
+        </tr>
+    </table>
+
+    <!-- TAILNET NODES -->
+    <div class="pb"></div>
+    <h2>Tailnet Nodes</h2>
+    <table>
+        <tr>
+            <th>Node</th>
+            <th>Type</th>
+            <th>IP</th>
+            <th>OS</th>
+            <th>Tags</th>
+            <th>Notes</th>
+        </tr>
+        <tr>
+            <td>clopeux-desktop</td>
+            <td>workstation</td>
+            <td>100.71.101.21</td>
+            <td>Windows</td>
+            <td>personal</td>
+            <td>RDP, Stash, Tor, FlareSolverr, Jackett, pyLoad, python-zipper, HL heartbeat</td>
+        </tr>
+        <tr>
+            <td>greencloud-vps</td>
+            <td>server</td>
+            <td>100.73.93.84</td>
+            <td>Debian 12</td>
+            <td>tag:server</td>
+            <td>nginx, webhooks, secrets, HL hub, tech-oracle, fullxxx, prom-king, link-sharing, dnsmasq</td>
+        </tr>
+        <tr>
+            <td>vps-ovhcloud</td>
+            <td>server</td>
+            <td>100.67.25.118</td>
+            <td>Ubuntu</td>
+            <td>tag:server</td>
+            <td>VaultWares API, MCP, shared-tube, Comet, media stack, Decypharr, Uptime Kuma</td>
+        </tr>
+        <tr>
+            <td>brumeux</td>
+            <td>appliance</td>
+            <td>100.114.136.28</td>
+            <td>OpenWrt</td>
+            <td>tag:server</td>
+            <td>tinyproxy residential egress</td>
+        </tr>
+        <tr>
+            <td>aperture</td>
+            <td>personal</td>
+            <td>100.90.168.111</td>
+            <td>Windows</td>
+            <td>personal</td>
+            <td>Operator personal device</td>
+        </tr>
+        <tr>
+            <td>clopeux-iphone</td>
+            <td>personal</td>
+            <td>100.75.112.67</td>
+            <td>iOS</td>
+            <td>personal</td>
+            <td>Operator phone</td>
+        </tr>
+        <tr>
+            <td>clopeux-laptop</td>
+            <td>personal</td>
+            <td>100.91.249.45</td>
+            <td>Windows</td>
+            <td>personal</td>
+            <td>Operator laptop</td>
+        </tr>
+        <tr>
+            <td>ipad-9th-gen-wifi</td>
+            <td>personal</td>
+            <td>100.84.168.106</td>
+            <td>iOS</td>
+            <td>personal</td>
+            <td>Operator iPad</td>
+        </tr>
+    </table>
+
+    <!-- SPLIT DNS -->
+    <h2>Split DNS Hostnames</h2>
+    <p>Managed by dnsmasq on greencloud-vps. Each resolves to <code>100.73.93.84</code> for tailnet clients.</p>
+    <div class="cb">docs.vaultwares.ca
+        monitor.vaultwares.ca
+        stats.vaultwares.ca
+        mcp.vaultwares.ca
+        hooks.vaultwares.ca
+        secrets.vaultwares.ca
+        warden.vaultwares.ca
+        ledger.vaultwares.ca
+        pyload.vaultwares.ca
+        jackett.vaultwares.ca
+        qbittorrent.vaultwares.ca
+        sonarr.vaultwares.ca
+        radarr.vaultwares.ca
+        lidarr.vaultwares.ca
+        prowlarr.vaultwares.ca
+        whisparr.vaultwares.ca
+        sabnzbd.vaultwares.ca
+        decypharr.vaultwares.ca
+        comet.vaultwares.ca
+        flaresolverr.vaultwares.ca
+        uptime.vaultwares.ca
+        vaultwares.ca
+        www.vaultwares.ca
+        flows.vaultwares.ca</div>
+    <div class="note"><strong>Note:</strong> <code>api.vaultwares.ca</code> resolves to <code>vps-ovhcloud</code>
+        (100.67.25.118), not greencloud. Do not enable Tailscale Serve on OVH :443.</div>
+
+    <!-- SSH -->
+    <h2>SSH Access</h2>
+    <div class="cb"># OVH (user: ubuntu, key: tube-site-vps)
+        ssh -i "$env:USERPROFILE\.ssh\tube-site-vps" ubuntu@100.67.25.118
+
+        # GreenCloud (user: root, key: greencloud-vps)
+        ssh -i "$env:USERPROFILE\.ssh\greencloud-vps" root@100.73.93.84</div>
+
+    <!-- ACL RULES -->
+    <h2>Tailscale ACL Rules (Summary)</h2>
+    <table>
+        <tr>
+            <th>Rule</th>
+            <th>Source</th>
+            <th>Destination</th>
+            <th>Ports</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>Owner to servers</td>
+            <td>owner</td>
+            <td>tag:server</td>
+            <td>22, 80, 443</td>
+            <td>SSH + web</td>
+        </tr>
+        <tr>
+            <td>DNS</td>
+            <td>tag:server</td>
+            <td>tag:server</td>
+            <td>53 TCP+UDP</td>
+            <td>Split-DNS</td>
+        </tr>
+        <tr>
+            <td>RDP</td>
+            <td>owner</td>
+            <td>100.71.101.21</td>
+            <td>3389</td>
+            <td>Remote Desktop</td>
+        </tr>
+        <tr>
+            <td>API direct</td>
+            <td>owner</td>
+            <td>100.67.25.118</td>
+            <td>9001</td>
+            <td>VaultWares API</td>
+        </tr>
+        <tr>
+            <td>API proxy</td>
+            <td>tag:server</td>
+            <td>100.67.25.118</td>
+            <td>9001</td>
+            <td>GC proxies to OVH API</td>
+        </tr>
+        <tr>
+            <td>HL probe</td>
+            <td>tag:server</td>
+            <td>tag:server</td>
+            <td>80, 443</td>
+            <td>Cross-VPS health probes</td>
+        </tr>
+        <tr>
+            <td>SSH dispatch</td>
+            <td>tag:vps-greencloud</td>
+            <td>tag:vps-ovhcloud</td>
+            <td>22</td>
+            <td>Deploy dispatcher SSH</td>
+        </tr>
+        <tr>
+            <td>Egress proxy</td>
+            <td>tag:server</td>
+            <td>100.114.136.28</td>
+            <td>8888</td>
+            <td>Residential egress (tinyproxy)</td>
+        </tr>
+    </table>
+
+    <!-- NOTES -->
+    <h2>Key Notes</h2>
+    <ul style="font-size:9pt;margin-left:20px;line-height:1.8">
+        <li><strong>prom-king.xyz</strong> runs on <code>greencloud-vps</code> (:4322), NOT OVH. nginx proxies
+            /api/promking/ and /auth/ to vps-ovhcloud:9001.</li>
+        <li><strong>Link sharing</strong> runs on greencloud-vps (:3001) serving both links.fullxxx.video and
+            links.prom-king.xyz. Old links.1pornhub.vip and links.sexyprn.lol are retired.</li>
+        <li><strong>FullXXX</strong> is on greencloud-vps (:4321). <strong>1PornHub</strong> and
+            <strong>SexyPRN</strong> are on vps-ovhcloud (systemd services).</li>
+        <li><strong>Health Ledger</strong> runs on all 3 machines: Probe Joker + Heartbeat on greencloud and OVH,
+            Heartbeat-only on Clopeux.</li>
+        <li><strong>Comet</strong> on OVH manages debrid lookups via ProtonVPN, exposed on 100.67.25.118:5173 through
+            comet-vpn Docker network.</li>
+        <li><strong>python-zipper</strong> on Clopeux includes Portable Tor Proxy Rotator and dataset builder, used for
+            QA automation and content acquisition.</li>
+        <li><strong>vw-deployd</strong> on greencloud is disabled. Deploy dispatch goes through vw-webhookd.</li>
+        <li><strong>Tailscale Serve</strong> is only on Clopeux-Desktop (Stash :9999). Do NOT enable on vps-ovhcloud
+            :443 (breaks api.vaultwares.ca).</li>
+        <li><strong>Brume2</strong> is Tailscale-SSH only (no OpenSSH key/password). GL.iNet firmware disables OpenSSH
+            when Tailscale-SSH is on.</li>
+        <li><strong>Mullvad VPN</strong> for media stack is opt-in. Use
+            <code>/opt/vw-media-stack/bin/mullvad-compose all-up</code>, not <code>docker compose up -d</code>.</li>
+        <li>GitHub org is <strong>Prom-King</strong> (capital P, capital K, hyphen) for all Prom-King repos.</li>
+    </ul>
+
+    <hr>
+    <p class="meta">End of document. Generated from live audit Jul 2026. Source:
+        vaultwares-docs/operations/network-topology-printable.html</p>
+</body>
+
+</html>
