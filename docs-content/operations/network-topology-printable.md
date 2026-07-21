@@ -3,7 +3,7 @@
 > **Generated:** Tue, 21 Jul 2026 12:35 America/Toronto
 > **Tailnet:** tail1764b8.ts.net
 > **Print:** Open in any Markdown viewer that supports Mermaid (GitHub, VS Code, Typora), then Ctrl+P.
-> **B&W Friendly:** Machine boxes use distinct border styles (solid=OVH, double=GreenCloud, dashed=Clopeux, dotted=Brume2) instead of color coding.
+> **Border Styles:** Machine boxes use distinct border patterns (solid=OVH, double=GreenCloud, dashed=Clopeux, dotted=Brume2) for additional visual distinction alongside colors.
 
 ---
 
