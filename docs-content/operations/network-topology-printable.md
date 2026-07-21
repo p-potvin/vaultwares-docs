@@ -1,8 +1,9 @@
-# VaultWares Network Topology - Full Audit (Printable)
+﻿# VaultWares Network Topology - Full Audit (Printable)
 
 > **Generated:** Tue, 21 Jul 2026 12:35 America/Toronto
 > **Tailnet:** tail1764b8.ts.net
 > **Print:** Open in any Markdown viewer that supports Mermaid (GitHub, VS Code, Typora), then Ctrl+P.
+> **B&W Friendly:** Machine boxes use distinct border styles (solid=OVH, double=GreenCloud, dashed=Clopeux, dotted=Brume2) instead of color coding.
 
 ---
 
@@ -17,10 +18,10 @@ flowchart TB
     Flows["flows.vaultwares.ca"]
     Noddit["noddit.org"]
     PK["prom-king.xyz"]
-    FXV["fullxxx.video"]
-    OnePorn["1pornhub.vip"]
-    SexyPrn["sexyprn.lol"]
-    LinksFXV["links.fullxxx.video"]
+    FXV["fxv.video"]
+    OPH["oph.vip"]
+    SPN["spn.lol"]
+    LinksFXV["links.fxv.video"]
     LinksPK["links.prom-king.xyz"]
     TechOracle["theitguyde.com"]
     Hooks["hooks.vaultwares.ca"]
@@ -53,7 +54,7 @@ flowchart TB
       GChooks["vaultwares-hooks :8787"]
       GCtech["tech-oracle-api :9080"]
       GCpk["prom-king.xyz :4322"]
-      GCfxv["fullxxx.video :4321"]
+      GCfxv["fxv.video :4321"]
       GClinks["link-sharing :3001"]
       GChl["Health Ledger :8790/:8791"]
       GCpg["PostgreSQL :5432"]
@@ -69,13 +70,13 @@ flowchart TB
       OVHnginx["nginx :80/:443"]
       OVHapi["VaultWares API :9001 (loopback)"]
       OVHmcp["MCP HTTP :9020 / SSE :9021"]
-      OVHoneporn["oneporn.service"]
-      OVHsexyprn["sexyprn.service"]
+      OVHoph["oph.service"]
+      OVHspn["spn.service"]
       OVHcomet["Comet (Docker) :5173 via VPN"]
       OVHmedia["Media Stack (Docker):<br/>qbittorrent :8081 | jackett :9117<br/>sonarr :8989 | radarr :7878<br/>lidarr :8686 | prowlarr :9696<br/>whisparr :6969 | sabnzbd :8082<br/>pyload-ng :8003 | flaresolverr :8191<br/>webdav :8083 | decypharr :8282"]
       OVHvpn["VPN Gateways (Docker):<br/>mullvad-gateway | gluetun-proton :8890<br/>comet-vpn | gluetun-comet-idx :9698"]
       OVHother["uptime-kuma :3001 (Docker)<br/>Health Ledger probe+heartbeat :8791<br/>upload-torrent-daemon"]
-      OVHtimers["Timers: tube-uploader ~15m | drive-upload ~15m<br/>sab-rclone-mover ~1h | linkvertise ~50-70m | backup daily"]
+      OVHtimers["Timers: media-uploader ~15m | drive-upload ~15m<br/>sab-rclone-mover ~1h | linkvertise ~50-70m | backup daily"]
     end
 
     %% Clopeux-Desktop
@@ -111,8 +112,8 @@ flowchart TB
   LinksPK --> GC
   TechOracle --> GC
   Hooks --> GC
-  OnePorn --> OVH
-  SexyPrn --> OVH
+  OPH --> OVH
+  SPN --> OVH
 
   %% Tailnet service routing
   Docs --> GC
@@ -142,11 +143,14 @@ flowchart TB
 
 ### Legend
 
-| Color/Style | Meaning |
+| Style | Meaning |
 |---|---|
-| Solid box | Machine or service |
-| Dashed line | Tailscale (WireGuard) mesh |
-| Solid arrow | Traffic flow (HTTPS/proxy) |
+| **Solid border** | Public service / OVH machine |
+| **Double border** | GreenCloud machine |
+| **Dashed border** | Clopeux machine / Tailnet service |
+| **Dotted border** | Brume2 machine / Local service |
+| **Dashed line** | Tailscale (WireGuard) mesh |
+| **Solid arrow** | Traffic flow (HTTPS/proxy) |
 | `:PORT` | Listening port |
 
 ---
@@ -161,7 +165,7 @@ flowchart TB
 | Tailnet IP | `100.73.93.84` |
 | Public IP | `173.249.194.15` |
 | SSH | `root@100.73.93.84` (key: `greencloud-vps`) |
-| Role | Web/docs/monitor, webhooks, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king, link-sharing |
+| Role | Web/docs/monitor, webhooks, secrets, health-ledger hub, tech-oracle, fxv, prom-king, link-sharing |
 
 #### Listening Ports
 
@@ -171,7 +175,7 @@ flowchart TB
 | 53 | 0.0.0.0 | dnsmasq | Split-DNS for tailnet hostnames |
 | 80/443 | 0.0.0.0 / 100.73.93.84 | nginx | HTTP/HTTPS public + tailnet vhosts |
 | 3001 | 0.0.0.0 | node (vwdeploy) | Link-sharing Fastify server |
-| 4321 | 127.0.0.1 | node | FullXXX shared-tube app |
+| 4321 | 127.0.0.1 | node | FXV shared-app app |
 | 4322 | 0.0.0.0 | node (vwdeploy) | Prom-King content-site |
 | 5432 | 127.0.0.1 | postgres | Local PostgreSQL |
 | 3306 | 127.0.0.1 | mariadbd | Local MariaDB |
@@ -216,7 +220,7 @@ flowchart TB
 
 #### nginx Sites Enabled
 
-api, docs, flows, fullxxx.video, hooks, ledger, link-sharing, mcp, monitor, noddit.org, prom-king.xyz, secrets, stats, theitguyde.com, vaultwares.ca, vw-media-acme, vw-media-tailnet, warden .vaultwares.ca
+api, docs, flows, fxv.video, hooks, ledger, link-sharing, mcp, monitor, noddit.org, prom-king.xyz, secrets, stats, theitguyde.com, vaultwares.ca, vw-media-acme, vw-media-tailnet, warden .vaultwares.ca
 
 ---
 
@@ -228,7 +232,7 @@ api, docs, flows, fullxxx.video, hooks, ledger, link-sharing, mcp, monitor, nodd
 | Tailnet IP | `100.67.25.118` |
 | Public IP | `51.79.55.113` |
 | SSH | `ubuntu@100.67.25.118` (key: `tube-site-vps`) |
-| Role | VaultWares API, MCP, shared-tube, Comet, media stack, Decypharr, Uptime Kuma |
+| Role | VaultWares API, MCP, shared-app, Comet, media stack, Decypharr, Uptime Kuma |
 
 #### Listening Ports
 
@@ -266,8 +270,8 @@ api, docs, flows, fullxxx.video, hooks, ledger, link-sharing, mcp, monitor, nodd
 | vaultwares-api.service | VaultWares API |
 | vaultwares-mcp.service | MCP HTTP |
 | vaultwares-mcp-sse.service | MCP SSE |
-| oneporn.service | 1pornhub.vip shared-tube |
-| sexyprn.service | sexyprn.lol shared-tube |
+| oph.service | oph.vip shared-app |
+| spn.service | spn.lol shared-app |
 | health-ledger-probe.service | Probe Joker |
 | health-ledger-heartbeat.service | Host Heartbeat |
 | upload-torrent-daemon.service | Torrent upload daemon |
@@ -277,7 +281,7 @@ api, docs, flows, fullxxx.video, hooks, ledger, link-sharing, mcp, monitor, nodd
 
 | Timer | Interval | Description |
 |---|---|---|
-| vw-tube-uploader.timer | ~15 min | rclone move tube content to GDrive |
+| vw-media-uploader.timer | ~15 min | rclone move media content to GDrive |
 | vw-drive-upload.timer | ~15 min | Upload media to GDrive |
 | vw-sab-rclone-mover.timer | ~1 h | rclone move SABnzbd completed |
 | vw-linkvertise.timer | ~50-70 min | Linkvertise downloader |
@@ -313,7 +317,7 @@ api, docs, flows, fullxxx.video, hooks, ledger, link-sharing, mcp, monitor, nodd
 
 #### nginx Sites Enabled
 
-1pornhub.vip, api.vaultwares.ca, decypharr.vaultwares.ca, mcp.vaultwares.ca, sabnzbd.vaultwares.ca, sexyprn.lol, uptime.vaultwares.ca, vw-media-tailnet
+oph.vip, api.vaultwares.ca, decypharr.vaultwares.ca, mcp.vaultwares.ca, sabnzbd.vaultwares.ca, spn.lol, uptime.vaultwares.ca, vw-media-tailnet
 
 #### Docker Compose Files
 
@@ -393,36 +397,36 @@ https://clopeux-desktop.tail1764b8.ts.net (tailnet only)
 
 | Service | URL | Where | Repo |
 |---|---|---|---|
-| Main website | https://vaultwares.ca | greencloud-vps | vaultwares-website |
-| vault-flows | https://flows.vaultwares.ca | greencloud-vps | vault-flows |
-| Noddit | https://noddit.org | greencloud-vps | vault-flows |
-| Prom-King content | https://prom-king.xyz | greencloud-vps :4322 | Prom-King/content-site |
-| FullXXX tube | https://fullxxx.video | greencloud-vps :4321 | Prom-King/shared-tube |
-| 1PornHub tube | https://1pornhub.vip | vps-ovhcloud (oneporn.service) | Prom-King/shared-tube |
-| SexyPRN tube | https://sexyprn.lol | vps-ovhcloud (sexyprn.service) | Prom-King/shared-tube |
-| FullXXX links | https://links.fullxxx.video | greencloud-vps :3001 | Prom-King/link-sharing |
-| Prom-King links | https://links.prom-king.xyz | greencloud-vps :3001 | Prom-King/link-sharing |
-| Tech Oracle | https://theitguyde.com | greencloud-vps :9080 | Prom-King/tech-oracle |
-| GitHub webhooks | https://hooks.vaultwares.ca/github | greencloud-vps :9033 | (ops) |
+| Main website | <https://vaultwares.ca> | greencloud-vps | vaultwares-website |
+| vault-flows | <https://flows.vaultwares.ca> | greencloud-vps | vault-flows |
+| Noddit | <https://noddit.org> | greencloud-vps | vault-flows |
+| Prom-King content | <https://prom-king.xyz> | greencloud-vps :4322 | Prom-King/content-site |
+| FXV tube | <https://fxv.video> | greencloud-vps :4321 | Prom-King/shared-app |
+| OPH tube | <https://oph.vip> | vps-ovhcloud (oph.service) | Prom-King/shared-app |
+| SPN tube | <https://spn.lol> | vps-ovhcloud (spn.service) | Prom-King/shared-app |
+| FXV links | <https://links.fxv.video> | greencloud-vps :3001 | Prom-King/link-sharing |
+| Prom-King links | <https://links.prom-king.xyz> | greencloud-vps :3001 | Prom-King/link-sharing |
+| Tech Oracle | <https://theitguyde.com> | greencloud-vps :9080 | Prom-King/tech-oracle |
+| GitHub webhooks | <https://hooks.vaultwares.ca/github> | greencloud-vps :9033 | (ops) |
 
 ### Tailnet-only
 
 | Service | URL / Endpoint | Where |
 |---|---|---|
-| Docs | https://docs.vaultwares.ca | greencloud-vps |
-| Monitor | https://monitor.vaultwares.ca | greencloud-vps |
-| Stats | https://stats.vaultwares.ca | greencloud-vps |
-| Agent Ledger | https://monitor.vaultwares.ca/ledger | greencloud-vps |
-| Health Ledger UI | https://monitor.vaultwares.ca/health-ledger | greencloud-vps |
-| API | https://api.vaultwares.ca | vps-ovhcloud :9001 |
-| MCP HTTP | http://100.67.25.118:9020/mcp | vps-ovhcloud |
-| MCP SSE | http://100.67.25.118:9021/mcp | vps-ovhcloud |
-| Secrets | https://warden.vaultwares.ca | greencloud-vps :9444 |
-| Comet | https://comet.vaultwares.ca | vps-ovhcloud :5173 VPN |
-| Uptime Kuma | https://uptime.vaultwares.ca | vps-ovhcloud :3001 |
-| Decypharr | https://decypharr.vaultwares.ca | vps-ovhcloud :8282 |
+| Docs | <https://docs.vaultwares.ca> | greencloud-vps |
+| Monitor | <https://monitor.vaultwares.ca> | greencloud-vps |
+| Stats | <https://stats.vaultwares.ca> | greencloud-vps |
+| Agent Ledger | <https://monitor.vaultwares.ca/ledger> | greencloud-vps |
+| Health Ledger UI | <https://monitor.vaultwares.ca/health-ledger> | greencloud-vps |
+| API | <https://api.vaultwares.ca> | vps-ovhcloud :9001 |
+| MCP HTTP | <http://100.67.25.118:9020/mcp> | vps-ovhcloud |
+| MCP SSE | <http://100.67.25.118:9021/mcp> | vps-ovhcloud |
+| Secrets | <https://warden.vaultwares.ca> | greencloud-vps :9444 |
+| Comet | <https://comet.vaultwares.ca> | vps-ovhcloud :5173 VPN |
+| Uptime Kuma | <https://uptime.vaultwares.ca> | vps-ovhcloud :3001 |
+| Decypharr | <https://decypharr.vaultwares.ca> | vps-ovhcloud :8282 |
 | Tech Oracle API | 100.73.93.84:9080 | greencloud-vps |
-| Stash | http://100.71.101.21:9999 | Clopeux (Tailscale Serve) |
+| Stash | <http://100.71.101.21:9999> | Clopeux (Tailscale Serve) |
 | HL heartbeat GC | 100.73.93.84:8791 | greencloud-vps |
 | HL heartbeat OVH | 100.67.25.118:8791 | vps-ovhcloud |
 | HL heartbeat PC | 100.71.101.21:8791 | Clopeux-Desktop |
@@ -431,12 +435,12 @@ https://clopeux-desktop.tail1764b8.ts.net (tailnet only)
 
 | Service | Endpoint | Visibility |
 |---|---|---|
-| python-zipper builder | http://100.71.101.21:5171 | Tailnet/local |
+| python-zipper builder | <http://100.71.101.21:5171> | Tailnet/local |
 | Tor SOCKS | socks5://127.0.0.1:20000 | Loopback |
 | Tor control | 127.0.0.1:9051 | Loopback |
 | pyLoad (local) | http://[::1]:8003 | Loopback |
-| FlareSolverr | http://100.71.101.21:8191 | Tailnet/local |
-| Jackett | http://100.71.101.21:9117 | Tailnet/local |
+| FlareSolverr | <http://100.71.101.21:8191> | Tailnet/local |
+| Jackett | <http://100.71.101.21:9117> | Tailnet/local |
 | FileZilla | 100.71.101.21:14148 | Tailnet/local |
 | RDP | 100.71.101.21:3389 | Tailnet |
 | SMB | 100.71.101.21:445/139 | Tailnet/local |
@@ -445,7 +449,7 @@ https://clopeux-desktop.tail1764b8.ts.net (tailnet only)
 
 | Service | Endpoint | Role |
 |---|---|---|
-| tinyproxy | http://100.114.136.28:8888 | HTTP/CONNECT proxy on Brume2. Egresses home WAN (74.57.201.206). Allowlisted to 100.64.0.0/10. Used by shared-tube /api/stream/* on both VPSes. |
+| tinyproxy | <http://100.114.136.28:8888> | HTTP/CONNECT proxy on Brume2. Egresses home WAN (74.57.201.206). Allowlisted to 100.64.0.0/10. Used by shared-app /api/stream/* on both VPSes. |
 
 ---
 
@@ -454,8 +458,8 @@ https://clopeux-desktop.tail1764b8.ts.net (tailnet only)
 | Node | Type | IP | OS | Tags | Notes |
 |---|---|---|---|---|---|
 | clopeux-desktop | workstation | 100.71.101.21 | Windows | personal | RDP, Stash, Tor, FlareSolverr, Jackett, pyLoad, python-zipper, HL heartbeat |
-| greencloud-vps | server | 100.73.93.84 | Debian 12 | tag:server | nginx, webhooks, secrets, HL hub, tech-oracle, fullxxx, prom-king, link-sharing, dnsmasq |
-| vps-ovhcloud | server | 100.67.25.118 | Ubuntu | tag:server | VaultWares API, MCP, shared-tube, Comet, media stack, Decypharr, Uptime Kuma |
+| greencloud-vps | server | 100.73.93.84 | Debian 12 | tag:server | nginx, webhooks, secrets, HL hub, tech-oracle, fxv, prom-king, link-sharing, dnsmasq |
+| vps-ovhcloud | server | 100.67.25.118 | Ubuntu | tag:server | VaultWares API, MCP, shared-app, Comet, media stack, Decypharr, Uptime Kuma |
 | brumeux | appliance | 100.114.136.28 | OpenWrt | tag:server | tinyproxy residential egress |
 | aperture | personal | 100.90.168.111 | Windows | personal | Operator personal device |
 | clopeux-iphone | personal | 100.75.112.67 | iOS | personal | Operator phone |
@@ -531,8 +535,8 @@ ssh -i "$env:USERPROFILE\.ssh\greencloud-vps" root@100.73.93.84
 ## Key Notes
 
 - **prom-king.xyz** runs on `greencloud-vps` (:4322), NOT OVH. nginx proxies /api/promking/ and /auth/ to vps-ovhcloud:9001.
-- **Link sharing** runs on greencloud-vps (:3001) serving both links.fullxxx.video and links.prom-king.xyz. Old links.1pornhub.vip and links.sexyprn.lol are retired.
-- **FullXXX** is on greencloud-vps (:4321). **1PornHub** and **SexyPRN** are on vps-ovhcloud (systemd services).
+- **Link sharing** runs on greencloud-vps (:3001) serving both links.fxv.video and links.prom-king.xyz. Old links.oph.vip and links.spn.lol are retired.
+- **FXV** is on greencloud-vps (:4321). **OPH** and **SPN** are on vps-ovhcloud (systemd services).
 - **Health Ledger** runs on all 3 machines: Probe Joker + Heartbeat on greencloud and OVH, Heartbeat-only on Clopeux.
 - **Comet** on OVH manages debrid lookups via ProtonVPN, exposed on 100.67.25.118:5173 through comet-vpn Docker network.
 - **python-zipper** on Clopeux includes Portable Tor Proxy Rotator and dataset builder, used for QA automation and content acquisition.
