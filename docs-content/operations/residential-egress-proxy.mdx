@@ -5,7 +5,7 @@ description: "How shared-tube /api/stream/* fetches reach Cloudflare-protected s
 
 # Residential egress proxy (Private)
 
-Single source of truth for the **tailnet HTTP proxy that lets `shared-tube` fetch source pages and MP4 bytes from Cloudflare-protected tube-site CDNs**. Without this, every stream endpoint on `oneporn` / `sexyprn` (OVH) and `fxv` / `pkt` (greencloud) 502s.
+Single source of truth for the **tailnet HTTP proxy that lets `shared-tube` fetch source pages and MP4 bytes from Cloudflare-protected tube-site CDNs**. Without this, every stream endpoint on `fxv` / `oneporn` / `sexyprn` / `pkt` (all on greencloud) 502s.
 
 Related:
 - `operations/services-inventory` (the tinyproxy entry)
@@ -131,7 +131,7 @@ Only hostnames matching `PROXIED_HOST_RE` get tunneled. Everything else (vaultwa
 
 ### Environment
 
-`/etc/shared-tube/{fxv,pkt,oneporn,sexyprn}.env` on both `vps-ovhcloud` and `greencloud-vps`:
+`/etc/shared-tube/{fxv,pkt,oneporn,sexyprn}.env` on `greencloud-vps`:
 
 ```ini
 FLARESOLVERR_URL=http://100.67.25.118:8191/v1
@@ -150,7 +150,7 @@ Both vars must be set on **both** hosts, because either set of apps can do the r
   ```
   Output should be the home residential IP. If it returns a datacenter range or Cloudflare gates you, every video page will 502.
 - **The proxy is a single point of failure for playback.** Home internet down, Brume powered off, or a Tailscale auth/lapse on Brume = no playback on any site. The stream handler falls through to "Source page returned 403" or "Proxy streaming error: CDN rejected request" in this state, both 502 from nginx. There is no graceful degradation today — the only fix is restoring the proxy.
-- **Bandwidth and concurrency scale with home upload.** Every concurrent stream is one TLS tunnel through Brume → home WAN. Acceptable for current traffic; revisit if `oneporn` / `sexyprn` grow.
+- **Bandwidth and concurrency scale with home upload.** Every concurrent stream is one TLS tunnel through Brume → home WAN. Acceptable for current traffic; revisit if traffic grows.
 
 ## Troubleshooting
 

@@ -127,8 +127,8 @@ flowchart TB
 | Noddit | `https://noddit.org` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
 | Prom-King content site | `https://prom-king.xyz` | `greencloud-vps` (nginx to `127.0.0.1:4322`) | `443` | Let's Encrypt (nginx) |
 | FullXXX tube site | `https://fullxxx.video` | `greencloud-vps` (nginx to `127.0.0.1:4321`) | `443` | Let's Encrypt (nginx) |
-| 1PornHub tube site | `https://1pornhub.vip` | `vps-ovhcloud` (nginx to `oneporn.service`) | `443` | Let's Encrypt (nginx) |
-| SexyPRN tube site | `https://sexyprn.lol` | `vps-ovhcloud` (nginx to `sexyprn.service`) | `443` | Let's Encrypt (nginx) |
+| 1PornHub tube site | `https://1pornhub.vip` | `greencloud-vps` (nginx to `oneporn.service`) | `443` | Let's Encrypt (nginx) |
+| SexyPRN tube site | `https://sexyprn.lol` | `greencloud-vps` (nginx to `sexyprn.service`) | `443` | Let's Encrypt (nginx) |
 | FullXXX link sharing | `https://links.fullxxx.video` | `greencloud-vps` (nginx to `127.0.0.1:3001`) | `443` | Let's Encrypt (nginx) |
 | Prom-King link sharing | `https://links.prom-king.xyz` | `greencloud-vps` (nginx to `127.0.0.1:3001`) | `443` | Let's Encrypt (nginx) |
 | Tech Oracle | `https://theitguyde.com` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
@@ -204,7 +204,7 @@ ssh -i "$env:USERPROFILE\.ssh\greencloud-vps" root@100.73.93.84
 |---|---|---|---|---|
 | `clopeux-desktop` | workstation | `100.71.101.21` | Windows | RDP, Stash, Tor, FlareSolverr, Jackett, pyLoad, python-zipper, health-ledger heartbeat |
 | `greencloud-vps` | server | `100.73.93.84` | Debian 12 | nginx, webhooks, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king content-site, link-sharing |
-| `vps-ovhcloud` | server | `100.67.25.118` | Ubuntu | VaultWares API, MCP, shared-tube (oneporn/sexyprn), Comet, media stack, Decypharr, Uptime Kuma |
+| `vps-ovhcloud` | server | `100.67.25.118` | Ubuntu | VaultWares API, MCP, Comet, media stack, Decypharr, Uptime Kuma |
 | `brumeux` | appliance | `100.114.136.28` | OpenWrt | tinyproxy residential egress |
 | `aperture` | personal | `100.90.168.111` | Windows | Operator personal device |
 | `clopeux-iphone` | personal | `100.75.112.67` | iOS | Operator phone |

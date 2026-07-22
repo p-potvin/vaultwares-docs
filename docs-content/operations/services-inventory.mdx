@@ -221,7 +221,7 @@ Both `vps-ovhcloud` and `greencloud-vps` carry `STREAM_OUTBOUND_PROXY=http://100
 ## Notes on the table above
 
 - Legacy CMS and Prom-King prelanding monitors are retired.
-- `fullxxx.video`, `1pornhub.vip`, and `sexyprn.lol` are all `Prom-King/shared-tube` sites. FullXXX lives on Greencloud (`127.0.0.1:4321`); 1PornHub and SexyPRN live on OVH (systemd services).
+- `fullxxx.video`, `1pornhub.vip`, and `sexyprn.lol` are all `Prom-King/shared-tube` sites. All three sites (fxv, oneporn, sexyprn) now live on Greencloud (`127.0.0.1:4321`, `:4323`, `:4324`). Moved from OVH on 2026-07-22 to reduce OVH load.
 - `prom-king.xyz` runs a standalone React/Express content-site on `greencloud-vps` (`127.0.0.1:4322`). nginx proxies `/api/promking/` and `/auth/` to `vps-ovhcloud:9001` (VaultWares API).
 - Link sharing runs on `greencloud-vps` (`127.0.0.1:3001`) serving both `links.fullxxx.video` and `links.prom-king.xyz`. The old `links.1pornhub.vip` and `links.sexyprn.lol` entries are retired.
 - The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for every repo in this list.
