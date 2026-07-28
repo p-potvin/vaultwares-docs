@@ -24,7 +24,9 @@ When writing secrets to a Linux `.env` file from a Windows environment, Windows 
 - **Always strip CRLF** using a command like `sed -i 's/\r//g' <file>`.
 
 ### 4. GitHub App Keys over PATs
-For deployments (like Prom-King), we use GitHub App private keys (`/etc/vw-github-app/private-key.pem`), not Personal Access Tokens (PATs). If deployments fail, rotate the App private key; do not attempt to bypass it with a PAT.
+For deployments (like Prom-King), we use GitHub App private keys (/etc/vw-github-app/private-key.pem), not Personal Access Tokens (PATs). If deployments fail, rotate the App private key; do not attempt to bypass it with a PAT.
+
+Note that /etc/vw-webhookd/env on greencloud-vps is mode 0640, owner root:vwdeploy and holds both VW_GITHUB_WEBHOOK_SECRET and GH_TOKEN (used by legacy alert scripts). Also, vw-token-expiry-watch.timer is legacy; Token Joker owns active credential tracking.
 
 ### 5. Incident Response for Secrets
 If you suspect a secret was accidentally committed or logged, **stop immediately.** Do not try to quietly remove it. Propose a mitigation plan (rotate the key, revoke access, and scrub the git history) before proceeding with any other work.
