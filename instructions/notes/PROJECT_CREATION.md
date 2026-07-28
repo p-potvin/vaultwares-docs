@@ -31,7 +31,10 @@ If the project has a user-facing UI, add `vaultwares-themes` as a git submodule.
 The project must be discoverable. Add a project page under the appropriate `docs-content/` section in the `vaultwares-docs` repository using proper frontmatter, and regenerate the page resources.
 
 ### 5. Services Inventory
-Update `docs-content/operations/services-inventory.mdx` **only** when the project has a deployed runtime URL, a package distribution channel, or a monitored endpoint. Do not add local-only code milestones to the live inventory.
+Update docs-content/operations/services-inventory.mdx only when the project has a deployed runtime URL, a package distribution channel, or a monitored endpoint. Do not add local-only code milestones to the live inventory.
+
+### 6. Media Clients (Comet Rule)
+For media clients, preserve the Comet rule: torrent/debrid lookup and stream URL resolution stay server-side. Thin clients may consume only VaultWares-controlled media APIs and playback URLs returned by those APIs.
 
 ## When is it "Done"?
 A project creation is complete when all repo metadata exists, the docs page is live, Jira sync is explicitly configured and verified, the submodule boundaries are set, and the entire creation event is recorded in the agent ledger.
