@@ -1,60 +1,37 @@
-# SKILL_SYNC notes
+# Skill Sync Policy Notes
 
-## Source layout
-`vaultwares-docs/skills/<kebab-name>/SKILL.md`. Each skill is a folder so future assets (images, child reference files) can live next to it without breaking the sync's verbatim copy.
+Welcome to the VaultWares skill sync policy! This guide explains how we author, edit, and disseminate agent skills across multiple AI hosts and IDEs.
 
-## Frontmatter contract (v1)
-```yaml
----
-name: <kebab-name>            # required, kebab-case, matches folder name
-description: >                # required, multi-line scalar; enumerate verbatim trigger phrases
-  <one paragraph...>
-metadata:                     # optional
-  author: vaultwares
-  version: "1.0.0"
----
-```
-The script's parser handles `>`-folded multi-line `description` and flat `key: value` pairs. It does not handle nested arrays in frontmatter; if you add complex frontmatter (e.g. `allowed-tools: [a, b]`), extend `Parse-SkillFile` in `sync-global-skills.ps1` first.
+## The Challenge of Multiple Hosts
 
-## Host registry (kept inside the sync script)
+We use several different AI assistants (Claude Code, Codex, Gemini, OpenCode, Windsurf, VS Code). Each has its own preferred format and location for storing "skills" or "custom instructions." Managing these manually is impossible.
 
-| Host | Adapter | Target |
-|---|---|---|
-| Claude Code | verbatim | `~/.claude/skills/<name>/SKILL.md` |
-| Codex | verbatim | `~/.codex/skills/<name>/SKILL.md` |
-| Gemini | verbatim | `~/.gemini/skills/<name>/SKILL.md` |
-| OpenCode | verbatim | `~/.config/opencode/skills/<name>/SKILL.md` |
-| Windsurf | flatten | `~/.codeium/windsurf/memories/skills/<name>.md` (no frontmatter; description hoisted to a leading italic line) |
-| VS Code | prompt.md | `$APPDATA/Code/User/prompts/<name>.prompt.md` (frontmatter rewritten to `mode: agent` + `description`) |
+## Guidelines for Synchronizing Skills
 
-Claude Desktop is intentionally skipped — no per-skill primitive.
+### 1. The Source of Truth
+The definitive source for any skill is always `vaultwares-docs/skills/<name>/SKILL.md`.
+- Each skill gets its own folder (e.g., `<kebab-name>`) so that future assets like images or child reference files can live next to it.
+- The file must contain specific YAML frontmatter (name, description, metadata) that the sync scripts rely on.
 
-## Authoring flow (use the create-skill skill)
-1. User asks for a new skill → `create-skill` triggers and runs an interrogation (7–12 questions, each with ≥3 choices + free-text).
-2. Draft is written to `vaultwares-docs/skills/<name>/SKILL.md` and shown back.
-3. User confirms with `ship` / `go` / `yes`.
-4. Agent runs `sync-global-skills.ps1 -SkillName <name>`.
-5. Agent verifies six on-disk targets exist.
-6. Ledger event recorded with `-Kind "code-change,verification"` and `-Project "vaultwares-docs"`.
+### 2. Authoring via the Agent
+Do not author new skills by manually typing out markdown files if possible.
+- Use the `create-skill` agent skill. It runs an interrogation flow, drafts the skill, asks for user confirmation, and then automatically triggers the sync.
+- Never push a draft skill to disk before the user has explicitly confirmed it (`ship`, `go`, `yes`).
 
-## Useful invocations
-```powershell
-# Disseminate every skill in the source folder
-./scripts/sync-global-skills.ps1
+### 3. Dissemination (The Sync Script)
+After *any* change to the source file, you must disseminate it using the sync script:
+`vaultwares-docs/scripts/sync-global-skills.ps1 [-SkillName <name>] [-DryRun]`
 
-# Disseminate one skill
-./scripts/sync-global-skills.ps1 -SkillName grill-me
+The script handles the translation to different host adapters:
+- **Verbatim Copy:** Claude Code, Codex, Gemini, OpenCode.
+- **Flattened (No Frontmatter):** Windsurf (description hoisted to a leading italic line).
+- **VS Code Prompt:** Rewrites frontmatter to `mode: agent` + description.
 
-# Dry run — print intended paths only
-./scripts/sync-global-skills.ps1 -DryRun
-```
+### 4. Do Not Hand-Edit Targets
+**Never hand-edit the per-host skill files** (e.g., `~/.claude/skills/`). The source in `vaultwares-docs` is authoritative; any manual edits in the target directories will be aggressively overwritten the next time the sync script runs.
 
-## Out of scope (v1)
-- Per-repo Cursor (`.cursor/rules/*.mdc`) and Copilot (`.github/prompts/*.prompt.md`) sync — would require repo enumeration.
-- Two-way sync. Source is authoritative; per-host edits are overwritten.
-- Scheduled / cron invocation. Manual only, matching `sync-global-instructions.ps1`.
+### 5. Verification
+After running the sync, you must verify that the target files (usually 8 different locations on disk) were successfully created or updated.
 
-## Related
-- `GLOBAL_INSTRUCTION_SYNC` — sibling protocol for Tier-1 instructions (one file, marker-based).
-- `KNOWLEDGE_SYNC` — durable knowledge in summaries/notes.
-- `BRAND_TOKENS_UI` — relevant when a skill references VaultWares theme tokens (always the Redesign).
+## When is it "Done"?
+A skill update is complete when the source file exists in `vaultwares-docs`, the sync script runs without warnings, all required targets are present on disk, and a ledger event is recorded detailing the sync.
