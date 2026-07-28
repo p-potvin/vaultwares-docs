@@ -20,5 +20,8 @@ When pulling in open-source dependencies (via npm, pip, etc.), ensure the licens
 ### 4. Data Residency
 Be aware of where data is stored. If a project requires GDPR compliance, ensure that any external services or databases utilized keep European user data within approved geographic boundaries.
 
+### 5. Handling Policy Conflicts
+If a request conflicts with security posture or policy, state the constraint and offer a safer alternative.
+
 ## When is it "Done"?
 A feature is compliant when it minimizes data collection, avoids prohibited impersonation mechanics, utilizes legally sound dependencies, and respects the geographical boundaries required by our deployment policies.
