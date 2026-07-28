@@ -1,28 +1,30 @@
-# RENAMING notes
+# Renaming Policy Notes
 
-## Why the mapping file order matters
-`backfill.py` uses `mapping/{repo}.json` (format: `{"prs": {}, "commits": {}}`) as its
-idempotency checkpoint. If the file still has the old name when backfill runs under the new
-name, the script treats every previously-synced PR and commit as new → creates duplicates in
-Jira. Cleaning up duplicates requires Jira REST DELETE calls or manual UI deletion.
+Welcome to the VaultWares renaming policy! This guide outlines the exact, multi-step procedure required when renaming critical infrastructure like GitHub repositories or Jira projects, ensuring we don't break tracking or duplicate data.
 
-Tested rename: `i-dub-thee` → `vaultwares-asttro` (2026-05-19). Partial re-backfill before
-mapping rename created IDUB-7 through IDUB-12 (6 duplicates); cleaned up manually.
+## The Danger of Renaming
 
-## Jira label scheme
-Labels embed the current GitHub repo name:
-- PR tasks: `gh-pr-{owner}-{repo}-{number}`
-- Commit tasks: `gh-commit-{owner}-{repo}-{sha12}`
+Systems like `vw-jira-sync` rely on stable identifiers to map GitHub PRs and Commits to Jira tasks. If you rename a repository without following the correct sequence, the sync scripts will lose their checkpoint. They will treat all historical data as "new" and create hundreds of duplicate tickets in Jira, which requires tedious manual cleanup.
 
-After a rename, only new events use the new-name labels. Existing issues keep old labels —
-that's fine. JQL lookups in live_sync.py search by label within the project, so both old and
-new labels resolve correctly as long as the Jira project key is unchanged.
+## The 6-Step Repo Rename Procedure
 
-## Multi-org repos
-If the repo being renamed is in a non-default org (listed under `repo_owners` in config.yaml),
-update that entry too (key = new name, value = org unchanged).
+If you must rename a GitHub repository, you **must** follow this exact order.
 
-## What does NOT need updating
-- Jira project key — stays the same (it's the stable identifier).
-- GitHub Actions caller workflow in the repo — GitHub redirects the repo URL automatically.
-- Existing Jira issues — they stay where they are; no field changes needed.
+1. **Rename on GitHub:** Change the repository name in the GitHub UI/Settings.
+2. **Update Config:** Update the `repo_project_keys` and `repos` lists in `vw-jira-sync/config.yaml` to reflect the new name.
+3. **Rename the Mapping File (Critical):**
+   - Before doing anything else, rename the local mapping checkpoint.
+   - Run: `Copy-Item mapping\old-name.json mapping\new-name.json`
+   - Then: `Remove-Item mapping\old-name.json`
+4. **Run Backfill:** Run the backfill script using the new name. Because the mapping file was renamed, it will prevent duplicates.
+   - `python scripts/backfill.py --repo new-name`
+5. **Redeploy Workflows:** Update the CI/CD caller workflows.
+   - `python scripts/deploy_caller_workflows.py --repo new-name --strategy main`
+6. **Commit and Push:** Commit these configuration changes in `vw-jira-sync` and push to `main`.
+
+## What Does NOT Need Updating
+- **The Jira Project Key:** This stays the same (it is the stable identifier).
+- **Existing Jira Issues:** They keep their old labels; JQL lookups handle this automatically.
+
+## When is it "Done"?
+A rename is complete when the configuration yaml is updated, the mapping file is renamed, the backfill runs with zero errors (and zero duplicates), the caller workflow is re-deployed, and all changes are pushed to main.

@@ -1,54 +1,40 @@
-# PROJECT_CREATION Notes
+# Project Creation Policy Notes
 
-Last updated: Wed, 01 Jul 2026 00:09 America/Toronto.
+Welcome to the VaultWares project creation policy! This guide outlines the minimum requirements for bootstrapping a new repository or service so that it doesn't become an untracked "code island."
 
-This protocol exists so new VaultWares apps do not appear as untracked code
-islands. The minimum project creation package is:
+## Why We Bootstrap Standardly
 
-1. Repository identity:
-   - canonical repo name
-   - owner/org
-   - one-sentence purpose
-   - runtime class: web app, desktop app, mobile app, service, library, docs,
-     automation, or experiment
-   - security/privacy boundary
+When a new project is created without standard metadata, Jira tracking, or documentation, it becomes invisible to the rest of the company. Onboarding new developers becomes difficult, and operational scripts (like backups or deployments) ignore it.
 
-2. Root files:
-   - `README.md` with purpose, commands, environment names, and safety boundary
-   - `ROADMAP.md` with milestone-level work
-   - `TODO.md` with immediate operational tasks
-   - `AGENTS.md` with repo-specific boundaries and a pointer to VaultWares Docs
+## The Minimum Project Package
 
-3. Theme and UI:
-   - add `vaultwares-themes` as a submodule for apps with user-facing UI
-   - do not patch the theme inside the submodule checkout
-   - update the standalone `vaultwares-themes` repo first, then update the
-     submodule pointer
+When creating a new repo, app, or service, you must complete the following checklist:
 
-4. Jira and sync:
-   - create a team-managed Kanban Jira project with an uppercase 2-10 character
-     key
-   - add `repo_project_keys` and `repos` entries in `vw-jira-sync/config.yaml`
-   - add the repository webhook to `https://hooks.vaultwares.ca/github`
-   - run `python scripts/backfill.py --repo <repo>` only after Jira exists
-   - do not paste Jira or GitHub tokens into docs, chat, or ledger
+### 1. Repository Identity & Root Files
+Define the canonical name, owner, and runtime class (e.g., web app, service, automation).
+You must create or update these root files:
+- `README.md`: Purpose, commands, environments, and safety boundaries.
+- `ROADMAP.md`: High-level, milestone-based goals.
+- `TODO.md`: Immediate operational tasks.
+- `AGENTS.md`: Repo-specific AI boundaries and a pointer to global docs.
 
-5. VaultWares Docs:
-   - add a project page under the most specific `docs-content/` section
-   - use `title` and `description` frontmatter
-   - link to repo root files and relevant operations runbooks
-   - regenerate page resources with `npm run generate:page-resources`
+### 2. UI and Theming (If Applicable)
+If the project has a user-facing UI, add `vaultwares-themes` as a git submodule. Do not patch the theme inside this submodule; update the standalone theme repo first.
 
-6. Inventory:
-   - update `docs-content/operations/services-inventory.mdx` only when there is
-     a deployed URL, package distribution surface, monitored service, or
-     operator-facing endpoint
-   - for local-only code milestones, document the project page instead
+### 3. Jira and Sync Automation
+- Create a team-managed Kanban Jira project with an uppercase 2-10 character key.
+- Update `vw-jira-sync/config.yaml` to map the repo to the new Jira key.
+- Add the GitHub webhook pointing to our infrastructure.
+- **Run the backfill script only after the Jira project is confirmed to exist.**
 
-7. Verification:
-   - run the smallest local checks that prove the new metadata/docs render
-   - for external systems, record verified success or the exact blocker
+### 4. VaultWares Docs Integration
+The project must be discoverable. Add a project page under the appropriate `docs-content/` section in the `vaultwares-docs` repository using proper frontmatter, and regenerate the page resources.
 
-For media clients, preserve the Comet rule: torrent/debrid lookup and stream URL
-resolution stay server-side. Thin clients may consume only VaultWares-controlled
-media APIs and playback URLs returned by those APIs.
+### 5. Services Inventory
+Update docs-content/operations/services-inventory.mdx only when the project has a deployed runtime URL, a package distribution channel, or a monitored endpoint. Do not add local-only code milestones to the live inventory.
+
+### 6. Media Clients (Comet Rule)
+For media clients, preserve the Comet rule: torrent/debrid lookup and stream URL resolution stay server-side. Thin clients may consume only VaultWares-controlled media APIs and playback URLs returned by those APIs.
+
+## When is it "Done"?
+A project creation is complete when all repo metadata exists, the docs page is live, Jira sync is explicitly configured and verified, the submodule boundaries are set, and the entire creation event is recorded in the agent ledger.
