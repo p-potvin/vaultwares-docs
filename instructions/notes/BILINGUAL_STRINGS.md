@@ -23,4 +23,4 @@ When adding new strings to a dictionary, always provide context if the word is a
 Always configure your localization system to fall back gracefully. If a string is missing in French, it should fall back to the English default rather than displaying an empty space or an ugly translation key (like `{{header.title}}`) to the user.
 
 ## When is it "Done"?
-A feature is complete when all its text is fully externalized, uses clear keys, and can be switched dynamically between our supported languages without breaking the UI layout.
+A feature is complete when all its text is fully externalized, uses clear keys, and can be switched dynamically between our supported languages without breaking the UI layout. Note that for internal-only developer notes and assistant protocol summaries, EN-only is acceptable unless the content is explicitly user-facing product documentation.
