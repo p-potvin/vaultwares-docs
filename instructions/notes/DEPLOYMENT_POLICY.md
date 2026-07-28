@@ -22,6 +22,15 @@ Every push to the `main` branch that triggers a deployment **MUST increment the 
 ### 3. CI/CD Runners
 We do not rely on outside, GitHub-hosted runners for VaultWares infrastructure. All deployments must use our self-hosted runners to ensure network security and tailnet access.
 
+### 4. Troubleshooting on greencloud-vps
+When tracking down a missing auto-deploy, check this order:
+1. tail /var/log/vw-webhookd.log - look for a push: repo=... line for the SHA.
+   - If absent, the signature was rejected (deny: bad_signature).
+   - If present but no run: line follows, vw_jira_sync exited non-zero on an unpatched webhookd.
+   - If run: is there but exit= is non-zero, the deploy script itself failed.
+2. tail /var/log/vw-deploy-notify.log - confirms whether the alert hop fired.
+3. Verify deploy script invariants (lock perms, rsync -rltD, wp-cli sudo wrapper, no git fetch origin SHA).
+
 ### 4. Secret Rotation and Access
 Deployments often require secrets (like GitHub App private keys or webhook tokens).
 - Prom-King deploy git authentication is based on a GitHub App. If deployments are failing due to auth, rotate the App private key and verify installation access. **Do not attempt to fix deploy access with a Personal Access Token (PAT).**
