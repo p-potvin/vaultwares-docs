@@ -1,10 +1,14 @@
 # HANDLING_BUGS
 Applies when: a bug/defect is reported or discovered.
 Do:
-- Create a GitHub issue first (title, reproduction, expected vs actual, environment).
-- Decide fix-now vs assign using token budget: fix now only if the full loop (diagnose+patch+verify+reply) is expected to fit within <=6000 tokens.
-- If not fix-now: assign the issue to the user and link it in the reply.
+- Diagnose the root cause before changing the environment (read the logs; no blind reinstalls).
+- Reproduce the defect, then add a regression test that fails before the patch and passes after.
+- Decide fix-now vs defer using token budget: fix now only if the full loop (diagnose+patch+verify+reply) is expected to fit within <=6000 tokens.
+- If deferring: record the diagnosis, reproduction, and remaining work in the ledger (and the repo's CHANGES/roadmap .md) so the next agent can resume without re-deriving it.
+- Audit for the same pattern elsewhere before calling it done.
 Do not:
-- Start large bugfix work without an issue link.
+- Ship a fix with no reproduction and no regression coverage.
 Done when:
-- Issue exists and is linked; fix is either merged via PR or clearly deferred with ownership.
+- Root cause is understood, the patch is verified locally, and regression coverage exists — or the defer is recorded with clear ownership.
+
+Changed Sun, 02 Aug 2026: dropped the "create a GitHub issue first" requirement. GitHub issues are no longer tracked; continuity lives in the agent-ledger and repo CHANGES/roadmap files.
