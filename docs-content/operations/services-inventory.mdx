@@ -47,7 +47,7 @@ Related:
 | FullXXX link sharing | `https://links.fullxxx.video` | Fastify link-sharing service on `greencloud-vps` (`127.0.0.1:3001`) | `Prom-King/link-sharing` | Public |
 | Prom-King link sharing | `https://links.prom-king.xyz` | Fastify link-sharing service on `greencloud-vps` (`127.0.0.1:3001`, same server as FullXXX links) | `Prom-King/link-sharing` | Public |
 | Tech Oracle | `https://theitguyde.com` | `tech-oracle-api.service` (FastAPI/uvicorn) on `greencloud-vps` (`100.73.93.84:9080`); nginx serves public site | `Prom-King/tech-oracle` | Public |
-| Comet (debrid manager) | `https://comet.vaultwares.ca` | Docker `comet` + `comet-postgres` + `comet-vpn` (ProtonVPN) on `vps-ovhcloud`; VPN-exposed on `100.67.25.118:5173` | `vw-comet` | Tailnet-only |
+| Comet (debrid manager) — **STOPPED** | `https://comet.vaultwares.ca` | Docker `comet` + `comet-postgres` + `comet-vpn` (ProtonVPN) on `vps-ovhcloud`; VPN-exposed on `100.67.25.118:5173`. **Stopped Thu, 06 Aug 2026 — 6000 GB of 8192 GB quota used, resets 12 Nov 2026.** Restart only when authorised: `cd /opt/vw-comet && sudo docker compose start` | `vw-comet` | Tailnet-only |
 | Uptime Kuma | `https://uptime.vaultwares.ca` | Docker `uptime-kuma` on `vps-ovhcloud` (`0.0.0.0:3001`); nginx on `100.67.25.118:443` | (ops service) | Tailnet-only |
 | Decypharr (debrid blackhole) | `https://decypharr.vaultwares.ca` | Docker `decypharr` on `vps-ovhcloud` (`127.0.0.1:8282`); nginx on `100.67.25.118:443` | (ops service) | Tailnet-only |
 | Stash | `http://100.71.101.21:9999` | `stash-win.exe` on `Clopeux-Desktop`; exposed via Tailscale Serve | (local install) | Tailnet-only (Tailscale Serve) |
