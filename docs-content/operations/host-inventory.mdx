@@ -14,6 +14,25 @@ Related:
 - `operations/services-inventory` (service-level table with URLs and repos)
 - `operations/tailscale` (ACLs, split DNS, tailnet nodes)
 
+## Working on the VPS hosts
+
+Both VPSes are administered **over SSH**, not through any control panel — that
+is the normal and expected way to inspect or change them.
+
+```bash
+ssh -i ~/.ssh/<key> root@100.73.93.84      # greencloud
+ssh -i ~/.ssh/<key> ubuntu@100.67.25.118   # OVH
+```
+
+Key **file names differ per workstation**, so this page names the account rather
+than the key. List `%USERPROFILE%\.ssh\` and use whichever key is authorised
+there; more than one is typically accepted for a given host. Both hosts are
+reachable only over the tailnet.
+
+Because everything here is measurable in one SSH session, **prefer verifying
+over trusting this page.** It records a point-in-time audit and drifts. Where an
+entry has been re-checked, the verification date is given inline.
+
 ---
 
 ## `vps-ovhcloud` (OVH VPS)
@@ -32,6 +51,7 @@ Related:
 |---|---|---|---|
 | `22` | `0.0.0.0` / `[::]` | `sshd` | SSH (tailnet-only via ACL) |
 | `53` | `127.0.0.1` / `100.67.25.118` / `[::1]` | `dnsmasq` | Local DNS forwarding |
+| `5432` | `127.0.0.1` | `postgres` | Local Postgres for OVH services |
 | `80` | `51.79.55.113` / `100.67.25.118` | `nginx` | HTTP (redirect to HTTPS) |
 | `443` | `51.79.55.113` / `100.67.25.118` | `nginx` | HTTPS public + tailnet vhosts |
 | `3001` | `0.0.0.0` | Docker (`uptime-kuma`) | Uptime Kuma |
@@ -46,7 +66,7 @@ Related:
 | `8686` | `127.0.0.1` / `100.67.25.118` | Docker (`lidarr`) / nginx | Lidarr |
 | `8791` | `100.67.25.118` | `node` | Health Ledger heartbeat (OVH) |
 | `8989` | `127.0.0.1` / `100.67.25.118` | Docker (`sonarr`) / nginx | Sonarr |
-| `9001` | `127.0.0.1` | `python` (FastAPI) | VaultWares API (loopback only) |
+| `9001` | `127.0.0.1` | `python` (FastAPI) | VaultWares API (loopback only — reachable **only** via this host's own nginx; see the warning below) |
 | `9020` | `100.67.25.118` | `python` | MCP HTTP server |
 | `9021` | `100.67.25.118` | `python` | MCP SSE server |
 | `9117` | `100.67.25.118` | Docker (`mullvad-gateway`) / nginx | Jackett (via Mullvad) |
@@ -127,7 +147,7 @@ Related:
 | **OS** | Debian 12 |
 | **Tailnet IP** | `100.73.93.84` |
 | **Public IP** | `173.249.194.15` |
-| **SSH** | `root@100.73.93.84` (key: `greencloud-vps`) |
+| **SSH** | `root@100.73.93.84` (key name varies by machine — see note below) |
 | **Role** | Web/docs/monitor host, webhook receiver, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king content-site, link-sharing |
 
 ### Listening ports
@@ -231,10 +251,10 @@ Related:
 
 | App | Path | Role |
 |---|---|---|
-| `stash-win` | `C:\Users\Administrator\Desktop\Executables\stash-win.exe` | Stash media manager |
-| `python-zipper` | `C:\Users\Administrator\Desktop\Github Repos\python-zipper` | Dataset builder, Tor proxy rotator, linkvertise, telegram bot, userscript |
-| `tor` | `C:\Users\Administrator\Desktop\Github Repos\python-zipper\Portable-Tor-Proxy-Rotator` | Tor proxy for IP rotation |
-| `flaresolverr` | `C:\Users\Administrator\Desktop\Executables\flaresolverr` | Cloudflare challenge solver |
+| `stash-win` | `C:\Users\%USERNAME%\Desktop\Executables\stash-win.exe` | Stash media manager |
+| `python-zipper` | `C:\Users\%USERNAME%\Desktop\Github Repos\python-zipper` | Dataset builder, Tor proxy rotator, linkvertise, telegram bot, userscript |
+| `tor` | `C:\Users\%USERNAME%\Desktop\Github Repos\python-zipper\Portable-Tor-Proxy-Rotator` | Tor proxy for IP rotation |
+| `flaresolverr` | `C:\Users\%USERNAME%\Desktop\Executables\flaresolverr` | Cloudflare challenge solver |
 | `Jackett` | `C:\ProgramData\Jackett\JackettConsole.exe` | Local Jackett indexer |
 | `FileZilla Server` | `C:\Program Files\FileZilla Server\filezilla-server.exe` | FTP/SFTP server |
 | `qBittorrent` | `C:\Program Files\qBittorrent\qbittorrent.exe` | Local qBittorrent client |

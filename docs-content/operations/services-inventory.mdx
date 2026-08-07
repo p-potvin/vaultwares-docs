@@ -102,7 +102,7 @@ Source of truth: `operations/deployment-flow`.
 |---|---|---|
 | `vw-webhookd` | systemd service, `127.0.0.1:9033` | Verifies GitHub webhook signatures + dispatches per-repo deploy scripts. Runs as `vwdeploy`. |
 | `vaultwares-hooks` | systemd service, `127.0.0.1:8787` | Tailnet-only webhook handler (uvicorn). |
-| `vw-secretsd` | systemd service, `127.0.0.1:9444` | Local secrets shim behind `warden.vaultwares.ca`. |
+| `vw-secretsd` | systemd service, `127.0.0.1:9444` | Secrets service behind `warden.vaultwares.ca`. **Runs the legacy 377-line build**, not the current `vault-warden` repo — it has no `/v1/vaults`, `/v1/account/key` or item endpoints, and `/opt/vault-warden` is not a git checkout. Anything written against the current repo API will 404 here until it is redeployed. Verified 2026-08-07. |
 | `vw-deployd` | systemd service (disabled) | Deploy webhook service; currently inactive. |
 | `vw-deny-watch.timer` | systemd timer (disabled) | Legacy GitHub issue writer for webhook `bad_signature` clusters. |
 | `vw-token-expiry-watch.timer` | systemd timer (disabled) | Legacy GitHub issue writer for token expiry. |
@@ -114,7 +114,7 @@ Source of truth: `operations/deployment-flow`.
 | `tech-oracle-api.service` | systemd service, `100.73.93.84:9080` | tech-oracle internal FastAPI health/predict service. Runs as `vwdeploy`. |
 | PostgreSQL (local) | `127.0.0.1:5432` | Local Postgres for greencloud services. |
 | MariaDB (local) | `127.0.0.1:3306` | Local MariaDB for greencloud services. |
-| `vw-secrets-postgres` | Docker, `127.0.0.1:5444` to `5432` | Postgres 16 for vault-warden secrets. |
+| `vw-secrets-postgres` | Docker, `127.0.0.1:5444` to `5432` | Postgres 16 backing `vw-secretsd`. **Holds no secrets.** The `secrets` table is empty and `audit_log` records 463 `get` calls, every one failed — nothing has ever successfully stored or read a secret through it. Schema is the legacy pair (`secrets`, `audit_log`); there are no `users`, `vaults` or `items` tables. Verified 2026-08-07. |
 | `gluetun-proton` | Docker, `127.0.0.1:8890`/`8889` | ProtonVPN gateway for QA automation. |
 | `qa_runner` | Docker | QA automation runner container. |
 | `qa_wireproxy` | Docker, `0.0.0.0:1085` | WireProxy for QA automation. |
