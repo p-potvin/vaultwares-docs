@@ -356,10 +356,10 @@ oph.vip, api.vaultwares.ca, decypharr.vaultwares.ca, mcp.vaultwares.ca, sabnzbd.
 
 | App | Path | Role |
 |---|---|---|
-| stash-win | C:\Users\%USERNAME%\Desktop\Executables\stash-win.exe | Stash media manager |
-| python-zipper | C:\Users\%USERNAME%\Desktop\Github Repos\python-zipper | Dataset builder, Tor rotator, telegram bot |
+| stash-win | C:\Users\Administrator\Desktop\Executables\stash-win.exe | Stash media manager |
+| python-zipper | C:\Users\Administrator\Desktop\Github Repos\python-zipper | Dataset builder, Tor rotator, telegram bot |
 | tor | ...\python-zipper\Portable-Tor-Proxy-Rotator | Tor proxy for IP rotation |
-| flaresolverr | C:\Users\%USERNAME%\Desktop\Executables\flaresolverr | CF challenge solver |
+| flaresolverr | C:\Users\Administrator\Desktop\Executables\flaresolverr | CF challenge solver |
 | Jackett | C:\ProgramData\Jackett\JackettConsole.exe | Local indexer |
 | FileZilla Server | C:\Program Files\FileZilla Server\ | FTP/SFTP |
 | qBittorrent | C:\Program Files\qBittorrent\ | Local torrent client |

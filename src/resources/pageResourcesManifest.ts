@@ -514,6 +514,12 @@ export const PAGE_RESOURCE_ENTRIES: PageResourceEntry[] = [
     "resourceKey": "operations__health-ledger"
   },
   {
+    "routePath": "/operations/host-inventory",
+    "routeKey": "operations/host-inventory",
+    "sectionKey": "operations",
+    "resourceKey": "operations__host-inventory"
+  },
+  {
     "routePath": "/operations/jira-sync",
     "routeKey": "operations/jira-sync",
     "sectionKey": "operations",

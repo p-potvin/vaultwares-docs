@@ -46,15 +46,15 @@ description: Hardware and software requirements for VaultWares products
     - Windows 10 (64-bit) or later
     - Windows Server 2016 or later
     - .NET Framework 4.8 or later
-    - 4GB RAM minimum (8GB recommended)
-    - 500MB available disk space
+    - 12GB RAM minimum (24GB recommended)
+    - 20GB available disk space
   </Tab>
 
   <Tab title="macOS">
     - macOS 11 (Big Sur) or later
-    - 4GB RAM minimum (8GB recommended)
-    - 500MB available disk space
-    - %USERPROFILE% privileges for installation
+    - 8GB RAM minimum (16GB recommended)
+    - 16GB available disk space
+    - Administrator privileges for installation
   </Tab>
 
   <Tab title="Linux">
@@ -62,8 +62,8 @@ description: Hardware and software requirements for VaultWares products
     - Red Hat Enterprise Linux 8 or later
     - CentOS 8 or later
     - Debian 11 or later
-    - 4GB RAM minimum (8GB recommended)
-    - 500MB available disk space
+    - 8GB RAM minimum (16GB recommended)
+    - 16GB available disk space
     - Root access for installation
   </Tab>
 </Tabs>
@@ -73,6 +73,7 @@ description: Hardware and software requirements for VaultWares products
 - **Bandwidth**: 10 Mbps minimum (100 Mbps recommended)
 - **Ports**: HTTPS (443), SSH (22), custom ports for API access
 - **Firewall**: Outbound HTTPS access for license validation and updates
+- **Tailscale**: Necessary to create a secure environments for your devices
 - **DNS**: Functional DNS resolution required
 
 ### Browser compatibility
@@ -80,7 +81,7 @@ description: Hardware and software requirements for VaultWares products
 For web-based management interfaces:
 
 - Google Chrome 90 or later
-- Mozilla Firefox 88 or later
+- Mozilla Firefox 128 or later
 - Microsoft Edge 90 or later
 - Safari 14 or later
 
@@ -88,10 +89,7 @@ For web-based management interfaces:
 
 For enterprise deployments with centralized management:
 
-- **PostgreSQL**: 12 or later
-- **MySQL**: 8.0 or later
-- **Microsoft SQL Server**: 2017 or later
-- **Oracle Database**: 19c or later
+- **PostgreSQL**: 16 or later
 
 ## Virtualization support
 

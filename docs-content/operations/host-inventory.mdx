@@ -227,7 +227,7 @@ entry has been re-checked, the verification date is given inline.
 | **Tailnet IP** | `100.71.101.21` |
 | **Public IP** | (home, behind residential WAN) |
 | **Access** | RDP over Tailnet (`3389`); Tailscale Serve on `:9999` |
-| **Role** | Workstation, local services host (Stash, Tor, FlareSolverr, Jackett, pyLoad, python-zipper, health-ledger heartbeat) |
+| **Role** | Workstation, local services host (Tor, FlareSolverr, Jackett, pyLoad, python-zipper, health-ledger heartbeat) |
 
 ### Listening ports (notable)
 
@@ -236,25 +236,25 @@ entry has been re-checked, the verification date is given inline.
 | `3389` | `0.0.0.0` / `[::]` | Windows RDP | Remote Desktop Protocol |
 | `80` | `0.0.0.0` / `[::]` | Windows (System) | HTTP (IIS/Windows service) |
 | `445` / `139` | `0.0.0.0` / `100.71.101.21` | Windows (System) | SMB file sharing |
-| `9999` | `0.0.0.0` / `[::]` | `stash-win.exe` | Stash media manager (Tailscale Serve proxy) |
-| `5171` | `0.0.0.0` | `python.exe` (python-zipper) | Dataset builder web server |
-| `8003` | `[::1]` | `python.exe` | Local pyLoad |
-| `8191` | `0.0.0.0` | `flaresolverr.exe` | Local FlareSolverr |
-| `9117` | `0.0.0.0` / `[::]` | `JackettConsole.exe` | Local Jackett |
+| `5171` | `127.0.0.1` | `python.exe` (python-zipper) | Dataset builder web server |
+| `8003` | `127.0.0.1` | `python.exe` | Local pyLoad |
+| `8191` | `127.0.0.1` | `flaresolverr.exe` | Local FlareSolverr |
+| `9117` | `127.0.0.1` | `JackettConsole.exe` | Local Jackett |
 | `8791` | `100.71.101.21` | `node.exe` | Health Ledger heartbeat (Clopeux) |
-| `14148` | `0.0.0.0` / `[::]` | `filezilla-server.exe` | FileZilla Server |
+| `14148` | `127.0.0.1` | `filezilla-server.exe` | FileZilla Server |
 | `20000` | `127.0.0.1` | `tor.exe` | Tor SOCKS proxy (python-zipper rotator) |
 | `9051` | `127.0.0.1` | `tor.exe` | Tor control port |
-| `443` | `100.71.101.21` | `tailscaled` | Tailscale Serve (HTTPS to Stash) |
+| `443` | `100.71.101.21` | `tailscaled` | Tailscale Serve |
+| `8188` | `127.0.0.1` | `ComfyUI` | ComfyUI WebUI |
+| `11434` | `127.0.0.1` | `Ollama` | Ollama API |
 
 ### Local applications
 
 | App | Path | Role |
 |---|---|---|
-| `stash-win` | `C:\Users\%USERNAME%\Desktop\Executables\stash-win.exe` | Stash media manager |
-| `python-zipper` | `C:\Users\%USERNAME%\Desktop\Github Repos\python-zipper` | Dataset builder, Tor proxy rotator, linkvertise, telegram bot, userscript |
-| `tor` | `C:\Users\%USERNAME%\Desktop\Github Repos\python-zipper\Portable-Tor-Proxy-Rotator` | Tor proxy for IP rotation |
-| `flaresolverr` | `C:\Users\%USERNAME%\Desktop\Executables\flaresolverr` | Cloudflare challenge solver |
+| `python-zipper` | `C:\Users\Administrator\Desktop\Github Repos\python-zipper` | Dataset builder, Tor proxy rotator, linkvertise, telegram bot, userscript |
+| `tor` | `C:\Users\Administrator\Desktop\Github Repos\python-zipper\Portable-Tor-Proxy-Rotator` | Tor proxy for IP rotation |
+| `flaresolverr` | `C:\Users\Administrator\Desktop\Executables\flaresolverr` | Cloudflare challenge solver |
 | `Jackett` | `C:\ProgramData\Jackett\JackettConsole.exe` | Local Jackett indexer |
 | `FileZilla Server` | `C:\Program Files\FileZilla Server\filezilla-server.exe` | FTP/SFTP server |
 | `qBittorrent` | `C:\Program Files\qBittorrent\qbittorrent.exe` | Local qBittorrent client |
@@ -274,14 +274,8 @@ https://clopeux-desktop.tail1764b8.ts.net (tailnet only)
 |---|---|
 | **OS** | OpenWrt (GL-MT2500) |
 | **Tailnet IP** | `100.114.136.28` |
-| **Public IP** | (home, residential `74.57.201.206`) |
-| **Access** | Tailscale-SSH only (no OpenSSH key/password) |
-| **Role** | Residential egress proxy (tinyproxy) |
-
-### Listening ports
-
-| Port | Bind | Process | Service |
-|---|---|---|---|
-| `8888` | `100.114.136.28` | `tinyproxy` | HTTP/CONNECT forward proxy (tailnet-only, allowlisted to `100.64.0.0/10`) |
+| **Public IP** | (home, residential IP) |
+| **Access** | Tailscale-SSH only |
+| **Role** | Residential egress proxy (wireguard) |
 
 See `operations/residential-egress-proxy` for full architecture and provisioning.

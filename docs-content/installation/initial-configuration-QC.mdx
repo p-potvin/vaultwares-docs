@@ -36,11 +36,11 @@ Ce guide vous présente les étapes de configuration initiales qui doivent être
     Évitez d'utiliser le compte générique `admin` pour les opérations quotidiennes. Créez des comptes nommés pour chaque administrateur :
 
     ```bash
-    # Create an $USERPROFILE account
+    # Create an administrator account
     vw-admin user create \
       --username alice \
       --email alice@example.com \
-      --role $USERPROFILE \
+      --role Administrator \
       --require-mfa true \
       --send-welcome-email
 
@@ -261,8 +261,8 @@ vw-admin health-check --full
 # [✓] SMTP: Reachable (smtp.example.com:587)
 # [✓] HSM: Connected (hsm01.corp.example.com, FIPS 140-2 Level 3)
 # [✓] Backup repository: Accessible (nas01, 45ms)
-# [✓] Admin accounts: 2 named $USERPROFILEs, default admin disabled
-# [!] MFA: 1 $USERPROFILE account without MFA enrolled (bob@example.com)
+# [✓] Admin accounts: 2 named administrators, default admin disabled
+# [!] MFA: 1 administrator account without MFA enrolled (bob@example.com)
 
 # Address any warnings before going live
 vw-admin user enforce-mfa --user bob@example.com

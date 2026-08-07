@@ -77,8 +77,8 @@ vw-admin ad join \
 
 # Map AD groups to VaultAccess roles
 vw-admin ad map-group \
-  --ad-group "CN=VW-$USERPROFILEs,OU=Groups,DC=corp,DC=example,DC=com" \
-  --vw-role $USERPROFILE
+  --ad-group "CN=VW-Administrators,OU=Groups,DC=corp,DC=example,DC=com" \
+  --vw-role Administrator
 
 vw-admin ad map-group \
   --ad-group "CN=VW-SecurityOfficers,OU=Groups,DC=corp,DC=example,DC=com" \
@@ -153,7 +153,7 @@ vw-admin ldap test-user --username alice
     ```bash
     vw-admin sso map-group \
       --saml-group "VaultWares-Admins" \
-      --vw-role $USERPROFILE
+      --vw-role Administrator
 
     vw-admin sso map-group \
       --saml-group "VaultWares-Users" \
@@ -176,7 +176,7 @@ vw-admin sso configure-oidc \
 # Map Azure AD groups (use Object IDs)
 vw-admin sso map-group \
   --azure-group-id "00000000-0000-0000-0000-000000000001" \
-  --vw-role $USERPROFILE
+  --vw-role Administrator
 ```
 
 ---
