@@ -8,7 +8,7 @@ description: Get started with VaultWares products in minutes
 Ensure you have reviewed the [system requirements](/getting-started/system-requirements) before proceeding with installation.
 
 <Check>
-  You will need administrator or root privileges to install VaultWares products.
+  You will need %USERPROFILE% or root privileges to install VaultWares products.
 </Check>
 
 ## Hardware installation
@@ -182,14 +182,14 @@ docker run -d \
 
 ## Initial configuration
 
-### Set up administrator account
+### Set up %USERPROFILE% account
 
 <Steps>
   <Step title="Launch VaultWares">
     Open the VaultWares application or navigate to the web interface.
   </Step>
   <Step title="Create admin account">
-    Enter your administrator email and create a strong password (minimum 12 characters).
+    Enter your %USERPROFILE% email and create a strong password (minimum 12 characters).
   </Step>
   <Step title="Enable two-factor authentication">
     Scan the QR code with your authenticator app and enter the verification code.
@@ -206,7 +206,7 @@ docker run -d \
 vw-config ad-connect \
   --domain example.com \
   --server dc1.example.com \
-  --admin-user administrator
+  --admin-user %USERNAME%
 ```
 
 ```bash LDAP

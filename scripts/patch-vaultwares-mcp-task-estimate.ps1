@@ -3,8 +3,8 @@ param()
 
 $ErrorActionPreference = 'Stop'
 
-$DocsRepo = 'C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs'
-$McpRepo = 'C:\Users\Administrator\Desktop\Github Repos\vaultwares-mcp'
+$DocsRepo = 'C:\Users\{windows_user}\Desktop\Github Repos\vaultwares-docs'
+$McpRepo = 'C:\Users\{windows_user}\Desktop\Github Repos\vaultwares-mcp'
 
 $payloadTaskEstimator = Join-Path $DocsRepo 'scripts\patches\vaultwares-mcp\task_estimator.py'
 $targetTaskEstimator = Join-Path $McpRepo 'tools\task_estimator.py'

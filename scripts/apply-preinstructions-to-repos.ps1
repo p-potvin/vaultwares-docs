@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [string]$ReposRoot = "C:\Users\Administrator\Desktop\Github Repos",
+  [string]$ReposRoot = "C:\Users\{windows_user}\Desktop\Github Repos",
   [switch]$DryRun
 )
 

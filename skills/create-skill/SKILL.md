@@ -72,7 +72,7 @@ You are about to author a new agent skill. Do not write `SKILL.md` yet. Run the 
 After the user confirms with "ship" / "go" / "yes":
 
 ```powershell
-& "C:\Users\Administrator\Desktop\Github Repos\vaultwares-docs\scripts\sync-global-skills.ps1" -SkillName <kebab-name>
+& "$env:USERPROFILE\Desktop\Github Repos\vaultwares-docs\scripts\sync-global-skills.ps1" -SkillName <kebab-name>
 ```
 
 Verify on disk by listing the six expected targets (5 verbatim + 1 .prompt.md):

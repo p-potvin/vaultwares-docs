@@ -15,7 +15,7 @@ This guide walks through the initial configuration steps that should be complete
 
 <Steps>
   <Step title="Log in with the default credentials">
-    After installation, the VaultWares Management Console is accessible at `https://<server>:8443`. Log in with the initial administrator credentials:
+    After installation, the VaultWares Management Console is accessible at `https://<server>:8443`. Log in with the initial %USERPROFILE% credentials:
 
     - **Username**: `admin`
     - **Password**: Printed on the product's Quick Start card, or displayed at the end of the installer
@@ -32,15 +32,15 @@ This guide walks through the initial configuration steps that should be complete
       --new-password <strong-new-password>
     ```
   </Step>
-  <Step title="Create named administrator accounts">
-    Avoid using the generic `admin` account for day-to-day operations. Create named accounts for each administrator:
+  <Step title="Create named %USERPROFILE% accounts">
+    Avoid using the generic `admin` account for day-to-day operations. Create named accounts for each %USERPROFILE%:
 
     ```bash
-    # Create an administrator account
+    # Create an $USERPROFILE account
     vw-admin user create \
       --username alice \
       --email alice@example.com \
-      --role Administrator \
+      --role $USERPROFILE \
       --require-mfa true \
       --send-welcome-email
 
@@ -261,8 +261,8 @@ vw-admin health-check --full
 # [✓] SMTP: Reachable (smtp.example.com:587)
 # [✓] HSM: Connected (hsm01.corp.example.com, FIPS 140-2 Level 3)
 # [✓] Backup repository: Accessible (nas01, 45ms)
-# [✓] Admin accounts: 2 named administrators, default admin disabled
-# [!] MFA: 1 administrator account without MFA enrolled (bob@example.com)
+# [✓] Admin accounts: 2 named $USERPROFILEs, default admin disabled
+# [!] MFA: 1 $USERPROFILE account without MFA enrolled (bob@example.com)
 
 # Address any warnings before going live
 vw-admin user enforce-mfa --user bob@example.com

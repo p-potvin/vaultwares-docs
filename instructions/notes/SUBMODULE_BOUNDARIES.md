@@ -13,7 +13,7 @@ When you are working inside a project and you need to look at code within a subm
 
 ### 2. Edit Standalone Repositories
 If a change is required in a Tier-2 repository (such as `vaultwares-themes`, `vaultwares-adk`, or `agent-ledger`), you must edit the code in its **standalone repository checkout**, not inside the submodule folder of the app you are currently working on.
-- Usually, this means navigating to `C:\Users\Administrator\Desktop\Github Repos\<repo>` (or the equivalent root location), making the patch, committing it, and pushing it there.
+- Usually, this means navigating to `%USERPROFILE%\Desktop\Github Repos\<repo>` (or the equivalent root location), making the patch, committing it, and pushing it there.
 - Once the standalone repo is updated, you return to your app and update the submodule pointer to the new commit.
 
 ### 3. Never Patch Locally

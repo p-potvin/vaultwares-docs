@@ -67,7 +67,7 @@ After any tracker code change or repo sync, verify with:
 ```powershell
 Start-ScheduledTask -TaskName "VaultWares-InputTracker"
 Start-Sleep -Seconds 70
-Get-Content "C:\Users\Administrator\Desktop\Github Repos\agent-ledger\input-state\input-tracker-health.json"
+Get-Content "$env:USERPROFILE\Desktop\Github Repos\agent-ledger\input-state\input-tracker-health.json"
 ```
 
 The health payload should show a fresh `updated_at`, a current `pid`, `status` as `online` or `listening`, and a `last_post_at` after the restart once activity has flushed.
@@ -145,7 +145,7 @@ To extend the global `vw` CLI with a new automation script, follow these standar
   </Step>
 
   <Step title="Register the command">
-    Open the registry file `C:\Users\Administrator\Desktop\pwsh\VaultWares CLI\vw-commands.ps1` and add a new entry to the `$Commands` hashtable:
+    Open the registry file `%USERPROFILE%\Desktop\pwsh\VaultWares CLI\vw-commands.ps1` and add a new entry to the `$Commands` hashtable:
 
     ```powershell
     "my-new-command" = @{
