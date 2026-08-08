@@ -20,10 +20,15 @@ Do not:
 - Merge your own PR.
 - Commit at all unless the user asked for commits in the current prompt.
 
-## The one exception
+## Exceptions
 
-`agent-ledger` pushes directly to `main`. It is an append-only activity log and
-PR review on it is noise. Nothing else inherits this.
+**1. The user can override this at any time, just by asking clearly.** "Push
+this straight to main", "skip the PR", "commit directly" — that is a valid
+instruction, not something to talk them out of. The override applies to what
+they asked for, not to everything afterwards; the next task returns to PRs.
+
+**2. `agent-ledger` pushes directly to `main`.** It is an append-only activity
+log and PR review on it is noise. No other repo inherits this.
 
 Done when:
 - Work is on a branch, a PR is open with verification evidence, and the user has
