@@ -3,7 +3,7 @@ param()
 
 $ErrorActionPreference = 'Stop'
 
-$LedgerRepo = 'C:\Users\{windows_user}\Desktop\Github Repos\agent-ledger'
+$LedgerRepo = '$env:USERPROFILE\Desktop\Github Repos\agent-ledger'
 $RecordPath = Join-Path $LedgerRepo 'scripts\record-agent-change.ps1'
 $RenderPath = Join-Path $LedgerRepo 'scripts\render-agent-ledger.ps1'
 
