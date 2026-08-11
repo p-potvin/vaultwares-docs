@@ -57,6 +57,43 @@ Public client  ->  stats.vaultwares.ca  ->  <public IP>  ->  nginx (403, intenti
 Tailnet node   ->  stats.vaultwares.ca  ->  100.x.x.x    ->  nginx (internal vhost, 200)
 ```
 
+### greencloud resolves the name; it does not carry the traffic
+
+This is the single most misread part of the setup, so it is worth stating
+plainly: `dnsmasq` on `greencloud-vps` is a **nameserver**, not a proxy.
+
+Tailscale's split-DNS entries point at `100.73.93.84` because that is the
+**address of the resolver to ask**. `dnsmasq` replies with the address of the
+host that actually runs the service, and the client then connects to that host
+**directly**. Traffic does not pass through greencloud unless greencloud is
+itself the destination.
+
+`api.vaultwares.ca` is the clearest example, and the one people get wrong:
+
+```
+Tailnet node asks  100.73.93.84 (greencloud dnsmasq)  "where is api.vaultwares.ca?"
+dnsmasq answers    100.67.25.118 (OVH)
+Tailnet node connects  ->  100.67.25.118  ->  OVH nginx  ->  127.0.0.1:9001
+                            (greencloud is not in this path at all)
+```
+
+So "`api.vaultwares.ca` points to greencloud" is true only of the *DNS query*.
+The API runs on OVH and is reached directly. Verified 2026-08-07 —
+`Resolve-DnsName api.vaultwares.ca` on a tailnet node returns `100.67.25.118`,
+while `warden.vaultwares.ca` returns `100.73.93.84` because warden genuinely
+does run on greencloud.
+
+<Warning>
+`greencloud-vps` also carries an `api.vaultwares.ca` nginx vhost that proxies to
+`http://100.67.25.118:9001`. **That path cannot work** — the OVH API binds
+`127.0.0.1:9001` only, so it refuses connections on its tailnet address. The
+vhost is a leftover from when the API ran on `clopeux-desktop`. It is harmless
+today because split DNS sends tailnet clients straight to OVH, but any client
+that resolves `api.vaultwares.ca` to greencloud (for example via public DNS)
+gets a 502. Either delete the vhost or bind the OVH API to its tailnet IP —
+do not do both.
+</Warning>
+
 ### Step 1 -- Tailscale DNS override
 
 In the [Tailscale admin console](https://login.tailscale.com/admin/dns) -> **Nameservers**:
