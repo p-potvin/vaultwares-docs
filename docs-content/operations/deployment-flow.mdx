@@ -151,3 +151,60 @@ separate from severity, and Medium+ alert fanout must go through the Health
 Ledger incident lock/dedupe model. See `operations/health-ledger` and
 `operations/deploy-alerts`.
 
+
+## Deploy path ownership
+
+`vw-webhookd` runs as **`vwdeploy`** (`systemctl show vw-webhookd -p User`). Every
+path a deploy script touches on `greencloud-vps` must therefore be owned by
+`vwdeploy` — with one deliberate exception: runtime directories owned by the
+service account that consumes them (`/opt/vault-warden` is `vwsecrets`,
+`/opt/health-ledger/data` is `healthledger`).
+
+**Why this matters more than it looks.** When a git checkout ends up owned by
+`root`, git refuses it with `detected dubious ownership`, the script dies on
+`set -e`, and — if the script dispatches to other hosts *after* that point — the
+remote hosts never get updated either. Nothing alerts. On 2026-08-27 a survey
+found three repos in exactly this state:
+
+| Path | Stale by | Consequence |
+| --- | --- | --- |
+| `/opt/health-ledger` | 2 weeks | greencloud probe config frozen; OVH never reached |
+| `/opt/vault-warden-src` | 3 weeks | secrets service never redeployed |
+| `/var/www/vaultwares-pwa-src` | 3 weeks | PWA never redeployed |
+
+All three were fixed the same day. 22 of the 26 surveyed paths were already correct.
+
+### The checker
+
+```bash
+ssh root@100.73.93.84 'python3 /var/www/deploy-scripts/verifier-permissions-deploiement.py'
+```
+
+It reads `/etc/vw-webhookd/config.yml`, walks every target's script, collects every
+path under `/var/www`, `/opt` and `/srv` that the script mentions, and reports the
+owner of each. It is **read-only** unless given `--appliquer`, and when applying it
+preserves sub-directories owned by a service account.
+
+Run it after adding a target, and whenever a deploy "succeeded" but nothing changed.
+
+### Two scripts still assume root
+
+`deploy-vault-warden.sh` and `deploy-vaultwares-pwa.sh` call `chown` and
+`systemctl` **without `sudo`**, and write into root-owned deploy directories
+(`/opt/vault-warden.rollback`, `/var/www/warden.vaultwares.ca`). They were written
+for a root runner; the other twelve targets assume `vwdeploy`.
+
+Their git checkouts are fixed, so they no longer fail at the first step — but
+converging them on the `vwdeploy` convention means either prefixing the privileged
+lines with `sudo` or handing those two deploy directories to `vwdeploy`. That
+touches a secrets service, so it was left for a session that can watch
+`vw-secretsd` restart.
+
+### On `vwdeploy`'s sudo grant
+
+`vwdeploy` currently holds `(ALL : ALL) NOPASSWD: ALL`. Worth knowing when
+reasoning about blast radius: the webhook is a remote-triggered path, and these
+scripts run `npm ci`, which executes package lifecycle scripts. Running the
+scripts *as* root would give those lifecycle scripts root ambient authority —
+which is the argument for keeping the runner unprivileged and fixing ownership
+instead.
