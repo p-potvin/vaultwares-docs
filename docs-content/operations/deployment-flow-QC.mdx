@@ -94,3 +94,58 @@ Un webhook, c’est comme un **reçu** (un message) que GitHub envoie automatiqu
   - `https://hooks.vaultwares.ca/health` retourne `200`
   - les logs de `vw-webhookd` sur `greencloud-vps` (et les logs du runner en aval)
 
+
+## Propriété des chemins de déploiement
+
+`vw-webhookd` tourne en **`vwdeploy`**. Tout chemin touché par un script de
+déploiement sur `greencloud-vps` doit donc lui appartenir — à une exception près,
+voulue : les répertoires d'exécution appartenant au compte de service qui les
+consomme (`/opt/vault-warden` est à `vwsecrets`, `/opt/health-ledger/data` est à
+`healthledger`).
+
+**Pourquoi c'est plus grave que ça en a l'air.** Quand une copie de travail git
+finit par appartenir à `root`, git la refuse (`detected dubious ownership`), le
+script meurt sur `set -e`, et si le script dépêche vers d'autres hôtes *après* ce
+point, ces hôtes ne sont jamais mis à jour non plus. Rien n'alerte. Le 27 août
+2026, une inspection a trouvé trois dépôts exactement dans cet état :
+
+| Chemin | Périmé depuis | Conséquence |
+| --- | --- | --- |
+| `/opt/health-ledger` | 2 semaines | config des sondes figée ; OVH jamais atteint |
+| `/opt/vault-warden-src` | 3 semaines | service de secrets jamais redéployé |
+| `/var/www/vaultwares-pwa-src` | 3 semaines | PWA jamais redéployée |
+
+Les trois ont été corrigés le jour même. 22 des 26 chemins inspectés étaient déjà bons.
+
+### Le vérificateur
+
+```bash
+ssh root@100.73.93.84 'python3 /var/www/deploy-scripts/verifier-permissions-deploiement.py'
+```
+
+Il lit `/etc/vw-webhookd/config.yml`, parcourt le script de chaque cible, ramasse
+tout chemin sous `/var/www`, `/opt` et `/srv` que le script mentionne, et rapporte
+le propriétaire de chacun. Il est en **lecture seule** sauf avec `--appliquer`, et
+il préserve alors les sous-répertoires appartenant à un compte de service.
+
+À lancer après l'ajout d'une cible, et chaque fois qu'un déploiement « réussit »
+sans que rien ne change.
+
+### Deux scripts supposent encore root
+
+`deploy-vault-warden.sh` et `deploy-vaultwares-pwa.sh` appellent `chown` et
+`systemctl` **sans `sudo`**, et écrivent dans des répertoires appartenant à root.
+Ils ont été écrits pour un lanceur root ; les douze autres cibles supposent
+`vwdeploy`. Leurs copies de travail git sont corrigées, donc ils ne meurent plus
+à la première étape — mais les faire converger demande soit de préfixer les lignes
+privilégiées par `sudo`, soit de confier ces deux répertoires à `vwdeploy`. Ça
+touche un service de secrets, donc laissé à une session qui peut regarder
+`vw-secretsd` redémarrer.
+
+### Sur le sudo de `vwdeploy`
+
+`vwdeploy` détient `(ALL : ALL) NOPASSWD: ALL`. Bon à savoir pour raisonner sur le
+rayon d'action : le webhook est déclenché à distance, et ces scripts lancent
+`npm ci`, qui exécute les scripts de cycle de vie des paquets. Lancer les scripts
+*en tant que* root donnerait à ces scripts-là l'autorité de root — c'est
+l'argument pour garder le lanceur non privilégié et corriger la propriété.
