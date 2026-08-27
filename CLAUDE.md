@@ -4,6 +4,7 @@ If user prompt or current working directory contains "prom king", STOP and switc
 All relative repo paths are relative to `%USERPROFILE%\Desktop\Github Repos\vaultwares-docs\`.
 
 ## Mandatory Entry Protocol
+
 1. **ROUTER routine (always first):** Open `instructions/ROUTER.md`, scan protocol categories end-to-end, select relevant categories, then read summaries in category order.
 2. **Path Variables:** Use `%USERPROFILE%` in docs, `$env:USERPROFILE` in PowerShell, and `$USERPROFILE` in Bash.
 3. **Infrastructure:** `greencloud` (`100.73.93.84`: dnsmasq, tube sites, vw-secrets), `vps-ovhcloud` (`100.67.25.118`: vaultwares-api, Databases, Comet/media stack), `Clopeux-Desktop` (`100.71.101.21`: local AI models, ComfyUI, Ollama). SSH keys in `%USERPROFILE%\.ssh\*`.
@@ -11,6 +12,7 @@ All relative repo paths are relative to `%USERPROFILE%\Desktop\Github Repos\vaul
 5. **Safety:** Never run unapproved batch/loop TCP, UDP, or API requests. Ask questions when facing ambiguity.
 
 ## Rules & Operations
+
 - **GATING POLICY (DESTRUCTIVE COMMANDS):** DO NOT run destructive `vw` CLI commands. The `vw` tool will refuse execution if tried. Do NOT attempt to bypass this. If requested, provide the command string for the user to execute manually.
 - **CI / Deployments:** SSH into target hosts for real-time state. Mandatory reading: `docs-content/operations/` (`deployment-flow.mdx`, `services-inventory.mdx`, `webhook-secret-rotation.mdx`, `deploy-alerts.mdx`). Read full notes only when requested.
 - **Python:** Prefer `uv venv --python 3.12`. Consolidate venvs. **DO NOT install CUDA libraries without verifying existing local installations (multi-GB breaking changes).**
@@ -19,6 +21,7 @@ All relative repo paths are relative to `%USERPROFILE%\Desktop\Github Repos\vaul
 - **Continuity & Secrets:** Do not log secrets. Maintain continuity via `%USERPROFILE%\Desktop\Github Repos\CHANGES.md` and `%USERPROFILE%\Desktop\Github Repos\agent-ledger\CHANGES.md`.
 
 ## Mandatory Agent Ledger (Last step before replying)
+
 Execute:
 `%USERPROFILE%\Desktop\Github Repos\agent-ledger\scripts\record-agent-change.ps1 -Summary "<what you changed>" -Kind "code-change|documentation|commands|verification|general" -Model "<your-model-name>" -AgentRole "main"`
 *(PowerShell execution syntax: `powershell.exe -ExecutionPolicy Bypass -File "$env:USERPROFILE\Desktop\Github Repos\agent-ledger\scripts\record-agent-change.ps1" -Summary "<summary>" -Kind "..." -Model "..." -AgentRole "main"`)*

@@ -35,6 +35,8 @@ Elle sert à :
 | Site tube SexyPRN | `https://sexyprn.lol` | application `shared-tube` sur `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
 | Link sharing Prom‑King | `https://links.prom-king.xyz` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
 | Link sharing FullXXX | `https://links.fullxxx.video` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+| L'Informaticien | `https://linformaticien.ca` | `/var/www/linformaticien/prod` -> `releases/<sha>` sur `greencloud-vps` ; le lien est basculé par une poussée sur la branche `prod`, jamais reconstruit entre dev et prod | `linformaticien` | Public |
+| L'Informaticien (dev) | `https://dev.linformaticien.ca` | `/var/www/linformaticien/dev` -> `releases/<sha>` sur `greencloud-vps` ; mis à jour à chaque poussée sur `main`. Exige la route split-DNS Tailscale `dev.linformaticien.ca` -> `100.73.93.84`, visant cet hôte seulement et volontairement pas l'apex | `linformaticien` | Tailnet-only |
 
 
 ## Note de déploiement (pareil pour tout le monde)
