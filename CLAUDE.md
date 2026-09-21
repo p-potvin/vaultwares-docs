@@ -9,14 +9,21 @@ All relative repo paths are relative to `%USERPROFILE%\Desktop\Github Repos\vaul
 2. **Path Variables:** Use `%USERPROFILE%` in docs, `$env:USERPROFILE` in PowerShell, and `$USERPROFILE` in Bash.
 3. **Infrastructure:** `greencloud` (`100.73.93.84`: dnsmasq, tube sites, vw-secrets), `vps-ovhcloud` (`100.67.25.118`: vaultwares-api, Databases, Comet/media stack), `Clopeux-Desktop` (`100.71.101.21`: local AI models, ComfyUI, Ollama). SSH keys in `%USERPROFILE%\.ssh\*`.
 4. **API Gateway:** `vaultwares-api` is the single central entrypoint and gateway to all databases.
-5. **Safety:** Never run unapproved batch/loop TCP, UDP, or API requests. Ask questions when facing ambiguity.
+5. **Safety:** Never run unapproved batch/loop TCP, UDP, or API requests.
+6. **Ask Questions:** Whenever uncertain about something,stop to ask yourself if you really know where you're going and if you don't know for sure, pause and ask me.
 
 ## Rules & Operations
 
 - **GATING POLICY (DESTRUCTIVE COMMANDS):** DO NOT run destructive `vw` CLI commands. The `vw` tool will refuse execution if tried. Do NOT attempt to bypass this. If requested, provide the command string for the user to execute manually.
-- **CI / Deployments:** SSH into target hosts for real-time state. Mandatory reading: `docs-content/operations/` (`deployment-flow.mdx`, `services-inventory.mdx`, `webhook-secret-rotation.mdx`, `deploy-alerts.mdx`). Read full notes only when requested.
+- **CI / Deployments:** Deployments trigger via a push to github main branch desipte the lack of github worker. It is done via a signed webhook instead. SSH into target hosts for real-time state. Mandatory reading: `docs-content/operations/` (`deployment-flow.mdx`, `services-inventory.mdx`, `webhook-secret-rotation.mdx`, `deploy-alerts.mdx`).
+- **PowerShell, not bash: quote every path.** Commands run in Windows PowerShell, so an unquoted path containing a space is split into several arguments, and backslash sequences in a bare path can be eaten before the command ever runs. Always quote paths, and use `&` to invoke an executable whose path contains a space: `& "C:\Program Files\Tool\tool.exe" arg`. Unquoted or unescaped paths are the single most common reason a first command fails and has to be retried. Related traps: in Python or heredocs use raw strings for Windows paths (`r"C:\Users\..."`), since `\U` and `\b` are escape sequences and will silently corrupt the string; use `--%` to stop PowerShell parsing arguments meant for a native exe; and a command that merely mentions a protected system path can be refused when the same command also contains a deletion cmdlet, even if the deletion targets a scratch directory, so split those into two calls rather than trying to defeat the guard.
 - **Python:** Prefer `uv venv --python 3.12`. Consolidate venvs. **DO NOT install CUDA libraries without verifying existing local installations (multi-GB breaking changes).**
-- **Torrent & Debrid Policy:** ALL torrent/debrid lookups, magnet resolutions, and stream URL fetches MUST go through Comet at `http://100.67.25.118:5173`. Never call Real-Debrid, AllDebrid, Torbox, Torrentio, Jackett, Prowlarr, Bitmagnet, or MediaFusion directly. Comet manifest accepts `tt`/`kitsu` IDs.
+- **Torrent & Debrid Policy:** Three separate torrenting/streaming entities. Each has its own Real-Debrid token and its own **Prowlarr tag** — the tag selects the provider set, so it must be correct per entity.
+  1. **vault-streaming + vault-tv** — MUST route through Comet at `http://100.67.25.118:5173`, so their shared Real-Debrid token is only ever seen from a single IP. Comet manifest accepts `tt`/`kitsu` IDs. Prowlarr tag: `comet`.
+  2. **Media stack** — its own Real-Debrid token. Reaches Prowlarr, decypharr, qBittorrent and SABnzbd directly. Not subject to the Comet rule. Prowlarr tag: `flaresolverr`.
+  3. **vault-zipper** — Prowlarr tag `vault-zipper`. Shares the media stack's Real-Debrid key and tunnel.
+
+  Comet is mandatory for entity 1 only. Direct Prowlarr/decypharr/qBittorrent/SABnzbd calls are correct and expected for entities 2 and 3. (The previous blanket "never call these directly" wording was overbroad: the multi-IP concern proved overstated and only ever applied to entity 1's shared token.)
 - **Versioning & Timestamps:** Increment project version on `main` push (render version as HTML comment `<!-- v1.2.3 -->` in `<head>`). Use timestamp format `DDD, dd MMM YYYY HH:mm` in chat responses to humans, commits, docs, and pwsh scripts (NO Unix epochs). Do not timestamp inside code files.
 - **Continuity & Secrets:** Do not log secrets. Maintain continuity via `%USERPROFILE%\Desktop\Github Repos\CHANGES.md` and `%USERPROFILE%\Desktop\Github Repos\agent-ledger\CHANGES.md`.
 
@@ -25,5 +32,5 @@ All relative repo paths are relative to `%USERPROFILE%\Desktop\Github Repos\vaul
 Execute:
 `%USERPROFILE%\Desktop\Github Repos\agent-ledger\scripts\record-agent-change.ps1 -Summary "<what you changed>" -Kind "code-change|documentation|commands|verification|general" -Model "<your-model-name>" -AgentRole "main"`
 *(PowerShell execution syntax: `powershell.exe -ExecutionPolicy Bypass -File "$env:USERPROFILE\Desktop\Github Repos\agent-ledger\scripts\record-agent-change.ps1" -Summary "<summary>" -Kind "..." -Model "..." -AgentRole "main"`)*
-*(Agent Self-Metadata: `-Summary` mandatory brief description; `-Kind` type of change; `-Model` your AI model name e.g. "Gemini 3.6 Flash" / "Claude 3.7 Sonnet"; `-AgentRole` "main" or "subagent".)*
-If agent-ledger is unreachable, state it in your reply.
+*(Agent Self-Metadata: `-Summary` mandatory brief description; `-Kind` type of change; `-Model` your AI model name e.g. "Gemini 3.6 Flash" / "Claude 12.5 Sonnet"; `-AgentRole` "main" or "subagent".)*
+If agent-ledger is unreachable, state it in your reply and save it locally.
