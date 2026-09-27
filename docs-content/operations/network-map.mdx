@@ -150,6 +150,7 @@ flowchart TB
 | Tailscale webhook handler | `http://127.0.0.1:8787` | `greencloud-vps` (`vaultwares-hooks`) | `8787` | Tailnet-local only |
 | Comet (debrid manager) | `https://comet.vaultwares.ca` | `vps-ovhcloud` (Docker `comet` via `comet-vpn` on `100.67.25.118:5173`) | `5173` | Tailnet ACL |
 | Uptime Kuma | `https://uptime.vaultwares.ca` | `vps-ovhcloud` (Docker on `0.0.0.0:3001`) | `443` to `3001` | Tailnet ACL + gateway secret |
+| Panopticam (Prom-King, private) | `https://vps-ovhcloud.tail1764b8.ts.net` | `vps-ovhcloud` (nginx to `127.0.0.1:9095`) | `443` to `9095` | Tailnet ACL; cert from `tailscale cert` (`panopticam-cert.timer`) |
 | Decypharr (debrid blackhole) | `https://decypharr.vaultwares.ca` | `vps-ovhcloud` (Docker on `127.0.0.1:8282`) | `443` to `8282` | Tailnet ACL |
 | Health Ledger dashboard | `http://127.0.0.1:8790` | `greencloud-vps` | `8790` | Loopback only |
 | Health Ledger heartbeat (GC) | `100.73.93.84:8791` | `greencloud-vps` | `8791` | Tailnet ACL |
