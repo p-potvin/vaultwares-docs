@@ -12,13 +12,13 @@ Protocol categories are executed only when relevant.
 - Set VW_STATE.interview.completed=true and continue execution.
 - Do not re-trigger the interview gate again for the same resumeId.
 
-1) Do a quick safety/scope check: if the request is ambiguous or risky, ask clarifying questions. Routing never replaces clarification.
-2) Scan the full protocol category table below end-to-end, then select 1+ relevant categories.
-3) Decide which other routines are relevant for this prompt (tools/routines, etc.).
-4) Run relevant routines (if any).
-5) Read the selected summary files in table order (mandatory).
-6) Compute estimate: estimated_output_tokens for the task (mandatory). Tokens are the primary estimate. Time is derived if needed.
-7) Apply overlay protocols driven by the estimate:
+2) Do a quick safety/scope check: if the request is ambiguous or risky, ask clarifying questions. Routing never replaces clarification.
+3) Scan the full protocol category table below end-to-end, then select 1+ relevant categories.
+4) Decide which other routines are relevant for this prompt (tools/routines, etc.).
+5) Run relevant routines (if any).
+6) Read the selected summary files in table order (mandatory).
+7) Compute estimate: estimated_output_tokens for the task (mandatory). Tokens are the primary estimate. Time is derived if needed.
+8) Apply overlay protocols driven by the estimate:
 
 - If estimated_output_tokens >= 16000: add overlay LONG_RUNNING_TASKS (even if other protocols already match).
 
