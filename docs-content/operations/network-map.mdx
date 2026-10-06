@@ -157,6 +157,7 @@ flowchart TB
 | Health Ledger heartbeat (OVH) | `100.67.25.118:8791` | `vps-ovhcloud` | `8791` | Tailnet ACL |
 | Health Ledger heartbeat (PC) | `100.71.101.21:8791` | `Clopeux-Desktop` | `8791` | Tailnet ACL |
 | Tech Oracle API | `100.73.93.84:9080` | `greencloud-vps` (`tech-oracle-api.service`) | `9080` | Tailnet ACL |
+| Tube Lab (Prom-King vision lab, private) | `https://tubelab.vaultwares.ca` | `greencloud-vps` nginx to `Clopeux-Desktop` `100.71.101.21:8790` (`tubevision serve`) | `443` to `8790` | Tailnet ACL + nginx allowlist (public IP gets 403); Let's Encrypt `tubelab.vaultwares.ca` |
 | Stash (local) | `http://100.71.101.21:9999` | `Clopeux-Desktop` (Tailscale Serve to `127.0.0.1:9999`) | `9999` | Tailnet ACL (Tailscale Serve) |
 | pyLoad (local) | `http://[::1]:8003` | `Clopeux-Desktop` (Python) | `8003` | Loopback only |
 | FlareSolverr (local) | `http://100.71.101.21:8191` | `Clopeux-Desktop` | `8191` | Tailnet/local |
