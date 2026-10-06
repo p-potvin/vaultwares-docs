@@ -1,7 +1,8 @@
 # REQUEST_RATE_LIMITING
+
 Applies when: any loop or batch of external or internal requests; translation, crawler, API polling, webhook polling, TCP/UDP probes, health checks, model calls, or local service requests.
 
-## HuggingFace: no loops. At all.
+## HuggingFace: no loops. At all
 
 Covers everything HF — Inference Providers, Spaces, ZeroGPU, Jobs, Hub API,
 `hf` CLI, and any gateway in front of them such as `vault-inference`.
@@ -28,6 +29,7 @@ If a task seems to need a loop over HF, stop and ask. Do not design around this.
 ## General
 
 Do:
+
 - Pause and ask before running any loop or batch of TCP, UDP, HTTP, API, translation, crawler, polling, or model requests.
 - State the target, request count, expected rate, stop condition, and why the batch is necessary.
 - Prefer local Gemma4 through Ollama at `http://localhost:11434` for translation or high-volume helper work when applicable.

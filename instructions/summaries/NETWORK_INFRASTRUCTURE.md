@@ -1,6 +1,8 @@
 # NETWORK_INFRASTRUCTURE
+
 Applies when: tailscale/tailnet, SSH, VPS, ports, nginx, firewalls, CI runners, any network access.
 Do:
+
 - Tailnet is the default control plane. Private services are tailnet-only.
 - SSH to servers is tailnet-only. Prefer SSH over Tailscale or tailnet IPs.
 - No outside contact for sensitive ops: do not open inbound ports for admin access; do not add public egress dependencies without explicit approval.

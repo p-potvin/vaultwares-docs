@@ -1,4 +1,5 @@
 # AUTOMATION_POLICY
+
 Applies when: cron, monitors, recurring automations, background jobs, schedulers.
 
 ## Any automation touching HuggingFace needs explicit approval first
@@ -15,9 +16,10 @@ authorises a new one. See REQUEST_RATE_LIMITING for the no-loop rule that
 applies inside each run.
 
 Do:
+
 - Prefer explicit, inspectable configs; avoid hidden state.
 - Record inside the repo what runs where, and how to stop/rollback.
-- If scheduled task, use conhost.exe with arguments: "--headless pwsh.exe -NoProfile -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File <your script>"
+- If scheduled task, use conhost.exe with arguments: "--headless pwsh.exe -NoProfile -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -File `your script`"
 Do not:
 - Create automations that run outside the tailnet policy.
 Done when:
