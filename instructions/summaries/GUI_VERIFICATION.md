@@ -1,6 +1,8 @@
 # GUI_VERIFICATION
+
 Applies when: web UI, docs site UI, dashboards, admin panels, SPAs.
 Do:
+
 - Navigate at least 2 links deep and back.
 - Check DevTools Console and Network for blocking errors.
 - Trigger hover/focus state and an empty/error state relevant to the change.

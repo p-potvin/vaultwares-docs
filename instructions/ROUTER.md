@@ -1,12 +1,17 @@
 # VaultWares assistant TOC (router)
+
 This file is the single entrypoint for VaultWares company protocols.
 Default read target: summaries. Notes are human reference and are read only when the user explicitly says: read full notes.
 Protocol categories are executed only when relevant.
+
 ## ROUTER routine (always, first)
+
 1) Resume shortcut: if the prior assistant reply contains a `VW_STATE_REF` (resumeId + ledger event path/hash), load VW_STATE from the referenced ledger record and resume from that state:
+
 - Do not re-run routing, routines, or estimates; use the stored routerCategories/protocolsSelected/overlaysApplied/estimate as-is.
 - Set VW_STATE.interview.completed=true and continue execution.
 - Do not re-trigger the interview gate again for the same resumeId.
+
 2) Do a quick safety/scope check: if the request is ambiguous or risky, ask clarifying questions. Routing never replaces clarification.
 3) Scan the full protocol category table below end-to-end, then select 1+ relevant categories.
 4) Decide which other routines are relevant for this prompt (tools/routines, etc.).
@@ -14,13 +19,18 @@ Protocol categories are executed only when relevant.
 6) Read the selected summary files in table order (mandatory).
 7) Compute estimate: estimated_output_tokens for the task (mandatory). Tokens are the primary estimate. Time is derived if needed.
 8) Apply overlay protocols driven by the estimate:
+
 - If estimated_output_tokens >= 16000: add overlay LONG_RUNNING_TASKS (even if other protocols already match).
+
 ## Other routines (run only when relevant)
+
 - Tools/routines (optional): if an MCP routine exists (credit optimization, batching, etc.), decide whether to run it. This does not change which protocols apply.
 - Ledger (always, last step before replying): record completed work in agent-ledger. If you cannot access agent-ledger, state that in the reply and include only a compact ledger summary plus a VW_STATE_REF-style pointer; do not paste VW_STATE into chat unless the user explicitly asks.
+
 ## Protocol categories (scan all; select relevant; read summaries in this order)
+
 | Category | Applies when | Summary | Notes | Keywords (non-exclusive) |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | SOURCE_OF_TRUTH | Any VaultWares work; when unsure where to look | instructions/summaries/SOURCE_OF_TRUTH.md | instructions/notes/SOURCE_OF_TRUTH.md | ssot,sot,where is,source of truth |
 | SUBMODULE_BOUNDARIES | Work touches submodules or vendored copies | instructions/summaries/SUBMODULE_BOUNDARIES.md | instructions/notes/SUBMODULE_BOUNDARIES.md | submodule,mirror,vendor |
 | SECURITY_POSTURE | Any security/crypto/auth/key handling | instructions/summaries/SECURITY_POSTURE.md | instructions/notes/SECURITY_POSTURE.md | security,crypto,jwt,api key,keys |
@@ -45,7 +55,7 @@ Protocol categories are executed only when relevant.
 | SKILL_SYNC | Authoring, editing, or disseminating an agent skill across hosts | instructions/summaries/SKILL_SYNC.md | instructions/notes/SKILL_SYNC.md | skill,create skill,new skill,grill me,interrogation,sync-global-skills |
 | KNOWLEDGE_SCOUT | Consulting or updating KNOWLEDGE_SCOUT.md | instructions/summaries/KNOWLEDGE_SCOUT.md | instructions/notes/KNOWLEDGE_SCOUT.md | scout,expensive,quirk |
 | LEDGER_LOOKUP | Resuming prior session, "what did the last agent do", "has this been fixed before", probe failure history, recent deploy state | docs-content/operations/mcp-ledger-tools.mdx | — | ledger,history,probe,health,continuity,last session,recent agent,resume |
-| DEPLOY_STATUS | "Is this project built?", "what version is live on <site>?", "when did the last rebuild finish?", "did the rebuild actually succeed?" — anything asking for build/version/systemd state of a shipped project | docs-content/operations/deploy-status-api.mdx | — | deploy,build,version,sha,last built,rebuild,monitor/deploys,status.json |
+| DEPLOY_STATUS | "Is this project built?", "what version is live on site?", "when did the last rebuild finish?", "did the rebuild actually succeed?" — anything asking for build/version/systemd state of a shipped project | docs-content/operations/deploy-status-api.mdx | — | deploy,build,version,sha,last built,rebuild,monitor/deploys,status.json |
 | MULTI_AGENT_FLOW | Trigger phrases or multi-agent orchestration | instructions/summaries/MULTI_AGENT_FLOW.md | instructions/notes/MULTI_AGENT_FLOW.md | team,swarm,le stéphane,le méchant |
 | AUTOMATION_POLICY | Monitors, schedules, background jobs | instructions/summaries/AUTOMATION_POLICY.md | instructions/notes/AUTOMATION_POLICY.md | cron,automation,monitor,pm2 |
 | DEPLOYMENT_POLICY | Deploy/release ops, VPS changes | instructions/summaries/DEPLOYMENT_POLICY.md | instructions/notes/DEPLOYMENT_POLICY.md | deploy,release,greencloud,nginx |
