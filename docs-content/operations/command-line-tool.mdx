@@ -65,7 +65,7 @@ Operational note, Thu, 02 Jul 2026 18:06: the launcher must only stop old `track
 After any tracker code change or repo sync, verify with:
 
 ```powershell
-Start-ScheduledTask -TaskName "VaultWares-InputTracker"
+Start-ScheduledTask -TaskName "VaultWares-InputTracker" -TaskPath '\VaultWares\'
 Start-Sleep -Seconds 70
 Get-Content "$env:USERPROFILE\Desktop\Github Repos\agent-ledger\input-state\input-tracker-health.json"
 ```
