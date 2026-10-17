@@ -1,6 +1,6 @@
 ---
 title: "ADR-001: Retire legacy tube sites; rebuild as Astro + vaultwares-api"
-description: "Retire the legacy CMS install behind fullxxx.video + prom-king.xyz. Replace with an Astro monorepo (shared-tube engine + per-site apps) talking to a Prom-King router inside vaultwares-api. Hard cutover with a fresh catalog refetch. Adding a new site in the mix, the shared-tube should be a semi-replica of the layout of this site: https://www.fullvideos.xxx/sites/ (NOT the same domain as FXV)". Ignore everything in this plan about a DNS swap, the new sites will directly replace the old ones, down time is not to be considered.
+description: "Retire the legacy CMS install behind platform-alpha.internal + prom-king.xyz. Replace with an Astro monorepo (shared-tube engine + per-site apps) talking to a Prom-King router inside vaultwares-api. Hard cutover with a fresh catalog refetch. Adding a new site in the mix, the shared-tube should be a semi-replica of the layout of this site: https://www.fullvideos.xxx/sites/ (NOT the same domain as FXV)". Ignore everything in this plan about a DNS swap, the new sites will directly replace the old ones, down time is not to be considered.
 ---
 
 # ADR-001: Retire legacy tube sites; rebuild as Astro + vaultwares-api
@@ -15,7 +15,7 @@ description: "Retire the legacy CMS install behind fullxxx.video + prom-king.xyz
 
 ## Context
 
-`fullxxx.video` and `prom-king.xyz` were both legacy CMS installs driven by two custom plugins (`fullxxx-video`, `promking-tube`) and a `tube-shared` helper plugin. The catalog is small (≈ 270 active videos, 132 studios, 245 actors), the UX is read-heavy with a few islands of interactivity (player modal, search, consent banner, age gate, admin), and none of the legacy CMS headline features are in use: no built-in theme, no posts/pages editor for content, no comments, no media library, no plugin ecosystem, no Gutenberg, no XML-RPC, no users.
+`platform-alpha.internal` and `prom-king.xyz` were both legacy CMS installs driven by two custom plugins (`platform-alpha-video`, `promking-tube`) and a `tube-shared` helper plugin. The catalog is small (≈ 270 active videos, 132 studios, 245 actors), the UX is read-heavy with a few islands of interactivity (player modal, search, consent banner, age gate, admin), and none of the legacy CMS headline features are in use: no built-in theme, no posts/pages editor for content, no comments, no media library, no plugin ecosystem, no Gutenberg, no XML-RPC, no users.
 
 What the WP install actually buys us today:
 
@@ -40,7 +40,7 @@ The owner has flagged two specific pain drivers: **dev velocity** and **operator
 
 ## Decision
 
-We retire the legacy CMS installs at `fullxxx.video` and `prom-king.xyz` and replace them with a four-piece architecture:
+We retire the legacy CMS installs at `platform-alpha.internal` and `prom-king.xyz` and replace them with a four-piece architecture:
 
 1. **`Prom-King/shared-tube`** — new repo, pnpm monorepo.
 2. **`shared/`** — npm package: design tokens, Astro components (header, footer, card, player, consent banner, age gate, ad-slot wrapper), fetcher engine (per-source XPath configs + normalize), Drizzle schema, shared TypeScript types.
@@ -254,12 +254,12 @@ Per-site rows are namespaced by `videos.site` (enum: `fxv`, `pkt`). Same table, 
 - `vaultwares-api` runs on `100.67.25.118:9001`; the new `/api/promking/*` routes deploy with the existing API deploy flow.
 - Postgres lives behind `vaultwares-api`; the current production target is
   `vps-ovhcloud` alongside the API service.
-- Legacy CMS installs at `/var/www/fullxxx.video` and `/var/www/prom-king.xyz` are tarballed to `/var/backups/wp-archive-<date>.tar.gz` and removed right away.
+- Legacy CMS installs at `/var/www/platform-alpha.internal` and `/var/www/prom-king.xyz` are tarballed to `/var/backups/wp-archive-<date>.tar.gz` and removed right away.
 
 ### Cutover plan
 
 1. New code lands on `Prom-King/shared-tube:main`. CI green.
-2. New apps deploy to `fullxxx.video` and `prom-king.xyz`, replacing the old code.
+2. New apps deploy to `platform-alpha.internal` and `prom-king.xyz`, replacing the old code.
 3. WP install tarballed + deleted from `/var/www/`. Nginx vhost retired.
 4. Fetcher runs against the new DB; catalog repopulates from scratch.
 5. Owner smoke-tests on new deployments (home, listings, single video, search, taxonomy archives, admin, legal pages, GTM, consent, age gate, sitemap, JSON-LD).
@@ -297,8 +297,8 @@ Deferred to v1.1:
 8. [x] Fetcher wired. `POST /api/promking/fetcher/run` spawns the TS CLI; `GET /fetcher/stream/{run_id}` relays NDJSON → SSE; `GET /fetcher/runs` returns recent rows. APScheduler reads `settings.value->'schedules'` per (site, source) and registers cron jobs at startup. node-cron deviation logged.
 9. [x] Astro pages shipped both apps: home (SSR), 4 legal (SSG), `/videos/` listing (SSR), `/videos/[slug]` single with JSON-LD, taxonomy archives, `/search`, `/sitemap.xml.ts`, `/llms.txt.ts`. All pages config-agnostic; fxv and pkt share the same source tree (mirrored, not symlinked, so per-site overrides remain easy).
 10. [x] React admin at `/admin` per app — App shell with bearer-token sign-in against `/auth/me` (`vaultwares-api` exposes the verify endpoint under `/auth/`, not at root), Fetcher console with live SSE stream (uses `fetch + reader` because `EventSource` can't set custom headers), Catalog browser, Stats dashboard, SQL canned queries panel. Admin uses `window.location.origin` as API base — nginx proxies to `vaultwares-api` with the gateway secret injected (see deviation #9).
-11. [x] Deploy glue in `Prom-King/shared-tube/scripts/`: `deploy-shared-tube.sh` (honours every operations/deployment-flow invariant), `systemd/{fxv,pkt}.service`, `nginx/{fullxxx.video,prom-king.xyz}.conf` with `/admin` + SSE buffering disabled, `vw-webhookd.targets.yml` fragment, `deploy-vaultwares-api.patch.md` for the existing API deploy script, and a `scripts/README.md` bootstrap recipe.
-12. [x] **Local + prod smoke green.** Local: `pnpm -r build` clean, `db:generate` + `db:migrate` against `promking` produced 11 tables, `pnpm preview` served home/legal/llms.txt/sitemap.xml correctly. Prod (2026-06-06): both apps live with real letsencrypt certs; `https://fullxxx.video/api/promking/stats` returns shape-correct JSON; admin sign-in works; multiple fetcher runs persisted real rows. The two outstanding items — Lighthouse + GA gate — are operator polish, not blockers.
+11. [x] Deploy glue in `Prom-King/shared-tube/scripts/`: `deploy-shared-tube.sh` (honours every operations/deployment-flow invariant), `systemd/{fxv,pkt}.service`, `nginx/{platform-alpha.internal,prom-king.xyz}.conf` with `/admin` + SSE buffering disabled, `vw-webhookd.targets.yml` fragment, `deploy-vaultwares-api.patch.md` for the existing API deploy script, and a `scripts/README.md` bootstrap recipe.
+12. [x] **Local + prod smoke green.** Local: `pnpm -r build` clean, `db:generate` + `db:migrate` against `promking` produced 11 tables, `pnpm preview` served home/legal/llms.txt/sitemap.xml correctly. Prod (2026-06-06): both apps live with real letsencrypt certs; `https://platform-alpha.internal/api/promking/stats` returns shape-correct JSON; admin sign-in works; multiple fetcher runs persisted real rows. The two outstanding items — Lighthouse + GA gate — are operator polish, not blockers.
 
 ## Locked decisions confirmed in session 2026-06-05
 
@@ -320,7 +320,7 @@ These are intentional — anywhere this ADR's prose conflicts with what's in the
 5. **`pornxp.com` → `pornxp.bz`** (was `.fo` in the PHP-port; `.fo` 301s to `.bz`, we pin `.bz` directly to skip the hop). **`1porn.com` → `1porn.tv`.** Anywhere the ADR or earlier docs say `.com`, the working host is the modern variant.
 6. **Apps run from `/srv/repos`, not `/var/www`.** The original cutover plan rsync'd `apps/<site>/dist/` into `/var/www/<domain>/` after `pnpm -r build` and pointed systemd `ExecStart` at that copy. `@astrojs/node` standalone externalises `react`/`react-dom`; without the workspace pnpm symlinks under `shared-tube/node_modules/.pnpm/...`, Node crashes with `ERR_MODULE_NOT_FOUND`. Systemd units now run from `/srv/repos/Prom-King/shared-tube/apps/<site>/dist/server/entry.mjs` with `WorkingDirectory=/srv/repos/Prom-King/shared-tube/apps/<site>/`. `/var/www/<domain>/` is no longer a deploy target. The deploy script no longer rsyncs.
 7. **xvideos is 1-indexed live**, contrary to the PHP-port's assumption of 0-indexed. `/new/0` now returns 404; `/new/1` is the first page. `Math.max(0, page-1)` was wrong; the source config now uses `page` directly.
-8. **`fullxxx.video` HTTPS via certbot, not pre-existing.** Greencloud-vps had a letsencrypt cert for `prom-king.xyz` but not `fullxxx.video` (the old WP install was broken externally anyway — both domains were already returning 404 before cutover). New cert obtained 2026-06-06 via `certbot certonly --webroot -w /var/www/_acme -d fullxxx.video -d www.fullxxx.video`. Auto-renewal scheduled.
+8. **`platform-alpha.internal` HTTPS via certbot, not pre-existing.** Greencloud-vps had a letsencrypt cert for `prom-king.xyz` but not `platform-alpha.internal` (the old WP install was broken externally anyway — both domains were already returning 404 before cutover). New cert obtained 2026-06-06 via `certbot certonly --webroot -w /var/www/_acme -d platform-alpha.internal -d www.platform-alpha.internal`. Auto-renewal scheduled.
 9. **Admin browser → API path is same-origin via nginx**, not direct-to-tailnet. The first admin design had a configurable API-base field defaulting to the API tailnet host. From an HTTPS page that's blocked by mixed-content + CORS. nginx now proxies `/api/promking/*` and `/auth/*` to `vaultwares-api`, injecting `x-vw-gateway-secret` from `/etc/nginx/snippets/vw-gateway-secret.conf` (0640 root:www-data; never committed). The admin React code uses `window.location.origin`; the override field was removed after stale localStorage values caused operators to keep hitting cross-origin URLs.
 10. **CLI emits one `videos` event per item, not one big array.** A 3-page `fullvideos` run produced a single ~80 KB `videos` line that blew past `asyncio.StreamReader`'s 64 KiB default. FastAPI's `readline()` silently failed and the persistence path never ran. The CLI now emits one `videos` event per item (single-element array each); FastAPI accumulates. As belt-and-braces, the subprocess `StreamReader` `limit` is raised to 10 MiB.
 11. **`_persist_videos` is per-row autocommit, no batch transaction.** The first design wrapped the batch in `async with conn.transaction():`. A single `NOT NULL` violation (e.g. `embed_url` empty on a fullvideos card with no `data-preview`) aborted the Postgres transaction; the inner `try/except` swallowed the immediate error but subsequent `INSERT`s all raised "current transaction is aborted, commands ignored", and the outer manager re-raised at commit — so `_finalize_run` never ran. Each row is now its own autocommit `INSERT … ON CONFLICT (site, source_url) DO NOTHING`. FastAPI also emits a `persisted` SSE event after persistence with the real `added` count, since the CLI's `done` always reports `added: 0`.
@@ -330,11 +330,11 @@ These are intentional — anywhere this ADR's prose conflicts with what's in the
 
 - `pnpm -r build` green from a clean clone.
 - `pnpm -r test` green; ≥ 80 % coverage on fetcher normalize + DB schema constraints.
-- `curl https://fullxxx.video/` returns 200 with the Hot/New/Studios rows and < 200 ms TTFB.
+- `curl https://platform-alpha.internal/` returns 200 with the Hot/New/Studios rows and < 200 ms TTFB.
 - Manual fetch trigger on `/admin/fetcher` yields ≥ 1 new video per active source (pornxp, 1porn), 0 errors.
 - Search for `sofia` returns matches across video titles and the `Sofia Smith` actor term.
 - `/sitemap.xml` contains every video URL + every taxonomy archive URL + every legal page.
-- `Location: https://fullxxx.video/2257/` returns 200 with the legal text (no redirect loop, ever).
+- `Location: https://platform-alpha.internal/2257/` returns 200 with the legal text (no redirect loop, ever).
 - Lighthouse: Performance ≥ 95, Accessibility ≥ 95, SEO ≥ 95 on the home page of both apps.
 - Health Ledger receives at least one fetch-run event per scheduled cycle, queryable by site.
 

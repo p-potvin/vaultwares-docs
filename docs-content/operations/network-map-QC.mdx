@@ -43,9 +43,9 @@ flowchart TB
     Flows["flows.vaultwares.ca\n(vault-flows SPA)\nHTTPS :443"]
     Noddit["noddit.org\n(vault-flows SPA)\nHTTPS :443"]
     PromKing["prom-king.xyz\n(tube)\nHTTPS :443"]
-    FullXXX["fullxxx.video\n(tube)\nHTTPS :443"]
+    PlatformAlpha["platform-alpha.internal\n(tube)\nHTTPS :443"]
     LinksPK["links.prom-king.xyz\n(link-sharing)\nHTTPS :443"]
-    LinksFXV["links.fullxxx.video\n(link-sharing)\nHTTPS :443"]
+    LinksFXV["links.platform-alpha.internal\n(link-sharing)\nHTTPS :443"]
   end
 
   %% Tailnet-only entrypoints
@@ -73,7 +73,7 @@ flowchart TB
   Users -->|HTTPS| Flows --> V1
   Users -->|HTTPS| Noddit --> V1
   Users -->|HTTPS| PromKing --> V1
-  Users -->|HTTPS| FullXXX --> V1
+  Users -->|HTTPS| PlatformAlpha --> V1
   Users -->|HTTPS| LinksPK --> V1
   Users -->|HTTPS| LinksFXV --> V1
 
@@ -118,9 +118,9 @@ flowchart TB
 | vault-flows SPA | `https://flows.vaultwares.ca` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 | Noddit | `https://noddit.org` | `greencloud-vps` (proxy vers PC) | `443` | Let’s Encrypt (nginx) |
 | Prom King | `https://prom-king.xyz` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| FullXXX | `https://fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| PlatformAlpha | `https://platform-alpha.internal` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 | Link sharing (PK) | `https://links.prom-king.xyz` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
-| Link sharing (FXV) | `https://links.fullxxx.video` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
+| Link sharing (FXV) | `https://links.platform-alpha.internal` | `greencloud-vps` | `443` | Let’s Encrypt (nginx) |
 
 ### Privé (Tailnet seulement)
 

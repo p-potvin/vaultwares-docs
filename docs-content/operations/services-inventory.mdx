@@ -41,11 +41,11 @@ Related:
 | Secrets manager | `https://warden.vaultwares.ca` | `vw-secretsd` on `greencloud-vps` to `127.0.0.1:9444` | (ops service) | Tailnet-only |
 | (alias) secrets | `https://secrets.vaultwares.ca` | redirect to `warden.vaultwares.ca` | (ops config) | Tailnet-only |
 | Prom-King content site | `https://prom-king.xyz` | Express API + React SPA on `greencloud-vps` (`127.0.0.1:4322`); nginx proxies `/api/promking/` and `/auth/` to `vps-ovhcloud:9001` | `Prom-King/content-site` | Public |
-| FullXXX tube site | `https://fullxxx.video` | `shared-tube` app on `greencloud-vps` (`127.0.0.1:4321`) | `Prom-King/shared-tube` | Public |
-| 1PornHub tube site | `https://1pornhub.vip` | `shared-tube` app on `vps-ovhcloud` (systemd `oneporn.service`) | `Prom-King/shared-tube` | Public |
-| SexyPRN tube site | `https://sexyprn.lol` | `shared-tube` app on `vps-ovhcloud` (systemd `sexyprn.service`) | `Prom-King/shared-tube` | Public |
-| FullXXX link sharing | `https://links.fullxxx.video` | Fastify link-sharing service on `greencloud-vps` (`127.0.0.1:3001`) | `Prom-King/link-sharing` | Public |
-| Prom-King link sharing | `https://links.prom-king.xyz` | Fastify link-sharing service on `greencloud-vps` (`127.0.0.1:3001`, same server as FullXXX links) | `Prom-King/link-sharing` | Public |
+| Video Platform Alpha | `https://platform-alpha.internal` | `shared-tube` app on `greencloud-vps` (`127.0.0.1:4321`) | `Prom-King/shared-tube` | Public |
+| Media Portal Beta | `https://portal-beta.internal` | `shared-tube` app on `vps-ovhcloud` (systemd `portal-beta.service`) | `Prom-King/shared-tube` | Public |
+| Media Portal Gamma | `https://portal-gamma.internal` | `shared-tube` app on `vps-ovhcloud` (systemd `portal-gamma.service`) | `Prom-King/shared-tube` | Public |
+| Link sharing Alpha | `https://links.platform-alpha.internal` | Fastify link-sharing service on `greencloud-vps` (`127.0.0.1:3001`) | `Prom-King/link-sharing` | Public |
+| Prom-King link sharing | `https://links.prom-king.xyz` | Fastify link-sharing service on `greencloud-vps` (`127.0.0.1:3001`, same server as PlatformAlpha links) | `Prom-King/link-sharing` | Public |
 | L'Informaticien | `https://linformaticien.ca` | `/var/www/linformaticien/prod` -> `releases/<sha>` on `greencloud-vps`; symlink flipped by a push to the `prod` branch, never rebuilt between dev and prod | `linformaticien` | Public |
 | L'Informaticien (dev) | `https://dev.linformaticien.ca` | `/var/www/linformaticien/dev` -> `releases/<sha>` on `greencloud-vps`; updated by every push to `main`. Needs the Tailscale split-DNS route for `dev.linformaticien.ca` -> `100.73.93.84`, scoped to that host and deliberately not to the apex | `linformaticien` | Tailnet-only |
 | Tech Oracle | `https://theitguyde.com` | `tech-oracle-api.service` (FastAPI/uvicorn) on `greencloud-vps` (`100.73.93.84:9080`); nginx serves public site | `Prom-King/tech-oracle` | Public |
@@ -53,7 +53,7 @@ Related:
 | Uptime Kuma | `https://uptime.vaultwares.ca` | Docker `uptime-kuma` on `vps-ovhcloud` (`0.0.0.0:3001`); nginx on `100.67.25.118:443` | (ops service) | Tailnet-only |
 | Panopticam (Prom-King cam room browser) | `https://vps-ovhcloud.tail1764b8.ts.net` | `panopticam.service` on `vps-ovhcloud` (`127.0.0.1:9095`); nginx on `100.67.25.118:443` (MagicDNS name, `tailscale cert`); deploys via `vw-webhookd` → `deploy-panopticam.sh` | Prom-King (private tool) | Tailnet-only |
 | Decypharr (debrid blackhole) | `https://decypharr.vaultwares.ca` | Docker `decypharr` on `vps-ovhcloud` (`127.0.0.1:8282`); nginx on `100.67.25.118:443` | (ops service) | Tailnet-only |
-| Stash | `http://100.71.101.21:9999` | `stash-win.exe` on `Clopeux-Desktop`; exposed via Tailscale Serve | (local install) | Tailnet-only (Tailscale Serve) |
+| Media Catalog | `http://100.71.101.21:9999` | `media-catalog-win.exe` on `Clopeux-Desktop`; exposed via Tailscale Serve | (local install) | Tailnet-only (Tailscale Serve) |
 | python-zipper dataset builder | `http://100.71.101.21:5171` | Python `dataset_builder/server.py` on `Clopeux-Desktop` | `python-zipper` | Tailnet/local |
 | Tor proxy rotator | `socks5://127.0.0.1:20000` | `tor.exe` from `python-zipper/Portable-Tor-Proxy-Rotator` on `Clopeux-Desktop`; control port `9051` | `python-zipper` | Loopback only |
 | FileZilla Server | `100.71.101.21:14148` | FileZilla Server on `Clopeux-Desktop` | (local install) | Tailnet/local |
@@ -133,8 +133,8 @@ Source of truth: `operations/deployment-flow`.
 | `vaultwares-mcp-sse.service` | systemd service, `100.67.25.118:9021` | MCP SSE server. |
 | `health-ledger-probe.service` | systemd service | Health Ledger Probe Joker (OVH instance). |
 | `health-ledger-heartbeat.service` | systemd service, `100.67.25.118:8791` | Health Ledger Host Heartbeat (OVH instance). |
-| `oneporn.service` | systemd service | shared-tube app for `1pornhub.vip`. |
-| `sexyprn.service` | systemd service | shared-tube app for `sexyprn.lol`. |
+| `portal-beta.service` | systemd service | shared-tube app for `portal-beta.internal`. |
+| `portal-gamma.service` | systemd service | shared-tube app for `portal-gamma.internal`. |
 | `upload-torrent-daemon.service` | systemd service | Torrent upload daemon (`/opt/vw-media-stack/upload-torrent-daemon.sh`). |
 | `mullvad-netns-restart-deps.service` | systemd service | Restarts qbittorrent/jackett after mullvad-gateway restarts. |
 | `vw-tube-uploader.timer` | systemd timer (~15 min) | rclone move tube content to Google Drive. |
@@ -196,7 +196,7 @@ Always use the dedicated wrapper script:
 
 | Surface | Listener / port | Role |
 |---|---|---|
-| `stash-win` | `0.0.0.0:9999` (Tailscale Serve) | Stash media manager. Exposed via Tailscale Serve proxy. |
+| `media-catalog-win` | `0.0.0.0:9999` (Tailscale Serve) | Media catalog manager. Exposed via Tailscale Serve proxy. |
 | `python-zipper dataset_builder` | `0.0.0.0:5171` | Dataset builder web server. |
 | `tor` (Portable-Tor-Proxy-Rotator) | `127.0.0.1:20000` (SOCKS), `127.0.0.1:9051` (control) | Tor proxy rotator for python-zipper. |
 | `flaresolverr` | `0.0.0.0:8191` | Local FlareSolverr (Cloudflare challenge solver). |
@@ -224,9 +224,9 @@ Both `vps-ovhcloud` and `greencloud-vps` carry `STREAM_OUTBOUND_PROXY=http://100
 ## Notes on the table above
 
 - Legacy CMS and Prom-King prelanding monitors are retired.
-- `fullxxx.video`, `1pornhub.vip`, and `sexyprn.lol` are all `Prom-King/shared-tube` sites. All three sites (fxv, oneporn, sexyprn) now live on Greencloud (`127.0.0.1:4321`, `:4323`, `:4324`). Moved from OVH on 2026-07-22 to reduce OVH load.
+- `platform-alpha.internal`, `portal-beta.internal`, and `portal-gamma.internal` are all `Prom-King/shared-tube` sites. All three sites (fxv, portal-beta, portal-gamma) now live on Greencloud (`127.0.0.1:4321`, `:4323`, `:4324`). Moved from OVH on 2026-07-22 to reduce OVH load.
 - `prom-king.xyz` runs a standalone React/Express content-site on `greencloud-vps` (`127.0.0.1:4322`). nginx proxies `/api/promking/` and `/auth/` to `vps-ovhcloud:9001` (VaultWares API).
-- Link sharing runs on `greencloud-vps` (`127.0.0.1:3001`) serving both `links.fullxxx.video` and `links.prom-king.xyz`. The old `links.1pornhub.vip` and `links.sexyprn.lol` entries are retired.
+- Link sharing runs on `greencloud-vps` (`127.0.0.1:3001`) serving both `links.platform-alpha.internal` and `links.prom-king.xyz`. The old `links.portal-beta.internal` and `links.portal-gamma.internal` entries are retired.
 - The GitHub org **is `Prom-King`** (capital `P`, capital `K`, hyphen) for every repo in this list.
 - `vw-deployd` on greencloud is currently disabled. Deploy dispatch goes through `vw-webhookd` instead.
 - Health Ledger runs on all three machines: Probe Joker + Heartbeat on greencloud and OVH, Heartbeat-only on Clopeux-Desktop.

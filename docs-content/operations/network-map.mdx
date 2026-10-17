@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Network map (Private)"
 description: "Tailnet, VPSes, PCs, services, ports, and how we access them. Private (tailnet-only)."
 ---
@@ -24,10 +24,10 @@ flowchart TB
     Flows["flows.vaultwares.ca\n(vault-flows SPA)\nHTTPS :443"]
     Noddit["noddit.org\n(vault-flows SPA)\nHTTPS :443"]
     PromKing["prom-king.xyz\n(content-site)\nHTTPS :443"]
-    FullXXX["fullxxx.video\n(shared-tube)\nHTTPS :443"]
-    OnePorn["1pornhub.vip\n(shared-tube)\nHTTPS :443"]
-    SexyPrn["sexyprn.lol\n(shared-tube)\nHTTPS :443"]
-    LinksFXV["links.fullxxx.video\n(link-sharing)\nHTTPS :443"]
+    PlatformAlpha["platform-alpha.internal\n(shared-tube)\nHTTPS :443"]
+    OnePorn["portal-beta.internal\n(shared-tube)\nHTTPS :443"]
+    SexyPrn["portal-gamma.internal\n(shared-tube)\nHTTPS :443"]
+    LinksFXV["links.platform-alpha.internal\n(link-sharing)\nHTTPS :443"]
     LinksPK["links.prom-king.xyz\n(link-sharing)\nHTTPS :443"]
     TechOracle["theitguyde.com\n(Tech Oracle)\nHTTPS :443"]
   end
@@ -67,7 +67,7 @@ flowchart TB
   Users -->|HTTPS| Flows --> V1
   Users -->|HTTPS| Noddit --> V1
   Users -->|HTTPS| PromKing --> V1
-  Users -->|HTTPS| FullXXX --> V1
+  Users -->|HTTPS| PlatformAlpha --> V1
   Users -->|HTTPS| OnePorn --> V2
   Users -->|HTTPS| SexyPrn --> V2
   Users -->|HTTPS| LinksFXV --> V1
@@ -126,10 +126,10 @@ flowchart TB
 | vault-flows SPA | `https://flows.vaultwares.ca` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
 | Noddit | `https://noddit.org` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
 | Prom-King content site | `https://prom-king.xyz` | `greencloud-vps` (nginx to `127.0.0.1:4322`) | `443` | Let's Encrypt (nginx) |
-| FullXXX tube site | `https://fullxxx.video` | `greencloud-vps` (nginx to `127.0.0.1:4321`) | `443` | Let's Encrypt (nginx) |
-| 1PornHub tube site | `https://1pornhub.vip` | `greencloud-vps` (nginx to `oneporn.service`) | `443` | Let's Encrypt (nginx) |
-| SexyPRN tube site | `https://sexyprn.lol` | `greencloud-vps` (nginx to `sexyprn.service`) | `443` | Let's Encrypt (nginx) |
-| FullXXX link sharing | `https://links.fullxxx.video` | `greencloud-vps` (nginx to `127.0.0.1:3001`) | `443` | Let's Encrypt (nginx) |
+| Video Platform Alpha | `https://platform-alpha.internal` | `greencloud-vps` (nginx to `127.0.0.1:4321`) | `443` | Let's Encrypt (nginx) |
+| Media Portal Beta | `https://portal-beta.internal` | `greencloud-vps` (nginx to `portal-beta.service`) | `443` | Let's Encrypt (nginx) |
+| Media Portal Gamma | `https://portal-gamma.internal` | `greencloud-vps` (nginx to `portal-gamma.service`) | `443` | Let's Encrypt (nginx) |
+| Link sharing Alpha | `https://links.platform-alpha.internal` | `greencloud-vps` (nginx to `127.0.0.1:3001`) | `443` | Let's Encrypt (nginx) |
 | Prom-King link sharing | `https://links.prom-king.xyz` | `greencloud-vps` (nginx to `127.0.0.1:3001`) | `443` | Let's Encrypt (nginx) |
 | Tech Oracle | `https://theitguyde.com` | `greencloud-vps` | `443` | Let's Encrypt (nginx) |
 
@@ -204,8 +204,8 @@ ssh -i "$env:USERPROFILE\.ssh\greencloud-vps" root@100.73.93.84
 
 | Node | Type | Tailnet IP | OS | Notes |
 |---|---|---|---|---|
-| `clopeux-desktop` | workstation | `100.71.101.21` | Windows | RDP, Stash, Tor, FlareSolverr, Jackett, pyLoad, python-zipper, health-ledger heartbeat |
-| `greencloud-vps` | server | `100.73.93.84` | Debian 12 | nginx, webhooks, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king content-site, link-sharing |
+| `clopeux-desktop` | workstation | `100.71.101.21` | Windows | RDP, MediaCatalog, Tor, FlareSolverr, Jackett, pyLoad, python-zipper, health-ledger heartbeat |
+| `greencloud-vps` | server | `100.73.93.84` | Debian 12 | nginx, webhooks, secrets, health-ledger hub, tech-oracle, platform-alpha, prom-king content-site, link-sharing |
 | `vps-ovhcloud` | server | `100.67.25.118` | Ubuntu | VaultWares API, MCP, Comet, media stack, Decypharr, Uptime Kuma |
 | `brumeux` | appliance | `100.114.136.28` | OpenWrt | tinyproxy residential egress |
 | `aperture` | personal | `100.90.168.111` | Windows | Operator personal device |

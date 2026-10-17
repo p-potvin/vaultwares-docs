@@ -30,11 +30,11 @@ Elle sert à :
 | Gestionnaire de secrets | `https://warden.vaultwares.ca` | `vw-secretsd` → `127.0.0.1:9444` | (service ops) | Tailnet-only |
 | (alias) secrets | `https://secrets.vaultwares.ca` | redirection → `warden.vaultwares.ca` | (config ops) | Tailnet-only |
 | Site de papiers peints Prom‑King (PKT) | `https://prom-king.xyz` | API Express + SPA React sur le port `4322` via systemd `pkt.service` dans `/srv/repos/Prom-King/content-site` | `Prom-King/content-site` | Public |
-| Site tube FullXXX | `https://fullxxx.video` | application `shared-tube` sur `greencloud-vps` | `Prom-King/shared-tube` | Public |
-| Site tube 1PornHub | `https://1pornhub.vip` | application `shared-tube` sur `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
-| Site tube SexyPRN | `https://sexyprn.lol` | application `shared-tube` sur `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
+| Plateforme vidéo Alpha | `https://platform-alpha.internal` | application `shared-tube` sur `greencloud-vps` | `Prom-King/shared-tube` | Public |
+| Portail média Beta | `https://portal-beta.internal` | application `shared-tube` sur `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
+| Portail média Gamma | `https://portal-gamma.internal` | application `shared-tube` sur `vps-ovhcloud` | `Prom-King/shared-tube` | Public |
 | Link sharing Prom‑King | `https://links.prom-king.xyz` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
-| Link sharing FullXXX | `https://links.fullxxx.video` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
+| Partage de liens Alpha | `https://links.platform-alpha.internal` | Fastify sur `127.0.0.1:3001` | `Prom-King/link-sharing` | Public |
 | L'Informaticien | `https://linformaticien.ca` | `/var/www/linformaticien/prod` -> `releases/<sha>` sur `greencloud-vps` ; le lien est basculé par une poussée sur la branche `prod`, jamais reconstruit entre dev et prod | `linformaticien` | Public |
 | L'Informaticien (dev) | `https://dev.linformaticien.ca` | `/var/www/linformaticien/dev` -> `releases/<sha>` sur `greencloud-vps` ; mis à jour à chaque poussée sur `main`. Exige la route split-DNS Tailscale `dev.linformaticien.ca` -> `100.73.93.84`, visant cet hôte seulement et volontairement pas l'apex | `linformaticien` | Tailnet-only |
 
@@ -64,8 +64,8 @@ doivent garder des `listen 100.73.93.84:443 ssl;` explicites. Sans ces listeners
 nginx peut choisir le certificat média pour les requêtes qui arrivent par le
 tailnet.
 
-## Notes sur Prom-King / FullXXX
+## Notes sur Prom-King / PlatformAlpha
 
-- Les moniteurs de prelanding Prom-King sont retirés. Les sites tube actifs sont suivis via `Prom-King/shared-tube`; FullXXX vit sur Greencloud, 1PornHub et SexyPRN vivent sur OVH.
+- Les moniteurs de prelanding Prom-King sont retirés. Les sites tube actifs sont suivis via `Prom-King/shared-tube`; PlatformAlpha vit sur Greencloud, MediaPortalBeta et MediaPortalGamma vivent sur OVH.
 - `prom-king.xyz` exécute une **application autonome de papiers peints React/Express** sous `/srv/repos/Prom-King/content-site`. Les miniatures et métadonnées sont stockées dans `/srv/pkt-wallpapers`.
 - L'org GitHub est **`Prom-King`** (P et K majuscules, trait d'union) pour chaque repo de cette liste — la forme en minuscules `prom-king/...` ne correspondra pas.

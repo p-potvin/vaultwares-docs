@@ -85,8 +85,8 @@ entry has been re-checked, the verification date is given inline.
 | `vaultwares-api.service` | VaultWares API Service (VPS instance) |
 | `vaultwares-mcp.service` | VaultWares MCP HTTP Service |
 | `vaultwares-mcp-sse.service` | VaultWares MCP SSE Service |
-| `oneporn.service` | 1pornhub.vip (shared-tube oneporn app) |
-| `sexyprn.service` | sexyprn.lol (shared-tube sexyprn app) |
+| `portal-beta.service` | portal-beta.internal (shared-tube portal-beta app) |
+| `portal-gamma.service` | portal-gamma.internal (shared-tube portal-gamma app) |
 | `health-ledger-probe.service` | Health Ledger Probe Joker (OVHCloud) |
 | `health-ledger-heartbeat.service` | Health Ledger Host Heartbeat (OVHCloud) |
 | `upload-torrent-daemon.service` | VaultWares Torrent Upload Daemon |
@@ -132,7 +132,7 @@ entry has been re-checked, the verification date is given inline.
 
 ### nginx sites enabled
 
-`1pornhub.vip.conf`, `api.vaultwares.ca.conf`, `decypharr.vaultwares.ca.conf`, `mcp.vaultwares.ca.conf`, `sabnzbd.vaultwares.ca.conf`, `sexyprn.lol.conf`, `uptime.vaultwares.ca.conf`, `vw-media-tailnet.conf`
+`portal-beta.internal.conf`, `api.vaultwares.ca.conf`, `decypharr.vaultwares.ca.conf`, `mcp.vaultwares.ca.conf`, `sabnzbd.vaultwares.ca.conf`, `portal-gamma.internal.conf`, `uptime.vaultwares.ca.conf`, `vw-media-tailnet.conf`
 
 ### Docker Compose files
 
@@ -148,7 +148,7 @@ entry has been re-checked, the verification date is given inline.
 | **Tailnet IP** | `100.73.93.84` |
 | **Public IP** | `173.249.194.15` |
 | **SSH** | `root@100.73.93.84` (key name varies by machine — see note below) |
-| **Role** | Web/docs/monitor host, webhook receiver, secrets, health-ledger hub, tech-oracle, fullxxx, prom-king content-site, link-sharing |
+| **Role** | Web/docs/monitor host, webhook receiver, secrets, health-ledger hub, tech-oracle, platform-alpha, prom-king content-site, link-sharing |
 
 ### Listening ports
 
@@ -159,7 +159,7 @@ entry has been re-checked, the verification date is given inline.
 | `80` | `0.0.0.0` / `[::]` | `nginx` | HTTP (redirect to HTTPS) |
 | `443` | `0.0.0.0` / `[::]` / `100.73.93.84` | `nginx` | HTTPS public + tailnet vhosts |
 | `3001` | `0.0.0.0` | `node` (vwdeploy) | Link-sharing Fastify server |
-| `4321` | `127.0.0.1` | `node` | FullXXX shared-tube app |
+| `4321` | `127.0.0.1` | `node` | PlatformAlpha shared-tube app |
 | `4322` | `0.0.0.0` | `node` (vwdeploy) | Prom-King content-site |
 | `5432` | `127.0.0.1` / `[::1]` | `postgres` | Local PostgreSQL |
 | `3306` | `127.0.0.1` | `mariadbd` | Local MariaDB |
@@ -207,7 +207,7 @@ entry has been re-checked, the verification date is given inline.
 
 ### nginx sites enabled
 
-`api.vaultwares.ca.conf`, `docs.vaultwares.ca.conf`, `flows.vaultwares.ca.conf`, `fullxxx.video.conf`, `hooks.vaultwares.ca.conf`, `ledger.vaultwares.ca`, `link-sharing.conf`, `mcp.vaultwares.ca.conf`, `monitor.vaultwares.ca.conf`, `noddit.org.conf`, `prom-king.xyz.conf`, `secrets.vaultwares.ca.conf`, `stats.vaultwares.ca.conf`, `theitguyde.com.conf`, `vaultwares.ca.conf`, `vw-media-acme.conf`, `vw-media-tailnet.conf`, `warden.vaultwares.ca.conf`
+`api.vaultwares.ca.conf`, `docs.vaultwares.ca.conf`, `flows.vaultwares.ca.conf`, `platform-alpha.internal.conf`, `hooks.vaultwares.ca.conf`, `ledger.vaultwares.ca`, `link-sharing.conf`, `mcp.vaultwares.ca.conf`, `monitor.vaultwares.ca.conf`, `noddit.org.conf`, `prom-king.xyz.conf`, `secrets.vaultwares.ca.conf`, `stats.vaultwares.ca.conf`, `theitguyde.com.conf`, `vaultwares.ca.conf`, `vw-media-acme.conf`, `vw-media-tailnet.conf`, `warden.vaultwares.ca.conf`
 
 ### Node.js applications
 

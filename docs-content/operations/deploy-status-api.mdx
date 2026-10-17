@@ -24,7 +24,7 @@ Router: `vaultwares-api/app/routers/monitor/__init__.py` (function `get_deploys_
 | Param | Type | Purpose |
 | --- | --- | --- |
 | `project` | string, optional | Filter to one project id (`shared-tube`, `vaultwares-api`, ...). Omitted → every project. |
-| `site` | string, optional | For multi-site projects (shared-tube's `fxv`/`oneporn`/`sexyprn`), filter the `targets[]` array. |
+| `site` | string, optional | For multi-site projects (shared-tube's `fxv`/`portal-beta`/`portal-gamma`), filter the `targets[]` array. |
 | `logs` | bool, default `false` | Include the last ~40 lines of the deploy log per project. Expensive; only ask when the panel needs it. |
 
 ### Response shape
@@ -46,8 +46,8 @@ Router: `vaultwares-api/app/routers/monitor/__init__.py` (function `get_deploys_
           "sha": "b4cf85f",
           "systemd": { "unit": "fxv.service", "active": "active", "since": "2026-07-05T02:33:00Z" }
         },
-        { "id": "shared-tube:oneporn", "site": "oneporn", "version": "0.1.8", "sha": "b4cf85f", "systemd": { ... } },
-        { "id": "shared-tube:sexyprn", "site": "sexyprn", "version": "0.1.8", "sha": "b4cf85f", "systemd": { ... } }
+        { "id": "shared-tube:portal-beta", "site": "portal-beta", "version": "0.1.8", "sha": "b4cf85f", "systemd": { ... } },
+        { "id": "shared-tube:portal-gamma", "site": "portal-gamma", "version": "0.1.8", "sha": "b4cf85f", "systemd": { ... } }
       ],
       "last_build": {
         "phase": "ok",
