@@ -57,6 +57,7 @@ Related:
 | python-zipper dataset builder | `http://100.71.101.21:5171` | Python `dataset_builder/server.py` on `Clopeux-Desktop` | `python-zipper` | Tailnet/local |
 | Tor proxy rotator | `socks5://127.0.0.1:20000` | `tor.exe` from `python-zipper/Portable-Tor-Proxy-Rotator` on `Clopeux-Desktop`; control port `9051` | `python-zipper` | Loopback only |
 | FileZilla Server | `100.71.101.21:14148` | FileZilla Server on `Clopeux-Desktop` | (local install) | Tailnet/local |
+| Enrichment gateway (vault-raggae) | `http://100.71.101.21:8750` | uvicorn `app.serve` on `Clopeux-Desktop` (scheduled task `\VaultWares\Enrichment Gateway`): local metadata catalog, EmbeddingGemma 2 embeddings, media index, semantic search; stats on every request (`/v1/stats`), health `/v1/health`. Since Sun 18 Oct 2026 | `vault-raggae` | Tailnet-only |
 
 
 ## Deployment and alert note
@@ -205,6 +206,7 @@ Always use the dedicated wrapper script:
 | `FileZilla Server` | `0.0.0.0:14148` | FTP/SFTP server. |
 | `qBittorrent` (local) | (desktop app) | Local qBittorrent client. |
 | `health-ledger-heartbeat` | `100.71.101.21:8791` | Health Ledger Host Heartbeat (Clopeux instance). |
+| `vault-raggae` (enrichment gateway) | `100.71.101.21:8750`, `127.0.0.1:8750`, `127.0.0.1:8791` (compat) | Metadata catalog, EmbeddingGemma 2 embeddings, media index. Loopback `8791` answers clients of the retired local embedding server until they restart; the tailnet `8791` stays the Health Ledger heartbeat. |
 | RDP | `100.71.101.21:3389` | Remote Desktop Protocol over tailnet. |
 | SMB | `100.71.101.21:445`/`139` | Windows file sharing. |
 
