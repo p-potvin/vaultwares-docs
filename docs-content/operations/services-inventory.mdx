@@ -5,7 +5,7 @@ description: "Single table of VaultWares + Prom-King services: URL, where it run
 
 # Services inventory (Private)
 
-Last updated: Tue, 21 Jul 2026 11:50 America/Toronto.
+Last updated: Mon, 19 Oct 2026 America/Toronto.
 
 This page is a **single source of truth table** for "what we run".
 
@@ -58,6 +58,7 @@ Related:
 | Tor proxy rotator | `socks5://127.0.0.1:20000` | `tor.exe` from `python-zipper/Portable-Tor-Proxy-Rotator` on `Clopeux-Desktop`; control port `9051` | `python-zipper` | Loopback only |
 | FileZilla Server | `100.71.101.21:14148` | FileZilla Server on `Clopeux-Desktop` | (local install) | Tailnet/local |
 | Enrichment gateway (vault-raggae) | `http://100.71.101.21:8750` | uvicorn `app.serve` on `Clopeux-Desktop` (scheduled task `\VaultWares\Enrichment Gateway`): local metadata catalog, EmbeddingGemma 2 embeddings, media index, semantic search; stats on every request (`/v1/stats`), health `/v1/health`. Since Sun 18 Oct 2026 | `vault-raggae` | Tailnet-only |
+| Miniville town observer | `https://miniville.vaultwares.ca` | FastAPI observer + 10-foot TV director on `Clopeux-Desktop` (`100.71.101.21:8751`), fronted by greencloud nginx (tailnet-only; Let's Encrypt cert); scheduled task `\VaultWares\Miniville Observer` runs `cli serve --live-step 8` (auto-advances the town); live world `miniville`. Since Mon 19 Oct 2026 | `miniville` | Tailnet-only |
 
 
 ## Deployment and alert note
