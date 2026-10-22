@@ -59,6 +59,7 @@ Related:
 | FileZilla Server | `100.71.101.21:14148` | FileZilla Server on `Clopeux-Desktop` | (local install) | Tailnet/local |
 | Enrichment gateway (vault-raggae) | `http://100.71.101.21:8750` | uvicorn `app.serve` on `Clopeux-Desktop` (scheduled task `\VaultWares\Enrichment Gateway`): local metadata catalog, EmbeddingGemma 2 embeddings, media index, semantic search; stats on every request (`/v1/stats`), health `/v1/health`. Since Sun 18 Oct 2026 | `vault-raggae` | Tailnet-only |
 | Miniville town observer | `https://miniville.vaultwares.ca` | FastAPI observer + 10-foot TV director on `Clopeux-Desktop` (`100.71.101.21:8751`), fronted by greencloud nginx (tailnet-only; Let's Encrypt cert); scheduled task `\VaultWares\Miniville Observer` runs `cli serve --live-step 8` (auto-advances the town); live world `miniville`. Since Mon 19 Oct 2026 | `miniville` | Tailnet-only |
+| Catalogs panel | `https://catalogs.vaultwares.ca` | The enrichment gateway's panel port on `Clopeux-Desktop` (`100.71.101.21:8752`: the built panel at `/`, the gateway's `/v1` API under `/api`), fronted by greencloud nginx (tailnet-only via allowlist; Let's Encrypt cert); one view over every catalog behind the gateway, read-only for now. Since Wed 21 Oct 2026 | `vault-raggae` (`web/`) | Tailnet-only |
 
 
 ## Deployment and alert note
@@ -207,7 +208,7 @@ Always use the dedicated wrapper script:
 | `FileZilla Server` | `0.0.0.0:14148` | FTP/SFTP server. |
 | `qBittorrent` (local) | (desktop app) | Local qBittorrent client. |
 | `health-ledger-heartbeat` | `100.71.101.21:8791` | Health Ledger Host Heartbeat (Clopeux instance). |
-| `vault-raggae` (enrichment gateway) | `100.71.101.21:8750`, `127.0.0.1:8750`, `127.0.0.1:8791` (compat) | Metadata catalog, EmbeddingGemma 2 embeddings, media index. Loopback `8791` answers clients of the retired local embedding server until they restart; the tailnet `8791` stays the Health Ledger heartbeat. |
+| `vault-raggae` (enrichment gateway) | `100.71.101.21:8750`, `127.0.0.1:8750`; panel `100.71.101.21:8752`, `127.0.0.1:8752` | Metadata catalog, EmbeddingGemma 2 embeddings, media index, scene catalog, transcripts. `8752` serves the catalogs panel (`catalogs.vaultwares.ca`). The loopback `8791` compat port was dropped Wed 21 Oct 2026; the tailnet `8791` stays the Health Ledger heartbeat. |
 | RDP | `100.71.101.21:3389` | Remote Desktop Protocol over tailnet. |
 | SMB | `100.71.101.21:445`/`139` | Windows file sharing. |
 
