@@ -54,6 +54,8 @@ flowchart TB
     V1["greencloud-vps (GreenCloud VPS)\nDebian 12\nPublic 173.249.194.15\nTailnet 100.73.93.84"]
     V2["vps-ovhcloud\nOVH VPS\nPublic 51.79.55.113\nTailnet 100.67.25.118"]
     PC["Clopeux-Desktop\nWindows\nTailnet 100.71.101.21"]
+    V3["ovh-panopticam (Prom-King VPS, OVH)\nUbuntu 26.04\nPublic 148.113.255.142\nTailnet 100.114.3.121"]
+    V4["greencloud-panopticam (Prom-King VPS, GreenCloud)\nUbuntu 26.04\nPublic 72.18.214.90\nTailnet 100.105.177.10"]
     Brume2["Brume2 / brumeux\nOpenWrt (GL-MT2500)\nTailnet 100.114.136.28\nResidential egress proxy (tinyproxy :8888)"]
   end
 
@@ -115,6 +117,8 @@ flowchart TB
 | `vps-ovhcloud` | API + DB host + media stack + Comet + debrid | Ubuntu | `100.67.25.118` | `51.79.55.113` | SSH tailnet-only as `ubuntu` with `tube-site-vps`; VaultWares API on `9001` |
 | `Brume2` / `brumeux` | Residential egress proxy for `shared-tube /api/stream` (tinyproxy on `:8888`); see `operations/residential-egress-proxy`. No longer drop-in gateway. | OpenWrt (GL-MT2500) | `100.114.136.28` | (home, residential `74.57.201.206`) | Tailscale-SSH only (no OpenSSH key/password); GL.iNet UI on LAN |
 | `greencloud-vps` | Web/docs/monitor host + webhook receiver + secrets + health-ledger hub | Debian 12 | `100.73.93.84` | `173.249.194.15` | SSH **tailnet-only** (key: `greencloud-vps`), HTTPS public services |
+| `ovh-panopticam` | Prom-King VPS: Panopticam (live until the move to `greencloud-panopticam`, ~end of Oct 2026) | Ubuntu 26.04 | `100.114.3.121` | `148.113.255.142` | Tailscale SSH as `ubuntu`; nginx on the tailnet IP only |
+| `greencloud-panopticam` | Prom-King VPS (GreenCloud, from Sat, 24 Oct 2026, paid to ~late Jan 2027): Panopticam standby, then its host. 4 vCPU EPYC-Milan, 7.7 GB, 60 GB | Ubuntu 26.04 | `100.105.177.10` | `72.18.214.90` (Kansas City, MO) | ufw: only `tailscale0` + `41641/udp`; Tailscale SSH (`ubuntu`, key `tube-site-vps`); public port 22 closed |
 
 ## Services / Services
 
@@ -150,7 +154,7 @@ flowchart TB
 | Tailscale webhook handler | `http://127.0.0.1:8787` | `greencloud-vps` (`vaultwares-hooks`) | `8787` | Tailnet-local only |
 | Comet (debrid manager) | `https://comet.vaultwares.ca` | `vps-ovhcloud` (Docker `comet` via `comet-vpn` on `100.67.25.118:5173`) | `5173` | Tailnet ACL |
 | Uptime Kuma | `https://uptime.vaultwares.ca` | `vps-ovhcloud` (Docker on `0.0.0.0:3001`) | `443` to `3001` | Tailnet ACL + gateway secret |
-| Panopticam (Prom-King, private) | `https://vps-ovhcloud.tail1764b8.ts.net` | `vps-ovhcloud` (nginx to `127.0.0.1:9095`) | `443` to `9095` | Tailnet ACL; cert from `tailscale cert` (`panopticam-cert.timer`) |
+| Panopticam (Prom-King, private) | `https://panopticam.vaultwares.ca` | `greencloud-vps` nginx (tailnet-only, public 403) proxies over TLS to the serving host named in `/etc/nginx/snippets/panopticam-upstream.conf`: `ovh-panopticam` now, `greencloud-panopticam` after the move; there nginx `443` to `127.0.0.1:9095` | `443` to `9095` | Let's Encrypt on greencloud (webroot); hosts keep their own `tailscale cert` names |
 | Decypharr (debrid blackhole) | `https://decypharr.vaultwares.ca` | `vps-ovhcloud` (Docker on `127.0.0.1:8282`) | `443` to `8282` | Tailnet ACL |
 | Health Ledger dashboard | `http://127.0.0.1:8790` | `greencloud-vps` | `8790` | Loopback only |
 | Health Ledger heartbeat (GC) | `100.73.93.84:8791` | `greencloud-vps` | `8791` | Tailnet ACL |

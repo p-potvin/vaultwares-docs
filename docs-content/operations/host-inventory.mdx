@@ -219,6 +219,20 @@ entry has been re-checked, the verification date is given inline.
 
 ---
 
+## `greencloud-panopticam` (Prom-King VPS, GreenCloud)
+
+Added Sat, 24 Oct 2026; paid for 3 months (to ~late Jan 2027). Takes over Panopticam from `ovh-panopticam`.
+
+- Ubuntu 26.04.1, 4 vCPU AMD EPYC-Milan, 7.7 GB RAM + 4 GB swap, 60 GB disk. Public `72.18.214.90` (Kansas City, MO,
+  AS32097); tailnet `100.105.177.10`.
+- Access: Tailscale SSH (`RunSSH`) as `ubuntu` (sudo, no password; key `tube-site-vps` also in `authorized_keys`).
+  sshd has `PermitRootLogin no`; ufw denies all incoming except `tailscale0` and `41641/udp`, so public 22 is closed.
+- Panopticam: `/srv/panopticam` (checkout, `.venv` via uv / Python 3.12), data `/var/lib/panopticam`,
+  `/srv/panopticam-datasets`, `/srv/panopticam-harvest`; `panopticam.service` on `127.0.0.1:9095`; nginx on
+  `100.105.177.10:443` for `greencloud-panopticam.tail1764b8.ts.net` (`tailscale cert`, `panopticam-cert.timer`).
+  Until the move it runs as a quiet standby (`/etc/panopticam/panopticam.env`; the full one is `panopticam.env.live`).
+- Some sites refuse this IP (US state blocks); the move brings the Privado WireGuard egress (gluetun) over.
+
 ## `Clopeux-Desktop` (local workstation)
 
 | Property | Value |
